@@ -9,13 +9,13 @@ class FileStatsHandler(o.SimpleHandler):
         self.rels = 0
 
     def node(self, n):
-        pass self.nodes += 1
+        self.nodes += 1
 
     def way(self, w):
-        pass self.ways += 1
+        self.ways += 1
 
     def relation(self, r):
-        pass self.rels += 1
+        self.rels += 1
 
 
 fd = o.Reader(sys.argv[1])
