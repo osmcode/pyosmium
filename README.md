@@ -10,12 +10,10 @@ to provided the bindings.
 
 ## Installation
 
-To compile the bindings, simply run
+To compile and install the bindings, simply run
 
-    make
+    python setup.py install
 
-There is currently no installation or packaging script because the library
-is still in an alpha state.
 
 ## License
 

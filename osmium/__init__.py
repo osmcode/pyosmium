@@ -1,1 +1,1 @@
-from _osmium import *
+from osmium._osmium import *
