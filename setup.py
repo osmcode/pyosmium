@@ -13,19 +13,21 @@ libdirs.append('/usr/lib/x86_64-linux-gnu/')
 includes.append('../libosmium/include')
 libs.extend(('expat', 'pthread', 'z', 'protobuf-lite', 'osmpbf', 'z', 'bz2'))
 
+extensions = []
 
-osmium = Extension('osmium._osmium',
-           sources = ['lib/osmium.cc'],
+for ext in ('osmium', 'io'):
+    extensions.append(Extension('osmium._%s' % ext,
+           sources = ['lib/%s.cc' % ext],
            include_dirs = includes,
            libraries = libs,
            library_dirs = libdirs,
            extra_compile_args = [ '-std=c++11' ]
-         )
+         ))
 
 setup (name = 'pyosmium',
        version = '0.1',
        description = 'Provides python bindings for libosmium.',
        packages = [ 'osmium' ],
-       ext_modules = [osmium])
+       ext_modules = extensions)
 
 

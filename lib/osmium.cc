@@ -104,9 +104,6 @@ BOOST_PYTHON_MODULE(_osmium)
                       make_function(static_cast<const osmium::RelationMemberList& (osmium::Relation::*)() const>(&osmium::Relation::members),
                       return_value_policy<reference_existing_object>()))
     ;
-    class_<osmium::io::Reader, boost::noncopyable>("Reader", init<std::string>())
-        .def("eof", &osmium::io::Reader::eof)
-    ;
     class_<SimpleHandlerWrap, boost::noncopyable>("SimpleHandler")
         .def("node", &VirtualHandler::node, &SimpleHandlerWrap::default_node)
         .def("way", &VirtualHandler::way, &SimpleHandlerWrap::default_way)

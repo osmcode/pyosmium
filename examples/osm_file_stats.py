@@ -18,7 +18,7 @@ class FileStatsHandler(o.SimpleHandler):
         self.rels += 1
 
 
-fd = o.Reader(sys.argv[1])
+fd = o.io.Reader(sys.argv[1])
 h = FileStatsHandler()
 
 o.apply(fd, h)
