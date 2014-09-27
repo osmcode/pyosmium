@@ -15,7 +15,7 @@ libs.extend(('expat', 'pthread', 'z', 'protobuf-lite', 'osmpbf', 'z', 'bz2'))
 
 extensions = []
 
-for ext in ('osmium', 'io'):
+for ext in ('osmium', 'io', 'osm'):
     extensions.append(Extension('osmium._%s' % ext,
            sources = ['lib/%s.cc' % ext],
            include_dirs = includes,

@@ -18,7 +18,7 @@ class MyHandler(o.SimpleHandler):
             print m.type, m.ref, m.role
 
 
-fd = o.Reader("examples/test.osm")
+fd = o.io.Reader("examples/test.osm", o.osm.osm_entity_bits.NODE)
 h = MyHandler()
 
 o.apply(fd, h)
