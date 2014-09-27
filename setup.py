@@ -1,4 +1,5 @@
 from distutils.core import setup, Extension
+from os import environ
 
 includes = []
 libs = []
@@ -14,14 +15,16 @@ includes.append('../libosmium/include')
 libs.extend(('expat', 'pthread', 'z', 'protobuf-lite', 'osmpbf', 'z', 'bz2'))
 
 extensions = []
+extra_compile_args = [ '-std=c++11' ]
 
-for ext in ('osmium', 'io', 'osm'):
+for ext in ('osmium', 'io', 'osm', 'index', 'geom'):
     extensions.append(Extension('osmium._%s' % ext,
            sources = ['lib/%s.cc' % ext],
            include_dirs = includes,
            libraries = libs,
            library_dirs = libdirs,
-           extra_compile_args = [ '-std=c++11' ]
+           language = 'c++',
+           extra_compile_args = extra_compile_args
          ))
 
 setup (name = 'pyosmium',
