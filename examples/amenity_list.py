@@ -1,5 +1,8 @@
 import osmium as o
 import sys
+import shapely.wkb as wkblib
+
+wkbfab = o.geom.WKBFactory()
 
 class AmenityListHandler(o.SimpleHandler):
 
@@ -14,7 +17,10 @@ class AmenityListHandler(o.SimpleHandler):
 
     def area(self, a):
         if 'amenity' in a.tags:
-            self.print_amenity(a.tags, 0, 0)
+            wkb = wkbfab.create_multipolygon(a)
+            poly = wkblib.loads(wkb)
+            centroid = poly.representative_point()
+            self.print_amenity(a.tags, centroid.x, centroid.y)
 
 
 handler = AmenityListHandler()
