@@ -14,6 +14,6 @@ class NamesHandler(osmium.SimpleHandler):
     def way(self, w):
         self.output_pubs(w.tags)
 
-
-osmium.apply(osmium.io.Reader(sys.argv[1]), NamesHandler())
+h = NamesHandler()
+h.apply_file(sys.argv[1])
 

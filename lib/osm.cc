@@ -109,4 +109,6 @@ BOOST_PYTHON_MODULE(_osm)
                       make_function(static_cast<const osmium::RelationMemberList& (osmium::Relation::*)() const>(&osmium::Relation::members),
                       return_value_policy<reference_existing_object>()))
     ;
+    class_<osmium::Area, bases<osmium::OSMObject>, boost::noncopyable>("Area", no_init)
+    ;
 }

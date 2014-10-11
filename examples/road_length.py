@@ -10,13 +10,7 @@ class RoadLengthHandler(o.SimpleHandler):
         if 'highway' in w.tags:
             self.length += o.geom.haversine_distance(w.nodes)
 
-
-fd = o.io.Reader(sys.argv[1])
 h = RoadLengthHandler()
-
-i = o.index.SparseLocationTable()
-l = o.SparseNodeLocationsForWays(i)
-
-o.apply(fd, l, h)
+h.apply_file(sys.argv[1])
 
 print 'Total way length:', h.length/1000, 'km'

@@ -18,10 +18,8 @@ class FileStatsHandler(o.SimpleHandler):
         self.rels += 1
 
 
-fd = o.io.Reader(sys.argv[1])
 h = FileStatsHandler()
-
-o.apply(fd, h)
+h.apply_file(sys.argv[1])
 
 print "Nodes:", h.nodes
 print "Ways:", h.ways
