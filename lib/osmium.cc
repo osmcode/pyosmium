@@ -8,12 +8,11 @@
 
 #include "generic_handler.hpp"
 
-typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium::Location> sparse_index;
-typedef osmium::handler::NodeLocationsForWays<sparse_index> location_handler_sparse;
-
-void apply_reader_simple(osmium::io::Reader &rd, VirtualHandler &h) {
+template <typename T>
+void apply_reader_simple(osmium::io::Reader &rd, T &h) {
     osmium::apply(rd, h);
 }
+
 
 template <typename T>
 void apply_reader_simple_with_location(osmium::io::Reader &rd,
@@ -22,15 +21,6 @@ void apply_reader_simple_with_location(osmium::io::Reader &rd,
     osmium::apply(rd, l, h);
 }
 
-void process_file_simple(const std::string &filename, VirtualHandler &h) {
-    osmium::io::Reader reader(filename);
-
-    osmium::apply(reader, h);
-}
-
-
-
-#include "osm.cc"
 #include "index.cc"
 
 BOOST_PYTHON_MODULE(_osmium)
@@ -47,8 +37,11 @@ BOOST_PYTHON_MODULE(_osmium)
         .value("AREA", SimpleHandlerWrap::area_handler)
     ;
 
-    class_<osmium::handler::NodeLocationsForWays<sparse_index>, boost::noncopyable>("SparseNodeLocationsForWays", 
-            init<sparse_index&>())
+    class_<osmium::handler::NodeLocationsForWays<SparseLocationTable>, boost::noncopyable>("NodeLocationsForWays", 
+            init<SparseLocationTable&>())
+    ;
+    class_<osmium::handler::NodeLocationsForWays<DenseLocationMapFile>, boost::noncopyable>("NodeLocationsForWays", 
+            init<DenseLocationMapFile&>())
     ;
 
     class_<SimpleHandlerWrap, boost::noncopyable>("SimpleHandler")
@@ -61,6 +54,7 @@ BOOST_PYTHON_MODULE(_osmium)
         .def("apply_file", &SimpleHandlerWrap::apply_file_no_index)
         .def("apply_file", &SimpleHandlerWrap::apply_file_no_handler)
     ;
-    def("apply", &apply_reader_simple);
-    def("apply", &apply_reader_simple_with_location<sparse_index>);
+    def("apply", &apply_reader_simple<VirtualHandler>);
+    def("apply", &apply_reader_simple<osmium::handler::NodeLocationsForWays<DenseLocationMapFile>>);
+    def("apply", &apply_reader_simple_with_location<SparseLocationTable>);
 }

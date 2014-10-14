@@ -11,6 +11,7 @@ BOOST_PYTHON_MODULE(_io)
     class_<osmium::io::Reader, boost::noncopyable>("Reader", init<std::string>())
         .def(init<std::string, osmium::osm_entity_bits::type>())
         .def("eof", &osmium::io::Reader::eof)
+        .def("close", &osmium::io::Reader::close)
     ;
 
 }

@@ -94,7 +94,7 @@ BOOST_PYTHON_MODULE(_osm)
         .def("positive_id", &osmium::OSMObject::positive_id)
     ;
     class_<osmium::Node, bases<osmium::OSMObject>, boost::noncopyable>("Node", no_init)
-        .add_property("location", static_cast<const osmium::Location (osmium::Node::*)() const>(&osmium::Node::location))
+        .add_property("location", static_cast<osmium::Location (osmium::Node::*)() const>(&osmium::Node::location))
     ;
     class_<osmium::Way, bases<osmium::OSMObject>, boost::noncopyable>("Way", no_init)
         .add_property("nodes", 
