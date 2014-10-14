@@ -62,6 +62,7 @@ BOOST_PYTHON_MODULE(_osm)
         .add_property("lon", &osmium::NodeRef::lon)
         .add_property("lat", &osmium::NodeRef::lat)
         .add_property("ref", &osmium::NodeRef::ref)
+        .add_property("location", static_cast<osmium::Location (osmium::NodeRef::*)() const>(&osmium::NodeRef::location))
     ;
     class_<osmium::WayNodeList, boost::noncopyable>("WayNodeList", no_init)
         .def("__len__", &osmium::WayNodeList::size)

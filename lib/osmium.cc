@@ -57,4 +57,5 @@ BOOST_PYTHON_MODULE(_osmium)
     def("apply", &apply_reader_simple<VirtualHandler>);
     def("apply", &apply_reader_simple<osmium::handler::NodeLocationsForWays<DenseLocationMapFile>>);
     def("apply", &apply_reader_simple_with_location<SparseLocationTable>);
+    def("apply", &apply_reader_simple_with_location<DenseLocationMapFile>);
 }
