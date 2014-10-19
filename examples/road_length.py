@@ -11,6 +11,6 @@ class RoadLengthHandler(o.SimpleHandler):
             self.length += o.geom.haversine_distance(w.nodes)
 
 h = RoadLengthHandler()
-h.apply_file(sys.argv[1])
+h.apply_file(sys.argv[1], o.pre_handlers.LOCATION)
 
-print 'Total way length:', h.length/1000, 'km'
+print('Total way length: %.2f km' % (h.length/1000))

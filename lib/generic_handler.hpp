@@ -82,6 +82,7 @@ struct SimpleHandlerWrap: VirtualHandler, wrapper<VirtualHandler> {
     void apply_file_with_location(osmium::io::Reader &r) {
         IDX index;
         osmium::handler::NodeLocationsForWays<IDX> location_handler(index);
+        location_handler.ignore_errors();
         osmium::apply(r, location_handler, *this);
     }
 
@@ -91,6 +92,7 @@ struct SimpleHandlerWrap: VirtualHandler, wrapper<VirtualHandler> {
 
         IDX index;
         osmium::handler::NodeLocationsForWays<IDX> location_handler(index);
+        location_handler.ignore_errors();
 
         osmium::apply(r, location_handler, *this, 
                       collector.handler([this](const osmium::memory::Buffer& area_buffer) {

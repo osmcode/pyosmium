@@ -4,12 +4,19 @@
 #include <osmium/geom/factory.hpp>
 #include <osmium/geom/wkb.hpp>
 
+class WKBFactory : public osmium::geom::WKBFactory<> {
+
+public:
+    WKBFactory()
+    : osmium::geom::WKBFactory<>(osmium::geom::wkb_type::wkb, osmium::geom::out_type::hex)
+    {}
+};
+
 BOOST_PYTHON_MODULE(_geom)
 {
     using namespace boost::python;
     def("haversine_distance", static_cast<double (*)(const osmium::WayNodeList&)>(&osmium::geom::haversine::distance));
 
-    using WKBFactory = osmium::geom::WKBFactory<>;
     class_<WKBFactory>("WKBFactory")
         .add_property("epsg", &WKBFactory::epsg)
         .add_property("proj_string", &WKBFactory::proj_string)

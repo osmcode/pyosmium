@@ -1,5 +1,7 @@
 from distutils.core import setup, Extension
 from os import environ
+from sys import version_info as pyversion
+from ctypes.util import find_library
 
 includes = []
 libs = []
@@ -7,12 +9,28 @@ libdirs = []
 
 ## boost dependencies
 includes.append('/usr/include')
-libs.append('boost_python')
 libdirs.append('/usr/lib/x86_64-linux-gnu/')
+
+# try to find the boost library matching the python version
+suffixes = [ # Debian naming convention for version installed in parallel
+             "-py%d%d" % (pyversion.major, pyversion.minor),
+             # standard naming
+             "",
+             # former naming schema?
+             "-mt"
+           ]
+for suf in suffixes:
+    lib = find_library("boost_python%s" % suf)
+    if lib is not None:
+        libs.append("boost_python%s" % suf)
+        break
+else:
+    raise Exception("Cannot find boost_python library")
 
 ### osmium dependencies
 includes.append('../libosmium/include')
-libs.extend(('expat', 'pthread', 'z', 'protobuf-lite', 'osmpbf', 'z', 'bz2'))
+osmium_libs = ('expat', 'pthread', 'z', 'protobuf-lite', 'osmpbf', 'bz2')
+libs.extend(osmium_libs)
 
 extensions = []
 extra_compile_args = [ '-std=c++11' ]

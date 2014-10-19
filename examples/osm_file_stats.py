@@ -21,6 +21,6 @@ class FileStatsHandler(o.SimpleHandler):
 h = FileStatsHandler()
 h.apply_file(sys.argv[1])
 
-print "Nodes:", h.nodes
-print "Ways:", h.ways
-print "Relations:", h.rels
+print("Nodes: %d" % h.nodes)
+print("Ways: %d" % h.ways)
+print("Relations: %d" % h.rels)

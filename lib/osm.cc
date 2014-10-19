@@ -45,6 +45,7 @@ BOOST_PYTHON_MODULE(_osm)
         .add_property("y", &osmium::Location::y)
         .add_property("lon", &osmium::Location::lon)
         .add_property("lat", &osmium::Location::lat)
+        .def("valid", &osmium::Location::valid)
     ;
     class_<osmium::Tag, boost::noncopyable>("Tag", no_init)
         .add_property("k", &osmium::Tag::key)

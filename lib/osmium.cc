@@ -21,11 +21,21 @@ void apply_reader_simple_with_location(osmium::io::Reader &rd,
     osmium::apply(rd, l, h);
 }
 
+PyObject *invalidLocationExceptionType = NULL;
+void translator(osmium::invalid_location const& x) {
+    PyErr_SetString(invalidLocationExceptionType, "Invalid location");
+}
+
 #include "index.cc"
 
 BOOST_PYTHON_MODULE(_osmium)
 {
     using namespace boost::python;
+
+    class_<osmium::invalid_location>invalidLocationExceptionClass("InvalidLocationException", no_init)
+    ;
+    invalidLocationExceptionType = invalidLocationExceptionClass.ptr();
+    register_exception_translator<osmium::invalid_location>(&translator);
 
     enum_<SimpleHandlerWrap::location_index>("index_types")
         .value("SPARSE", SimpleHandlerWrap::sparse_index)

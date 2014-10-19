@@ -2,13 +2,12 @@ import osmium as o
 import sys
 
 if len(sys.argv) != 3:
-    print "Usage: python create_nodecache.py <osm file> <node cache>"
+    print("Usage: python create_nodecache.py <osm file> <node cache>")
     exit()
 
 reader = o.io.Reader(sys.argv[1], o.osm.osm_entity_bits.NODE)
 
 idxfile = open(sys.argv[2], 'a+b')
-print sys.argv[2],idxfile.fileno()
 
 idx = o.index.DenseLocationMapFile(idxfile.fileno())
 lh = o.NodeLocationsForWays(idx)
