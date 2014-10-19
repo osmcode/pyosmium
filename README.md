@@ -1,9 +1,12 @@
 # pyosmium
 
 Provides Python bindings for the [libosmium](https://github.com/osmcode/libosmium) C++
-library, a library for fast and flexible working with OpenStreetMap data.
+library, a library for working with OpenStreetMap data in a fast and flexible
+manner.
 
 ## Depends
+
+Python >= 2.7 is supported (that includes python 3.x).
 
 pyosmium uses [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
 to create the bindings.
@@ -13,6 +16,9 @@ to create the bindings.
 To compile and install the bindings, simply run
 
     python setup.py install
+
+libosmium is expected to reside in the same directory as pyosmium or to be
+installed globally.
 
 ## Examples
 
