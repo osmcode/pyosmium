@@ -14,6 +14,19 @@ To compile and install the bindings, simply run
 
     python setup.py install
 
+## Examples
+
+The example/ directory contains small examples on how to use the library.
+They are for most parts ports of the examples in libosmium and osmium/contrib.
+
+## Testing
+
+There is a small test suite in the test directory. This provides regression
+test for the python bindings, it is not meant to be a test suite for libosmium.
+The suit can be run with:
+
+    cd test
+    python run_tests.py
 
 ## License
 
