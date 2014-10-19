@@ -68,9 +68,14 @@ BOOST_PYTHON_MODULE(_osmium)
         .def("changeset", &BaseHandler::changeset, &SimpleHandlerWrap::default_changeset)
         .def("area", &BaseHandler::area, &SimpleHandlerWrap::default_area)
         .def("apply_file", &SimpleHandlerWrap::apply_file,
-              ("filename", arg("locations")=false, arg("idx")=BaseHandler::sparse_index))
-        //.def("apply_file", &SimpleHandlerWrap::apply_file_no_index)
-        //.def("apply_file", &SimpleHandlerWrap::apply_file_no_handler)
+              ("filename", arg("locations")=false, arg("idx")=BaseHandler::sparse_index),
+             "Apply the handler to the given file. If locations is true, then\n"
+             "a location handler will be applied before, which saves the node\n"
+             "positions. In that case, the type of this position index can be\n"
+             "further selected in idx. If an area callback is implemented, then\n"
+             "the file will be scanned twice and a location handler and a\n"
+             "handler for assembling multipolygones and areas from ways will\n"
+             "be executed.")
     ;
     def("apply", &apply_reader_simple<BaseHandler>);
     def("apply", &apply_reader_simple<osmium::handler::NodeLocationsForWays<DenseLocationMapFile>>);
