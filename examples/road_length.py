@@ -8,7 +8,10 @@ class RoadLengthHandler(o.SimpleHandler):
 
     def way(self, w):
         if 'highway' in w.tags:
-            self.length += o.geom.haversine_distance(w.nodes)
+            try:
+                self.length += o.geom.haversine_distance(w.nodes)
+            except o.InvalidLocationError:
+                print("WARNING: way %d incomplete. Ignoring." % w.id)
 
 h = RoadLengthHandler()
 h.apply_file(sys.argv[1], o.pre_handlers.LOCATION)
