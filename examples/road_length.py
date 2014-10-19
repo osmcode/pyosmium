@@ -14,6 +14,6 @@ class RoadLengthHandler(o.SimpleHandler):
                 print("WARNING: way %d incomplete. Ignoring." % w.id)
 
 h = RoadLengthHandler()
-h.apply_file(sys.argv[1], o.pre_handlers.LOCATION)
+h.apply_file(sys.argv[1], locations=True)
 
 print('Total way length: %.2f km' % (h.length/1000))

@@ -17,7 +17,7 @@ void apply_reader_simple(osmium::io::Reader &rd, T &h) {
 template <typename T>
 void apply_reader_simple_with_location(osmium::io::Reader &rd,
                          osmium::handler::NodeLocationsForWays<T> &l,
-                         VirtualHandler &h) {
+                         BaseHandler &h) {
     osmium::apply(rd, l, h);
 }
 
@@ -50,14 +50,8 @@ BOOST_PYTHON_MODULE(_osmium)
     invalidLocationExceptionType = createExceptionClass("InvalidLocationError", PyExc_RuntimeError);
     register_exception_translator<osmium::invalid_location>(&translator);
 
-    enum_<SimpleHandlerWrap::location_index>("index_types")
-        .value("SPARSE", SimpleHandlerWrap::sparse_index)
-    ;
-
-    enum_<SimpleHandlerWrap::pre_handler>("pre_handlers")
-        .value("NONE", SimpleHandlerWrap::no_handler)
-        .value("LOCATION", SimpleHandlerWrap::location_handler)
-        .value("AREA", SimpleHandlerWrap::area_handler)
+    enum_<BaseHandler::location_index>("index_types")
+        .value("SPARSE", BaseHandler::sparse_index)
     ;
 
     class_<osmium::handler::NodeLocationsForWays<SparseLocationTable>, boost::noncopyable>("NodeLocationsForWays", 
@@ -68,16 +62,17 @@ BOOST_PYTHON_MODULE(_osmium)
     ;
 
     class_<SimpleHandlerWrap, boost::noncopyable>("SimpleHandler")
-        .def("node", &VirtualHandler::node, &SimpleHandlerWrap::default_node)
-        .def("way", &VirtualHandler::way, &SimpleHandlerWrap::default_way)
-        .def("relation", &VirtualHandler::relation, &SimpleHandlerWrap::default_relation)
-        .def("changeset", &VirtualHandler::changeset, &SimpleHandlerWrap::default_changeset)
-        .def("area", &VirtualHandler::area, &SimpleHandlerWrap::default_area)
-        .def("apply_file", &SimpleHandlerWrap::apply_file)
-        .def("apply_file", &SimpleHandlerWrap::apply_file_no_index)
-        .def("apply_file", &SimpleHandlerWrap::apply_file_no_handler)
+        .def("node", &BaseHandler::node, &SimpleHandlerWrap::default_node)
+        .def("way", &BaseHandler::way, &SimpleHandlerWrap::default_way)
+        .def("relation", &BaseHandler::relation, &SimpleHandlerWrap::default_relation)
+        .def("changeset", &BaseHandler::changeset, &SimpleHandlerWrap::default_changeset)
+        .def("area", &BaseHandler::area, &SimpleHandlerWrap::default_area)
+        .def("apply_file", &SimpleHandlerWrap::apply_file,
+              ("filename", arg("locations")=false, arg("idx")=BaseHandler::sparse_index))
+        //.def("apply_file", &SimpleHandlerWrap::apply_file_no_index)
+        //.def("apply_file", &SimpleHandlerWrap::apply_file_no_handler)
     ;
-    def("apply", &apply_reader_simple<VirtualHandler>);
+    def("apply", &apply_reader_simple<BaseHandler>);
     def("apply", &apply_reader_simple<osmium::handler::NodeLocationsForWays<DenseLocationMapFile>>);
     def("apply", &apply_reader_simple_with_location<SparseLocationTable>);
     def("apply", &apply_reader_simple_with_location<DenseLocationMapFile>);

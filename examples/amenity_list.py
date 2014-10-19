@@ -24,4 +24,4 @@ class AmenityListHandler(o.SimpleHandler):
 
 handler = AmenityListHandler()
 
-handler.apply_file(sys.argv[1], o.pre_handlers.AREA)
+handler.apply_file(sys.argv[1])
