@@ -41,6 +41,7 @@ BOOST_PYTHON_MODULE(_osm)
         .def("__str__", &osmium::Timestamp::to_iso)
     ;
     class_<osmium::Location>("Location")
+        .def(init<double, double>())
         .add_property("x", &osmium::Location::x)
         .add_property("y", &osmium::Location::y)
         .add_property("lon", &osmium::Location::lon)

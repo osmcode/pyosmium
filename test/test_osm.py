@@ -6,6 +6,18 @@ from test_helper import create_osm_file, osmobj, HandlerTestBase
 
 import osmium as o
 
+class TestLocation(unittest.TestCase):
+
+    def test_invalid_location(self):
+        loc = o.osm.Location()
+        assert_false(loc.valid())
+
+    def test_valid_location(self):
+        loc = o.osm.Location(1,10)
+        assert_equals(loc.lon, 1, 0.0001)
+        assert_equals(loc.lat, 10, 0.00001)
+        assert_equals(loc.x, 10000000)
+        assert_equals(loc.y, 100000000)
 
 class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, version=5, changeset=58674, uid=42,
