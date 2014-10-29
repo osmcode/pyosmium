@@ -36,7 +36,7 @@ The suit can be run with:
 
 ## License
 
-pyosmium is available under a BSD license.
+Pyosmium is available under the BSD 2-Clause License. See LICENSE.TXT.
 
 ## Authors
 
