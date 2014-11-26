@@ -1,5 +1,5 @@
-from osmium._osmium import *
-import osmium._io as io
-import osmium._osm as osm
-import osmium._index as index
-import osmium._geom as geom
+from ._osmium import *
+from . import _io as io
+from . import _osm as osm
+from . import _index as index
+from . import _geom as geom
