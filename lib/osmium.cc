@@ -22,8 +22,14 @@ void apply_reader_simple_with_location(osmium::io::Reader &rd,
 }
 
 PyObject *invalidLocationExceptionType = NULL;
-void translator(osmium::invalid_location const& x) {
+PyObject *notFoundExceptionType = NULL;
+
+void translator1(osmium::invalid_location const& x) {
     PyErr_SetString(invalidLocationExceptionType, "Invalid location");
+}
+
+void translator2(osmium::not_found const& x) {
+    PyErr_SetString(notFoundExceptionType, "Element not found in index");
 }
 
 PyObject* createExceptionClass(const char* name, PyObject* baseTypeObj = PyExc_Exception)
@@ -48,7 +54,10 @@ BOOST_PYTHON_MODULE(_osmium)
     using namespace boost::python;
 
     invalidLocationExceptionType = createExceptionClass("InvalidLocationError", PyExc_RuntimeError);
-    register_exception_translator<osmium::invalid_location>(&translator);
+    register_exception_translator<osmium::invalid_location>(&translator1);
+
+    notFoundExceptionType = createExceptionClass("NotFoundError", PyExc_KeyError);
+    register_exception_translator<osmium::not_found>(&translator2);
 
     enum_<BaseHandler::location_index>("index_types")
         .value("SPARSE", BaseHandler::sparse_index)

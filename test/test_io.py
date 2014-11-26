@@ -48,6 +48,17 @@ class TestReaderFromFile(unittest.TestCase):
             os.remove(fn)
 
 
+class TestFileHeader(unittest.TestCase):
+
+    def test_file_header(self):
+        fn = create_osm_file([osmobj('N', id=1)])
+        try:
+            rd = o.io.Reader(fn)
+            h = rd.header()
+            assert_false(h.has_multiple_object_versions)
+            rd.close()
+        finally:
+            os.remove(fn)
 
 if __name__ == '__main__':
     unittest.main()

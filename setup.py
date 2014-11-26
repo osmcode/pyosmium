@@ -33,7 +33,7 @@ osmium_libs = ('expat', 'pthread', 'z', 'protobuf-lite', 'osmpbf', 'bz2')
 libs.extend(osmium_libs)
 
 extensions = []
-extra_compile_args = [ '-std=c++11' ]
+extra_compile_args = [ '-std=c++11', '-D_LARGEFILE_SOURCE', '-D_FILE_OFFSET_BITS=64' ]
 
 for ext in ('osmium', 'io', 'osm', 'index', 'geom'):
     extensions.append(Extension('osmium._%s' % ext,
