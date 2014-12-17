@@ -1,6 +1,6 @@
 from distutils.core import setup, Extension
 from os import environ
-from sys import version_info as pyversion
+from sys import version_info as pyversion, platform as osplatform
 from ctypes.util import find_library
 
 includes = []
@@ -9,7 +9,8 @@ libdirs = []
 
 ## boost dependencies
 includes.append('/usr/include')
-libdirs.append('/usr/lib/x86_64-linux-gnu/')
+if osplatform in ["linux", "linux2"]:
+    libdirs.append('/usr/lib/x86_64-linux-gnu/')
 
 # try to find the boost library matching the python version
 suffixes = [ # Debian naming convention for version installed in parallel
