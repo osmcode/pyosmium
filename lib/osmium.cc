@@ -1,7 +1,7 @@
 #include <boost/python.hpp>
 
 #include <osmium/visitor.hpp>
-#include <osmium/index/map/sparse_table.hpp>
+#include <osmium/index/map/all.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/area/assembler.hpp>
@@ -59,15 +59,9 @@ BOOST_PYTHON_MODULE(_osmium)
     notFoundExceptionType = createExceptionClass("NotFoundError", PyExc_KeyError);
     register_exception_translator<osmium::not_found>(&translator2);
 
-    enum_<BaseHandler::location_index>("index_types")
-        .value("SPARSE", BaseHandler::sparse_index)
-    ;
-
-    class_<osmium::handler::NodeLocationsForWays<SparseLocationTable>, boost::noncopyable>("NodeLocationsForWays", 
-            init<SparseLocationTable&>())
-    ;
-    class_<osmium::handler::NodeLocationsForWays<DenseLocationMapFile>, boost::noncopyable>("NodeLocationsForWays", 
-            init<DenseLocationMapFile&>())
+    class_<osmium::handler::NodeLocationsForWays<LocationTable>, boost::noncopyable>("NodeLocationsForWays", 
+            init<LocationTable&>())
+        .def("ignore_errors", &osmium::handler::NodeLocationsForWays<LocationTable>::ignore_errors)
     ;
 
     class_<SimpleHandlerWrap, boost::noncopyable>("SimpleHandler")
@@ -77,7 +71,7 @@ BOOST_PYTHON_MODULE(_osmium)
         .def("changeset", &BaseHandler::changeset, &SimpleHandlerWrap::default_changeset)
         .def("area", &BaseHandler::area, &SimpleHandlerWrap::default_area)
         .def("apply_file", &SimpleHandlerWrap::apply_file,
-              ("filename", arg("locations")=false, arg("idx")=BaseHandler::sparse_index),
+              ("filename", arg("locations")=false, arg("idx")="sparse_mem_array"),
              "Apply the handler to the given file. If locations is true, then\n"
              "a location handler will be applied before, which saves the node\n"
              "positions. In that case, the type of this position index can be\n"
@@ -87,7 +81,6 @@ BOOST_PYTHON_MODULE(_osmium)
              "be executed.")
     ;
     def("apply", &apply_reader_simple<BaseHandler>);
-    def("apply", &apply_reader_simple<osmium::handler::NodeLocationsForWays<DenseLocationMapFile>>);
-    def("apply", &apply_reader_simple_with_location<SparseLocationTable>);
-    def("apply", &apply_reader_simple_with_location<DenseLocationMapFile>);
+    def("apply", &apply_reader_simple<osmium::handler::NodeLocationsForWays<LocationTable>>);
+    def("apply", &apply_reader_simple_with_location<LocationTable>);
 }

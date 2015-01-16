@@ -1,8 +1,9 @@
 #include <osmium/handler.hpp>
+#include <osmium/index/map/all.hpp>
 
 using namespace boost::python;
 
-typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium::Location> sparse_index_type;
+typedef osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location> index_type;
 
 class BaseHandler : public osmium::handler::Handler {
 
@@ -13,13 +14,7 @@ protected:
         area_handler
     };
 
-
 public:
-    enum location_index {
-        sparse_index
-    };
-
-
 // handler functions
 virtual void node(const osmium::Node&) const = 0;
 virtual void way(const osmium::Way&) const = 0;
@@ -29,20 +24,20 @@ virtual void area(const osmium::Area&) const = 0;
 
 
 private:
-template <typename IDX>
-void apply_with_location(osmium::io::Reader &r) {
-    IDX index;
-    osmium::handler::NodeLocationsForWays<IDX> location_handler(index);
+void apply_with_location(osmium::io::Reader &r, const std::string &idx) {
+    const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
+    std::unique_ptr<index_type> index = map_factory.create_map(idx);
+    osmium::handler::NodeLocationsForWays<index_type> location_handler(*index);
     location_handler.ignore_errors();
     osmium::apply(r, location_handler, *this);
 }
 
-template <typename IDX>
 void apply_with_area(osmium::io::Reader &r,
-                     osmium::area::MultipolygonCollector<osmium::area::Assembler> &collector) {
-
-    IDX index;
-    osmium::handler::NodeLocationsForWays<IDX> location_handler(index);
+                     osmium::area::MultipolygonCollector<osmium::area::Assembler> &collector,
+                     const std::string &idx) {
+    const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
+    std::unique_ptr<index_type> index = map_factory.create_map(idx);
+    osmium::handler::NodeLocationsForWays<index_type> location_handler(*index);
     location_handler.ignore_errors();
 
     osmium::apply(r, location_handler, *this,
@@ -56,7 +51,7 @@ void apply_with_area(osmium::io::Reader &r,
 protected:
 void apply(const std::string &filename, osmium::osm_entity_bits::type types,
            pre_handler pre = no_handler,
-           location_index idx = sparse_index) {
+           const std::string &idx = "sparse_mem_array") {
 
     switch (pre) {
     case no_handler:
@@ -69,11 +64,7 @@ void apply(const std::string &filename, osmium::osm_entity_bits::type types,
     case location_handler:
         {
             osmium::io::Reader reader(filename, types);
-            switch (idx) {
-                case sparse_index:
-                    apply_with_location<sparse_index_type>(reader);
-                    break;
-            }
+            apply_with_location(reader, idx);
             reader.close();
             break;
         }
@@ -87,12 +78,7 @@ void apply(const std::string &filename, osmium::osm_entity_bits::type types,
             reader1.close();
 
             osmium::io::Reader reader2(filename);
-
-            switch (idx) {
-                case sparse_index:
-                    apply_with_area<sparse_index_type>(reader2, collector);
-                    break;
-            }
+            apply_with_area(reader2, collector, idx);
             reader2.close();
             break;
         }
@@ -147,7 +133,7 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
     }
 
     void apply_file(const std::string &filename, bool locations = false,
-                    location_index idx = sparse_index)
+                    const std::string &idx = "sparse_mem_array")
     {
         osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nothing;
         BaseHandler::pre_handler handler = locations?

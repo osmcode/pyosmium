@@ -19,10 +19,9 @@ if len(sys.argv) != 3:
 
 reader = o.io.Reader(sys.argv[1], o.osm.osm_entity_bits.WAY)
 
-idxfile = open(sys.argv[2], 'a+b')
-
-idx = o.index.DenseLocationMapFile(idxfile.fileno())
+idx = o.index.create_map("sparse_file_array," + sys.argv[2])
 lh = o.NodeLocationsForWays(idx)
+lh.ignore_errors()
 
 o.apply(reader, lh, WayHandler(idx))
 

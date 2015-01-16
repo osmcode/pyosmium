@@ -1,34 +1,33 @@
 #include <boost/python.hpp>
 
 #include <osmium/osm.hpp>
-#include <osmium/index/map/sparse_table.hpp>
-#include <osmium/index/map/mmap_vector_anon.hpp>
-#include <osmium/index/map/mmap_vector_file.hpp>
+#include <osmium/index/map/all.hpp>
 
 using namespace boost::python;
 
-typedef osmium::index::map::SparseTable<osmium::unsigned_object_id_type, osmium::Location> SparseLocationTable;
-typedef osmium::index::map::DenseMapFile<osmium::unsigned_object_id_type, osmium::Location> DenseLocationMapFile;
+typedef osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location> LocationTable;
 
+LocationTable *create_map(const std::string& config_string) {
+    const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
+    return map_factory.create_map(config_string).release();
+}
+
+std::vector<std::string> map_types() {
+    const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
+    return map_factory.map_types();
+}
 
 BOOST_PYTHON_MODULE(_index)
 {
-
-    class_<SparseLocationTable, boost::noncopyable>("SparseLocationTable")
-        .def("set", &SparseLocationTable::set)
-        .def("get", &SparseLocationTable::get)
-        .def("size", &SparseLocationTable::size)
-        .def("used_memory", &SparseLocationTable::used_memory)
-        .def("clear", &SparseLocationTable::clear)
+    class_<LocationTable, boost::noncopyable>("LocationTable", no_init)
+        .def("set", &LocationTable::set)
+        .def("get", &LocationTable::get)
+        .def("size", &LocationTable::size)
+        .def("used_memory", &LocationTable::used_memory)
+        .def("clear", &LocationTable::clear)
     ;
 
-    class_<DenseLocationMapFile, boost::noncopyable>("DenseLocationMapFile", 
-           init<int>())
-        .def("set", &DenseLocationMapFile::set)
-        .def("get", &DenseLocationMapFile::get)
-        .def("size", &DenseLocationMapFile::size)
-        .def("used_memory", &DenseLocationMapFile::used_memory)
-        .def("clear", &DenseLocationMapFile::clear)
-    ;
+    def("create_map", &create_map, return_value_policy<manage_new_object>());
+    def("map_types", &map_types);
 }
 
