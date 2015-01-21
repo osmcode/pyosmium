@@ -15,6 +15,8 @@ if osplatform in ["linux", "linux2"]:
 # try to find the boost library matching the python version
 suffixes = [ # Debian naming convention for version installed in parallel
              "-py%d%d" % (pyversion.major, pyversion.minor),
+             # standard suffix for Python3
+             "%d" % (pyversion.major),
              # standard naming
              "",
              # former naming schema?
