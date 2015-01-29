@@ -9,11 +9,15 @@ manner.
 Python >= 2.7 is supported (that includes python 3.x).
 
 pyosmium uses [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
-to create the bindings.
+to create the bindings. On Debian/Ubuntu install `libboost-python-dev`.
 
 ## Installation
 
-To compile and install the bindings, simply run
+To compile the bindings, run
+
+    python setup.py build
+
+To compile and install the bindings, run
 
     python setup.py install
 
@@ -22,14 +26,18 @@ installed globally.
 
 ## Examples
 
-The example/ directory contains small examples on how to use the library.
-They are for most parts ports of the examples in libosmium and osmium/contrib.
+The `example` directory contains small examples on how to use the library.
+They are for most parts ports of the examples in Libosmium and osmium-contrib.
 
 ## Testing
 
 There is a small test suite in the test directory. This provides regression
 test for the python bindings, it is not meant to be a test suite for libosmium.
-The suit can be run with:
+
+You'll need the Python `nose` module. On Debian/Ubuntu install the package
+`python-nose`.
+
+The suite can be run with:
 
     cd test
     python run_tests.py
@@ -41,3 +49,4 @@ Pyosmium is available under the BSD 2-Clause License. See LICENSE.TXT.
 ## Authors
 
 Sarah Hoffmann (lonvia@denofr.de)
+
