@@ -1,0 +1,42 @@
+language: cpp
+
+compiler:
+ - gcc
+ - clang
+
+env:
+ - USE_PYTHON_VERSION=2.7
+ - USE_PYTHON_VERSION=3.4
+
+before_install:
+ # we need at least g++-4.8 for c++11 features
+ - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+ - sudo apt-get update --yes --quiet
+
+install:
+ # upgrade compilers
+ - sudo apt-get install --yes gcc-4.8 g++-4.8
+ # make sure 'cpp' is the just installed current one
+ - sudo rm /usr/bin/cpp
+ - sudo ln -s /usr/bin/cpp-4.8 /usr/bin/cpp
+ # upgrade libosmium dependencies
+ - sudo apt-get install --yes make libboost-dev libboost-python-dev libprotobuf-dev protobuf-compiler
+ - cd ..
+ - git clone https://github.com/osmcode/libosmium.git
+ # OSMPBF is too old, install from git
+ #- sudo apt-get install --yes libosmpbf-dev
+ - git clone https://github.com/scrosby/OSM-binary.git
+ - cd OSM-binary/src
+ - make
+ - sudo make install
+
+#before_script:
+# - true
+
+script:
+ - cd $TRAVIS_BUILD_DIR
+ - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; fi;
+ - python${USE_PYTHON_VERSION} setup.py build
+ - cd test
+ - python${USE_PYTHON_VERSION} run_tests.py
+
