@@ -5,8 +5,8 @@ compiler:
  - clang
 
 env:
- - USE_PYTHON_VERSION=2.7
- - USE_PYTHON_VERSION=3.4
+ - USE_PYTHON_VERSION=2
+ - USE_PYTHON_VERSION=3
 
 before_install:
  # we need at least g++-4.8 for c++11 features
@@ -19,8 +19,8 @@ install:
  # make sure 'cpp' is the just installed current one
  - sudo rm /usr/bin/cpp
  - sudo ln -s /usr/bin/cpp-4.8 /usr/bin/cpp
- # upgrade libosmium dependencies
- - sudo apt-get install --yes make libboost-dev libboost-python-dev libprotobuf-dev protobuf-compiler
+ # innstall dependencies
+ - sudo apt-get install --yes make libboost-dev libboost-python-dev libprotobuf-dev protobuf-compiler libsparsehash-dev python-nose
  - cd ..
  - git clone https://github.com/osmcode/libosmium.git
  # OSMPBF is too old, install from git
