@@ -36,6 +36,7 @@ install:
 script:
  - cd $TRAVIS_BUILD_DIR
  - if [ "${CXX}" = 'g++' ]; then export CXX=g++-4.8; fi;
+ - if [ "${CC}" = 'gcc' ]; then export CC=gcc-4.8; fi;
  - python${USE_PYTHON_VERSION} setup.py build
  - cd test
  - python${USE_PYTHON_VERSION} run_tests.py
