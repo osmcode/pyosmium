@@ -4,6 +4,8 @@ Provides Python bindings for the [libosmium](https://github.com/osmcode/libosmiu
 library, a library for working with OpenStreetMap data in a fast and flexible
 manner.
 
+[![Build Status](https://secure.travis-ci.org/osmcode/pyosmium.png)](http://travis-ci.org/osmcode/pyosmium)
+
 ## Depends
 
 Python >= 2.7 is supported (that includes python 3.x).
