@@ -26,6 +26,7 @@ inline const char member_item_type(osmium::RelationMember& obj)
 BOOST_PYTHON_MODULE(_osm)
 {
     using namespace boost::python;
+    docstring_options doc_options(true, true, false);
 
     enum_<osmium::osm_entity_bits::type>("osm_entity_bits")
         .value("NOTHING", osmium::osm_entity_bits::nothing)
@@ -82,21 +83,28 @@ BOOST_PYTHON_MODULE(_osm)
     ;
     class_<osmium::Changeset, boost::noncopyable>("Changeset", no_init)
     ;
-    class_<osmium::OSMObject, boost::noncopyable>("OSMObject", no_init)
+    class_<osmium::OSMObject, boost::noncopyable>("OSMObject",
+            "This is the base class for all OSM entity classes below and contains "
+            "all common attributes.",
+            no_init)
         .add_property("id", &osmium::OSMObject::id)
         .add_property("deleted", &osmium::OSMObject::deleted)
         .add_property("visible", &osmium::OSMObject::visible)
         .add_property("version", &osmium::OSMObject::version)
         .add_property("changeset", &osmium::OSMObject::changeset)
         .add_property("uid", &osmium::OSMObject::uid)
-        .def("user_is_anonymous", &osmium::OSMObject::user_is_anonymous)
         .add_property("timestamp", &osmium::OSMObject::timestamp)
         .add_property("user", &osmium::OSMObject::user)
         .add_property("tags", make_function(&osmium::OSMObject::tags,
                        return_value_policy<reference_existing_object>()))
-        .def("positive_id", &osmium::OSMObject::positive_id)
+        .def("positive_id", &osmium::OSMObject::positive_id,
+             arg("self"),
+             "Get the absolute value of the id of this object.")
+        .def("user_is_anonymous", &osmium::OSMObject::user_is_anonymous)
     ;
-    class_<osmium::Node, bases<osmium::OSMObject>, boost::noncopyable>("Node", no_init)
+    class_<osmium::Node, bases<osmium::OSMObject>, boost::noncopyable>("Node",
+            "Represents a single OSM node. It inherits from OSMObjects and "
+            "adds a single attribute: the location.", no_init)
         .add_property("location", static_cast<osmium::Location (osmium::Node::*)() const>(&osmium::Node::location))
     ;
     class_<osmium::Way, bases<osmium::OSMObject>, boost::noncopyable>("Way", no_init)
