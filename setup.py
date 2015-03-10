@@ -38,8 +38,18 @@ libs.extend(osmium_libs)
 extensions = []
 extra_compile_args = [ '-std=c++11', '-D_LARGEFILE_SOURCE', '-D_FILE_OFFSET_BITS=64' ]
 
-for ext in ('osmium', 'io', 'osm', 'index', 'geom'):
-    extensions.append(Extension('osmium._%s' % ext,
+extensions.append(Extension('osmium._osmium',
+       sources = ['lib/osmium.cc'],
+       include_dirs = includes,
+       libraries = libs,
+       library_dirs = libdirs,
+       language = 'c++',
+       extra_compile_args = extra_compile_args
+     ))
+packages = ['osmium']
+
+for ext in ('io', 'osm', 'index', 'geom'):
+    extensions.append(Extension('osmium.%s._%s' % (ext, ext),
            sources = ['lib/%s.cc' % ext],
            include_dirs = includes,
            libraries = libs,
@@ -47,11 +57,13 @@ for ext in ('osmium', 'io', 'osm', 'index', 'geom'):
            language = 'c++',
            extra_compile_args = extra_compile_args
          ))
+    packages.append('osmium.%s' % ext)
+
 
 setup (name = 'pyosmium',
        version = '0.1',
        description = 'Provides python bindings for libosmium.',
-       packages = [ 'osmium' ],
+       packages = packages,
        ext_modules = extensions)
 
 
