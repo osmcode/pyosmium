@@ -93,7 +93,7 @@ BOOST_PYTHON_MODULE(_osm)
                       "(read-only) Node coordinates as a :py:class:`osmium.osm.Location` object.")
     ;
     class_<osmium::WayNodeList, boost::noncopyable>("WayNodeList",
-        "A sequence of node references py:class:`osmium.osm.NodeRef`.",
+        "A sequence of node references :py:class:`osmium.osm.NodeRef`.",
         no_init)
         .def("__len__", &osmium::WayNodeList::size)
         .def("__getitem__", &osmium::WayNodeList::operator[], return_value_policy<reference_existing_object>())

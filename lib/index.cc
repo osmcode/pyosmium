@@ -19,15 +19,33 @@ std::vector<std::string> map_types() {
 
 BOOST_PYTHON_MODULE(_index)
 {
-    class_<LocationTable, boost::noncopyable>("LocationTable", no_init)
-        .def("set", &LocationTable::set)
-        .def("get", &LocationTable::get)
-        .def("size", &LocationTable::size)
-        .def("used_memory", &LocationTable::used_memory)
-        .def("clear", &LocationTable::clear)
+    docstring_options doc_options(true, true, false);
+
+    class_<LocationTable, boost::noncopyable>("LocationTable",
+        "A map from a node ID to a location object. This implementation works "
+        "only with positive node IDs.",
+        no_init)
+        .def("set", &LocationTable::set,
+             (arg("self"), arg("id"), arg("loc")),
+             "Set the location for a given node id.")
+        .def("get", &LocationTable::get,
+             (arg("self"), arg("id")),
+             "Return the location for a given id.")
+        .def("used_memory", &LocationTable::used_memory,
+             arg("self"),
+             "Return the size (in bytes) currently allocated by this location table.")
+        .def("clear", &LocationTable::clear,
+             arg("self"),
+             "Remove all entries from the location table.")
     ;
 
-    def("create_map", &create_map, return_value_policy<manage_new_object>());
-    def("map_types", &map_types);
+    def("create_map", &create_map, return_value_policy<manage_new_object>(),
+        (arg("map_type")),
+        "Create a new location store. The string parameter takes the type "
+        "and, where required, additional arguments separated by comma. For "
+        "example, to create a array cache backed by a file ``foo.store``, "
+        "the map_type should be ``dense_file_array,foo.store``.");
+    def("map_types", &map_types,
+        "Return a list of strings with valid types for the location table.");
 }
 

@@ -14,6 +14,7 @@ a wrapper of the C++ library osmium and profits from its fast implementation.
 
    intro
    reference
+    
 
 * :ref:`genindex`
 * :ref:`search`
