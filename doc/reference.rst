@@ -7,7 +7,7 @@ of the exported classes and interfaces. More details and background
 information can be found in the osmium manual.
 
 ``osm`` - Basic Datatypes
------------------------
+-------------------------
 
 The ``osm`` submodule contains definition of the basic data types used
 throughout the library.
@@ -75,3 +75,6 @@ complex classes.
     :members:
     :undoc-members:
 
+.. autoclass:: osmium.osm.WayNodeList
+    :members:
+    :undoc-members:
