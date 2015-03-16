@@ -63,10 +63,6 @@ complex classes.
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Timestamp
-    :members:
-    :undoc-members:
-
 .. autoclass:: osmium.osm.WayNodeList
     :members:
     :undoc-members:

@@ -1,7 +1,10 @@
+#include <time.h>
 #include <boost/python.hpp>
+#include <datetime.h>
 
 #include <osmium/osm.hpp>
 #include <osmium/osm/entity_bits.hpp>
+
 
 inline const char *get_tag_by_key(osmium::TagList const& obj, const char *value)
 {
@@ -22,11 +25,28 @@ inline const char member_item_type(osmium::RelationMember& obj)
     return item_type_to_char(obj.type());
 }
 
+// Converter for osmium::Timestamp -> datetime.datetime
+struct Timestamp_to_python {
+    static PyObject* convert(osmium::Timestamp const& s) {
+        struct tm tm;
+        time_t sse = s.seconds_since_epoch();
+        gmtime_r(&sse, &tm);
+
+        return boost::python::incref(
+                PyDateTime_FromDateAndTime(tm.tm_year + 1900, tm.tm_mon + 1,
+                                           tm.tm_mday, tm.tm_hour, tm.tm_min,
+                                           tm.tm_sec, 0));
+    }
+};
+
 
 BOOST_PYTHON_MODULE(_osm)
 {
+    PyDateTime_IMPORT;
     using namespace boost::python;
     docstring_options doc_options(true, true, false);
+
+    to_python_converter<osmium::Timestamp, Timestamp_to_python>();
 
     enum_<osmium::osm_entity_bits::type>("osm_entity_bits")
         .value("NOTHING", osmium::osm_entity_bits::nothing)
@@ -37,11 +57,6 @@ BOOST_PYTHON_MODULE(_osm)
         .value("OBJECT", osmium::osm_entity_bits::object)
         .value("CHANGESET", osmium::osm_entity_bits::changeset)
         .value("ALL", osmium::osm_entity_bits::all)
-    ;
-    class_<osmium::Timestamp>("Timestamp",
-        "A date object. The date in ISO format can be obtained from the "
-        "``__str__`` function.")
-        .def("__str__", &osmium::Timestamp::to_iso)
     ;
     class_<osmium::Location>("Location",
         "A geographic coordinate in WGS84 projection. A location doesn't "
@@ -139,7 +154,8 @@ BOOST_PYTHON_MODULE(_osm)
                       "(read-only) Id of the user that created this version "
                       "of the object. Only this ID uniquely identifies users.")
         .add_property("timestamp", &osmium::OSMObject::timestamp,
-                      "(read-only) Date when this version has been created.")
+                      "(read-only) Date when this version has been created, "
+                      "returned as a ``datetime.datetime``.")
         .add_property("user", &osmium::OSMObject::user,
                       "(read-only) Name of the user that created this version. "
                       "Be aware that user names can change, so that the same "

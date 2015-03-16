@@ -1,6 +1,7 @@
 from nose.tools import *
 import unittest
 import os
+from datetime import datetime
 
 from test_helper import create_osm_file, osmobj, HandlerTestBase
 
@@ -32,7 +33,7 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.changeset, 58674)
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
-            assert_equals(str(n.timestamp), '2014-01-31T06:23:35Z')
+            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), True)
 
@@ -50,7 +51,7 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.changeset, 58674)
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
-            assert_equals(str(n.timestamp), '2014-01-31T06:23:35Z')
+            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), True)
 
@@ -68,7 +69,7 @@ class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.changeset, 58674)
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
-            assert_equals(str(n.timestamp), '2014-01-31T06:23:35Z')
+            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), True)
 
