@@ -212,7 +212,21 @@ BOOST_PYTHON_MODULE(_osm)
             "They can either be derived from closed ways or from relations "
             "that represent multipolygons. They also inherit the attributes "
             "of OSMObjects and in addition contain polygon geometries. The "
-            "geometries are not exported to Python at the moment.",
+            "geometries are not exported to Python at the moment. Areas have "
+            "their own unique id space. This is computed as the OSM id times 2 "
+            "and for relations 1 is added,",
             no_init)
+        .def("from_way", &osmium::Area::from_way, args("self"),
+             "Return true if the area was created from a way, false if it was "
+             "created from a relation of multipolygon type.")
+        .def("orig_id", &osmium::Area::orig_id, args("self"),
+             "Compute the original OSM id of this object. Note that this is not "
+             "necessarily unique because the object might be a way or relation "
+             "which have an overlapping id space.")
+        .def("is_multipolygon", &osmium::Area::is_multipolygon, args("self"),
+             "Return true if this area is a true multipolygon, i.e. it consists "
+             "of multiple outer rings.")
+        .def("num_rings", &osmium::Area::num_rings, args("self"),
+             "Return a tuple with the number of outer rings and inner rings.")
     ;
 }

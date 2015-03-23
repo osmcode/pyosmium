@@ -35,7 +35,17 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.user_is_anonymous(), False)
             assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
-            assert_equals(n.positive_id(), True)
+            assert_equals(n.positive_id(), 1)
+
+
+class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
+    data = [osmobj('N', id=-34, version=5, changeset=58674, uid=42,
+                   timestamp='2014-01-31T06:23:35Z', user='anonymous')]
+
+    class Handler(o.SimpleHandler):
+        def node(self, n):
+            assert_equals(n.positive_id(), 34)
+
 
 class TestWayAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('W', id=1, version=5, changeset=58674, uid=42,
@@ -53,7 +63,7 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.user_is_anonymous(), False)
             assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
-            assert_equals(n.positive_id(), True)
+            assert_equals(n.positive_id(), 1)
 
 class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
@@ -71,6 +81,28 @@ class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.user_is_anonymous(), False)
             assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
-            assert_equals(n.positive_id(), True)
+            assert_equals(n.positive_id(), 1)
+
+class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
+    data = [osmobj('W', id=23, version=5, changeset=58674, uid=42,
+                   timestamp='2014-01-31T06:23:35Z', user='anonymous',
+                   nodes = [1,2,3], tags = { "area" : "yes" })]
+
+    class Handler(o.SimpleHandler):
+        def area(self, n):
+            assert_equals(n.id, 46)
+            assert_equals(n.deleted, False)
+            assert_equals(n.visible, True)
+            assert_equals(n.version, 5)
+            assert_equals(n.changeset, 58674)
+            assert_equals(n.uid, 42)
+            assert_equals(n.user_is_anonymous(), False)
+            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
+            assert_equals(n.user, 'anonymous')
+            assert_equals(n.positive_id(), 46)
+            assert_equals(n.orig_id(), 23)
+            assert_equals(n.is_way(), True)
+            assert_equals(n.is_multipolygon(), False)
+            assert_equals(n.num_rings(), (1, 0))
 
 
