@@ -5,6 +5,8 @@
 #include <osmium/osm.hpp>
 #include <osmium/osm/entity_bits.hpp>
 
+#include "std_pair.hpp"
+
 
 inline const char *get_tag_by_key(osmium::TagList const& obj, const char *value)
 {
@@ -47,6 +49,7 @@ BOOST_PYTHON_MODULE(_osm)
     docstring_options doc_options(true, true, false);
 
     to_python_converter<osmium::Timestamp, Timestamp_to_python>();
+    std_pair_to_python_converter<int, int>();
 
     enum_<osmium::osm_entity_bits::type>("osm_entity_bits")
         .value("NOTHING", osmium::osm_entity_bits::nothing)
@@ -135,6 +138,16 @@ BOOST_PYTHON_MODULE(_osm)
            "A changeset description, currently unimplemented.",
            no_init)
     ;
+    class_<osmium::OuterRing, boost::noncopyable>("OuterRing",
+           "A list of NodeRefs representing an outer ring of an area.",
+           no_init)
+        .def("__iter__", iterator<osmium::OuterRing,return_internal_reference<>>())
+    ;
+    class_<osmium::InnerRing, boost::noncopyable>("OuterRing",
+           "A list of NodeRefs representing an inner ring of an area.",
+           no_init)
+        .def("__iter__", iterator<osmium::InnerRing,return_internal_reference<>>())
+    ;
     class_<osmium::OSMObject, boost::noncopyable>("OSMObject",
             "This is the base class for all OSM entity classes below and contains "
             "all common attributes.",
@@ -211,8 +224,7 @@ BOOST_PYTHON_MODULE(_osm)
             "Areas are a special kind of meta-object representing a polygon. "
             "They can either be derived from closed ways or from relations "
             "that represent multipolygons. They also inherit the attributes "
-            "of OSMObjects and in addition contain polygon geometries. The "
-            "geometries are not exported to Python at the moment. Areas have "
+            "of OSMObjects and in addition contain polygon geometries. Areas have "
             "their own unique id space. This is computed as the OSM id times 2 "
             "and for relations 1 is added,",
             no_init)
@@ -228,5 +240,15 @@ BOOST_PYTHON_MODULE(_osm)
              "of multiple outer rings.")
         .def("num_rings", &osmium::Area::num_rings, args("self"),
              "Return a tuple with the number of outer rings and inner rings.")
+        .def("outer_rings", 
+              range<return_internal_reference<> >(
+                &osmium::Area::cbegin<osmium::OuterRing>,
+                &osmium::Area::cend<osmium::OuterRing>),
+             "Return an iterator over all outer rings of the multipolygon.")
+        .def("inner_rings", 
+              range<return_internal_reference<> >(
+                &osmium::Area::cbegin<osmium::InnerRing>,
+                &osmium::Area::cend<osmium::InnerRing>),
+             "Return an iterator over all inner rings of the multipolygon.")
     ;
 }

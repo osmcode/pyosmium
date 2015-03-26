@@ -80,9 +80,7 @@ class HandlerTestBase:
     def test_func(self):
         fn = create_osm_file(self.data)
         try:
-            rd = osmium.io.Reader(fn)
-            osmium.apply(rd, self.Handler())
-            rd.close()
+            self.Handler().apply_file(fn)
         finally:
             os.remove(fn)
 

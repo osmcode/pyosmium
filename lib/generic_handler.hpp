@@ -1,3 +1,6 @@
+#ifndef PYOSMIUM_GENERIC_HANDLER_HPP
+#define PYOSMIUM_GENERIC_HANDLER_HPP
+
 #include <osmium/handler.hpp>
 #include <osmium/index/map/all.hpp>
 
@@ -159,3 +162,5 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
         apply(filename, entities, handler, idx);
     }
 };
+
+#endif
