@@ -77,10 +77,13 @@ def osmobj(kind, **args):
 
 class HandlerTestBase:
 
+    apply_locations = False
+    apply_idx = 'sparse_mem_array'
+
     def test_func(self):
         fn = create_osm_file(self.data)
         try:
-            self.Handler().apply_file(fn)
+            self.Handler().apply_file(fn, self.apply_locations, self.apply_idx)
         finally:
             os.remove(fn)
 

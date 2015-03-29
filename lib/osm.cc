@@ -110,13 +110,6 @@ BOOST_PYTHON_MODULE(_osm)
         .add_property("location", static_cast<osmium::Location (osmium::NodeRef::*)() const>(&osmium::NodeRef::location),
                       "(read-only) Node coordinates as a :py:class:`osmium.osm.Location` object.")
     ;
-    class_<osmium::WayNodeList, boost::noncopyable>("WayNodeList",
-        "A sequence of node references :py:class:`osmium.osm.NodeRef`.",
-        no_init)
-        .def("__len__", &osmium::WayNodeList::size)
-        .def("__getitem__", &osmium::WayNodeList::operator[], return_value_policy<reference_existing_object>())
-        .def("__iter__", iterator<osmium::WayNodeList,return_internal_reference<>>())
-    ;
     class_<osmium::RelationMember, boost::noncopyable>("RelationMember",
         "Member of a relation.",
         no_init)
@@ -129,24 +122,40 @@ BOOST_PYTHON_MODULE(_osm)
                       "If no role is set then the string is empty.")
     ;
     class_<osmium::RelationMemberList, boost::noncopyable>("RelationMemberList",
-           "A sequence of relation members :py:class:`osmium.osm.RelationMember`.",
+           "An immutable  sequence of relation members :py:class:`osmium.osm.RelationMember`.",
            no_init)
         .def("__len__", &osmium::RelationMemberList::size)
         .def("__iter__", iterator<osmium::RelationMemberList,return_internal_reference<>>())
     ;
-    class_<osmium::Changeset, boost::noncopyable>("Changeset",
-           "A changeset description, currently unimplemented.",
+    class_<osmium::NodeRefList, boost::noncopyable>("NodeRefList",
+        "A list of node references, implemented as "
+        "an immutable sequence of :py:class:`osmium.osm.NodeRef`. This class "
+        "is normally not used directly, use one of its subclasses instead.",
+        no_init)
+        .def("__len__", &osmium::NodeRefList::size)
+        .def("__getitem__", &osmium::NodeRefList::operator[], return_value_policy<reference_existing_object>())
+        .def("__iter__", iterator<osmium::NodeRefList,return_internal_reference<>>())
+        .def("is_closed", &osmium::NodeRefList::is_closed, args("self"),
+             "True if the start and end node are the same (synonym for "
+             "``ends_have_same_id``).")
+        .def("ends_have_same_id", &osmium::NodeRefList::ends_have_same_id, args("self"),
+             "True if the start and end node are exactly the same.")
+        .def("ends_have_same_location", &osmium::NodeRefList::ends_have_same_location,
+             args("self"),
+             "True if the start and end node of the way are at the same location. "
+             "Throws an exception if the location of one of the nodes is missing.")
+    ;
+    class_<osmium::WayNodeList, bases<osmium::NodeRefList>, boost::noncopyable>("WayNodeList",
+        "List of nodes in a way. For its members see :py:class:`osmium.osm.NodeRefList`.",
+        no_init)
+    ;
+    class_<osmium::OuterRing, bases<osmium::NodeRefList>, boost::noncopyable>("OuterRing",
+        "List of nodes in an outer ring. For its members see :py:class:`osmium.osm.NodeRefList`.",
            no_init)
     ;
-    class_<osmium::OuterRing, boost::noncopyable>("OuterRing",
-           "A list of NodeRefs representing an outer ring of an area.",
+    class_<osmium::InnerRing, bases<osmium::NodeRefList>, boost::noncopyable>("InnerRing",
+        "List of nodes in an inner ring. For its members see :py:class:`osmium.osm.NodeRefList`.",
            no_init)
-        .def("__iter__", iterator<osmium::OuterRing,return_internal_reference<>>())
-    ;
-    class_<osmium::InnerRing, boost::noncopyable>("OuterRing",
-           "A list of NodeRefs representing an inner ring of an area.",
-           no_init)
-        .def("__iter__", iterator<osmium::InnerRing,return_internal_reference<>>())
     ;
     class_<osmium::OSMObject, boost::noncopyable>("OSMObject",
             "This is the base class for all OSM entity classes below and contains "
@@ -197,7 +206,7 @@ BOOST_PYTHON_MODULE(_osm)
         "Represents a OSM way. It inherits the attributes from OSMObjects and "
         "adds an ordered list of nodes that describes the way.",
         no_init)
-        .add_property("nodes", 
+        .add_property("nodes",
                       make_function(static_cast<const osmium::WayNodeList& (osmium::Way::*)() const>(&osmium::Way::nodes),
                       return_value_policy<reference_existing_object>()),
                       "(read-only) Ordered list of nodes. See :py:class:`osmium.osm.WayNodeList`.")
@@ -208,7 +217,8 @@ BOOST_PYTHON_MODULE(_osm)
              "True if the start and end node are exactly the same.")
         .def("ends_have_same_location", &osmium::Way::ends_have_same_location,
              args("self"),
-             "True if the start and end node of the way are at the same location.")
+             "True if the start and end node of the way are at the same location."
+             "Throws an exception if the location of one of the nodes is missing.")
     ;
     class_<osmium::Relation, bases<osmium::OSMObject>, boost::noncopyable>("Relation",
                  "Represents a OSM relation. It inherits the attributes from OSMObjects "
@@ -250,5 +260,9 @@ BOOST_PYTHON_MODULE(_osm)
                 &osmium::Area::cbegin<osmium::InnerRing>,
                 &osmium::Area::cend<osmium::InnerRing>),
              "Return an iterator over all inner rings of the multipolygon.")
+    ;
+    class_<osmium::Changeset, boost::noncopyable>("Changeset",
+           "A changeset description, currently unimplemented.",
+           no_init)
     ;
 }

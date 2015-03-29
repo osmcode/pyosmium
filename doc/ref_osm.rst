@@ -29,21 +29,46 @@ There are five classes representing the basic OSM entities.
     :members:
     :undoc-members:
 
-OSM Entity Attributes
-^^^^^^^^^^^^^^^^^^^^^
-
-Some of the attributes of the OSM entities are represented with more
-complex classes.
-
 .. autoclass:: osmium.osm.Changeset
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Location
+
+Node Reference Lists
+^^^^^^^^^^^^^^^^^^^^
+
+Line geometries in OSM are simply a sequence of nodes. To simplify processing
+osmium returns such node sequences using a special datatype that contains a
+reference to the node id and also the location geometry. The latter is only
+valid if the node locations have been cached by a location handler.
+
+.. autoclass:: osmium.osm.NodeRef
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.NodeRef
+.. autoclass:: osmium.osm.NodeRefList
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.osm.WayNodeList
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.osm.OuterRing
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.osm.InnerRing
+    :members:
+    :undoc-members:
+
+Other OSM Entity Attributes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some of the attributes of the OSM entities are represented with more
+complex classes.
+
+.. autoclass:: osmium.osm.Location
     :members:
     :undoc-members:
 
@@ -63,6 +88,4 @@ complex classes.
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.WayNodeList
-    :members:
-    :undoc-members:
+

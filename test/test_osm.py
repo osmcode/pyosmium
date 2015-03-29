@@ -48,7 +48,12 @@ class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
 
 
 class TestWayAttributes(HandlerTestBase, unittest.TestCase):
-    data = [osmobj('W', id=1, version=5, changeset=58674, uid=42,
+
+    apply_locations = True
+
+    data = [osmobj('N', id=1, lat=0, lon=0),
+            osmobj('N', id=3, lat=1, lon=1),
+            osmobj('W', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous',
                    nodes = [1,2,3])]
 
@@ -64,6 +69,9 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), 1)
+            assert_false(n.is_closed())
+            assert_false(n.ends_have_same_id())
+            assert_false(n.ends_have_same_location())
 
 class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
@@ -112,6 +120,9 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
             oring = list(n.outer_rings())[0]
             assert_equals(len(list(oring)), 4)
             assert_equals(set((1,2,3)), set([x.ref for x in oring]))
+            assert_true(oring.is_closed())
+            assert_true(oring.ends_have_same_id())
+            assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings())), 0)
 
 
