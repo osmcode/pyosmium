@@ -2,7 +2,7 @@
 -----------------------
 
 The ``index`` submodule provides efficient storage containers for
-preprocessed OMS data.
+preprocessed OSM data.
 
 
 Node Location Storage
