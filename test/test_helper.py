@@ -9,10 +9,19 @@ def _complete_object(o):
     """Takes a hash with an incomplete OSM object description and returns a
        complete one.
     """
-    ret = { 'version' : '1', 'timestamp': "2012-05-01T15:06:20Z",
-            'changeset' : "11470653", 'uid' : "122294", 'user' : "foo",
-            'tags' : {}
-          }
+    if o['type'] == 'C':
+        ret = { 'created_at' : "2005-04-09T19:54:13Z",
+                'num_changes' : 2, 'closed_at' : "2005-04-09T20:54:39Z",
+                'open' : "false", 'min_lon' : -0.1465242,
+                'min_lat' : 51.5288506, 'max_lon' : -0.1464925,
+                'max_lat' : 51.5288620, 'user' : "Steve", 'uid' : "1",
+                'tags' : None
+        }
+    else:
+        ret = { 'version' : '1', 'timestamp': "2012-05-01T15:06:20Z",
+                'changeset' : "11470653", 'uid' : "122294", 'user' : "foo",
+                'tags' : {}
+        }
     ret.update(o)
     if ret['type'] == 'N':
         if 'lat' not in ret:
@@ -45,6 +54,15 @@ def _write_osm_obj(fd, obj):
         for k,v in iter(obj['tags'].items()):
             fd.write(('  <tag k="%s" v="%s"/>\n' % (k, v)).encode('utf-8'))
         fd.write('</relation>\n'.encode('utf-8'))
+    elif obj['type'] == 'C':
+        fd.write(('<changeset id="%(id)d" created_at="%(created_at)s" num_changes="%(num_changes)d" closed_at="%(closed_at)s" open="%(open)s" min_lon="%(min_lon).8f" min_lat="%(min_lat).8f" max_lon="%(max_lon).8f" max_lat="%(max_lat).8f"  user="%(user)s" uid="%(uid)s"' % obj).encode('utf-8'))
+        if obj['tags'] is None:
+            fd.write('/>\n'.encode('utf-8'))
+        else:
+            fd.write('>\n'.encode('utf-8'))
+            for k,v in iter(obj['tags'].items()):
+                fd.write(('  <tag k="%s" v="%s"/>\n' % (k, v)).encode('utf-8'))
+            fd.write('</changeset>\n'.encode('utf-8'))
 
 
 

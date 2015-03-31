@@ -77,6 +77,9 @@ BOOST_PYTHON_MODULE(_osm)
                       "Check that the location is a valid WGS84 coordinate, i.e. "
                       "that it is within the usual bounds.")
     ;
+    class_<osmium::Box>("Box",
+                        "A bounding box around a geographic area.")
+    ;
     class_<osmium::Tag, boost::noncopyable>("Tag",
             "A single OSM tag.",
             no_init)
@@ -184,7 +187,7 @@ BOOST_PYTHON_MODULE(_osm)
                       "user ID may appear with different names and vice versa. ")
         .add_property("tags", make_function(&osmium::OSMObject::tags,
                        return_value_policy<reference_existing_object>()),
-                      "List of tags describing the object. "
+                      "(read-only) List of tags describing the object. "
                       "See :py:class:`osmium.osm.TagList`.")
         .def("positive_id", &osmium::OSMObject::positive_id,
              arg("self"),
@@ -262,7 +265,38 @@ BOOST_PYTHON_MODULE(_osm)
              "Return an iterator over all inner rings of the multipolygon.")
     ;
     class_<osmium::Changeset, boost::noncopyable>("Changeset",
-           "A changeset description, currently unimplemented.",
+           "A changeset description.",
            no_init)
+        .add_property("id", &osmium::Changeset::id,
+                      "(read-only) Unique ID of the changeset.")
+        .add_property("uid", &osmium::Changeset::uid,
+                      "(read-only) User ID of the changeset creator.")
+        .add_property("created_at", &osmium::Changeset::created_at,
+                      "(read-only) Timestamp when the changeset was first opened.")
+        .add_property("closed_at", &osmium::Changeset::closed_at,
+                      "(read-only) Timestamp when the changeset was finalized. May be "
+                      "None when the changeset is still open/")
+        .add_property("open", &osmium::Changeset::open,
+                      "(read-only) True when the changeset is still open.")
+        .add_property("num_changes", &osmium::Changeset::num_changes,
+                      "(read-only) The total number of objects changed in this "
+                      "Changeset.")
+        .add_property("bounds",
+                      make_function(static_cast<const osmium::Box& (osmium::Changeset::*)() const>(&osmium::Changeset::bounds),
+                      return_value_policy<reference_existing_object>()),
+                      "(read-only) The bounding box of the area that was edited.")
+        .add_property("user", &osmium::Changeset::user,
+                      "(read-only) Name of the user that created the changeset. "
+                      "Be aware that user names can change, so that the same "
+                      "user ID may appear with different names and vice versa. ")
+        .add_property("tags", make_function(&osmium::Changeset::tags,
+                       return_value_policy<reference_existing_object>()),
+                      "(read-only) List of tags describing the changeset. "
+                      "See :py:class:`osmium.osm.TagList`.")
+        .def("user_is_anonymous", &osmium::Changeset::user_is_anonymous,
+               arg("self"),
+               "Check if the user anonymous. If true, the uid does not uniquely "
+               "identify a single user but only the group of all anonymous users "
+               "in general.")
     ;
 }

@@ -68,6 +68,10 @@ Other OSM Entity Attributes
 Some of the attributes of the OSM entities are represented with more
 complex classes.
 
+.. autoclass:: osmium.osm.Box
+    :members:
+    :undoc-members:
+
 .. autoclass:: osmium.osm.Location
     :members:
     :undoc-members:

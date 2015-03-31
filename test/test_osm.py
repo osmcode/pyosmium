@@ -125,4 +125,23 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings())), 0)
 
+class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
+    data = [osmobj('C', id=34, created_at="2005-04-09T19:54:13Z",
+                num_changes=2, closed_at="2005-04-09T20:54:39Z",
+                open="false", min_lon=-0.1465242,
+                min_lat=51.5288506, max_lon=-0.1464925,
+                max_lat=51.5288620, user="Steve", uid="1")
+           ]
+
+    class Handler(o.SimpleHandler):
+        def changeset(self,c):
+            assert_equals(34, c.id)
+            assert_equals(1, c.uid)
+            assert_false(c.user_is_anonymous())
+            assert_equals("Steve", c.user)
+            assert_equals(datetime(2005, 4, 9, 19, 54, 13), c.created_at)
+            assert_equals(datetime(2005, 4, 9, 20, 54, 39), c.closed_at)
+            assert_false(c.open)
+            assert_equals(2, c.num_changes)
+            assert_equals(0, len(c.tags))
 
