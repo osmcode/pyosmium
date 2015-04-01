@@ -78,7 +78,39 @@ BOOST_PYTHON_MODULE(_osm)
                       "that it is within the usual bounds.")
     ;
     class_<osmium::Box>("Box",
-                        "A bounding box around a geographic area.")
+        "A bounding box around a geographic area. Such a box consists of two "
+        ":py:class:`osmium.osm.Location`s. Those locations may be invalid in "
+        "which case the box is considered invalid, too.")
+        .def(init<double, double, double, double>())
+        .def(init<osmium::Location, osmium::Location>())
+        .add_property("bottom_left",
+                      make_function(static_cast<osmium::Location& (osmium::Box::*)()>(&osmium::Box::bottom_left),
+                                    return_value_policy<reference_existing_object>()),
+             "(read-only) Bottom-left corner of the bounding box.")
+        .add_property("top_right",
+                      make_function(static_cast<osmium::Location& (osmium::Box::*)()>(&osmium::Box::top_right),
+                                    return_value_policy<reference_existing_object>()),
+             "(read-only) Top-right corner of the bounding box.")
+        .def("extend",
+              make_function(static_cast<osmium::Box& (osmium::Box::*)(const osmium::Location&)>(&osmium::Box::extend),
+                            return_value_policy<reference_existing_object>()),
+             //(arg("self"), arg("location")),
+             "Extend the box to include the given location. If the location "
+             "is invalid the box remains unchanged. If the box is invalid, it "
+             "will contain only the location after the operation.")
+        .def("extend",
+              make_function(static_cast<osmium::Box& (osmium::Box::*)(const osmium::Box&)>(&osmium::Box::extend),
+                            return_value_policy<reference_existing_object>()),
+             //(arg("self"), arg("box")),
+             "Extend the box to include the given box. If the box to be added "
+             "is invalid the input box remains unchanged. If the input box is invalid, it "
+             "will become equal to the box that was added.")
+        .def("valid", &osmium::Box::valid, args("self"),
+             "Check if the box coordinates are defined and with the usual bounds.")
+        .def("size", &osmium::Box::size, args("self"),
+             "Return the size in square degrees.")
+        .def("contains", &osmium::Box::contains, (arg("self"), arg("location")),
+             "Check if the given location is inside the box.")
     ;
     class_<osmium::Tag, boost::noncopyable>("Tag",
             "A single OSM tag.",

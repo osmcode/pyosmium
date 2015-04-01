@@ -144,4 +144,7 @@ class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
             assert_false(c.open)
             assert_equals(2, c.num_changes)
             assert_equals(0, len(c.tags))
-
+            assert_equals(-1464925, c.bounds.top_right.x)
+            assert_equals(515288620, c.bounds.top_right.y)
+            assert_equals(-1465242, c.bounds.bottom_left.x)
+            assert_equals(515288506, c.bounds.bottom_left.y)
