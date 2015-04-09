@@ -1,3 +1,6 @@
+"""
+Search for pubs in an osm file and list their names.
+"""
 import osmium
 import sys
 
@@ -14,6 +17,11 @@ class NamesHandler(osmium.SimpleHandler):
     def way(self, w):
         self.output_pubs(w.tags)
 
-h = NamesHandler()
-h.apply_file(sys.argv[1])
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print "Usage: python pub_names.py <osmfile>"
+        sys.exit(-1)
+
+    h = NamesHandler()
+    h.apply_file(sys.argv[1])
 

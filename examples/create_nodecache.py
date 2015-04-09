@@ -3,7 +3,7 @@ import sys
 
 if len(sys.argv) != 3:
     print("Usage: python create_nodecache.py <osm file> <node cache>")
-    exit()
+    exit(-1)
 
 reader = o.io.Reader(sys.argv[1], o.osm.osm_entity_bits.NODE)
 
