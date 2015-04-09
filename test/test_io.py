@@ -2,7 +2,7 @@ from nose.tools import *
 import unittest
 import os
 
-from test_helper import create_osm_file, osmobj
+from helpers import create_osm_file, osmobj
 
 import osmium as o
 

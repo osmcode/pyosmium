@@ -3,7 +3,7 @@ import unittest
 import os
 from datetime import datetime
 
-from test_helper import create_osm_file, osmobj, HandlerTestBase
+from helpers import create_osm_file, osmobj, HandlerTestBase
 
 import osmium as o
 
