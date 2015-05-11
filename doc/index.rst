@@ -7,7 +7,8 @@ Welcome to Pyosmium's documentation!
 ====================================
 
 Pyosmium is a library to process OSM files in different formats. It is
-a wrapper of the C++ library osmium and profits from its fast implementation.
+a wrapper of the C++ library `osmium <http://osmcode.org/libosmium/>`_
+and profits from its fast implementation.
 
 .. toctree::
    :maxdepth: 2
