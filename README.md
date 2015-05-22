@@ -54,7 +54,7 @@ The suite can be run with:
 To build the documentation you need [Sphinx](http://sphinx-doc.org/).
 On Debian/Ubuntu install `python-sphinx` or `python3-sphinx`.
 
-Then run:
+First compile the bindings as described above and then run:
 
     cd doc
     make html
