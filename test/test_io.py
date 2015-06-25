@@ -43,7 +43,7 @@ class TestReaderFromFile(unittest.TestCase):
             rd = o.io.Reader(fn)
             with assert_raises(ValueError):
                 o.apply(rd, o.SimpleHandler())
-            rd.close()
+                rd.close()
         finally:
             os.remove(fn)
 
