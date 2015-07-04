@@ -61,7 +61,7 @@ for ext in ('io', 'osm', 'index', 'geom'):
 
 
 setup (name = 'pyosmium',
-       version = '0.1',
+       version = '2.2.0',
        description = 'Provides python bindings for libosmium.',
        packages = packages,
        ext_modules = extensions)
