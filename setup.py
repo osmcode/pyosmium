@@ -32,7 +32,7 @@ else:
 
 ### osmium dependencies
 includes.append('../libosmium/include')
-osmium_libs = ('expat', 'pthread', 'z', 'protobuf-lite', 'osmpbf', 'bz2')
+osmium_libs = ('expat', 'pthread', 'z', 'bz2')
 libs.extend(osmium_libs)
 
 extensions = []
