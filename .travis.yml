@@ -6,39 +6,50 @@
 
 language: cpp
 
-compiler:
- - gcc
- - clang
+sudo: false
 
-env:
- - USE_PYTHON_VERSION=2
- - USE_PYTHON_VERSION=3
+matrix:
+    include:
+        - os: linux
+          compiler: clang
+          env: USE_PYTHON_VERSION=2
+        - os: linux
+          compiler: clang
+          env: USE_PYTHON_VERSION=3
+        - os: linux
+          compiler: gcc
+          env: USE_PYTHON_VERSION=2
+        - os: linux
+          compiler: gcc
+          env: USE_PYTHON_VERSION=3
 
-before_install:
- # upgrade compiler (we need at least g++-4.8 for C++11 features)
- - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
- - sudo apt-get update --yes -qq
- - gcc_version=4.8
- - sudo apt-get install --yes gcc-${gcc_version} g++-${gcc_version}
- - gcc-${gcc_version} --version
- # make sure compiler executables point to the just installed version
- - sudo ln -sf /usr/bin/cpp-${gcc_version} /usr/bin/cpp
- - sudo ln -sf /usr/bin/gcc-${gcc_version} /usr/bin/gcc
- - sudo ln -sf /usr/bin/g++-${gcc_version} /usr/bin/g++
- # install dependencies
- - sudo apt-get install --yes make python3-dev python3 libboost-dev libboost-python-dev libprotobuf-dev protobuf-compiler libsparsehash-dev python-nose python3-nose
+# http://docs.travis-ci.com/user/apt/
+addons:
+    apt:
+        sources:
+            - boost-latest
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-4.8
+            - gcc-4.8
+            - libboost-python1.55-dev
+            - libboost1.55-dev
+            - libsparsehash-dev
+            - python-nose
+            - python3
+            - python3-dev
+            - python3-nose
 
 install:
- - cd ..
- - git clone https://github.com/osmcode/libosmium.git
- - git clone https://github.com/scrosby/OSM-binary.git
- - cd OSM-binary/src
- - make
- - sudo make install
+    - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git ../libosmium
 
 script:
- - cd $TRAVIS_BUILD_DIR
- - python${USE_PYTHON_VERSION} setup.py build
- - cd test
- - python${USE_PYTHON_VERSION} run_tests.py
+    - if [ "${CXX}" = 'g++' ]; then
+          CXX=g++-4.8;
+          CC=gcc-4.8;
+      fi
+    - python${USE_PYTHON_VERSION} --version
+    - python${USE_PYTHON_VERSION} setup.py build
+    - cd test
+    - python${USE_PYTHON_VERSION} run_tests.py
 
