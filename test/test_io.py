@@ -18,23 +18,23 @@ class TestReaderFromFile(unittest.TestCase):
 
     def test_node_only(self):
         self._run_file(create_osm_file([osmobj('N', id=1)]))
-        
+
     def test_way_only(self):
         self._run_file(create_osm_file([osmobj('W', id=1, nodes=[1,2,3])]))
 
     def test_relation_only(self):
-        self._run_file(create_osm_file([osmobj('R', id=1, members=[('W', 1, '')])]))
+        self._run_file(create_osm_file([osmobj('R', id=1, members=[('way', 1, '')])]))
 
     def test_node_with_tags(self):
         self._run_file(create_osm_file([osmobj('N', id=1, 
                                                tags=dict(foo='bar', name='xx'))]))
-        
+
     def test_way_with_tags(self):
         self._run_file(create_osm_file([osmobj('W', id=1, nodes=[1,2,3],
                                                tags=dict(foo='bar', name='xx'))]))
 
     def test_relation_with_tags(self):
-        self._run_file(create_osm_file([osmobj('R', id=1, members=[('W', 1, '')],
+        self._run_file(create_osm_file([osmobj('R', id=1, members=[('way', 1, '')],
                                                tags=dict(foo='bar', name='xx'))]))
 
     def test_broken_timestamp(self):

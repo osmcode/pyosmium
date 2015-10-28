@@ -76,7 +76,7 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
 class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous',
-                   members=[('W',1,'')])]
+                   members=[('way',1,'')])]
 
     class Handler(o.SimpleHandler):
         def relation(self, n):
