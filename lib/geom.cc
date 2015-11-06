@@ -39,7 +39,7 @@ BOOST_PYTHON_MODULE(_geom)
                       "(read-only) EPSG number of the output geometry.")
         .add_property("proj_string", &WKBFactory::proj_string,
                       "(read-only) projection string of the output geometry.")
-        .def("create_point", static_cast<std::string (WKBFactory::*)(const osmium::Location) const>(&WKBFactory::create_point),
+        .def("create_point", static_cast<std::string (WKBFactory::*)(const osmium::Location&) const>(&WKBFactory::create_point),
              (arg("self"), arg("location")),
              "Create a point geometry from a :py:class:`osmium.osm.Location`.")
         .def("create_point", static_cast<std::string (WKBFactory::*)(const osmium::Node&)>(&WKBFactory::create_point),
