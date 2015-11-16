@@ -22,7 +22,7 @@ class RoadLengthHandler(o.SimpleHandler):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print "Usage: python road_length.py <osmfile>"
+        print("Usage: python road_length.py <osmfile>")
         sys.exit(-1)
 
     h = RoadLengthHandler()
