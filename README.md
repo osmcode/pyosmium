@@ -14,6 +14,8 @@ Python >= 2.7 is supported (that includes python 3.x).
 pyosmium uses [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
 to create the bindings. On Debian/Ubuntu install `libboost-python-dev`.
 
+You need a modern compiler for this to work. GCC 4.9 or newer and Clang 3.5 or newer work.
+
 
 ## Installation
 
