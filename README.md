@@ -12,11 +12,13 @@ manner.
 Python >= 2.7 is supported (that includes python 3.x).
 
 pyosmium uses [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
-to create the bindings. On Debian/Ubuntu install `libboost-python-dev`.
+to create the bindings. On Debian/Ubuntu install `libboost-python-dev`, on OS X run `brew install boost-python`.
 
 You have to compile with the same compiler version python is compiled with on
 your system, otherwise it might not work.
 
+Libosmium is expected to reside in the same directory as pyosmium or to be
+installed globally.
 
 ## Installation
 
@@ -27,10 +29,6 @@ To compile the bindings, run
 To compile and install the bindings, run
 
     python setup.py install
-
-Libosmium is expected to reside in the same directory as pyosmium or to be
-installed globally.
-
 
 ## Examples
 
