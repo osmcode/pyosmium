@@ -13,6 +13,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.5.4] - 2015-12-03
+
+### Changed
+
+- Use current libosmium
+- README updates
+
+
 ## [2.5.3] - 2015-11-17
 
 ### Changed
@@ -44,7 +52,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.5.3...HEAD
+[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.5.4...HEAD
+[2.5.4]: https://github.com/osmcode/pyosmium/compare/v2.4.3...v2.5.4
 [2.5.3]: https://github.com/osmcode/pyosmium/compare/v2.4.1...v2.5.3
 [2.4.1]: https://github.com/osmcode/pyosmium/compare/v2.3.0...v2.4.1
 [2.3.0]: https://github.com/osmcode/pyosmium/compare/v2.2.0...v2.3.0
