@@ -12,7 +12,7 @@ manner.
 Python >= 2.7 is supported (that includes python 3.x).
 
 pyosmium uses [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
-to create the bindings. On Debian/Ubuntu install `libboost-python-dev`, on OS X run `brew install boost-python`.
+to create the bindings. On Debian/Ubuntu install `libboost-python-dev`. OS X run `brew install boost-python` or `brew install boost-python --with-python3` depending on which python version you want to use – You can also (re)install both.
 
 You have to compile with the same compiler version python is compiled with on
 your system, otherwise it might not work.
