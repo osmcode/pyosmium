@@ -17,7 +17,7 @@ std::vector<std::string> map_types() {
     return map_factory.map_types();
 }
 
-BOOST_PYTHON_MODULE(_index)
+BOOST_PYTHON_MODULE(index)
 {
     docstring_options doc_options(true, true, false);
 

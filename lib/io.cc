@@ -4,7 +4,7 @@
 
 #include "osm.cc"
 
-BOOST_PYTHON_MODULE(_io)
+BOOST_PYTHON_MODULE(io)
 {
     using namespace boost::python;
     docstring_options doc_options(true, true, false);

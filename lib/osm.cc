@@ -42,7 +42,7 @@ struct Timestamp_to_python {
 };
 
 
-BOOST_PYTHON_MODULE(_osm)
+BOOST_PYTHON_MODULE(osm)
 {
     PyDateTime_IMPORT;
     using namespace boost::python;

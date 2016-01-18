@@ -49,7 +49,7 @@ extensions.append(Extension('osmium._osmium',
 packages = ['osmium']
 
 for ext in ('io', 'osm', 'index', 'geom'):
-    extensions.append(Extension('osmium.%s._%s' % (ext, ext),
+    extensions.append(Extension('osmium.%s' % ext,
            sources = ['lib/%s.cc' % ext],
            include_dirs = includes,
            libraries = libs,
@@ -57,7 +57,6 @@ for ext in ('io', 'osm', 'index', 'geom'):
            language = 'c++',
            extra_compile_args = extra_compile_args
          ))
-    packages.append('osmium.%s' % ext)
 
 
 setup (name = 'pyosmium',

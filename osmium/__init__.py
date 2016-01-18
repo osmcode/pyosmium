@@ -1,4 +1,4 @@
-from ._osmium import *
+from osmium._osmium import *
 import osmium.io
 import osmium.osm
 import osmium.index

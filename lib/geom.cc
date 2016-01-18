@@ -12,7 +12,7 @@ public:
     {}
 };
 
-BOOST_PYTHON_MODULE(_geom)
+BOOST_PYTHON_MODULE(geom)
 {
     using namespace boost::python;
     docstring_options doc_options(true, true, false);
