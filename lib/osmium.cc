@@ -7,6 +7,7 @@
 #include <osmium/area/assembler.hpp>
 
 #include "generic_handler.hpp"
+#include "generic_writer.hpp"
 
 template <typename T>
 void apply_reader_simple(osmium::io::Reader &rd, T &h) {
@@ -24,11 +25,11 @@ void apply_reader_simple_with_location(osmium::io::Reader &rd,
 PyObject *invalidLocationExceptionType = NULL;
 PyObject *notFoundExceptionType = NULL;
 
-void translator1(osmium::invalid_location const& x) {
+void translator1(osmium::invalid_location const&) {
     PyErr_SetString(invalidLocationExceptionType, "Invalid location");
 }
 
-void translator2(osmium::not_found const& x) {
+void translator2(osmium::not_found const&) {
     PyErr_SetString(notFoundExceptionType, "Element not found in index");
 }
 
@@ -103,4 +104,21 @@ BOOST_PYTHON_MODULE(_osmium)
         "Apply a chain of handlers.");
     def("apply", &apply_reader_simple<osmium::handler::NodeLocationsForWays<LocationTable>>);
     def("apply", &apply_reader_simple_with_location<LocationTable>);
+
+    class_<SimpleWriterWrap, boost::noncopyable>("SimpleWriter",
+        "The most basic class to write osmium objects into a file.",
+        init<const char*>())
+        .def("add_node", &SimpleWriterWrap::add_osmium_object,
+             (arg("self"), arg("node")),
+             "Add an osmium node as is to the file")
+        .def("add_way", &SimpleWriterWrap::add_osmium_object,
+             (arg("self"), arg("way")),
+             "Add an osmium way as is to the file")
+        .def("add_relation", &SimpleWriterWrap::add_osmium_object,
+             (arg("self"), arg("relation")),
+             "Add an osmium relation as is to the file")
+        .def("close", &SimpleWriterWrap::close,
+             args("self"),
+             "Close the writer.")
+    ;
 }
