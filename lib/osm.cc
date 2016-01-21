@@ -1,3 +1,5 @@
+
+#include <cassert>
 #include <time.h>
 #include <boost/python.hpp>
 #include <datetime.h>
@@ -32,7 +34,12 @@ struct Timestamp_to_python {
     static PyObject* convert(osmium::Timestamp const& s) {
         struct tm tm;
         time_t sse = s.seconds_since_epoch();
-        gmtime_r(&sse, &tm);
+
+#ifndef NDEBUG
+        auto result =
+#endif
+                      gmtime_r(&sse, &tm);
+        assert(result != nullptr);
 
         return boost::python::incref(
                 PyDateTime_FromDateAndTime(tm.tm_year + 1900, tm.tm_mon + 1,
