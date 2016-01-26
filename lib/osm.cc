@@ -2,7 +2,7 @@
 #include <cassert>
 #include <time.h>
 #include <boost/python.hpp>
-#include <datetime.h>
+//#include <datetime.h>
 
 #include <osmium/osm.hpp>
 #include <osmium/osm/entity_bits.hpp>
@@ -32,6 +32,9 @@ inline const char member_item_type(osmium::RelationMember& obj)
 // Converter for osmium::Timestamp -> datetime.datetime
 struct Timestamp_to_python {
     static PyObject* convert(osmium::Timestamp const& s) {
+        static auto fconv = boost::python::import("datetime").attr("datetime").attr("utcfromtimestamp");
+        return boost::python::incref(fconv(s.seconds_since_epoch()).ptr());
+        /*
         struct tm tm;
         time_t sse = s.seconds_since_epoch();
 
@@ -44,14 +47,14 @@ struct Timestamp_to_python {
         return boost::python::incref(
                 PyDateTime_FromDateAndTime(tm.tm_year + 1900, tm.tm_mon + 1,
                                            tm.tm_mday, tm.tm_hour, tm.tm_min,
-                                           tm.tm_sec, 0));
+                                           tm.tm_sec, 0));*/
     }
 };
 
 
 BOOST_PYTHON_MODULE(osm)
 {
-    PyDateTime_IMPORT;
+    //PyDateTime_IMPORT;
     using namespace boost::python;
     docstring_options doc_options(true, true, false);
 
