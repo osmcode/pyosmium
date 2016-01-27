@@ -26,12 +26,10 @@ public:
         osmium::builder::NodeBuilder builder(buffer);
         osmium::Node& node = builder.object();
 
-        set_common_attributes(o, node);
-
         if (hasattr(o, "location"))
             node.set_location(get_location(o.attr("location")));
 
-        set_user(o, builder);
+        set_common_attributes(o, builder);
 
         if (hasattr(o, "tags"))
             set_taglist(o.attr("tags"), builder);
@@ -41,11 +39,11 @@ public:
 
     void add_way(boost::python::object o) {
         osmium::builder::WayBuilder builder(buffer);
-        osmium::Way& way = builder.object();
 
-        set_common_attributes(o, way);
+        set_common_attributes(o, builder);
 
-        set_user(o, builder);
+        if (hasattr(o, "nodes"))
+            set_nodelist(o.attr("nodes"), &builder);
 
         if (hasattr(o, "tags"))
             set_taglist(o.attr("tags"), builder);
@@ -55,11 +53,11 @@ public:
 
     void add_relation(boost::python::object o) {
         osmium::builder::RelationBuilder builder(buffer);
-        osmium::Relation& rel = builder.object();
 
-        set_common_attributes(o, rel);
+        set_common_attributes(o, builder);
 
-        set_user(o, builder);
+        if (hasattr(o, "members"))
+            set_memberlist(o.attr("members"), &builder);
 
         if (hasattr(o, "tags"))
             set_taglist(o.attr("tags"), builder);
@@ -73,7 +71,7 @@ public:
     }
 
 private:
-    void set_common_attributes(boost::python::object o, osmium::OSMObject& t) {
+    void set_object_attributes(const boost::python::object& o, osmium::OSMObject& t) {
         if (hasattr(o, "id"))
             t.set_id(boost::python::extract<osmium::object_id_type>(o.attr("id")));
         if (hasattr(o, "visible"))
@@ -95,16 +93,19 @@ private:
     }
 
     template <typename T>
-    void set_user(boost::python::object o, T& builder) {
+    void set_common_attributes(const boost::python::object& o, T& builder) {
+        set_object_attributes(o, builder.object());
+
         if (hasattr(o, "user")) {
             auto s = boost::python::extract<const char *>(o.attr("user"));
             builder.add_user(s);
-        } else
+        } else {
             builder.add_user("", 0);
+        }
     }
 
     template <typename T>
-    void set_taglist(boost::python::object o, T& obuilder) {
+    void set_taglist(const boost::python::object& o, T& obuilder) {
         osmium::builder::TagListBuilder builder(buffer, &obuilder);
 
         // original taglist
@@ -142,6 +143,36 @@ private:
                 builder.add_tag(boost::python::extract<const char *>(tag[0]),
                                 boost::python::extract<const char *>(tag[1]));
             }
+        }
+    }
+
+    void set_nodelist(const boost::python::object& o,
+                      osmium::builder::WayBuilder *builder) {
+        auto len = boost::python::len(o);
+        if (len <= 0)
+            return;
+
+        osmium::builder::WayNodeListBuilder wnl_builder(buffer, builder);
+
+        for (int i = 0; i < len; ++i) {
+            wnl_builder.add_node_ref(boost::python::extract<osmium::object_id_type>(o[i]));
+        }
+    }
+
+    void set_memberlist(const boost::python::object& o,
+                        osmium::builder::RelationBuilder *builder) {
+        auto len = boost::python::len(o);
+        if (len <= 0)
+            return;
+
+        osmium::builder::RelationMemberListBuilder rml_builder(buffer, builder);
+
+        for (int i = 0; i < len; ++i) {
+            auto member = o[i];
+            auto type = osmium::char_to_item_type(boost::python::extract<const char*>(member[0])()[0]);
+            auto id = boost::python::extract<osmium::object_id_type>(member[1])();
+            auto role = boost::python::extract<const char*>(member[2])();
+            rml_builder.add_member(type, id, role);
         }
     }
 

@@ -91,6 +91,20 @@ class TestWriteNode(unittest.TestCase):
         with WriteExpect('n0 v0 dV c0 t i0 u T x1.0000000 y2.0000000') as w:
             w.add_node(O(location=(1, 2)))
 
+class TestWriteWay(unittest.TestCase):
+
+    def test_node_list(self):
+        with WriteExpect('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
+            w.add_way(O(nodes=(1, 2, 3, -4)))
+
+class TestWriteRelation(unittest.TestCase):
+
+    def test_relation_members(self):
+        with WriteExpect('r0 v0 dV c0 t i0 u T Mn34@foo,r200@,w1111@x') as w:
+            w.add_relation(O(members=(('n', 34, 'foo'),
+                                      ('r', 200, ''),
+                                      ('w', 1111, 'x')
+                                     )))
 
 if __name__ == '__main__':
     unittest.main()
