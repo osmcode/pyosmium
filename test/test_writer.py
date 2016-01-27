@@ -33,6 +33,12 @@ class O(object):
 class TestWriteSimpleAttributes(unittest.TestCase):
 
     test_data_simple_attr = (
+      (O(id=None), '0 v0 dV c0 t i0 u T'),
+      (O(visible=None), '0 v0 dV c0 t i0 u T'),
+      (O(version=None), '0 v0 dV c0 t i0 u T'),
+      (O(uid=None), '0 v0 dV c0 t i0 u T'),
+      (O(user=None), '0 v0 dV c0 t i0 u T'),
+      (O(timestamp=None), '0 v0 dV c0 t i0 u T'),
       (O(id=1), '1 v0 dV c0 t i0 u T'),
       (O(id=-99), '-99 v0 dV c0 t i0 u T'),
       (O(visible=True), '0 v0 dV c0 t i0 u T'),
@@ -63,6 +69,9 @@ class TestWriteSimpleAttributes(unittest.TestCase):
 class TestWriteTags(unittest.TestCase):
 
     test_data_tags = (
+     (None, 'T'),
+     ([], 'T'),
+     ({}, 'T'),
      ((("foo", "bar"), ), 'Tfoo=bar'),
      ((("foo", "bar"), ("2", "1")), 'Tfoo=bar,2=1'),
      ({'test' : 'drive'}, 'Ttest=drive'),
@@ -91,11 +100,19 @@ class TestWriteNode(unittest.TestCase):
         with WriteExpect('n0 v0 dV c0 t i0 u T x1.0000000 y2.0000000') as w:
             w.add_node(O(location=(1, 2)))
 
+    def test_location_none(self):
+        with WriteExpect('n0 v0 dV c0 t i0 u T x y') as w:
+            w.add_node(O(location=None))
+
 class TestWriteWay(unittest.TestCase):
 
     def test_node_list(self):
         with WriteExpect('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
             w.add_way(O(nodes=(1, 2, 3, -4)))
+
+    def test_node_list_none(self):
+        with WriteExpect('w0 v0 dV c0 t i0 u T N') as w:
+            w.add_way(O(nodes=None))
 
 class TestWriteRelation(unittest.TestCase):
 
@@ -105,6 +122,10 @@ class TestWriteRelation(unittest.TestCase):
                                       ('r', 200, ''),
                                       ('w', 1111, 'x')
                                      )))
+
+    def test_relation_members_None(self):
+        with WriteExpect('r0 v0 dV c0 t i0 u T M') as w:
+            w.add_relation(O(members=None))
 
 if __name__ == '__main__':
     unittest.main()

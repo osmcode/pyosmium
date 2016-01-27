@@ -106,11 +106,14 @@ private:
 
     template <typename T>
     void set_taglist(const boost::python::object& o, T& obuilder) {
-        osmium::builder::TagListBuilder builder(buffer, &obuilder);
 
         // original taglist
-        boost::python::extract<osmium::TagList> otl(o);
+        boost::python::extract<osmium::TagList&> otl(o);
         if (otl.check()) {
+            if (otl().size() == 0)
+                return;
+
+            osmium::builder::TagListBuilder builder(buffer, &obuilder);
             for (const auto& tag : otl()) {
                 builder.add_tag(tag);
             }
@@ -122,6 +125,10 @@ private:
         if (tagdict.check()) {
             auto items = tagdict().items();
             auto len = boost::python::len(items);
+            if (len == 0)
+                return;
+
+            osmium::builder::TagListBuilder builder(buffer, &obuilder);
             auto iter = items.attr("__iter__")();
             for (int i = 0; i < len; ++i) {
                 auto tag = iter.attr("__next__")();
@@ -133,6 +140,10 @@ private:
 
         // any other iterable
         auto l = boost::python::len(o);
+        if (l == 0)
+            return;
+
+        osmium::builder::TagListBuilder builder(buffer, &obuilder);
         for (int i = 0; i < l; ++i) {
             auto tag = o[i];
 
@@ -149,7 +160,7 @@ private:
     void set_nodelist(const boost::python::object& o,
                       osmium::builder::WayBuilder *builder) {
         auto len = boost::python::len(o);
-        if (len <= 0)
+        if (len == 0)
             return;
 
         osmium::builder::WayNodeListBuilder wnl_builder(buffer, builder);
@@ -162,7 +173,7 @@ private:
     void set_memberlist(const boost::python::object& o,
                         osmium::builder::RelationBuilder *builder) {
         auto len = boost::python::len(o);
-        if (len <= 0)
+        if (len == 0)
             return;
 
         osmium::builder::RelationMemberListBuilder rml_builder(buffer, builder);
@@ -176,7 +187,7 @@ private:
         }
     }
 
-    osmium::Location get_location(boost::python::object o) {
+    osmium::Location get_location(const boost::python::object& o) {
         boost::python::extract<osmium::Location> ol(o);
         if (ol.check())
             return ol;
@@ -186,8 +197,9 @@ private:
                                 boost::python::extract<float>(o[1]));
     }
 
-    bool hasattr(boost::python::object obj, char const *attr) {
-        return PyObject_HasAttrString(obj.ptr(), attr);
+    bool hasattr(const boost::python::object& obj, char const *attr) {
+        return PyObject_HasAttrString(obj.ptr(), attr)
+                && (obj.attr(attr) != boost::python::object());
     }
 
     void flush_buffer() {
