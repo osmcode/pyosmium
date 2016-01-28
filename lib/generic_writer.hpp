@@ -85,6 +85,7 @@ private:
         if (hasattr(o, "timestamp")) {
             boost::python::object ts = o.attr("timestamp");
             // XXX terribly inefficient because of the double string conversion
+            //     but conveniently works for python2 and 3
             if (hasattr(ts, "strftime"))
                 ts = ts.attr("strftime")("%Y-%m-%dT%H:%M:%SZ");
 
@@ -131,7 +132,11 @@ private:
             osmium::builder::TagListBuilder builder(buffer, &obuilder);
             auto iter = items.attr("__iter__")();
             for (int i = 0; i < len; ++i) {
+#if PY_VERSION_HEX < 0x03000000
+                auto tag = iter.attr("next")();
+#else
                 auto tag = iter.attr("__next__")();
+#endif
                 builder.add_tag(boost::python::extract<const char *>(tag[0]),
                                 boost::python::extract<const char *>(tag[1]));
             }
