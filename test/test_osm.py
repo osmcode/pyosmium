@@ -1,7 +1,18 @@
 from nose.tools import *
 import unittest
 import os
+import sys
 from datetime import datetime
+
+if sys.version_info[0] == 3:
+    from datetime import timezone
+
+    def mkdate(*args):
+        return datetime(*args, tzinfo=timezone.utc)
+else:
+    def mkdate(*args):
+        return datetime(*args)
+
 
 from helpers import create_osm_file, osmobj, HandlerTestBase
 
@@ -33,7 +44,7 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.changeset, 58674)
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
-            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
+            assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), 1)
 
@@ -66,7 +77,7 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.changeset, 58674)
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
-            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
+            assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), 1)
             assert_false(n.is_closed())
@@ -87,7 +98,7 @@ class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.changeset, 58674)
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
-            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
+            assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), 1)
 
@@ -109,7 +120,7 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.changeset, 58674)
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
-            assert_equals(n.timestamp, datetime(2014, 1, 31, 6, 23, 35))
+            assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), 46)
             assert_equals(n.orig_id(), 23)
@@ -139,8 +150,8 @@ class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(1, c.uid)
             assert_false(c.user_is_anonymous())
             assert_equals("Steve", c.user)
-            assert_equals(datetime(2005, 4, 9, 19, 54, 13), c.created_at)
-            assert_equals(datetime(2005, 4, 9, 20, 54, 39), c.closed_at)
+            assert_equals(mkdate(2005, 4, 9, 19, 54, 13), c.created_at)
+            assert_equals(mkdate(2005, 4, 9, 20, 54, 39), c.closed_at)
             assert_false(c.open)
             assert_equals(2, c.num_changes)
             assert_equals(0, len(c.tags))

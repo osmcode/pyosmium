@@ -3,7 +3,7 @@ import unittest
 import tempfile
 import os
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime
 from collections import OrderedDict
 import logging
 

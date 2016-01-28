@@ -32,8 +32,14 @@ inline const char member_item_type(osmium::RelationMember& obj)
 // Converter for osmium::Timestamp -> datetime.datetime
 struct Timestamp_to_python {
     static PyObject* convert(osmium::Timestamp const& s) {
+#if PY_VERSION_HEX >= 0x03000000
+        static auto fconv = boost::python::import("datetime").attr("datetime").attr("fromtimestamp");
+        static boost::python::object utc = boost::python::import("datetime").attr("timezone").attr("utc");
+        return boost::python::incref(fconv(s.seconds_since_epoch(), utc).ptr());
+#else
         static auto fconv = boost::python::import("datetime").attr("datetime").attr("utcfromtimestamp");
         return boost::python::incref(fconv(s.seconds_since_epoch()).ptr());
+#endif
         /*
         struct tm tm;
         time_t sse = s.seconds_since_epoch();
