@@ -3,7 +3,7 @@ import unittest
 import tempfile
 import os
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime
 from collections import OrderedDict
 import logging
 import sys
@@ -24,7 +24,7 @@ else:
 @contextmanager
 def WriteExpect(expected):
     fname = tempfile.mktemp(dir='/tmp', suffix='.opl')
-    writer = o.SimpleWriter(fname, 1024*1024*1024)
+    writer = o.SimpleWriter(fname, 1024*1024)
     try:
         yield writer
     finally:
