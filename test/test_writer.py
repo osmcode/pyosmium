@@ -3,18 +3,28 @@ import unittest
 import tempfile
 import os
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import OrderedDict
 import logging
+import sys
 
 import osmium as o
 
 log = logging.getLogger(__name__)
 
+if sys.version_info[0] == 3:
+    from datetime import timezone
+
+    def mkdate(*args):
+        return datetime(*args, tzinfo=timezone.utc)
+else:
+    def mkdate(*args):
+        return datetime(*args)
+
 @contextmanager
 def WriteExpect(expected):
     fname = tempfile.mktemp(dir='/tmp', suffix='.opl')
-    writer = o.SimpleWriter(fname)
+    writer = o.SimpleWriter(fname, 1024*1024*1024)
     try:
         yield writer
     finally:
@@ -48,7 +58,8 @@ class TestWriteSimpleAttributes(unittest.TestCase):
       (O(user=""), '0 v0 dV c0 t i0 u T'),
       (O(uid=987), '0 v0 dV c0 t i987 u T'),
       (O(timestamp='2012-04-14T20:58:35Z'), '0 v0 dV c0 t2012-04-14T20:58:35Z i0 u T'),
-      (O(timestamp=datetime(2009, 4, 14, 20, 58, 35)), '0 v0 dV c0 t2009-04-14T20:58:35Z i0 u T'),
+      (O(timestamp=mkdate(2009, 4, 14, 20, 58, 35)), '0 v0 dV c0 t2009-04-14T20:58:35Z i0 u T'),
+      (O(timestamp='1970-01-01T00:00:01Z'), '0 v0 dV c0 t1970-01-01T00:00:01Z i0 u T'),
     )
 
     def test_node_simple_attr(self):

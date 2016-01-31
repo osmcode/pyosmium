@@ -12,9 +12,10 @@
 class SimpleWriterWrap {
 
 public:
-    SimpleWriterWrap(const char* filename)
+    SimpleWriterWrap(const char* filename, unsigned long bufsz=1024UL*1024*1024)
     : writer(filename),
-      buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes)
+      buffer(bufsz, osmium::memory::Buffer::auto_grow::yes),
+      buffer_size(bufsz)
     {}
 
     void add_osmium_object(const osmium::OSMObject& o) {
@@ -23,44 +24,60 @@ public:
     }
 
     void add_node(boost::python::object o) {
-        osmium::builder::NodeBuilder builder(buffer);
-        osmium::Node& node = builder.object();
+        boost::python::extract<osmium::Node&> node(o);
+        if (node.check()) {
+            buffer.add_item(node());
+        } else {
+            osmium::builder::NodeBuilder builder(buffer);
 
-        if (hasattr(o, "location"))
-            node.set_location(get_location(o.attr("location")));
+            if (hasattr(o, "location")) {
+                osmium::Node& n = builder.object();
+                n.set_location(get_location(o.attr("location")));
+            }
 
-        set_common_attributes(o, builder);
+            set_common_attributes(o, builder);
 
-        if (hasattr(o, "tags"))
-            set_taglist(o.attr("tags"), builder);
+            if (hasattr(o, "tags"))
+                set_taglist(o.attr("tags"), builder);
+        }
 
         flush_buffer();
     }
 
-    void add_way(boost::python::object o) {
-        osmium::builder::WayBuilder builder(buffer);
+    void add_way(const boost::python::object& o) {
+        boost::python::extract<osmium::Way&> way(o);
+        if (way.check()) {
+            buffer.add_item(way());
+        } else {
+            osmium::builder::WayBuilder builder(buffer);
 
-        set_common_attributes(o, builder);
+            set_common_attributes(o, builder);
 
-        if (hasattr(o, "nodes"))
-            set_nodelist(o.attr("nodes"), &builder);
+            if (hasattr(o, "nodes"))
+                set_nodelist(o.attr("nodes"), &builder);
 
-        if (hasattr(o, "tags"))
-            set_taglist(o.attr("tags"), builder);
+            if (hasattr(o, "tags"))
+                set_taglist(o.attr("tags"), builder);
+        }
 
         flush_buffer();
     }
 
     void add_relation(boost::python::object o) {
-        osmium::builder::RelationBuilder builder(buffer);
+        boost::python::extract<osmium::Relation&> rel(o);
+        if (rel.check()) {
+            buffer.add_item(rel());
+        } else {
+            osmium::builder::RelationBuilder builder(buffer);
 
-        set_common_attributes(o, builder);
+            set_common_attributes(o, builder);
 
-        if (hasattr(o, "members"))
-            set_memberlist(o.attr("members"), &builder);
+            if (hasattr(o, "members"))
+                set_memberlist(o.attr("members"), &builder);
 
-        if (hasattr(o, "tags"))
-            set_taglist(o.attr("tags"), builder);
+            if (hasattr(o, "tags"))
+                set_taglist(o.attr("tags"), builder);
+        }
 
         flush_buffer();
     }
@@ -84,12 +101,25 @@ private:
             t.set_uid_from_signed(boost::python::extract<osmium::signed_user_id_type>(o.attr("uid")));
         if (hasattr(o, "timestamp")) {
             boost::python::object ts = o.attr("timestamp");
-            // XXX terribly inefficient because of the double string conversion
-            //     but conveniently works for python2 and 3
-            if (hasattr(ts, "strftime"))
-                ts = ts.attr("strftime")("%Y-%m-%dT%H:%M:%SZ");
-
-            t.set_timestamp(osmium::Timestamp(boost::python::extract<const char *>(ts)));
+            boost::python::extract<osmium::Timestamp> ots(ts);
+            if (ots.check()) {
+                t.set_timestamp(ots());
+            } else {
+#if PY_VERSION_HEX < 0x03000000
+                // XXX terribly inefficient because of the double string conversion
+                //     but the only painless method in python 2.
+                if (hasattr(ts, "strftime"))
+                    ts = ts.attr("strftime")("%Y-%m-%dT%H:%M:%SZ");
+#else
+                if (hasattr(ts, "timestamp")) {
+                    double epoch = boost::python::extract<double>(ts.attr("timestamp")());
+                    t.set_timestamp(osmium::Timestamp(uint32_t(epoch)));
+                } else
+#endif
+                {
+                    t.set_timestamp(osmium::Timestamp(boost::python::extract<const char *>(ts)));
+                }
+            }
         }
     }
 
@@ -111,13 +141,8 @@ private:
         // original taglist
         boost::python::extract<osmium::TagList&> otl(o);
         if (otl.check()) {
-            if (otl().size() == 0)
-                return;
-
-            osmium::builder::TagListBuilder builder(buffer, &obuilder);
-            for (const auto& tag : otl()) {
-                builder.add_tag(tag);
-            }
+            if (otl().size() > 0)
+                obuilder.add_item(&otl());
             return;
         }
 
@@ -164,6 +189,14 @@ private:
 
     void set_nodelist(const boost::python::object& o,
                       osmium::builder::WayBuilder *builder) {
+        // original nodelist
+        boost::python::extract<osmium::NodeRefList&> onl(o);
+        if (onl.check()) {
+            if (onl().size() > 0)
+                builder->add_item(&onl());
+            return;
+        }
+
         auto len = boost::python::len(o);
         if (len == 0)
             return;
@@ -171,12 +204,24 @@ private:
         osmium::builder::WayNodeListBuilder wnl_builder(buffer, builder);
 
         for (int i = 0; i < len; ++i) {
-            wnl_builder.add_node_ref(boost::python::extract<osmium::object_id_type>(o[i]));
+            boost::python::extract<osmium::NodeRef> ref(o[i]);
+            if (ref.check())
+                wnl_builder.add_node_ref(ref());
+            else
+                wnl_builder.add_node_ref(boost::python::extract<osmium::object_id_type>(o[i]));
         }
     }
 
     void set_memberlist(const boost::python::object& o,
                         osmium::builder::RelationBuilder *builder) {
+        // original nodelist
+        boost::python::extract<osmium::RelationMemberList&> oml(o);
+        if (oml.check()) {
+            if (oml().size() > 0)
+                builder->add_item(&oml());
+            return;
+        }
+
         auto len = boost::python::len(o);
         if (len == 0)
             return;
@@ -210,8 +255,8 @@ private:
     void flush_buffer() {
         buffer.commit();
 
-        if (buffer.committed() > 900*1024) {
-            osmium::memory::Buffer new_buffer(1024*1024, osmium::memory::Buffer::auto_grow::yes);
+        if (buffer.committed() > (buffer_size / 10) * 9) {
+            osmium::memory::Buffer new_buffer(buffer_size, osmium::memory::Buffer::auto_grow::yes);
             using std::swap;
             swap(buffer, new_buffer);
             writer(std::move(new_buffer));
@@ -220,6 +265,7 @@ private:
 
     osmium::io::Writer writer;
     osmium::memory::Buffer buffer;
+    unsigned long buffer_size;
 };
 
 #endif // PYOSMIUM_GENERIC_WRITER_HPP

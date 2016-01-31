@@ -107,24 +107,15 @@ BOOST_PYTHON_MODULE(_osmium)
 
     class_<SimpleWriterWrap, boost::noncopyable>("SimpleWriter",
         "The most basic class to write osmium objects into a file.",
-        init<const char*>())
-        .def("add_node", &SimpleWriterWrap::add_osmium_object,
-             (arg("self"), arg("node")),
-             "Add an osmium node as is to the file")
+        init<const char*, unsigned long>())
         .def("add_node", &SimpleWriterWrap::add_node,
              (arg("self"), arg("node")),
              "Add a new node to the file. The node must be a class object "
              "with the same attributes as the osmium Node object. Tags are "
              "expected in a dictionary-like object.")
-        .def("add_way", &SimpleWriterWrap::add_osmium_object,
-             (arg("self"), arg("way")),
-             "Add an osmium way as is to the file")
         .def("add_way", &SimpleWriterWrap::add_way,
              (arg("self"), arg("way")),
              "Add a new way to the file.")
-        .def("add_relation", &SimpleWriterWrap::add_osmium_object,
-             (arg("self"), arg("relation")),
-             "Add an osmium relation as is to the file")
         .def("add_relation", &SimpleWriterWrap::add_relation,
              (arg("self"), arg("relation")),
              "Add a new relation to the file.")
