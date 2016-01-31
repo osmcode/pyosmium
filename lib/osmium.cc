@@ -108,6 +108,7 @@ BOOST_PYTHON_MODULE(_osmium)
     class_<SimpleWriterWrap, boost::noncopyable>("SimpleWriter",
         "The most basic class to write osmium objects into a file.",
         init<const char*, unsigned long>())
+        .def(init<const char*>())
         .def("add_node", &SimpleWriterWrap::add_node,
              (arg("self"), arg("node")),
              "Add a new node to the file. The node must be a class object "
