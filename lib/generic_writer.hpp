@@ -11,12 +11,18 @@
 
 class SimpleWriterWrap {
 
+    enum { BUFFER_WRAP = 4096 };
+
 public:
-    SimpleWriterWrap(const char* filename, unsigned long bufsz=1024UL*1024*1024)
+    SimpleWriterWrap(const char* filename, size_t bufsz=4096*1024)
     : writer(filename),
-      buffer(bufsz, osmium::memory::Buffer::auto_grow::yes),
-      buffer_size(bufsz)
+      buffer(bufsz < 2*BUFFER_WRAP ? 2*BUFFER_WRAP : bufsz, osmium::memory::Buffer::auto_grow::yes)
     {}
+
+    virtual ~SimpleWriterWrap()
+    {
+        close();
+    }
 
     void add_osmium_object(const osmium::OSMObject& o) {
         buffer.add_item(o);
@@ -83,8 +89,11 @@ public:
     }
 
     void close() {
-        writer(std::move(buffer));
-        writer.close();
+        if (buffer) {
+            writer(std::move(buffer));
+            writer.close();
+            buffer = osmium::memory::Buffer();
+        }
     }
 
 private:
@@ -254,8 +263,8 @@ private:
     void flush_buffer() {
         buffer.commit();
 
-        if (buffer.committed() > (buffer_size / 10) * 9) {
-            osmium::memory::Buffer new_buffer(buffer_size, osmium::memory::Buffer::auto_grow::yes);
+        if (buffer.committed() > buffer.capacity() - BUFFER_WRAP) {
+            osmium::memory::Buffer new_buffer(buffer.capacity(), osmium::memory::Buffer::auto_grow::yes);
             using std::swap;
             swap(buffer, new_buffer);
             writer(std::move(new_buffer));
@@ -264,7 +273,6 @@ private:
 
     osmium::io::Writer writer;
     osmium::memory::Buffer buffer;
-    unsigned long buffer_size;
 };
 
 #endif // PYOSMIUM_GENERIC_WRITER_HPP
