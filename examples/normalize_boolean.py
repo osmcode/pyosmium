@@ -17,20 +17,23 @@ class BoolNormalizer(o.SimpleHandler):
         if len(o.tags) == 0:
             return o
 
-        newtags = {}
+        # new tags should be kept in a list so that the order is preserved
+        newtags = []
         # pyosmium is much faster writing an original osmium object than
         # a osmium.mutable.*. Therefore, keep track if the tags list was
         # actually changed.
         modified = False
         for t in o.tags:
             if t.v == 'yes':
-                newtags[t.k] = '1'
+                # custom tags should be added as a key/value tuple
+                newtags.append((t.k, '1'))
                 modified = True
             elif t.v == 'no':
-                newtags[t.k] = '0'
+                newtags.append((t.k, '0'))
                 modified = True
             else:
-                newtags[t.k] = t.v
+                # if the tag is not modified, simply readd it to the list
+                newtags.append(t)
 
         if modified:
             # We have changed tags. Create a new object as a copy of the
