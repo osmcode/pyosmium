@@ -65,7 +65,7 @@ BOOST_PYTHON_MODULE(_osmium)
     ;
 
     class_<SimpleHandlerWrap, boost::noncopyable>("SimpleHandler",
-        "A handler implements custom processing of OSM data. For each data type "
+        "The most generic of OSM data handlers. For each data type "
         "a callback can be implemented where the object is processed. Note that "
         "all objects that are handed into the handler are only readable and are "
         "only valid until the end of the callback is reached. Any data that "
@@ -104,22 +104,36 @@ BOOST_PYTHON_MODULE(_osmium)
     def("apply", &apply_reader_simple_with_location<LocationTable>);
 
     class_<SimpleWriterWrap, boost::noncopyable>("SimpleWriter",
-        "The most basic class to write osmium objects into a file.",
+        "The most generic class to write osmium objects into a file. The writer "
+        "takes a file name as its mandatory parameter. The file must not yet "
+        "exists. The file type to output is determined from the file extension. "
+        "The second (optional) parameter is the buffer size. osmium caches the "
+        "output data in an internal memory buffer before writing it on disk. This "
+        "parameter allows to change the default buffer size of 4MB. Larger buffers "
+        "are normally better but you should be aware that there are normally multiple "
+        "buffers in use during the write process.",
         init<const char*, unsigned long>())
         .def(init<const char*>())
         .def("add_node", &SimpleWriterWrap::add_node,
              (arg("self"), arg("node")),
-             "Add a new node to the file. The node must be a class object "
-             "with the same attributes as the osmium Node object. Tags are "
-             "expected in a dictionary-like object.")
+             "Add a new node to the file. The node may be an ``osmium.osm.Node`` object, "
+             "an ``osmium.osm.mutable.Node`` object or any other Python object that "
+             "implements the same attributes.")
         .def("add_way", &SimpleWriterWrap::add_way,
              (arg("self"), arg("way")),
-             "Add a new way to the file.")
+             "Add a new way to the file. The way may be an ``osmium.osm.Way`` object, "
+             "an ``osmium.osm.mutable.Way`` object or any other Python object that "
+             "implements the same attributes.")
         .def("add_relation", &SimpleWriterWrap::add_relation,
              (arg("self"), arg("relation")),
-             "Add a new relation to the file.")
+             "Add a new relation to the file. The relation may be an "
+             "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Way`` "
+             "object or any other Python object that implements the same attributes.")
         .def("close", &SimpleWriterWrap::close,
              args("self"),
-             "Close the writer.")
+             "Flush the remaining buffers and close the writer. While it is not "
+             "strictly necessary to call this function explicitly, it is still "
+             "strongly recommended to close the writer as soon as possible, so "
+             "that the buffer memory can be freed.")
     ;
 }

@@ -4,8 +4,12 @@
 The ``osm`` submodule contains definition of the basic data types used
 throughout the library.
 
-OSM Objects
-^^^^^^^^^^^
+Native OSM Objects
+^^^^^^^^^^^^^^^^^^
+
+Native OSM object classes are lightwight wrappers around the osmium OSM
+data classes. They are immutable and generally bound to the life-time of
+the buffer they are saved in.
 
 There are five classes representing the basic OSM entities.
 
@@ -30,6 +34,31 @@ There are five classes representing the basic OSM entities.
     :undoc-members:
 
 .. autoclass:: osmium.osm.Changeset
+    :members:
+    :undoc-members:
+
+.. _mutable-objects:
+
+Mutable OSM Objects
+^^^^^^^^^^^^^^^^^^^
+
+The objects in ``osmium.osm.mutable`` are Python versions of the native OSM
+objects that can be modified. You can use these classes as a base class for
+your own objects or to modify objects read from a file.
+
+.. autoclass:: osmium.osm.mutable.OSMObject
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.osm.mutable.Node
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.osm.mutable.Way
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.osm.mutable.Relation
     :members:
     :undoc-members:
 

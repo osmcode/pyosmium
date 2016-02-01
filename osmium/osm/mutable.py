@@ -1,4 +1,13 @@
 class OSMObject(object):
+    """Mutable version of ``osmium.osm.OSMObject``. It exposes the following
+       attributes ``id``, ``version``, ``visible``, ``changeset``, ``timestamp``,
+       ``uid`` and ``tags``. Timestamps may be strings or datetime objects.
+       Tags can be an osmium.osm.TagList, a dict-like object
+       or a list of tuples, where each tuple contains a (key value) string pair.
+
+       If the ``base`` parameter is given in the constructor, then the object
+       will be initialised first from the attributes of this base object.
+    """
 
     def __init__(self, base=None, id=None, version=None, visible=None, changeset=None,
             timestamp=None, uid=None, tags=None):
@@ -21,11 +30,9 @@ class OSMObject(object):
 
 
 class Node(OSMObject):
-    """An OSM node that can be modified. The class has the same attributes as
-       an osmium.osm.Node. The `location` attribute may either be an
-       osmium.osm.Location or a tuple of floats representing (x,y) coordinates.
-       The `tags` attribute can be an osmium.osm.TagList, a dict-like object
-       or a list of tuples, where each tuple contains a (key value) string pair.
+    """The mutable version of ``osmium.osm.Node``. It inherits all attributes
+       from osmium.osm.mutable.OSMObject and adds a `location` attribute. This
+       may either be an `osmium.osm.Location` or a tuple of lon/lat coordinates.
     """
 
     def __init__(self, base=None, location=None, **attrs):
@@ -37,7 +44,10 @@ class Node(OSMObject):
 
 
 class Way(OSMObject):
-    """An OSM way that can be modified.
+    """The mutable version of ``osmium.osm.Way``. It inherits all attributes
+       from osmium.osm.mutable.OSMObject and adds a `nodes` attribute. This may
+       either be and ``osmium.osm.NodeList`` or a list consisting of
+       ``osmium.osm.NodeRef`` or simple node ids.
     """
 
     def __init__(self, base=None, nodes=None, **attrs):
@@ -48,7 +58,11 @@ class Way(OSMObject):
             self.nodes = nodes if nodes is not None else base.nodes
 
 class Relation(OSMObject):
-    """An OSM relation that can be modified.
+    """The mutable version of ``osmium.osm.Relation``. It inherits all attributes
+       from osmium.osm.mutable.OSMObject and adds a `members` attribute. This
+       may either be an ``osmium.osm.RelationMemberList`` or a list consisting
+       of ``osmium.osm.RelationMember`` or tuples of (type, id, role). The
+       member type should be a single character 'n', 'w' or 'r'.
     """
 
     def __init__(self, base=None, members=None, **attrs):
