@@ -1,13 +1,13 @@
 #ifndef PYOSMIUM_GENERIC_WRITER_HPP
 #define PYOSMIUM_GENERIC_WRITER_HPP
 
-#include <boost/python.hpp>
 
 #include <osmium/osm.hpp>
 #include <osmium/io/any_output.hpp>
 #include <osmium/io/writer.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
+#include <boost/python.hpp>
 
 class SimpleWriterWrap {
 

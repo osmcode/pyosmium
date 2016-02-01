@@ -1,8 +1,6 @@
 #ifndef PYOSMIUM_GENERIC_HANDLER_HPP
 #define PYOSMIUM_GENERIC_HANDLER_HPP
 
-#include <boost/python.hpp>
-
 #include <osmium/area/assembler.hpp>
 #include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/handler.hpp>
@@ -10,6 +8,8 @@
 #include <osmium/index/map/all.hpp>
 #include <osmium/io/any_input.hpp>
 #include <osmium/visitor.hpp>
+
+#include <boost/python.hpp>
 
 
 typedef osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location> index_type;

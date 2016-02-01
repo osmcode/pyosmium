@@ -1,13 +1,11 @@
-#include <boost/python.hpp>
-
 #include <osmium/visitor.hpp>
 #include <osmium/index/map/all.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/area/multipolygon_collector.hpp>
 #include <osmium/area/assembler.hpp>
 
-#include "generic_handler.hpp"
 #include "generic_writer.hpp"
+#include "generic_handler.hpp"
 
 template <typename T>
 void apply_reader_simple(osmium::io::Reader &rd, T &h) {
