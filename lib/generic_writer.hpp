@@ -105,18 +105,17 @@ private:
             if (ots.check()) {
                 t.set_timestamp(ots());
             } else {
-#if PY_VERSION_HEX < 0x03000000
-                // XXX terribly inefficient because of the double string conversion
-                //     but the only painless method in python 2.
-                if (hasattr(ts, "strftime"))
-                    ts = ts.attr("strftime")("%Y-%m-%dT%H:%M:%SZ");
-#else
                 if (hasattr(ts, "timestamp")) {
                     double epoch = boost::python::extract<double>(ts.attr("timestamp")());
                     t.set_timestamp(osmium::Timestamp(uint32_t(epoch)));
                 } else
-#endif
                 {
+                    // XXX terribly inefficient because of the double string conversion
+                    //     but the only painless method for converting a datetime
+                    //     in python < 3.3.
+                    if (hasattr(ts, "strftime"))
+                        ts = ts.attr("strftime")("%Y-%m-%dT%H:%M:%SZ");
+
                     t.set_timestamp(osmium::Timestamp(boost::python::extract<const char *>(ts)));
                 }
             }
