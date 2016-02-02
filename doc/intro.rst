@@ -11,8 +11,11 @@ reader is referred to the `osmium documentation`_.
 .. _OSM data model: http://wiki.openstreetmap.org/wiki/Elements
 .. _osmium documentation: http://osmcode.org/libosmium/manual/libosmium-manual.html
 
+Reading OSM Data
+----------------
+
 Using Handler Classes
-+++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^
 
 OSM file parsing by osmium is built around the concept of handlers. A handler
 is a class with a set of callback functions. Each function processes exactly
@@ -54,7 +57,7 @@ therefore looks like this::
 That already finishes our node counting program.
 
 Inspecting the OSM objects
-++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Counting nodes is actually boring because it completely ignores the
 content of the nodes. So let's change the handler to only count hotels
@@ -94,7 +97,7 @@ copy any data that should be kept for later use into their own data
 structures. This also includes attributes like tag lists.
 
 Handling Geometries
-+++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^
 
 Because of the way that OSM data is structured, osmium needs to internally
 cache node geometries, when the handler wants to process the geometries of
@@ -117,7 +120,7 @@ cache like that::
 where `example.nodecache` is the name of the cache file.
 
 Interfacing with Shapely
-++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Pyosmium is a library for processing OSM files and therefore offers almost
 no functionality for processing geometries further. For this other libraries
@@ -149,3 +152,67 @@ example uses the libgeos wrapper `Shapely`_ to compute the total way length::
         print("Total length: %f" % h.total)
 
 .. _Shapely: http://toblerity.org/shapely/index.html
+
+
+Writing OSM Data
+----------------
+
+:py:class:`osmium.SimpleWriter` is the main class that takes care of
+writing out OSM data to a file. The file name must be given when the
+writer is constructed. Its suffix determines the format of the data.
+For example::
+
+    writer = osmium.SimpleWriter('nodes.osm.bz2')
+
+opens a new writer for a packed OSM XML file. Objects can be written
+by using one of the writers ``add_*`` functions.
+
+A simple handler, that only writes out all the nodes from the input
+file into out new ``nodes.osm.bz2`` file would look like this::
+
+    import osmium
+
+    class NodeWriter(osmium.SimpleHandler):
+        def __init__(self, writer):
+            osmium.SimpleHandler.__init__(self)
+            self.writer = writer
+
+        def node(self, n):
+            self.writer.add_node(n)
+
+This example shows that an unmodified object can be written out directly
+to the writer. Normally, however, you want to modify some data. The native
+osmium OSM types are immutable and cannot be changed directly. Therefore
+you have create a copy that can be changed. The ``node``, ``way`` and ``relation``
+objects offer a convenient ``replace()`` function to achieve exactly that.
+The function makes a copy and a the same time replaces all attibutes where
+new values are given as parameters to the function.
+
+Let's say you want to
+remove all the user names from your nodes before saving them to the new
+file (maybe to save some space), then the ``node()`` handler callback above
+needs to be changed like that::
+
+    class NodeWriter(osmium.SimpleHandler):
+        ...
+
+        def node(self, n):
+            self.writer.add_node(n.replace(user=""))
+
+``replace()`` creates a new instance of an ``osmium.osm.mutable.`` object. These
+class a real python versions of the native object types in ``osmium.osm``. They
+have exactly the same attributes but they are mutable.
+
+A writer is able to process the mutable datatypes just like the native osmium
+types. In fact, a writer is able to process any python object. It just expects
+suitably named attributes and will simply assume sensible default values for
+attributes that are missing.
+
+.. note::
+
+    It is important to understand that ``replace()`` only makes a shallow copy
+    of the object. Tag, node and member lists are still native osmium objects.
+    Normally this is what you want because the writer is much faster writing
+    these native objects than pythonized copies. However, it means that you
+    cannot use ``replace()`` to create a copy of the object that can be kept
+    after the handler callback has finished.
