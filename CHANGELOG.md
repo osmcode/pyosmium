@@ -8,7 +8,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Experimental write support, see documentation
+- Multiple examples for writing data
+
 ### Changed
+
+- Use current libosmium
+- Improve timestamp to datetime conversion
+- Simplified package structure that uses the compiled libs directly
 
 ### Fixed
 
