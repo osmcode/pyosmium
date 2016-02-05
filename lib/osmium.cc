@@ -97,6 +97,11 @@ BOOST_PYTHON_MODULE(_osmium)
              "the file will be scanned twice and a location handler and a\n"
              "handler for assembling multipolygones and areas from ways will\n"
              "be executed.")
+        .def("apply_buffer", &SimpleHandlerWrap::apply_buffer,
+              (arg("self"), arg("buffer"), arg("format"),
+               arg("locations")=false, arg("idx")="sparse_mem_array"),
+             "Apply the handler to a string buffer. The buffer must be a\n"
+             "byte string.")
     ;
     def("apply", &apply_reader_simple<BaseHandler>,
         "Apply a chain of handlers.");
