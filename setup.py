@@ -58,7 +58,7 @@ for ext in ('io', 'index', 'geom'):
            extra_compile_args = extra_compile_args
          ))
 
-for ext in ('osm', ):
+for ext in ('osm', 'replication'):
     extensions.append(Extension('osmium.%s._%s' % (ext, ext),
            sources = ['lib/%s.cc' % ext],
            include_dirs = includes,
