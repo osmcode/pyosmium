@@ -22,6 +22,22 @@ matrix:
         - os: linux
           compiler: gcc
           env: USE_PYTHON_VERSION=3
+        - os: osx
+          osx_image: xcode6.4
+          compiler: clang
+          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX= BOOST_PYTHON_OPTION=
+        - os: osx
+          osx_image: xcode6.4
+          compiler: clang
+          env: USE_PYTHON_VERSION=3 PYTHON_SUFFIX=3 BOOST_PYTHON_OPTION="--with-python3 --without-python"
+        - os: osx
+          osx_image: xcode7
+          compiler: clang
+          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX= BOOST_PYTHON_OPTION=
+        - os: osx
+          osx_image: xcode7
+          compiler: clang
+          env: USE_PYTHON_VERSION=3 PYTHON_SUFFIX=3 BOOST_PYTHON_OPTION="--with-python3 --without-python"
 
 # http://docs.travis-ci.com/user/apt/
 addons:
@@ -42,6 +58,11 @@ addons:
 
 install:
     - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git ../libosmium
+    - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
+          brew install python$PYTHON_SUFFIX google-sparsehash;
+          brew install boost-python $BOOST_PYTHON_OPTION;
+          pip$PYTHON_SUFFIX install -q nose;
+      fi
 
 script:
     - if [ "${CXX}" = 'g++' ]; then
