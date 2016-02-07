@@ -109,7 +109,7 @@ BOOST_PYTHON_MODULE(_osmium)
         "exists. The file type to output is determined from the file extension. "
         "The second (optional) parameter is the buffer size. osmium caches the "
         "output data in an internal memory buffer before writing it on disk. This "
-        "parameter allows to change the default buffer size of 4MB. Larger buffers "
+        "parameter allows changing the default buffer size of 4MB. Larger buffers "
         "are normally better but you should be aware that there are normally multiple "
         "buffers in use during the write process.",
         init<const char*, unsigned long>())
