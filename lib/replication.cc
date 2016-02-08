@@ -10,15 +10,7 @@ namespace pyosmium {
 struct LastChangeHandler : public osmium::handler::Handler {
     osmium::Timestamp last_change;
 
-    void node(const osmium::Node& obj) {
-        set(obj.timestamp());
-    }
-
-    void way(const osmium::Way& obj) {
-        set(obj.timestamp());
-    }
-
-    void relation(const osmium::Relation& obj) {
+    void osm_object(const osmium::OSMObject& obj) {
         set(obj.timestamp());
     }
 
