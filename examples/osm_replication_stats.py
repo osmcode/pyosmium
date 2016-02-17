@@ -6,7 +6,7 @@ Shows how to detect the different kind of modifications.
 """
 import osmium as o
 import sys
-from datetime import datetime
+import datetime as dt
 import osmium.replication.server as rserv
 
 class Stats(object):
@@ -53,7 +53,9 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     server_url = sys.argv[1]
-    start = datetime.strptime(sys.argv[2], "%Y-%m-%dT%H:%M:%SZ")
+    start = dt.datetime.strptime(sys.argv[2], "%Y-%m-%dT%H:%M:%SZ")
+    if sys.version_info >= (3,0):
+        start = start.replace(tzinfo=dt.timezone.utc)
     maxkb = min(int(sys.argv[3]), 10 * 1024)
 
     repserv = rserv.ReplicationServer(server_url)

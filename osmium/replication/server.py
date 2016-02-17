@@ -2,8 +2,14 @@
 """
 
 import sys
-import urllib.request
-import urllib.error
+try:
+    import urllib.request as urlrequest
+except ImportError:
+    import urllib2 as urlrequest
+try:
+    import urllib.error as urlerror
+except ImportError:
+    import urllib2 as urlerror
 import datetime as dt
 from collections import namedtuple
 from math import ceil
@@ -97,9 +103,9 @@ class ReplicationServer(object):
             if balanced_search:
                 base_splitid = int((lower.sequence + upper.sequence) / 2)
             else:
-                ts_int = upper.timestamp - lower.timestamp
+                ts_int = (upper.timestamp - lower.timestamp).total_seconds()
                 seq_int = upper.sequence - lower.sequence
-                goal = timestamp - lower.timestamp
+                goal = (timestamp - lower.timestamp).total_seconds()
                 base_splitid = lower.sequence + ceil(goal * seq_int / ts_int)
                 if base_splitid == upper.sequence:
                     base_splitid -= 1
@@ -138,8 +144,8 @@ class ReplicationServer(object):
             returns `None`.
         """
         try:
-            response = urllib.request.urlopen(self.get_state_url(seq))
-        except urllib.error.HTTPError:
+            response = urlrequest.urlopen(self.get_state_url(seq))
+        except urlerror.HTTPError:
             return None
 
         ts = None
@@ -166,9 +172,10 @@ class ReplicationServer(object):
     def get_diff_block(self, seq):
         """ Downloads the diff with the given sequence number and returns
             it as a byte sequence. Throws a `urllib.error.HTTPError`
+            (or `urllib2.HTTPError` in python2)
             if the file cannot be downloaded.
         """
-        return urllib.request.urlopen(self.get_diff_url(seq)).read()
+        return urlrequest.urlopen(self.get_diff_url(seq)).read()
 
 
     def get_state_url(self, seq):
