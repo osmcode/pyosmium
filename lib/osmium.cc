@@ -6,6 +6,7 @@
 
 #include "generic_writer.hpp"
 #include "generic_handler.hpp"
+#include "merged_input.hpp"
 
 template <typename T>
 void apply_reader_simple(osmium::io::Reader &rd, T &h) {
@@ -140,5 +141,27 @@ BOOST_PYTHON_MODULE(_osmium)
              "strictly necessary to call this function explicitly, it is still "
              "strongly recommended to close the writer as soon as possible, so "
              "that the buffer memory can be freed.")
+    ;
+
+    class_<pyosmium::MergeInputReader, boost::noncopyable>("MergeInputReader",
+        "Collects data from multiple input files and sorts and optionally "
+        "deduplicates the data before apllying it to a handler.")
+        .def("apply", &pyosmium::MergeInputReader::apply,
+            (arg("self"), arg("handler"), arg("simplify")=true),
+            "Apply collected data to a handler. The data will be sorted first. "
+            "If `simplify` is true (default) then duplicates will be eliminated "
+            "and only the newest version of each object kept. After the data "
+            "has been applied the buffer of the MergeInputReader is empty and "
+            "new data can be added for the next round of application.")
+        .def("add_file", &pyosmium::MergeInputReader::add_file,
+            (arg("self"), arg("file")),
+             "Add data from a file to the internal cache. The file type will be "
+             "determined from the file extension.")
+        .def("add_buffer", &pyosmium::MergeInputReader::add_buffer,
+             (arg("self"), arg("buffer"), arg("format")),
+             "Add data from a byte buffer. The format of the input data must "
+             "be given in the `format` argument as a string. The data will be "
+             "copied into internal buffers, so that the input buffer can be "
+             "safely discarded after the function has been called.")
     ;
 }

@@ -34,6 +34,7 @@ osmium::Timestamp compute_latest_change(const char* filename)
     return handler.last_change;
 }
 
+
 }
 
 BOOST_PYTHON_MODULE(_replication)

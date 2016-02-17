@@ -1,11 +1,13 @@
 """ Helper functions to communicate with replication servers.
 """
 
+import sys
 import urllib.request
 import urllib.error
-from datetime import datetime
+import datetime as dt
 from collections import namedtuple
 from math import ceil
+from osmium import MergeInputReader
 
 OsmosisState = namedtuple('OsmosisState', ['sequence', 'timestamp'])
 
@@ -15,8 +17,37 @@ class ReplicationServer(object):
         the full dataset again.
     """
 
-    def __init__(self, url):
+    def __init__(self, url, diff_type='osc.gz'):
         self.baseurl = url
+        self.diff_type = diff_type
+
+    def apply_diffs(self, handler, start_id, max_size=1024, simplify=True):
+        """ Download diffs starting with sequence id `start_id`, merge them
+            together and then apply them to handler `handler`. `max_size`
+            restricts the number of diffs that are downloaded. The download
+            stops as soon as either a diff cannot be downloaded or the
+            unpacked data in memory exceeds `max_size` kB.
+
+            The function returns the sequence id of the last diff that was
+            downloaded or None if the download failed completely.
+        """
+        left_size = max_size * 1024
+        current_id = start_id
+        rd = MergeInputReader()
+
+        while left_size > 0:
+            try:
+                diffdata = self.get_diff_block(current_id)
+            except:
+                if start_id == current_id:
+                    return None
+                break
+            left_size -= rd.add_buffer(diffdata, self.diff_type)
+            current_id += 1
+
+        rd.apply(handler, simplify)
+
+        return current_id - 1
 
 
     def timestamp_to_sequence(self, timestamp, balanced_search=False):
@@ -101,8 +132,13 @@ class ReplicationServer(object):
 
 
     def get_state_info(self, seq=None):
+        """ Downloads and returns the state information for the given
+            sequence. If the download is successful, a namedtuple with
+            `sequence` and `timestamp` is returned, otherwise the function
+            returns `None`.
+        """
         try:
-            response = urllib.request.urlopen(self.sequence_to_state_url(seq))
+            response = urllib.request.urlopen(self.get_state_url(seq))
         except urllib.error.HTTPError:
             return None
 
@@ -120,12 +156,22 @@ class ReplicationServer(object):
                 if key == 'sequenceNumber':
                     seq = int(val)
                 elif key == 'timestamp':
-                    ts = datetime.strptime(val, "%Y-%m-%dT%H\\:%M\\:%SZ")
+                    ts = dt.datetime.strptime(val, "%Y-%m-%dT%H\\:%M\\:%SZ")
+                    if sys.version_info >= (3,0):
+                        ts = ts.replace(tzinfo=dt.timezone.utc)
             line = response.readline()
 
         return OsmosisState(sequence=seq, timestamp=ts)
 
-    def sequence_to_state_url(self, seq):
+    def get_diff_block(self, seq):
+        """ Downloads the diff with the given sequence number and returns
+            it as a byte sequence. Throws a `urllib.error.HTTPError`
+            if the file cannot be downloaded.
+        """
+        return urllib.request.urlopen(self.get_diff_url(seq)).read()
+
+
+    def get_state_url(self, seq):
         """ Returns the URL of the state.txt files for a given sequence id.
         """
         if seq is None:
@@ -135,3 +181,9 @@ class ReplicationServer(object):
                      seq / 1000000, (seq % 100000) / 1000, seq % 1000)
 
 
+    def get_diff_url(self, seq):
+        """ Returns the URL to the diff file for the given sequence id.
+        """
+        return '%s/%03i/%03i/%03i.%s' % (self.baseurl,
+                     seq / 1000000, (seq % 100000) / 1000, seq % 1000,
+                     self.diff_type)
