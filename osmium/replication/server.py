@@ -107,8 +107,8 @@ class ReplicationServer(object):
                 seq_int = upper.sequence - lower.sequence
                 goal = (timestamp - lower.timestamp).total_seconds()
                 base_splitid = lower.sequence + ceil(goal * seq_int / ts_int)
-                if base_splitid == upper.sequence:
-                    base_splitid -= 1
+                if base_splitid >= upper.sequence:
+                    base_splitid = upper.sequence - 1
             split = self.get_state_info(base_splitid)
 
             if split is None:
@@ -185,12 +185,12 @@ class ReplicationServer(object):
             return self.baseurl + '/state.txt'
 
         return '%s/%03i/%03i/%03i.state.txt' % (self.baseurl,
-                     seq / 1000000, (seq % 100000) / 1000, seq % 1000)
+                     seq / 1000000, (seq % 1000000) / 1000, seq % 1000)
 
 
     def get_diff_url(self, seq):
         """ Returns the URL to the diff file for the given sequence id.
         """
         return '%s/%03i/%03i/%03i.%s' % (self.baseurl,
-                     seq / 1000000, (seq % 100000) / 1000, seq % 1000,
+                     seq / 1000000, (seq % 1000000) / 1000, seq % 1000,
                      self.diff_type)
