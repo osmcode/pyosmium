@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
 
     # go through the ways to find all relevant nodes
-    ways = WayFilter(writer)
+    ways = WayFilter()
     ways.apply_file(sys.argv[1])
 
     # go through the file again and write out the data
