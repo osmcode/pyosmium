@@ -53,9 +53,12 @@ class ReplicationServer(object):
             try:
                 diffdata = self.get_diff_block(current_id)
             except:
+                diffdata = ''
+            if len(diffdata) == 0:
                 if start_id == current_id:
                     return None
                 break
+
             left_size -= rd.add_buffer(diffdata, self.diff_type)
             current_id += 1
 
