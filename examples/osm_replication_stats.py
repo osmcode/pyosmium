@@ -61,10 +61,11 @@ if __name__ == '__main__':
     repserv = rserv.ReplicationServer(server_url)
 
     seqid = repserv.timestamp_to_sequence(start)
-    print("Sequence:", seqid)
+    print("Initial sequence id:", seqid)
 
     h = FileStatsHandler()
-    repserv.apply_diffs(h, seqid, maxkb)
+    seqid = repserv.apply_diffs(h, seqid, maxkb)
+    print("Final sequence id:", seqid)
 
     h.nodes.outstats("Nodes")
     h.ways.outstats("Ways")

@@ -39,9 +39,17 @@ class ReplicationServer(object):
         """
         left_size = max_size * 1024
         current_id = start_id
+
+        # must not read data newer than the published sequence id
+        # or we might end up reading partial data
+        newest = self.get_state_info()
+
+        if current_id > newest.sequence:
+            return None
+
         rd = MergeInputReader()
 
-        while left_size > 0:
+        while left_size > 0 and current_id <= newest.sequence:
             try:
                 diffdata = self.get_diff_block(current_id)
             except:
@@ -180,6 +188,10 @@ class ReplicationServer(object):
 
     def get_state_url(self, seq):
         """ Returns the URL of the state.txt files for a given sequence id.
+
+            If seq is `None` the URL for the latest state info is returned,
+            i.e. the state file in the root directory of the replication
+            service.
         """
         if seq is None:
             return self.baseurl + '/state.txt'
