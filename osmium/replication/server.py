@@ -42,7 +42,10 @@ class ReplicationServer(object):
 
         # must not read data newer than the published sequence id
         # or we might end up reading partial data
-        newest = self.get_state_info()
+        try:
+            newest = self.get_state_info()
+        except:
+            return None
 
         if current_id > newest.sequence:
             return None
