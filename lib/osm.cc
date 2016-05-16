@@ -50,6 +50,7 @@ BOOST_PYTHON_MODULE(_osm)
 
     to_python_converter<osmium::Timestamp, Timestamp_to_python>();
     std_pair_to_python_converter<int, int>();
+    std_pair_to_python_converter<unsigned long, unsigned long>();
 
     enum_<osmium::osm_entity_bits::type>("osm_entity_bits")
         .value("NOTHING", osmium::osm_entity_bits::nothing)
