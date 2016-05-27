@@ -159,7 +159,7 @@ class ReplicationServer(object):
         """
         try:
             response = urlrequest.urlopen(self.get_state_url(seq))
-        except urlerror.HTTPError:
+        except:
             return None
 
         ts = None
