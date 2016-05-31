@@ -42,12 +42,9 @@ class ReplicationServer(object):
 
         # must not read data newer than the published sequence id
         # or we might end up reading partial data
-        try:
-            newest = self.get_state_info()
-        except:
-            return None
+        newest = self.get_state_info()
 
-        if current_id > newest.sequence:
+        if newest is None or current_id > newest.sequence:
             return None
 
         rd = MergeInputReader()
