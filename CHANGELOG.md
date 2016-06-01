@@ -13,6 +13,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.7.1] - 2016-06-01
+
+### Added
+
+- `apply_buffer()` for handling in-memory data
+- MergeInputReader for reading and sorting multiple input files
+- Functions using replication change files to update an OSM file or database.
+
+### Changed
+
+- Use current libosmium
+
+
 ## [2.6.0] - 2016-02-04
 
 ### Added
@@ -66,7 +79,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.6.0...HEAD
+[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.7.1...HEAD
+[2.7.1]: https://github.com/osmcode/pyosmium/compare/v2.6.0...v2.7.1
 [2.6.0]: https://github.com/osmcode/pyosmium/compare/v2.5.4...v2.6.0
 [2.5.4]: https://github.com/osmcode/pyosmium/compare/v2.5.3...v2.5.4
 [2.5.3]: https://github.com/osmcode/pyosmium/compare/v2.4.1...v2.5.3
