@@ -108,7 +108,7 @@ class TestWriteTags(unittest.TestCase):
 class TestWriteNode(unittest.TestCase):
 
     def test_location_tuple(self):
-        with WriteExpect('n0 v0 dV c0 t i0 u T x1.0000000 y2.0000000') as w:
+        with WriteExpect('n0 v0 dV c0 t i0 u T x1 y2') as w:
             w.add_node(O(location=(1, 2)))
 
     def test_location_none(self):
