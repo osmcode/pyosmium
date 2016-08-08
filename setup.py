@@ -70,7 +70,7 @@ for ext in ('osm', 'replication'):
     packages.append('osmium.%s' % ext)
 
 setup (name = 'pyosmium',
-       version = '2.7.1',
+       version = '2.8.0',
        description = 'Provides python bindings for libosmium.',
        packages = packages,
        ext_modules = extensions)
