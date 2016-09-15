@@ -222,7 +222,7 @@ private:
 
     void set_memberlist(const boost::python::object& o,
                         osmium::builder::RelationBuilder *builder) {
-        // original nodelist
+        // original memberlist
         boost::python::extract<osmium::RelationMemberList&> oml(o);
         if (oml.check()) {
             if (oml().size() > 0)
