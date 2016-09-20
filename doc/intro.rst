@@ -199,9 +199,9 @@ needs to be changed like that::
         def node(self, n):
             self.writer.add_node(n.replace(user=""))
 
-``replace()`` creates a new instance of an ``osmium.osm.mutable.`` object. These
-class a real python versions of the native object types in ``osmium.osm``. They
-have exactly the same attributes but they are mutable.
+``replace()`` creates a new instance of an ``osmium.osm.mutable`` object. These
+classes are python implementations of the native object types in ``osmium.osm``.
+They have exactly the same attributes but they are mutable.
 
 A writer is able to process the mutable datatypes just like the native osmium
 types. In fact, a writer is able to process any python object. It just expects
