@@ -56,6 +56,8 @@ class TestFileHeader(unittest.TestCase):
             rd = o.io.Reader(fn)
             h = rd.header()
             assert_false(h.has_multiple_object_versions)
+            assert_true(h.box().valid())
+            assert_equals(h.box().size(), 64800.0)
             rd.close()
         finally:
             os.remove(fn)

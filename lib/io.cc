@@ -17,6 +17,9 @@ BOOST_PYTHON_MODULE(io)
                       "True if there may be more than one version of the same "
                       "object in the file. This happens normally only in history "
                       "files.")
+        .def("box", &osmium::io::Header::box, arg("self"),
+                "Return the bounding box of the data in the file or an invalid "
+                "box if the information is not available.")
     ;
 
     class_<osmium::io::Reader, boost::noncopyable>("Reader", 
