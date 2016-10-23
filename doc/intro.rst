@@ -123,9 +123,9 @@ Interfacing with Shapely
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Pyosmium is a library for processing OSM files and therefore offers almost
-no functionality for processing geometries further. For this other libraries
-exist. To interface with these libraries you can simply convert the osmium
-geometries into WKB or WKT format and import the result. The following
+no functionality for processing geometries further. There are other libraries
+for that puspose. To interface with these libraries you can simply convert the
+osmium geometries into WKB or WKT format and import the result. The following
 example uses the libgeos wrapper `Shapely`_ to compute the total way length::
 
     import osmium
