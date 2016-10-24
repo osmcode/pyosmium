@@ -1,0 +1,6 @@
+include *md
+include LICENSE.TXT
+include lib/*.hpp
+include doc/*.rst
+include examples/*py
+include test/*py
