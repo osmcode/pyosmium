@@ -175,7 +175,7 @@ class ReplicationServer(object):
                 if kv[0] == 'sequenceNumber':
                     seq = int(kv[1])
                 elif kv[0] == 'timestamp':
-                    ts = dt.datetime.strptime(key[1], "%Y-%m-%dT%H\\:%M\\:%SZ")
+                    ts = dt.datetime.strptime(kv[1], "%Y-%m-%dT%H\\:%M\\:%SZ")
                     if sys.version_info >= (3,0):
                         ts = ts.replace(tzinfo=dt.timezone.utc)
             line = response.readline()
