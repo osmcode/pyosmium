@@ -145,7 +145,7 @@ BOOST_PYTHON_MODULE(_osmium)
 
     class_<pyosmium::MergeInputReader, boost::noncopyable>("MergeInputReader",
         "Collects data from multiple input files and sorts and optionally "
-        "deduplicates the data before apllying it to a handler.")
+        "deduplicates the data before applying it to a handler.")
         .def("apply", &pyosmium::MergeInputReader::apply,
             (arg("self"), arg("handler"), arg("simplify")=true),
             "Apply collected data to a handler. The data will be sorted first. "
