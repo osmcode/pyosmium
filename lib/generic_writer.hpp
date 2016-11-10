@@ -137,9 +137,7 @@ private:
 
         if (hasattr(o, "user")) {
             auto s = boost::python::extract<const char *>(o.attr("user"));
-            builder.add_user(s);
-        } else {
-            builder.add_user("", 0);
+            builder.set_user(s);
         }
     }
 
@@ -150,7 +148,7 @@ private:
         boost::python::extract<osmium::TagList&> otl(o);
         if (otl.check()) {
             if (otl().size() > 0)
-                obuilder.add_item(&otl());
+                obuilder.add_item(otl());
             return;
         }
 
@@ -201,7 +199,7 @@ private:
         boost::python::extract<osmium::NodeRefList&> onl(o);
         if (onl.check()) {
             if (onl().size() > 0)
-                builder->add_item(&onl());
+                builder->add_item(onl());
             return;
         }
 
@@ -226,7 +224,7 @@ private:
         boost::python::extract<osmium::RelationMemberList&> oml(o);
         if (oml.check()) {
             if (oml().size() > 0)
-                builder->add_item(&oml());
+                builder->add_item(oml());
             return;
         }
 
