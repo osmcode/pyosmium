@@ -13,6 +13,25 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.10.2] - 2016-11-16
+
+### Added
+
+- support for sdist creation (now published via Pypi)
+- custom locations for libosmium and boost can be set via the
+  environment variables LIBOSMIUM_PREFIX and BOOST_PREFIX.
+- export bounding box from osmium::io::Header
+
+### Changed
+
+- Use libosmium 2.10.2
+
+### Fixed
+
+- various typos in documentation
+- crash in replication handler on incomplete state files
+
+
 ## [2.9.0] - 2016-09-15
 
 ### Changed
