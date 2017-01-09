@@ -2,6 +2,7 @@
 ------------------------------------
 
 This module provides various helper functions for geometry handling.
+Note: remember to apply a location handler before in order to use these geometry utilities on node locations.
 
 Geometry Factories
 ^^^^^^^^^^^^^^^^^^
