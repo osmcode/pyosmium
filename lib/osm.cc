@@ -170,7 +170,8 @@ BOOST_PYTHON_MODULE(_osm)
         "is normally not used directly, use one of its subclasses instead.",
         no_init)
         .def("__len__", &osmium::NodeRefList::size)
-        .def("__getitem__", &osmium::NodeRefList::operator[], return_value_policy<reference_existing_object>())
+        .def("__getitem__",
+             make_function(static_cast<const osmium::NodeRef& (osmium::NodeRefList::*)(osmium::NodeRefList::size_type) const>(&osmium::NodeRefList::operator[]), return_value_policy<reference_existing_object>()))
         .def("__iter__", iterator<osmium::NodeRefList,return_internal_reference<>>())
         .def("is_closed", &osmium::NodeRefList::is_closed, args("self"),
              "True if the start and end node are the same (synonym for "
