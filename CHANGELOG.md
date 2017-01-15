@@ -13,13 +13,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.11.0] - 2017-01-15
+
+### Changed
+
+- Use current libosmium
+
+
 ## [2.10.2] - 2016-11-16
 
 ### Added
 
 - support for sdist creation (now published via Pypi)
 - custom locations for libosmium and boost can be set via the
-  environment variables LIBOSMIUM_PREFIX and BOOST_PREFIX.
+  environment variables `LIBOSMIUM_PREFIX` and `BOOST_PREFIX`.
 - export bounding box from osmium::io::Header
 
 ### Changed
@@ -116,7 +123,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.9.0...HEAD
+[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.11.0...HEAD
+[2.11.0]: https://github.com/osmcode/pyosmium/compare/v2.10.2...v2.11.0
+[2.10.2]: https://github.com/osmcode/pyosmium/compare/v2.9.0...v2.10.2
 [2.9.0]: https://github.com/osmcode/pyosmium/compare/v2.8.0...v2.9.0
 [2.8.0]: https://github.com/osmcode/pyosmium/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/osmcode/pyosmium/compare/v2.6.0...v2.7.1
