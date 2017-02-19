@@ -26,11 +26,11 @@ protected:
 
 public:
 // handler functions
-virtual void node(const osmium::Node&) const = 0;
-virtual void way(const osmium::Way&) const = 0;
-virtual void relation(const osmium::Relation&) const = 0;
-virtual void changeset(const osmium::Changeset&) const = 0;
-virtual void area(const osmium::Area&) const = 0;
+virtual void node(const osmium::Node&)= 0;
+virtual void way(const osmium::Way&) = 0;
+virtual void relation(const osmium::Relation&) = 0;
+virtual void changeset(const osmium::Changeset&) = 0;
+virtual void area(const osmium::Area&) = 0;
 
 
 private:
@@ -103,44 +103,44 @@ using namespace boost::python;
 
 struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
 
-    void node(const osmium::Node& node) const {
+    void node(const osmium::Node& node) {
         if (override f = this->get_override("node"))
             f(boost::ref(node));
     }
 
-    void default_node(const osmium::Node&) const {
+    void default_node(const osmium::Node&) {
     }
 
-    void way(const osmium::Way& way) const {
+    void way(const osmium::Way& way) {
         if (override f = this->get_override("way"))
             f(boost::ref(way));
     }
 
-    void default_way(const osmium::Way&) const {
+    void default_way(const osmium::Way&) {
     }
 
-    void relation(const osmium::Relation& rel) const {
+    void relation(const osmium::Relation& rel) {
         if (override f = this->get_override("relation"))
             f(boost::ref(rel));
     }
 
-    void default_relation(const osmium::Relation&) const {
+    void default_relation(const osmium::Relation&) {
     }
 
-    void changeset(const osmium::Changeset& cs) const {
+    void changeset(const osmium::Changeset& cs) {
         if (override f = this->get_override("changeset"))
             f(boost::ref(cs));
     }
 
-    void default_changeset(const osmium::Changeset&) const {
+    void default_changeset(const osmium::Changeset&) {
     }
 
-    void area(const osmium::Area& area) const {
+    void area(const osmium::Area& area) {
         if (override f = this->get_override("area"))
             f(boost::ref(area));
     }
 
-    void default_area(const osmium::Area&) const {
+    void default_area(const osmium::Area&) {
     }
 
     void apply_file(const std::string &filename, bool locations = false,

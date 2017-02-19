@@ -7,6 +7,7 @@
 #include "generic_writer.hpp"
 #include "generic_handler.hpp"
 #include "merged_input.hpp"
+#include "write_handler.hpp"
 
 template <typename T>
 void apply_reader_simple(osmium::io::Reader &rd, T &h) {
@@ -112,7 +113,7 @@ BOOST_PYTHON_MODULE(_osmium)
     class_<SimpleWriterWrap, boost::noncopyable>("SimpleWriter",
         "The most generic class to write osmium objects into a file. The writer "
         "takes a file name as its mandatory parameter. The file must not yet "
-        "exists. The file type to output is determined from the file extension. "
+        "exist. The file type to output is determined from the file extension. "
         "The second (optional) parameter is the buffer size. osmium caches the "
         "output data in an internal memory buffer before writing it on disk. This "
         "parameter allows changing the default buffer size of 4MB. Larger buffers "
@@ -136,6 +137,26 @@ BOOST_PYTHON_MODULE(_osmium)
              "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Way`` "
              "object or any other Python object that implements the same attributes.")
         .def("close", &SimpleWriterWrap::close,
+             args("self"),
+             "Flush the remaining buffers and close the writer. While it is not "
+             "strictly necessary to call this function explicitly, it is still "
+             "strongly recommended to close the writer as soon as possible, so "
+             "that the buffer memory can be freed.")
+    ;
+
+    class_<WriteHandler, boost::noncopyable>("WriteHandler",
+        "Handler function that writes all data directly to a file."
+        "The handler takes a file name as its mandatory parameter. The file "
+        "must not yet exist. The file type to output is determined from the "
+        "file extension. "
+        "The second (optional) parameter is the buffer size. osmium caches the "
+        "output data in an internal memory buffer before writing it on disk. This "
+        "parameter allows changing the default buffer size of 4MB. Larger buffers "
+        "are normally better but you should be aware that there are normally multiple "
+        "buffers in use during the write process.",
+        init<const char*, unsigned long>())
+        .def(init<const char*>())
+        .def("close", &WriteHandler::close,
              args("self"),
              "Flush the remaining buffers and close the writer. While it is not "
              "strictly necessary to call this function explicitly, it is still "

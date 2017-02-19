@@ -1,0 +1,115 @@
+#!/usr/bin/python
+"""
+Fetch diffs from an OSM planet server.
+
+The starting point of the diff must be given either as a sequence ID or a date
+or can be computed from an OSM file. If no output file is given, the program
+will just print the intial sequence ID it would use (or save it in a file, if
+requested) and exit. This can be used to bootstrap the update process.
+
+The program tries to download until the latest change on the server is found
+or the maximum requested diff size is reached. Note that diffs are kept in
+memory during download.
+
+On success, the program will print a single number to stdout, the sequence
+number where to continue updates in the next run. This output can also be
+written to (and later read from) a file.
+"""
+
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from datetime import datetime
+from osmium.replication import server as rserv
+from osmium.replication import newest_change_from_file
+from osmium import SimpleHandler, WriteHandler
+
+import sys
+
+class InputArgumentError(Exception):
+    pass
+
+def get_start_sequence(svr, opt):
+    if opt.start_id is not None:
+        return opt.start_id
+
+    if opt.start_file is not None:
+        if opt.start_file == '-':
+            fid = sys.stdin.readline()
+        else:
+            with open(opt.start_file, 'r') as f:
+                fid = f.readline()
+        return int(fid)
+
+    if opt.start_date is not None:
+        try:
+            date = datetime.strptime(opt.start_date, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            raise InputArgumentError("Cannot parse start data. ISO8601 format required.")
+
+        return svr.timestamp_to_sequence(date)
+
+    if opt.start_osm_file is not None:
+        date = newest_change_from_file(opt.start_osm_file)
+        if date is None:
+            raise InputArgumentError("OSM file does not seem to contian valid data.")
+
+        return svr.timestamp_to_sequence(date)
+
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument('outfile', nargs='?',
+                        help="""Name of diff output file. If omitted, only the
+                              sequence ID will be printed where updates would start.""")
+    parser.add_argument('--server', action='store', dest='server_url',
+                        default='http://planet.osm.org/replication/minute/',
+                        help='Base URL of the replication server')
+    parser.add_argument('-s', '--size', dest='outsize', type=int, default=10*1024,
+                        help='Maximum data to load in kB (default: 10MB).')
+    parser.add_argument('-d', '--no-deduplicate', action='store_false', dest='simplify',
+                        help='Do not deduplicate and sort diffs.')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-I', '--start-id', action='store', dest='start_id',
+                       type=int, metavar='ID',
+                       help='Sequence ID to start with')
+    group.add_argument('-F', '--start-file', action='store', dest='start_file',
+                       metavar='FILE',
+                       help='Read start sequence ID from given file (- for stdin)')
+    group.add_argument('-D', '--start-date', action='store', dest='start_date',
+                       metavar='DATE',
+                       help='Date when to start updates')
+    group.add_argument('-O', '--start-osm-data', action='store', dest='start_osm_file',
+                       metavar='OSMFILE',
+                       help='--start at the date of the newest OSM object in the file')
+    parser.add_argument('-f', '--sequence-file', dest='end_file',
+                       help='Store the final sequence id in the given file.')
+
+    options = parser.parse_args()
+
+    svr = rserv.ReplicationServer(options.server_url)
+
+    startseq = get_start_sequence(svr, options)
+
+    if options.outfile is None:
+        if options.end_file is not None:
+            with open(options.end_file, 'w') as fd:
+                fd.write(str(startseq))
+        else:
+            print(startseq)
+        exit(0)
+
+    outhandler = WriteHandler(options.outfile)
+
+    endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize,
+                             simplify=options.simplify)
+    outhandler.close()
+
+    if endseq is None:
+        exit(3)
+
+    if options.end_file is not None:
+        with open(options.end_file, 'w') as fd:
+            fd.write(str(endseq))
+    else:
+        print(endseq + 1)
