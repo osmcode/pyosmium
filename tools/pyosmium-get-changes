@@ -59,14 +59,14 @@ def get_start_sequence(svr, opt):
 if __name__ == '__main__':
     parser = ArgumentParser(description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
-    parser.add_argument('outfile', nargs='?',
+    parser.add_argument('-o', '--outfile', dest='outfile',
                         help="""Name of diff output file. If omitted, only the
                               sequence ID will be printed where updates would start.""")
     parser.add_argument('--server', action='store', dest='server_url',
-                        default='http://planet.osm.org/replication/minute/',
+                        default='https://planet.osm.org/replication/minute/',
                         help='Base URL of the replication server')
-    parser.add_argument('-s', '--size', dest='outsize', type=int, default=10*1024,
-                        help='Maximum data to load in kB (default: 10MB).')
+    parser.add_argument('-s', '--size', dest='outsize', type=int, default=100,
+                        help='Maximum data to load in MB (default: 100MB).')
     parser.add_argument('-d', '--no-deduplicate', action='store_false', dest='simplify',
                         help='Do not deduplicate and sort diffs.')
     group = parser.add_mutually_exclusive_group(required=True)
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
     outhandler = WriteHandler(options.outfile)
 
-    endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize,
+    endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
                              simplify=options.simplify)
     outhandler.close()
 
