@@ -20,6 +20,12 @@ BOOST_PYTHON_MODULE(io)
         .def("box", &osmium::io::Header::box, arg("self"),
                 "Return the bounding box of the data in the file or an invalid "
                 "box if the information is not available.")
+        .def("get", &osmium::io::Header::get, (arg("self"), arg("key"), arg("default")=""),
+                "Get the value of header option 'key' or default value if "
+                "there is no header optoin with that name. The default cannot be "
+                "None.")
+        .def("set", &osmium::io::Header::get, (arg("self"), arg("key"), arg("value")),
+                "Set the value of header opton 'key'.")
     ;
 
     class_<osmium::io::Reader, boost::noncopyable>("Reader", 
