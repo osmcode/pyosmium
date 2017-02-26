@@ -14,3 +14,4 @@ information can be found in the osmium manual.
     ref_io
     ref_index
     ref_geom
+    ref_replication
