@@ -15,6 +15,11 @@ from collections import namedtuple
 from math import ceil
 from osmium import MergeInputReader
 
+import logging
+
+log = logging.getLogger('pyosmium')
+log.addHandler(logging.NullHandler())
+
 OsmosisState = namedtuple('OsmosisState', ['sequence', 'timestamp'])
 
 class ReplicationServer(object):
@@ -60,6 +65,7 @@ class ReplicationServer(object):
                 break
 
             left_size -= rd.add_buffer(diffdata, self.diff_type)
+            log.debug("Downloaded change %d. (%d bytes left to do)" % (current_id, left_size))
             current_id += 1
 
         rd.apply(handler, simplify)

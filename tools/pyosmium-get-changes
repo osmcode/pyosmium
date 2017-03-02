@@ -16,89 +16,208 @@ number where to continue updates in the next run. This output can also be
 written to (and later read from) a file.
 """
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 from datetime import datetime
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium import SimpleHandler, WriteHandler
+from osmium.io import Reader as oreader
 
 import sys
+import logging
+from textwrap import dedent as msgfmt
 
-class InputArgumentError(Exception):
-    pass
+log = logging.getLogger()
 
-def get_start_sequence(svr, opt):
-    if opt.start_id is not None:
-        return opt.start_id
+class ReplicationStart(object):
+    """ Represents the point where changeset download should begin.
+    """
 
-    if opt.start_file is not None:
-        if opt.start_file == '-':
-            fid = sys.stdin.readline()
-        else:
-            with open(opt.start_file, 'r') as f:
-                fid = f.readline()
-        return int(fid)
+    def __init__(self, date=None, seq_id=None, src=None):
+        self.date = date
+        self.seq_id = seq_id
+        self.source = src
 
-    if opt.start_date is not None:
+    def get_sequence(self, svr):
+        if self.seq_id is not None:
+            log.debug("Using given sequence ID %d" % self.seq_id)
+            return self.seq_id + 1
+
+        log.debug("Looking up sequence ID for timestamp %s" % self.date)
+        seq = svr.timestamp_to_sequence(self.date)
+        log.debug("Found sequence ID %d" % seq)
+
+        return seq + 1 if seq is not None else None
+
+    @staticmethod
+    def from_id(idstr):
         try:
-            date = datetime.strptime(opt.start_date, "%Y-%m-%dT%H:%M:%SZ")
+            seq_id=int(idstr)
         except ValueError:
-            raise InputArgumentError("Cannot parse start data. ISO8601 format required.")
+            raise ArgumentTypeError("Sequence id '%s' is not a number" % idstr)
 
-        return svr.timestamp_to_sequence(date)
+        if seq_id < 0:
+            raise ArgumentTypeError("Sequence id '%s' is negative" % idstr)
 
-    if opt.start_osm_file is not None:
-        date = newest_change_from_file(opt.start_osm_file)
-        if date is None:
-            raise InputArgumentError("OSM file does not seem to contian valid data.")
+        return ReplicationStart(seq_id=seq_id)
 
-        return svr.timestamp_to_sequence(date)
+    @staticmethod
+    def from_date(datestr):
+        try:
+            date = datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            raise ArgumentTypeError("Date needs to be in ISO8601 format (e.g. 2015-12-24T08:08Z).")
 
+        return ReplicationStart(date=date)
 
+    @staticmethod
+    def from_osm_file(fname, ignore_headers):
+        if ignore_headers:
+            ts = None
+            seq = None
+            url = None
+        else:
+            try:
+                r = oreader(fname)
+                h = r.header()
+            except RuntimeError as e:
+                raise ArgumentTypeError(e)
+
+            ts = h.get("osmosis_replication_timestamp")
+            seq = h.get("osmosis_replication_sequence_number")
+            url = h.get("osmosis_replication_base_url")
+
+            r = None
+
+            if url or seq or ts:
+                log.debug("Replication information found in OSM file header.")
+
+            if url:
+                log.debug("Replication URL: %s" % url)
+            else:
+                url = None
+
+            if seq:
+                log.debug("Replication sequence: %s" % seq)
+                try:
+                    seq = int(seq)
+                    if seq < 0:
+                        log.warning("Sequence id '%d' in OSM file header is negative. Ignored." % seq)
+                except ValueError:
+                    log.warning("Sequence id '%s' in OSM file header is not a number.Ignored" % seq)
+            else:
+                seq = None
+
+            if ts:
+                log.debug("Replication timestamp: %s" % ts)
+                try:
+                    ts = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
+                except ValueError:
+                    log.warning("Date in OSM file header is not in ISO8601 format (e.g. 2015-12-24T08:08Z). Ignored")
+            else:
+                ts = None
+
+        if ts is None and seq is None:
+            log.debug("OSM file has no replication headers. Looking for newest OSM object.")
+            try:
+                ts = newest_change_from_file(fname)
+            except RuntimeError as e:
+                raise ArgumentTypeError(e)
+
+            if ts is None:
+                raise ArgumentTypeError("OSM file does not seem to contain valid data.")
+
+        return ReplicationStart(seq_id=seq, date=ts, src=url)
+
+def write_end_sequence(fname, seqid):
+    """Either writes out the sequence file or prints the sequence id to stdout.
+    """
+    if fname is None:
+        print(seqid)
+    else:
+        with open(fname, 'w') as fd:
+            fd.write(str(startseq))
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stderr,
+                        format='%(levelname)s: %(message)s')
+
     parser = ArgumentParser(description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument('-v', dest='loglevel', action='count', default=0,
+                        help='Increase verbosity')
     parser.add_argument('-o', '--outfile', dest='outfile',
                         help="""Name of diff output file. If omitted, only the
                               sequence ID will be printed where updates would start.""")
     parser.add_argument('--server', action='store', dest='server_url',
-                        default='https://planet.osm.org/replication/minute/',
                         help='Base URL of the replication server')
     parser.add_argument('-s', '--size', dest='outsize', type=int, default=100,
                         help='Maximum data to load in MB (default: 100MB).')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-I', '--start-id', dest='start',
+                       type=ReplicationStart.from_id, metavar='ID',
+                       help='Sequence ID to start with')
+    group.add_argument('-D', '--start-date', dest='start', metavar='DATE',
+                       type=ReplicationStart.from_date,
+                       help='Date when to start updates')
+    group.add_argument('-O', '--start-osm-data', dest='start_file', metavar='OSMFILE',
+                       help='start at the date of the newest OSM object in the file')
+    parser.add_argument('-f', '--sequence-file', dest='seq_file',
+                       help="""Sequence file. If the file exists, then updates
+                               will start after the id given in the file. At the
+                               end of the process, the last sequence ID contained
+                               in the diff is written.""")
+    parser.add_argument('--ignore-osmosis-headers', dest='ignore_headers',
+                        action='store_true',
+                        help="""When determining the start from an OSM file,
+                                ignore potential replication information in the
+                                header and search for the newest OSM object.""")
     parser.add_argument('-d', '--no-deduplicate', action='store_false', dest='simplify',
                         help='Do not deduplicate and sort diffs.')
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-I', '--start-id', action='store', dest='start_id',
-                       type=int, metavar='ID',
-                       help='Sequence ID to start with')
-    group.add_argument('-F', '--start-file', action='store', dest='start_file',
-                       metavar='FILE',
-                       help='Read start sequence ID from given file (- for stdin)')
-    group.add_argument('-D', '--start-date', action='store', dest='start_date',
-                       metavar='DATE',
-                       help='Date when to start updates')
-    group.add_argument('-O', '--start-osm-data', action='store', dest='start_osm_file',
-                       metavar='OSMFILE',
-                       help='--start at the date of the newest OSM object in the file')
-    parser.add_argument('-f', '--sequence-file', dest='end_file',
-                       help='Store the final sequence id in the given file.')
 
     options = parser.parse_args()
 
-    svr = rserv.ReplicationServer(options.server_url)
+    log.setLevel(max(3 - options.loglevel, 0) * 10)
 
-    startseq = get_start_sequence(svr, options)
+    if options.start_file is not None:
+        options.start = ReplicationStart.from_osm_file(options.start_file,
+                                                       options.ignore_headers)
+    if options.start is None:
+        if options.seq_file is None:
+            log.error(msgfmt("""
+              Don't know with which change to start. One of the parameters
+                -I / -D / -O / -f
+              needs to begiven."""))
+            exit(1)
+
+        with open(opt.start_file, 'r') as f:
+            seq = f.readline()
+            options.start = ReplicationStart_from_id(seq)
+
+    if options.server_url is not None and options.start.source is not None:
+        if options.server_url != options.start.source:
+            log.error(msgfmt("""
+              You asked to use server URL:
+                %s
+              but the referenced OSM file points to replication server:
+                %s
+              If you really mean to overwrite the URL, use --ignore-osmosis-headers."""
+              % (options.server_url, options.start.source)))
+            exit(2)
+    url = options.server_url \
+            or options.start.source \
+            or 'https://planet.osm.org/replication/minute/'
+    logging.info("Using replication server at %s" % url)
+
+    svr = rserv.ReplicationServer(url)
+
+    startseq = options.start.get_sequence(svr)
 
     if options.outfile is None:
-        if options.end_file is not None:
-            with open(options.end_file, 'w') as fd:
-                fd.write(str(startseq))
-        else:
-            print(startseq)
+        write_end_sequence(options.seq_file, startseq)
         exit(0)
 
+    log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
     outhandler = WriteHandler(options.outfile)
 
     endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
@@ -108,8 +227,4 @@ if __name__ == '__main__':
     if endseq is None:
         exit(3)
 
-    if options.end_file is not None:
-        with open(options.end_file, 'w') as fd:
-            fd.write(str(endseq))
-    else:
-        print(endseq + 1)
+    write_end_sequence(options.seq_file, endseq)
