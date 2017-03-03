@@ -20,8 +20,8 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeEr
 from datetime import datetime
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
+from osmium.replication.utils import get_replication_header
 from osmium import SimpleHandler, WriteHandler
-from osmium.io import Reader as oreader
 
 import sys
 import logging
@@ -78,44 +78,9 @@ class ReplicationStart(object):
             url = None
         else:
             try:
-                r = oreader(fname)
-                h = r.header()
+                (ts, seq, url) = get_replication_header(fname)
             except RuntimeError as e:
                 raise ArgumentTypeError(e)
-
-            ts = h.get("osmosis_replication_timestamp")
-            seq = h.get("osmosis_replication_sequence_number")
-            url = h.get("osmosis_replication_base_url")
-
-            r = None
-
-            if url or seq or ts:
-                log.debug("Replication information found in OSM file header.")
-
-            if url:
-                log.debug("Replication URL: %s" % url)
-            else:
-                url = None
-
-            if seq:
-                log.debug("Replication sequence: %s" % seq)
-                try:
-                    seq = int(seq)
-                    if seq < 0:
-                        log.warning("Sequence id '%d' in OSM file header is negative. Ignored." % seq)
-                except ValueError:
-                    log.warning("Sequence id '%s' in OSM file header is not a number.Ignored" % seq)
-            else:
-                seq = None
-
-            if ts:
-                log.debug("Replication timestamp: %s" % ts)
-                try:
-                    ts = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
-                except ValueError:
-                    log.warning("Date in OSM file header is not in ISO8601 format (e.g. 2015-12-24T08:08Z). Ignored")
-            else:
-                ts = None
 
         if ts is None and seq is None:
             log.debug("OSM file has no replication headers. Looking for newest OSM object.")
