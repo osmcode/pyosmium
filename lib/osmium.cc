@@ -97,7 +97,7 @@ BOOST_PYTHON_MODULE(_osmium)
              "positions. In that case, the type of this position index can be\n"
              "further selected in idx. If an area callback is implemented, then\n"
              "the file will be scanned twice and a location handler and a\n"
-             "handler for assembling multipolygones and areas from ways will\n"
+             "handler for assembling multipolygons and areas from ways will\n"
              "be executed.")
         .def("apply_buffer", &SimpleHandlerWrap::apply_buffer,
               (arg("self"), arg("buffer"), arg("format"),
