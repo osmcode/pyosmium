@@ -65,7 +65,7 @@ BOOST_PYTHON_MODULE(_osm)
     ;
     class_<osmium::Location>("Location",
         "A geographic coordinate in WGS84 projection. A location doesn't "
-         "have to be necessarily valid.")
+         "necessarily have to be valid.")
         .def(init<double, double>())
         .add_property("x", &osmium::Location::x,
                       "(read-only) X coordinate (longitude) as a fixed-point integer.")
@@ -229,7 +229,7 @@ BOOST_PYTHON_MODULE(_osm)
              "Get the absolute value of the id of this object.")
         .def("user_is_anonymous", &osmium::OSMObject::user_is_anonymous,
              arg("self"),
-             "Check if the user anonymous. If true, the uid does not uniquely "
+             "Check if the user is anonymous. If true, the uid does not uniquely "
              "identify a single user but only the group of all anonymous users "
              "in general.")
     ;
@@ -310,7 +310,7 @@ BOOST_PYTHON_MODULE(_osm)
                       "(read-only) Timestamp when the changeset was first opened.")
         .add_property("closed_at", &osmium::Changeset::closed_at,
                       "(read-only) Timestamp when the changeset was finalized. May be "
-                      "None when the changeset is still open/")
+                      "None when the changeset is still open.")
         .add_property("open", &osmium::Changeset::open,
                       "(read-only) True when the changeset is still open.")
         .add_property("num_changes", &osmium::Changeset::num_changes,

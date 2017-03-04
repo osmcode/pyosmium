@@ -12,7 +12,7 @@ functions and processors are exported as well in this module.
 Input Handlers
 ^^^^^^^^^^^^^^
 
-An input handler implements provides the base class for writing custom
+An input handler provides the base class for writing custom
 data processors. They take input data, usually from a file, and forward
 it to handler functions.
 
@@ -28,7 +28,7 @@ handle native ``osmium.osm`` objects as well as any Python object that
 exposes the same attributes. It is not necessary to implement the full
 list of attributes as any missing attributes will be replaced with a
 sensible default value when writing. See :ref:`mutable-objects`
-for a detailed discussion what data formats are understood for each attribute.
+for a detailed discussion of the data formats understood for each attribute.
 
 .. warning::
 

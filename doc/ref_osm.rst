@@ -1,14 +1,14 @@
 ``osm`` - Basic Datatypes
 -------------------------
 
-The ``osm`` submodule contains definition of the basic data types used
+The ``osm`` submodule contains definitions of the basic data types used
 throughout the library.
 
 Native OSM Objects
 ^^^^^^^^^^^^^^^^^^
 
 Native OSM object classes are lightwight wrappers around the osmium OSM
-data classes. They are immutable and generally bound to the life-time of
+data classes. They are immutable and generally bound to the lifetime of
 the buffer they are saved in.
 
 There are five classes representing the basic OSM entities.
