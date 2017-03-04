@@ -81,7 +81,7 @@ BOOST_PYTHON_MODULE(_osm)
     ;
     class_<osmium::Box>("Box",
         "A bounding box around a geographic area. Such a box consists of two "
-        ":py:class:`osmium.osm.Location`s. Those locations may be invalid in "
+        ":py:class:`osmium.osm.Location`'s. Those locations may be invalid in "
         "which case the box is considered invalid, too.")
         .def(init<double, double, double, double>())
         .def(init<osmium::Location, osmium::Location>())
