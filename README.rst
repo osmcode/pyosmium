@@ -23,11 +23,11 @@ depending on which python version you want to use. You can also (re)install both
 
 Python >= 2.7 is supported but a version >= 3.3 is strongly recommended.
 
-Other dependencies are expat, libz, and libbz2. See `Libosmium dependencies`_
-for required packages for various distributions.
+Other dependencies are expat, libz, libbz2 and Boost iterator.
+See `Libosmium dependencies`_ for required packages for various distributions.
 
 .. _Boost.Python: http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html
-.. _Libosmium dependencies: https://github.com/osmcode/libosmium/wiki/Libosmium-dependencies
+.. _Libosmium dependencies: http://osmcode.org/libosmium/manual.html#dependencies
 
 Documentation
 =============
