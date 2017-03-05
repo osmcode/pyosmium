@@ -37,7 +37,7 @@ input file::
 A handler first of all needs to inherit from one of the handler classes.
 At the moment this is always :py:class:`osmium.SimpleHandler`. Then it
 needs to implement functions for each object type it wants to process. In
-out case it is exactly one function `node()`. All other potential callbacks
+our case it is exactly one function `node()`. All other potential callbacks
 can be safely ignored.
 
 Now the handler needs to be applied to an OSM file. The easiest way to
@@ -102,8 +102,8 @@ Handling Geometries
 Because of the way that OSM data is structured, osmium needs to internally
 cache node geometries, when the handler wants to process the geometries of
 ways and areas. The :py:meth:`~!osmium.SimpleHandler.apply_file` method cannot
-deduct by itself, if this cache is needed. Therefore locations need to be
-explicitly enabled by setting the location parameter to true::
+deduce by itself if this cache is needed. Therefore locations need to be
+explicitly enabled by setting the locations parameter to True::
 
     h.apply_file("test.osm.pbf", locations=True, idx='sparse_mem_array')
 
@@ -124,7 +124,7 @@ Interfacing with Shapely
 
 Pyosmium is a library for processing OSM files and therefore offers almost
 no functionality for processing geometries further. There are other libraries
-for that puspose. To interface with these libraries you can simply convert the
+for that purpose. To interface with these libraries you can simply convert the
 osmium geometries into WKB or WKT format and import the result. The following
 example uses the libgeos wrapper `Shapely`_ to compute the total way length::
 
@@ -168,7 +168,7 @@ opens a new writer for a packed OSM XML file. Objects can be written
 by using one of the writers ``add_*`` functions.
 
 A simple handler, that only writes out all the nodes from the input
-file into out new ``nodes.osm.bz2`` file would look like this::
+file into our new ``nodes.osm.bz2`` file would look like this::
 
     import osmium
 
@@ -183,15 +183,15 @@ file into out new ``nodes.osm.bz2`` file would look like this::
 This example shows that an unmodified object can be written out directly
 to the writer. Normally, however, you want to modify some data. The native
 osmium OSM types are immutable and cannot be changed directly. Therefore
-you have create a copy that can be changed. The ``node``, ``way`` and ``relation``
+you have to create a copy that can be changed. The ``node``, ``way`` and ``relation``
 objects offer a convenient ``replace()`` function to achieve exactly that.
-The function makes a copy and a the same time replaces all attibutes where
+The function makes a copy and at the same time replaces all attributes where
 new values are given as parameters to the function.
 
 Let's say you want to
 remove all the user names from your nodes before saving them to the new
 file (maybe to save some space), then the ``node()`` handler callback above
-needs to be changed like that::
+needs to be changed like this::
 
     class NodeWriter(osmium.SimpleHandler):
         ...

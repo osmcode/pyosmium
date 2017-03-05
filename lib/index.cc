@@ -43,7 +43,7 @@ BOOST_PYTHON_MODULE(index)
         (arg("map_type")),
         "Create a new location store. The string parameter takes the type "
         "and, where required, additional arguments separated by comma. For "
-        "example, to create a array cache backed by a file ``foo.store``, "
+        "example, to create an array cache backed by a file ``foo.store``, "
         "the map_type should be ``dense_file_array,foo.store``.");
     def("map_types", &map_types,
         "Return a list of strings with valid types for the location table.");
