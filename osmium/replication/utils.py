@@ -24,26 +24,29 @@ def get_replication_header(fname):
     h = r.header()
 
     ts = h.get("osmosis_replication_timestamp")
-    seq = h.get("osmosis_replication_sequence_number")
     url = h.get("osmosis_replication_base_url")
 
-    if url or seq or ts:
+    if url or ts:
         log.debug("Replication information found in OSM file header.")
 
     if url:
         log.debug("Replication URL: %s" % url)
+        # the sequence ID is only considered valid, if an URL is given
+        seq = h.get("osmosis_replication_sequence_number")
+        if seq:
+            log.debug("Replication sequence: %s" % seq)
+            try:
+                seq = int(seq)
+                if seq < 0:
+                    log.warning("Sequence id '%d' in OSM file header is negative. Ignored." % seq)
+                    seq = None
+            except ValueError:
+                log.warning("Sequence id '%s' in OSM file header is not a number.Ignored" % seq)
+                seq = None
+        else:
+            seq = None
     else:
         url = None
-
-    if seq:
-        log.debug("Replication sequence: %s" % seq)
-        try:
-            seq = int(seq)
-            if seq < 0:
-                log.warning("Sequence id '%d' in OSM file header is negative. Ignored." % seq)
-        except ValueError:
-            log.warning("Sequence id '%s' in OSM file header is not a number.Ignored" % seq)
-    else:
         seq = None
 
     if ts:
@@ -52,6 +55,7 @@ def get_replication_header(fname):
             ts = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             log.warning("Date in OSM file header is not in ISO8601 format (e.g. 2015-12-24T08:08Z). Ignored")
+            ts = None
     else:
         ts = None
 
