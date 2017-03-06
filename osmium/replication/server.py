@@ -14,6 +14,7 @@ import datetime as dt
 from collections import namedtuple
 from math import ceil
 from osmium import MergeInputReader
+from osmium import io as oio
 
 import logging
 
@@ -21,6 +22,7 @@ log = logging.getLogger('pyosmium')
 log.addHandler(logging.NullHandler())
 
 OsmosisState = namedtuple('OsmosisState', ['sequence', 'timestamp'])
+DownloadResult = namedtuple('DownloadResult', ['id', 'reader', 'newest'])
 
 class ReplicationServer(object):
     """ Represents a server that publishes replication data. Replication
@@ -32,15 +34,20 @@ class ReplicationServer(object):
         self.baseurl = url
         self.diff_type = diff_type
 
-    def apply_diffs(self, handler, start_id, max_size=1024, simplify=True):
-        """ Download diffs starting with sequence id `start_id`, merge them
-            together and then apply them to handler `handler`. `max_size`
+    def collect_diffs(self, start_id, max_size=1024):
+        """ Create a MergeInputReader and download diffs starting with sequence
+            id `start_id` into it. `max_size`
             restricts the number of diffs that are downloaded. The download
             stops as soon as either a diff cannot be downloaded or the
             unpacked data in memory exceeds `max_size` kB.
 
-            The function returns the sequence id of the last diff that was
-            downloaded or None if the download failed completely.
+            If some data was downloaded, returns a namedtuple with three fields:
+            `id` contains the sequence id of the last downloaded diff, `reader`
+            contains the MergeInputReader with the data and `newest` is a
+            sequence id of the most recent diff available.
+
+            Returns None if there was an error during download or no new
+            data was available.
         """
         left_size = max_size * 1024
         current_id = start_id
@@ -68,9 +75,71 @@ class ReplicationServer(object):
             log.debug("Downloaded change %d. (%d bytes left to do)" % (current_id, left_size))
             current_id += 1
 
-        rd.apply(handler, simplify)
+        return DownloadResult(current_id - 1, rd, newest.sequence)
 
-        return current_id - 1
+    def apply_diffs(self, handler, start_id, max_size=1024, simplify=True):
+        """ Download diffs starting with sequence id `start_id`, merge them
+            together and then apply them to handler `handler`. `max_size`
+            restricts the number of diffs that are downloaded. The download
+            stops as soon as either a diff cannot be downloaded or the
+            unpacked data in memory exceeds `max_size` kB.
+
+            The function returns the sequence id of the last diff that was
+            downloaded or None if the download failed completely.
+        """
+        diffs = self.collect_diffs(start_id, max_size)
+
+        if diffs is None:
+            return None
+
+        diffs.reader.apply(handler, simplify)
+
+        return diffs.id
+
+    def apply_diffs_to_file(self, infile, outfile, start_id, max_size=1024,
+                            set_replication_header=True):
+        """ Download diffs starting with sequence id `start_id`, merge them
+            with the data from the OSM file named `infile` and write the result
+            into a file with the name `outfile`. The output file must not yet
+            exist.
+
+            `max_size` restricts the number of diffs that are downloaded. The
+            download stops as soon as either a diff cannot be downloaded or the
+            unpacked data in memory exceeds `max_size` kB.
+
+            If `set_replication_header` is true then the URL of the replication
+            server and the sequence id and timestamp of the last diff applied
+            will be written into the `writer`. Note that this currently works
+            only for the PBF format.
+
+            The function returns a tuple of last downloaded sequence id and
+            newest available sequence id if new data has been written or None
+            if no data was available or the download failed completely.
+        """
+        diffs = self.collect_diffs(start_id, max_size)
+
+        if diffs is None:
+            return None
+
+        reader = oio.Reader(infile)
+        has_history = reader.header().has_multiple_object_versions
+
+        h = oio.Header()
+        h.has_multiple_object_versions = has_history
+        if set_replication_header:
+            h.set("osmosis_replication_base_url", self.baseurl)
+            h.set("osmosis_replication_sequence_number", str(diffs.id))
+            info = self.get_state_info(diffs.id)
+            h.set("osmosis_replication_timestamp", info.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
+
+        writer = oio.Writer(outfile, h)
+
+        diffs.reader.apply_to_reader(reader, writer, has_history)
+
+        reader.close()
+        writer.close()
+
+        return (diffs.id, diffs.newest)
 
 
     def timestamp_to_sequence(self, timestamp, balanced_search=False):
@@ -95,6 +164,7 @@ class ReplicationServer(object):
         lower = None
         lowerid = 0
         while lower is None:
+            log.debug("Trying with Id %s" % lowerid)
             lower = self.get_state_info(lowerid)
 
             if lower is not None and lower.timestamp >= timestamp:
