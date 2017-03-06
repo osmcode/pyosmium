@@ -23,7 +23,7 @@ BOOST_PYTHON_MODULE(io)
                 "box if the information is not available.")
         .def("get", &osmium::io::Header::get, (arg("self"), arg("key"), arg("default")=""),
                 "Get the value of header option 'key' or default value if "
-                "there is no header optoin with that name. The default cannot be "
+                "there is no header option with that name. The default cannot be "
                 "None.")
         .def("set", static_cast<void (osmium::io::Header::*)(const std::string&, const char*)>(&osmium::io::Header::set),
                 (arg("self"), arg("key"), arg("value")),

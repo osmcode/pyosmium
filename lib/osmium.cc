@@ -180,7 +180,7 @@ BOOST_PYTHON_MODULE(_osmium)
             "the result to `writer`. This function can be used to merge the diff "
             "data together with other OSM data (for example when updating a "
             "planet file. If `with_history` is true, then the collected data will "
-            "be applied verbatim without removing duplicats. This is important "
+            "be applied verbatim without removing duplicates. This is important "
             "when using OSM history files as input.")
         .def("add_file", &pyosmium::MergeInputReader::add_file,
             (arg("self"), arg("file")),
