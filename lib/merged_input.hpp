@@ -3,13 +3,49 @@
 
 #include <vector>
 
+#include <boost/function_output_iterator.hpp>
+
 #include <osmium/osm/object_comparisons.hpp>
 #include <osmium/io/any_input.hpp>
+#include <osmium/io/any_output.hpp>
+#include <osmium/io/output_iterator.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/object_pointer_collection.hpp>
 #include <osmium/visitor.hpp>
 
 #include <boost/python.hpp>
+
+namespace {
+
+    /**
+     *  Copy the first OSM object with a given Id to the output. Keep
+     *  track of the Id of each object to do this.
+     *
+     *  We are using this functor class instead of a simple lambda, because the
+     *  lambda doesn't build on MSVC.
+     */
+    class copy_first_with_id {
+        osmium::io::Writer* writer;
+        osmium::object_id_type id = 0;
+
+    public:
+        explicit copy_first_with_id(osmium::io::Writer& w) :
+            writer(&w) {
+        }
+
+        void operator()(const osmium::OSMObject& obj) {
+            if (obj.id() != id) {
+                if (obj.visible()) {
+                    (*writer)(obj);
+                }
+                id = obj.id();
+            }
+        }
+
+    };
+
+} // anonymous namespace
+
 
 namespace pyosmium {
 
@@ -34,7 +70,39 @@ public:
 
         objects = osmium::ObjectPointerCollection();
         changes.clear();
+    }
 
+    void apply_to_reader(osmium::io::Reader &reader, osmium::io::Writer &writer,
+                         bool with_history = true) {
+        auto input = osmium::io::make_input_iterator_range<osmium::OSMObject>(reader);
+        if (with_history) {
+            // For history files this is a straightforward sort of the change
+            // files followed by a merge with the input file.
+            objects.sort(osmium::object_order_type_id_version());
+
+            auto out = osmium::io::make_output_iterator(writer);
+            std::set_union(objects.begin(),
+                    objects.end(),
+                    input.begin(),
+                    input.end(),
+                    out);
+        } else {
+            // For normal data files we sort with the largest version of each
+            // object first and then only copy this last version of any object
+            // to the output.
+            objects.sort(osmium::object_order_type_id_reverse_version());
+
+            auto output_it = boost::make_function_output_iterator(
+                    copy_first_with_id(writer)
+                    );
+
+            std::set_union(objects.begin(),
+                    objects.end(),
+                    input.begin(),
+                    input.end(),
+                    output_it,
+                    osmium::object_order_type_id_reverse_version());
+        }
     }
 
     size_t add_file(const std::string &filename) {

@@ -174,6 +174,14 @@ BOOST_PYTHON_MODULE(_osmium)
             "and only the newest version of each object kept. After the data "
             "has been applied the buffer of the MergeInputReader is empty and "
             "new data can be added for the next round of application.")
+        .def("apply_to_reader", &pyosmium::MergeInputReader::apply_to_reader,
+            (arg("self"), arg("reader"), arg("writer"), arg("with_history")=false),
+            "Apply the collected data to data from the given `reader` and write "
+            "the result to `writer`. This function can be used to merge the diff "
+            "data together with other OSM data (for example when updating a "
+            "planet file. If `with_history` is true, then the collected data will "
+            "be applied verbatim without removing duplicats. This is important "
+            "when using OSM history files as input.")
         .def("add_file", &pyosmium::MergeInputReader::add_file,
             (arg("self"), arg("file")),
              "Add data from a file to the internal cache. The file type will be "
