@@ -1,0 +1,159 @@
+#!/usr/bin/python
+"""
+Update an OSM with changes from a OSM replication server.
+
+Takes an OSM file and downloads and applies the latest changes in OSM.
+"""
+
+import sys
+import logging
+
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from datetime import timedelta
+from osmium.replication import server as rserv
+from osmium.replication.utils import get_replication_header
+from osmium.replication import newest_change_from_file
+from textwrap import dedent as msgfmt
+from tempfile import mktemp
+import os.path
+
+log = logging.getLogger()
+
+def update_from_osm_server(ts, options):
+    """Update the OSM file using the official OSM servers at
+       https://planet.osm.org/replication. This strategy will attempt
+       to start with daily updates before going down to minutelies.
+       TODO: only updates from minutelies currently implemented.
+    """
+    update_from_custom_server("https://planet.osm.org/replication/minute/",
+                              None, ts, options)
+
+
+def update_from_custom_server(url, seq, ts, options):
+    """Update from a custom URL, simply using the diff sequence as is."""
+
+    svr = rserv.ReplicationServer(url)
+
+    if seq is None:
+        log.debug("Looking up sequence ID for timestamp %s" % ts)
+        startseq = svr.timestamp_to_sequence(ts)
+        if startseq is None:
+            log.error("No starting point found for time %s on server %s"
+                      % (str(ts), url))
+            exit(1)
+        log.debug("Found sequence ID %d" % startseq)
+    else:
+        log.debug("Using given sequence ID %d" % seq)
+        startseq = seq + 1
+
+    log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
+
+    outfile = options.outfile
+    infile = options.infile
+    while True:
+        if outfile is None:
+            fdir, fname = os.path.split(infile)
+            if options.tmpdir is not None:
+                fdir = options.tmpdir
+            ofname = mktemp(suffix='-' + fname, dir=fdir)
+        else:
+            ofname = outfile
+
+        outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
+                                         max_size=options.outsize*1024)
+
+        if outseqs is None:
+            log.info("No new updates found.")
+            exit(3)
+
+        if outfile is None:
+            os.rename(ofname, infile)
+
+        log.debug("Downloaded until %d. Available until %d." % outseqs)
+        if outseqs[1] > outseqs[0]:
+            log.info("File updated but more updates are available (%d of %d). Continuing." % outseqs)
+            startseq = outseqs[0] + 1
+            if outfile is not None:
+                infile = outfile
+                outfile = None
+        else:
+            break
+
+
+
+def compute_start_point(options):
+    if options.ignore_headers:
+        url, seq, ts = None, None, None
+    else:
+        url, seq, ts = get_replication_header(options.infile)
+
+    if options.server_url is not None:
+        if url is not None and url != options.server_url:
+            log.error(msgfmt("""
+                  You asked to use server URL:
+                    %s
+                  but the referenced OSM file points to replication server:
+                    %s
+                  If you really mean to overwrite the URL, use --ignore-osmosis-headers."""
+                  % (options.server_url, url)))
+            exit(1)
+        url = options.server_url
+
+    if seq is None and ts is None:
+        log.info("No replication information found, scanning for newest OSM object.")
+        ts = newest_change_from_file(options.infile)
+
+        if ts is None:
+            log.error("OSM file does not seem to contain valid data.")
+            exit(1)
+
+    if ts is not None:
+        ts -= timedelta(minutes=options.wind_back)
+
+    return url, seq, ts
+
+
+if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stderr,
+                        format='%(levelname)s: %(message)s')
+
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument('-v', dest='loglevel', action='count', default=0,
+                        help='Increase verbosity')
+    parser.add_argument('infile', help="OSM file to update")
+    parser.add_argument('-o', '--outfile', dest='outfile',
+                        help="""Name output of file. If missing, the input file
+                                will be overwritten.""")
+    parser.add_argument('--server', action='store', dest='server_url',
+                        help="""Base URL of the replication server. Default
+                                is to use the OSM servers.""")
+    parser.add_argument('-s', '--size', dest='outsize', type=int, default=500,
+                        help='Maximum size of change to apply at once in MB. Default: 500MB.')
+    parser.add_argument('--tmpdir', dest='tmpdir',
+                        help='Directory to use for temporary files.')
+    parser.add_argument('--ignore-osmosis-headers', dest='ignore_headers',
+                        action='store_true',
+                        help="""Ignore potential replication information in the
+                                header of the input file and search for the
+                                newest OSM object in the file instead.""")
+    parser.add_argument('-b', '--wind-back', dest='wind_back', type=int, default=60,
+                        help="""Number of minutes to start downloading before 
+                                the newest addition to input data. (Only used
+                                when starting point is determined from
+                                timestamp.) Default: 60.""")
+
+    options = parser.parse_args()
+    log.setLevel(max(3 - options.loglevel, 0) * 10)
+
+    try:
+        url, seq, ts = compute_start_point(options)
+    except RuntimeError as e:
+        log.error(str(e))
+        exit(1)
+
+    if url is None:
+        update_from_osm_server(ts, options)
+    else:
+        update_from_custom_server(url, seq, ts, options)
+
