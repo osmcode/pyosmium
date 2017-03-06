@@ -1,6 +1,7 @@
 #include <boost/python.hpp>
 
 #include <osmium/io/any_input.hpp>
+#include <osmium/io/any_output.hpp>
 
 #include "osm.cc"
 
@@ -24,11 +25,12 @@ BOOST_PYTHON_MODULE(io)
                 "Get the value of header option 'key' or default value if "
                 "there is no header optoin with that name. The default cannot be "
                 "None.")
-        .def("set", &osmium::io::Header::get, (arg("self"), arg("key"), arg("value")),
-                "Set the value of header opton 'key'.")
+        .def("set", static_cast<void (osmium::io::Header::*)(const std::string&, const char*)>(&osmium::io::Header::set),
+                (arg("self"), arg("key"), arg("value")),
+                "Set the value of header option 'key'.")
     ;
 
-    class_<osmium::io::Reader, boost::noncopyable>("Reader", 
+    class_<osmium::io::Reader, boost::noncopyable>("Reader",
         "A class that reads OSM data from a file.",
         init<std::string>())
         .def(init<std::string, osmium::osm_entity_bits::type>())
@@ -40,4 +42,13 @@ BOOST_PYTHON_MODULE(io)
              "Return the header with file information, see :py:class:`osmium.io.Header`.")
     ;
 
+    class_<osmium::io::Writer, boost::noncopyable>("Writer",
+        "Class for writing OSM data to a file. This class just encapsulates an "
+        "OSM file,. Have a look `osmium.SimpleWriter` for a high-level interface "
+        "for writing out data.",
+        init<std::string>())
+        .def(init<std::string, osmium::io::Header>())
+        .def("close", &osmium::io::Writer::close, arg("self"),
+             "Close any open file handles. The writer is unusable afterwards.")
+    ;
 }
