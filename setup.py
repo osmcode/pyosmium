@@ -83,7 +83,7 @@ osmium_libs = ('expat', 'pthread', 'z', 'bz2')
 libs.extend(osmium_libs)
 
 extensions = []
-extra_compile_args = [ '-std=c++11', '-D_LARGEFILE_SOURCE', '-D_FILE_OFFSET_BITS=64' ]
+extra_compile_args = [ '-std=c++11', '-D_LARGEFILE_SOURCE', '-D_FILE_OFFSET_BITS=64', '-D__STDC_FORMAT_MACROS' ]
 
 extensions.append(Extension('osmium._osmium',
        sources = ['lib/osmium.cc'],
