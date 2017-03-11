@@ -1,8 +1,26 @@
 #!/usr/bin/python
 """
-Update an OSM with changes from a OSM replication server.
+Update an OSM file with changes from a OSM replication server.
 
-Takes an OSM file and downloads and applies the latest changes in OSM.
+Diffs are downloaded and kept in memory. To avoid running out of memory,
+the maximum size of diffs that can be downloaded at once is limited
+to 1 GB per default. This limit can be changed with the --size parameter.
+However, if you need to update that much data you should consider
+downnloading a newer planet or excerpt instead.
+
+The starting time is automatically determined from the the data in the
+file. For PBF files, it is also possible to read and write the
+replication information from the extended osmium header. That means
+that after the first update, subsequent calls to pyosmium-up-to-date
+will continue the updates from the same server exactly where they have
+left of.
+
+The program returns 0, if updates have been successfully applied up to
+the newest data. It returns 1, if some updates have been applied but
+there is still data available on the server (either because the size
+limit has been reached or there was a network error which could not be
+resolved). Any other error results in a return code larger than 1. The
+output file is guaranteed to be unmodified in that case.
 """
 
 import sys
@@ -23,10 +41,10 @@ def update_from_osm_server(ts, options):
     """Update the OSM file using the official OSM servers at
        https://planet.osm.org/replication. This strategy will attempt
        to start with daily updates before going down to minutelies.
-       TODO: only updates from minutelies currently implemented.
+       TODO: only updates from hourlies currently implemented.
     """
-    update_from_custom_server("https://planet.osm.org/replication/minute/",
-                              None, ts, options)
+    return update_from_custom_server("https://planet.osm.org/replication/hour/",
+                                     None, ts, options)
 
 
 def update_from_custom_server(url, seq, ts, options):
@@ -40,7 +58,7 @@ def update_from_custom_server(url, seq, ts, options):
         if startseq is None:
             log.error("No starting point found for time %s on server %s"
                       % (str(ts), url))
-            exit(1)
+            exit(2)
         log.debug("Found sequence ID %d" % startseq)
     else:
         log.debug("Using given sequence ID %d" % seq)
@@ -50,35 +68,28 @@ def update_from_custom_server(url, seq, ts, options):
 
     outfile = options.outfile
     infile = options.infile
-    while True:
-        if outfile is None:
-            fdir, fname = os.path.split(infile)
-            if options.tmpdir is not None:
-                fdir = options.tmpdir
-            ofname = mktemp(suffix='-' + fname, dir=fdir)
-        else:
-            ofname = outfile
 
-        outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
-                                         max_size=options.outsize*1024)
+    if outfile is None:
+        fdir, fname = os.path.split(infile)
+        if options.tmpdir is not None:
+            fdir = options.tmpdir
+        ofname = mktemp(suffix='-' + fname, dir=fdir)
+    else:
+        ofname = outfile
 
-        if outseqs is None:
-            log.info("No new updates found.")
-            exit(3)
+    outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
+                                     max_size=options.outsize*1024)
 
-        if outfile is None:
-            os.rename(ofname, infile)
+    if outseqs is None:
+        log.info("No new updates found.")
+        exit(2)
 
-        log.debug("Downloaded until %d. Available until %d." % outseqs)
-        if outseqs[1] > outseqs[0]:
-            log.info("File updated but more updates are available (%d of %d). Continuing." % outseqs)
-            startseq = outseqs[0] + 1
-            if outfile is not None:
-                infile = outfile
-                outfile = None
-        else:
-            break
+    if outfile is None:
+        os.rename(ofname, infile)
 
+    log.debug("Downloaded until %d. Available until %d." % outseqs)
+
+    return 0 if outseqs[1] == outseqs[0] else 1
 
 
 def compute_start_point(options):
@@ -126,22 +137,21 @@ if __name__ == '__main__':
                         help="""Name output of file. If missing, the input file
                                 will be overwritten.""")
     parser.add_argument('--server', action='store', dest='server_url',
-                        help="""Base URL of the replication server. Default
-                                is to use the OSM servers.""")
-    parser.add_argument('-s', '--size', dest='outsize', type=int, default=500,
-                        help='Maximum size of change to apply at once in MB. Default: 500MB.')
+            help="""Base URL of the replication server. Default:
+                    hourly diffs from osm.org.""")
+    parser.add_argument('-s', '--size', dest='outsize', type=int, default=1024,
+                        help='Maximum size of change to apply at once in MB. Default: 1GB.')
     parser.add_argument('--tmpdir', dest='tmpdir',
-                        help='Directory to use for temporary files.')
+            help='Directory to use for temporary files. Default: directory of input file')
     parser.add_argument('--ignore-osmosis-headers', dest='ignore_headers',
                         action='store_true',
                         help="""Ignore potential replication information in the
                                 header of the input file and search for the
                                 newest OSM object in the file instead.""")
     parser.add_argument('-b', '--wind-back', dest='wind_back', type=int, default=60,
-                        help="""Number of minutes to start downloading before 
-                                the newest addition to input data. (Only used
-                                when starting point is determined from
-                                timestamp.) Default: 60.""")
+                        help="""Number of minutes to start downloading before
+                                the newest addition to input data. (Ignored when
+                                the file contains a sequence ID.) Default: 60.""")
 
     options = parser.parse_args()
     log.setLevel(max(3 - options.loglevel, 0) * 10)
@@ -150,10 +160,11 @@ if __name__ == '__main__':
         url, seq, ts = compute_start_point(options)
     except RuntimeError as e:
         log.error(str(e))
-        exit(1)
+        exit(2)
 
     if url is None:
-        update_from_osm_server(ts, options)
+        ret = update_from_osm_server(ts, options)
     else:
-        update_from_custom_server(url, seq, ts, options)
+        ret = update_from_custom_server(url, seq, ts, options)
 
+    exit(ret)
