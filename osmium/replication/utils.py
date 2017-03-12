@@ -1,9 +1,10 @@
 """ Helper functions for change file handling. """
 
 import logging
-from datetime import datetime
+import datetime as dt
 from collections import namedtuple
 from osmium.io import Reader as oreader
+from sys import version_info as python_version
 
 log = logging.getLogger('pyosmium')
 
@@ -52,7 +53,10 @@ def get_replication_header(fname):
     if ts:
         log.debug("Replication timestamp: %s" % ts)
         try:
-            ts = datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
+            ts = dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
+            if python_version >= (3,0):
+                ts = ts.replace(tzinfo=dt.timezone.utc)
+
         except ValueError:
             log.warning("Date in OSM file header is not in ISO8601 format (e.g. 2015-12-24T08:08Z). Ignored")
             ts = None

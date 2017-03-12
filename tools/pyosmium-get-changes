@@ -17,7 +17,8 @@ written to (and later read from) a file.
 """
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
-from datetime import datetime
+import datetime as dt
+from sys import version_info as python_version
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
@@ -45,7 +46,6 @@ class ReplicationStart(object):
 
         log.debug("Looking up sequence ID for timestamp %s" % self.date)
         seq = svr.timestamp_to_sequence(self.date)
-        log.debug("Found sequence ID %d" % seq)
 
         return seq + 1 if seq is not None else None
 
@@ -64,7 +64,9 @@ class ReplicationStart(object):
     @staticmethod
     def from_date(datestr):
         try:
-            date = datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%SZ")
+            date = dt.datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%SZ")
+            if python_version >= (3,0):
+                date = date.replace(tzinfo=dt.timezone.utc)
         except ValueError:
             raise ArgumentTypeError("Date needs to be in ISO8601 format (e.g. 2015-12-24T08:08Z).")
 
@@ -78,7 +80,7 @@ class ReplicationStart(object):
             url = None
         else:
             try:
-                (ts, seq, url) = get_replication_header(fname)
+                (url, seq, ts) = get_replication_header(fname)
             except RuntimeError as e:
                 raise ArgumentTypeError(e)
 

@@ -58,7 +58,6 @@ def update_from_custom_server(url, seq, ts, options):
             log.error("No starting point found for time %s on server %s"
                       % (str(ts), url))
             exit(2)
-        log.debug("Found sequence ID %d" % startseq)
     else:
         log.debug("Using given sequence ID %d" % seq)
         startseq = seq + 1

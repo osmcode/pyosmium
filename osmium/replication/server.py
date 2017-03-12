@@ -134,6 +134,8 @@ class ReplicationServer(object):
 
         writer = oio.Writer(outfile, h)
 
+        log.debug("Merging changes into OSM file.")
+
         diffs.reader.apply_to_reader(reader, writer, has_history)
 
         reader.close()
