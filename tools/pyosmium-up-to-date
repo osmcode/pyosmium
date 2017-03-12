@@ -6,14 +6,13 @@ Diffs are downloaded and kept in memory. To avoid running out of memory,
 the maximum size of diffs that can be downloaded at once is limited
 to 1 GB per default. This limit can be changed with the --size parameter.
 However, if you need to update that much data you should consider
-downnloading a newer planet or excerpt instead.
+downloading a newer planet or excerpt instead.
 
-The starting time is automatically determined from the the data in the
-file. For PBF files, it is also possible to read and write the
-replication information from the extended osmium header. That means
-that after the first update, subsequent calls to pyosmium-up-to-date
-will continue the updates from the same server exactly where they have
-left of.
+The starting time is automatically determined from the the data in the file.
+For PBF files, it is also possible to read and write the replication
+information from the osmosis headers. That means that after the first update,
+subsequent calls to pyosmium-up-to-date will continue the updates from the same
+server exactly where they have left of.
 
 The program returns 0, if updates have been successfully applied up to
 the newest data. It returns 1, if some updates have been applied but
@@ -138,8 +137,9 @@ if __name__ == '__main__':
                                 will be overwritten.""")
     parser.add_argument('--server', action='store', dest='server_url',
             help="""Base URL of the replication server. Default:
-                    hourly diffs from osm.org.""")
-    parser.add_argument('-s', '--size', dest='outsize', type=int, default=1024,
+                    'https://planet.osm.org/replication/hour/' (
+                    hourly diffs from osm.org).""")
+    parser.add_argument('-s', '--size', dest='outsize', metavar='SIZE', type=int, default=1024,
                         help='Maximum size of change to apply at once in MB. Default: 1GB.')
     parser.add_argument('--tmpdir', dest='tmpdir',
             help='Directory to use for temporary files. Default: directory of input file')
