@@ -57,7 +57,7 @@ def update_from_custom_server(url, seq, ts, options):
         if startseq is None:
             log.error("No starting point found for time %s on server %s"
                       % (str(ts), url))
-            exit(2)
+            return 3
     else:
         log.debug("Using given sequence ID %d" % seq)
         startseq = seq + 1
@@ -80,7 +80,7 @@ def update_from_custom_server(url, seq, ts, options):
 
     if outseqs is None:
         log.info("No new updates found.")
-        exit(2)
+        return 3
 
     if outfile is None:
         os.rename(ofname, infile)
@@ -105,7 +105,7 @@ def compute_start_point(options):
                     %s
                   If you really mean to overwrite the URL, use --ignore-osmosis-headers."""
                   % (options.server_url, url)))
-            exit(1)
+            exit(2)
         url = options.server_url
 
     if seq is None and ts is None:
@@ -114,7 +114,7 @@ def compute_start_point(options):
 
         if ts is None:
             log.error("OSM file does not seem to contain valid data.")
-            exit(1)
+            exit(2)
 
     if ts is not None:
         ts -= timedelta(minutes=options.wind_back)
