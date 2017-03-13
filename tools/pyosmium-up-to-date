@@ -55,16 +55,6 @@ def update_from_custom_server(url, seq, ts, options):
 
     if seq is None:
         log.info("Using timestamp %s as starting point." % ts)
-        if not options.force_update:
-            cmpdate = dt.datetime.utcnow() - dt.timedelta(days=90)
-            if python_version >= (3,0):
-                cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
-            if ts < cmpdate:
-                log.error(
-              """The OSM file is more than 3 months old. You should download a
-                 more recent file instead of updating. If you really want to
-                 update the file, use --force-update-of-old-planet.""")
-            return 3
         startseq = svr.timestamp_to_sequence(ts)
         if startseq is None:
             log.error("No starting point found for time %s on server %s"
@@ -73,6 +63,22 @@ def update_from_custom_server(url, seq, ts, options):
     else:
         log.debug("Using given sequence ID %d" % seq)
         startseq = seq + 1
+        ts = rserv.get_state_info(seq=startseq)
+        if ts is None:
+            log.error("Cannot download state information for ID %d" % seq)
+            return 3
+        ts = ts.timestamp
+
+    if not options.force_update:
+        cmpdate = dt.datetime.utcnow() - dt.timedelta(days=90)
+        if python_version >= (3,0):
+            cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
+        if ts < cmpdate:
+            log.error(
+          """The OSM file is more than 3 months old. You should download a
+             more recent file instead of updating. If you really want to
+             update the file, use --force-update-of-old-planet.""")
+        return 3
 
     log.info("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
 
