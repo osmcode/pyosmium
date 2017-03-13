@@ -52,6 +52,7 @@ def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
 
     svr = rserv.ReplicationServer(url)
+    log.info("Using replication service at %s" % url)
 
     if seq is None:
         log.info("Using timestamp %s as starting point." % ts)
@@ -63,9 +64,9 @@ def update_from_custom_server(url, seq, ts, options):
     else:
         log.debug("Using given sequence ID %d" % seq)
         startseq = seq + 1
-        ts = rserv.get_state_info(seq=startseq)
+        ts = svr.get_state_info(seq=startseq)
         if ts is None:
-            log.error("Cannot download state information for ID %d" % seq)
+            log.error("Cannot download state information for ID %d. Is the URl correct?" % seq)
             return 3
         ts = ts.timestamp
 
