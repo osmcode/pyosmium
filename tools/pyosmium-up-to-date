@@ -66,7 +66,7 @@ def update_from_custom_server(url, seq, ts, options):
         startseq = seq + 1
         ts = svr.get_state_info(seq=startseq)
         if ts is None:
-            log.error("Cannot download state information for ID %d. Is the URl correct?" % seq)
+            log.error("Cannot download state information for ID %d. Is the URL correct?" % seq)
             return 3
         ts = ts.timestamp
 
