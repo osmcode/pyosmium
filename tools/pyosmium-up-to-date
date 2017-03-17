@@ -76,10 +76,10 @@ def update_from_custom_server(url, seq, ts, options):
             cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
         if ts < cmpdate:
             log.error(
-          """The OSM file is more than 3 months old. You should download a
-             more recent file instead of updating. If you really want to
-             update the file, use --force-update-of-old-planet.""")
-        return 3
+              """The OSM file is more than 3 months old. You should download a
+                 more recent file instead of updating. If you really want to
+                 update the file, use --force-update-of-old-planet.""")
+            return 3
 
     log.info("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
 
@@ -104,7 +104,7 @@ def update_from_custom_server(url, seq, ts, options):
     if outfile is None:
         os.rename(ofname, infile)
 
-    log.info("Downloaded until %d. Server has dat available until %d." % outseqs)
+    log.info("Downloaded until %d. Server has data available until %d." % outseqs)
 
     return 0 if outseqs[1] == outseqs[0] else 1
 
@@ -143,7 +143,7 @@ def compute_start_point(options):
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr,
-                        format='%(levelname)s: %(message)s')
+                        format='%(asctime)s %(levelname)s: %(message)s')
 
     parser = ArgumentParser(description=__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
