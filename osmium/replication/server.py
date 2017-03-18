@@ -72,7 +72,8 @@ class ReplicationServer(object):
                 break
 
             left_size -= rd.add_buffer(diffdata, self.diff_type)
-            log.debug("Downloaded change %d. (%d bytes left to do)" % (current_id, left_size))
+            log.debug("Downloaded change %d. (%d kB available in download buffer)"
+                      % (current_id, left_size / 1024))
             current_id += 1
 
         return DownloadResult(current_id - 1, rd, newest.sequence)
