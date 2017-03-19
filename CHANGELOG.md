@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [2.12.0] - 2017-03-19
+
+### Added
+
 - WriteHandler for writing data directly to a file
 - tools for downloading changes and updating a OSM files from these changes
 - get/set functions for io.Header
