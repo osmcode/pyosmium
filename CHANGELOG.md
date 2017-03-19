@@ -8,10 +8,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- WriteHandler for writing data directly to a file
+- tools for downloading changes and updating a OSM files from these changes
+- get/set functions for io.Header
+
 ### Changed
+
+- use current libosmium
 
 ### Fixed
 
+- various typos in documentation
 
 ## [2.11.0] - 2017-01-15
 
@@ -123,7 +130,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.11.0...HEAD
+[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.12.0...HEAD
+[2.12.0]: https://github.com/osmcode/pyosmium/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/osmcode/pyosmium/compare/v2.10.2...v2.11.0
 [2.10.2]: https://github.com/osmcode/pyosmium/compare/v2.9.0...v2.10.2
 [2.9.0]: https://github.com/osmcode/pyosmium/compare/v2.8.0...v2.9.0
