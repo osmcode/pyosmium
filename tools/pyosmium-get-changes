@@ -4,7 +4,7 @@ Fetch diffs from an OSM planet server.
 
 The starting point of the diff must be given either as a sequence ID or a date
 or can be computed from an OSM file. If no output file is given, the program
-will just print the intial sequence ID it would use (or save it in a file, if
+will just print the initial sequence ID it would use (or save it in a file, if
 requested) and exit. This can be used to bootstrap the update process.
 
 The program tries to download until the latest change on the server is found
