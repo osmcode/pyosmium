@@ -71,23 +71,6 @@ BOOST_PYTHON_MODULE(_osmium)
         "all objects that are handed into the handler are only readable and are "
         "only valid until the end of the callback is reached. Any data that "
         "should be retained must be copied into other data structures.")
-        .def("node", &BaseHandler::node, &SimpleHandlerWrap::default_node,
-             (arg("self"), arg("node")),
-             "Handler called for node objects.")
-        .def("way", &BaseHandler::way, &SimpleHandlerWrap::default_way,
-             (arg("self"), arg("way")),
-             "Handler called for way objects. If the geometry of the way is "
-             "needed then ``locations`` must be set to true when calling "
-             "apply_file.")
-        .def("relation", &BaseHandler::relation, &SimpleHandlerWrap::default_relation,
-             (arg("self"), arg("relation")),
-             "Handler called for relation objects.")
-        .def("changeset", &BaseHandler::changeset, &SimpleHandlerWrap::default_changeset,
-             (arg("self"), arg("changeset")),
-             "Handler called for changeset objects.")
-        .def("area", &BaseHandler::area, &SimpleHandlerWrap::default_area,
-             (arg("self"), arg("area")),
-             "Handler called for area objects.")
         .def("apply_file", &SimpleHandlerWrap::apply_file,
               (arg("self"), arg("filename"),
                arg("locations")=false, arg("idx")="sparse_mem_array"),
