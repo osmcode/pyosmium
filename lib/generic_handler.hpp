@@ -103,12 +103,13 @@ using namespace boost::python;
 
 struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
 
-    void node(const osmium::Node& node) {
-        if (override f = this->get_override("node"))
-            f(boost::ref(node));
-    }
+    void node(const osmium::Node& node) override {
+        if (!m_has_node_cb)
+            return;
 
-    void default_node(const osmium::Node&) {
+        if (override f = this->get_override("node")) {
+            f(boost::ref(node));
+        }
     }
 
     void way(const osmium::Way& way) {
@@ -116,15 +117,9 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
             f(boost::ref(way));
     }
 
-    void default_way(const osmium::Way&) {
-    }
-
     void relation(const osmium::Relation& rel) {
         if (override f = this->get_override("relation"))
             f(boost::ref(rel));
-    }
-
-    void default_relation(const osmium::Relation&) {
     }
 
     void changeset(const osmium::Changeset& cs) {
@@ -132,15 +127,9 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
             f(boost::ref(cs));
     }
 
-    void default_changeset(const osmium::Changeset&) {
-    }
-
     void area(const osmium::Area& area) {
         if (override f = this->get_override("area"))
             f(boost::ref(area));
-    }
-
-    void default_area(const osmium::Area&) {
     }
 
     void apply_file(const std::string &filename, bool locations = false,
@@ -155,7 +144,7 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
     {
         Py_buffer pybuf;
         PyObject_GetBuffer(buf.ptr(), &pybuf, PyBUF_C_CONTIGUOUS);
-        size_t len = pybuf.len;
+        size_t len = (size_t) pybuf.len;
         const char *cbuf = reinterpret_cast<const char *>(pybuf.buf);
         const char *cfmt = boost::python::extract<const char *>(format);
 
@@ -169,25 +158,40 @@ private:
         BaseHandler::pre_handler handler = locations?
                                             BaseHandler::location_handler
                                             :BaseHandler::no_handler;
+        m_has_node_cb = hasfunc("node");
 
-        if (this->get_override("area"))
+        if (hasfunc("area"))
         {
             entities = osmium::osm_entity_bits::object;
             handler = BaseHandler::area_handler;
         } else {
-            if (locations || this->get_override("node"))
+            if (locations || m_has_node_cb)
                 entities |= osmium::osm_entity_bits::node;
-            if (this->get_override("way"))
+            if (hasfunc("way"))
                 entities |= osmium::osm_entity_bits::way;
-            if (this->get_override("relation"))
+            if (hasfunc("relation"))
                 entities |= osmium::osm_entity_bits::relation;
         }
 
-        if (this->get_override("changeset"))
+        if (hasfunc("changeset"))
             entities |= osmium::osm_entity_bits::changeset;
 
         apply(file, entities, handler, idx);
     }
+
+    bool hasfunc(char const *name) {
+        reference_existing_object::apply<SimpleHandlerWrap*>::type converter;
+        PyObject* obj = converter( this );
+
+        if (PyObject_HasAttrString(obj, name)) {
+            auto o = boost::python::object(handle<>(obj));
+            return o.attr(name) != boost::python::object();
+        }
+
+        return false;
+    }
+
+    bool m_has_node_cb;
 };
 
 #endif
