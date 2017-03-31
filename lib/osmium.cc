@@ -67,8 +67,11 @@ BOOST_PYTHON_MODULE(_osmium)
     ;
 
     class_<SimpleHandlerWrap, boost::noncopyable>("SimpleHandler",
-        "The most generic of OSM data handlers. For each data type "
-        "a callback can be implemented where the object is processed. Note that "
+        "The most generic of OSM data handlers. Derive your data processor "
+        "from this class and implement callbacks for each object type you are "
+        "interested in. The following data types are recognised: \n"
+        " `node`, `way`, `relation`, `area` and `changeset`.\n "
+        "A callback takes exactly one parameter which is the object. Note that "
         "all objects that are handed into the handler are only readable and are "
         "only valid until the end of the callback is reached. Any data that "
         "should be retained must be copied into other data structures.")
