@@ -104,7 +104,7 @@ using namespace boost::python;
 struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
 
     void node(const osmium::Node& node) override {
-        if (!m_has_node_cb)
+        if (!(m_callbacks & osmium::osm_entity_bits::node))
             return;
 
         if (override f = this->get_override("node")) {
@@ -113,21 +113,33 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
     }
 
     void way(const osmium::Way& way) {
+        if (!(m_callbacks & osmium::osm_entity_bits::way))
+            return;
+
         if (override f = this->get_override("way"))
             f(boost::ref(way));
     }
 
     void relation(const osmium::Relation& rel) {
+        if (!(m_callbacks & osmium::osm_entity_bits::relation))
+            return;
+
         if (override f = this->get_override("relation"))
             f(boost::ref(rel));
     }
 
     void changeset(const osmium::Changeset& cs) {
+        if (!(m_callbacks & osmium::osm_entity_bits::changeset))
+            return;
+
         if (override f = this->get_override("changeset"))
             f(boost::ref(cs));
     }
 
     void area(const osmium::Area& area) {
+        if (!(m_callbacks & osmium::osm_entity_bits::area))
+            return;
+
         if (override f = this->get_override("area"))
             f(boost::ref(area));
     }
@@ -158,22 +170,33 @@ private:
         BaseHandler::pre_handler handler = locations?
                                             BaseHandler::location_handler
                                             :BaseHandler::no_handler;
-        m_has_node_cb = hasfunc("node");
 
+        m_callbacks = osmium::osm_entity_bits::nothing;
+        if (hasfunc("node"))
+            m_callbacks |= osmium::osm_entity_bits::node;
+        if (hasfunc("way"))
+            m_callbacks |= osmium::osm_entity_bits::way;
+        if (hasfunc("relation"))
+            m_callbacks |= osmium::osm_entity_bits::relation;
         if (hasfunc("area"))
+            m_callbacks |= osmium::osm_entity_bits::area;
+        if (hasfunc("changeset"))
+            m_callbacks |= osmium::osm_entity_bits::changeset;
+
+        if (m_callbacks & osmium::osm_entity_bits::area)
         {
             entities = osmium::osm_entity_bits::object;
             handler = BaseHandler::area_handler;
         } else {
-            if (locations || m_has_node_cb)
+            if (locations || m_callbacks & osmium::osm_entity_bits::node)
                 entities |= osmium::osm_entity_bits::node;
-            if (hasfunc("way"))
+            if (m_callbacks & osmium::osm_entity_bits::way)
                 entities |= osmium::osm_entity_bits::way;
-            if (hasfunc("relation"))
+            if (m_callbacks & osmium::osm_entity_bits::relation)
                 entities |= osmium::osm_entity_bits::relation;
         }
 
-        if (hasfunc("changeset"))
+        if (m_callbacks & osmium::osm_entity_bits::changeset)
             entities |= osmium::osm_entity_bits::changeset;
 
         apply(file, entities, handler, idx);
@@ -191,7 +214,7 @@ private:
         return false;
     }
 
-    bool m_has_node_cb;
+    osmium::osm_entity_bits::type m_callbacks;
 };
 
 #endif
