@@ -11,6 +11,14 @@ Geometry Factories
     :members:
     :undoc-members:
 
+.. autoclass:: osmium.geom.WKTFactory
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.geom.GeoJSONFactory
+    :members:
+    :undoc-members:
+
 
 Other Functions
 ^^^^^^^^^^^^^^^
