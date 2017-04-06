@@ -70,13 +70,20 @@ The suite can be run with:
 
 ## Documentation
 
-To build the documentation you need [Sphinx](http://sphinx-doc.org/).
-On Debian/Ubuntu install `python-sphinx` or `python3-sphinx`.
+To build the documentation you need [Sphinx](http://sphinx-doc.org/)
+and the [autoprogram extension](https://pythonhosted.org/sphinxcontrib-autoprogram/)
+On Debian/Ubuntu install `python-sphinx sphinxcontrib-autoprogram`
+or `python3-sphinx python3-sphinxcontrib.autoprogram`.
 
 First compile the bindings as described above and then run:
 
     cd doc
     make html
+
+For building the man pages for the tools run:
+
+    cd doc
+    make man
 
 
 ## License
