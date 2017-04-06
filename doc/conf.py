@@ -27,6 +27,7 @@ build_dir = "../build/lib.%s-%d.%d" % (
 
 # insert after the current directory
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), build_dir)))
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), '../tools')))
 
 try:
     from osmium.version import pyosmium_major, pyosmium_release
@@ -49,6 +50,7 @@ except ImportError:
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
+    'sphinxcontrib.autoprogram',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -247,8 +249,10 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pyosmium', 'Pyosmium Documentation',
-     ['Sarah Hoffmann'], 1)
+    ('tools_get_changes', 'pyosmium-get-changes', 'Download OSM change files',
+     ['Sarah Hoffmann'], 1),
+    ('tools_uptodate', 'pyosmium-up-to-date', 'Bring OSM files up-to-date',
+     ['Sarah Hoffmann'], 1),
 ]
 
 # If true, show URL addresses after external links.

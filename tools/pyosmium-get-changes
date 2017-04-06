@@ -24,6 +24,7 @@ from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
 from osmium import SimpleHandler, WriteHandler
 
+import re
 import sys
 import logging
 from textwrap import dedent as msgfmt
@@ -105,17 +106,18 @@ def write_end_sequence(fname, seqid):
         with open(fname, 'w') as fd:
             fd.write(str(startseq))
 
-if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stderr,
-                        format='%(levelname)s: %(message)s')
+def get_arg_parser(from_main=False):
+    def h(s):
+        return re.sub("\s\s+" , " ", s)
 
     parser = ArgumentParser(description=__doc__,
+                            usage=None if from_main else 'pyosmium-get-changes [options]',
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='count', default=0,
                         help='Increase verbosity')
     parser.add_argument('-o', '--outfile', dest='outfile',
-                        help="""Name of diff output file. If omitted, only the
-                              sequence ID will be printed where updates would start.""")
+                        help=h("""Name of diff output file. If omitted, only the
+                              sequence ID will be printed where updates would start."""))
     parser.add_argument('--server', action='store', dest='server_url',
                         help='Base URL of the replication server')
     parser.add_argument('-s', '--size', dest='outsize', type=int, default=100,
@@ -130,19 +132,26 @@ if __name__ == '__main__':
     group.add_argument('-O', '--start-osm-data', dest='start_file', metavar='OSMFILE',
                        help='start at the date of the newest OSM object in the file')
     parser.add_argument('-f', '--sequence-file', dest='seq_file',
-                       help="""Sequence file. If the file exists, then updates
+                       help=h("""Sequence file. If the file exists, then updates
                                will start after the id given in the file. At the
                                end of the process, the last sequence ID contained
-                               in the diff is written.""")
+                               in the diff is written."""))
     parser.add_argument('--ignore-osmosis-headers', dest='ignore_headers',
                         action='store_true',
-                        help="""When determining the start from an OSM file,
+                        help=h("""When determining the start from an OSM file,
                                 ignore potential replication information in the
-                                header and search for the newest OSM object.""")
+                                header and search for the newest OSM object."""))
     parser.add_argument('-d', '--no-deduplicate', action='store_false', dest='simplify',
                         help='Do not deduplicate and sort diffs.')
 
-    options = parser.parse_args()
+    return parser
+
+
+if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stderr,
+                        format='%(levelname)s: %(message)s')
+
+    options = get_arg_parser(from_main=True).parse_args()
 
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 

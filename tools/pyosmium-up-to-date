@@ -23,6 +23,7 @@ resolved). Any other error results in a return code larger than 1. The
 output file is guaranteed to be unmodified in that case.
 """
 
+import re
 import sys
 import logging
 
@@ -140,41 +141,47 @@ def compute_start_point(options):
 
     return url, seq, ts
 
-
-if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stderr,
-                        format='%(asctime)s %(levelname)s: %(message)s')
+def get_arg_parser(from_main=False):
+    def h(s):
+        return re.sub("\s\s+" , " ", s)
 
     parser = ArgumentParser(description=__doc__,
+                            usage=None if from_main else 'pyosmium-up-to-date [options] <osm file>',
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='count', default=0,
                         help='Increase verbosity')
     parser.add_argument('infile', metavar='<OSM file>', help="OSM file to update")
     parser.add_argument('-o', '--outfile', dest='outfile',
-                        help="""Name output of file. If missing, the input file
-                                will be overwritten.""")
+                        help=h("""Name output of file. If missing, the input file
+                                will be overwritten."""))
     parser.add_argument('--server', action='store', dest='server_url',
-            help="""Base URL of the replication server. Default:
-                    'https://planet.osm.org/replication/hour/' (
-                    hourly diffs from osm.org).""")
+            help=h("""Base URL of the replication server. Default:
+                    'https://planet.osm.org/replication/hour/'
+                    (hourly diffs from osm.org)."""))
     parser.add_argument('-s', '--size', dest='outsize', metavar='SIZE', type=int, default=1024,
                         help='Maximum size of change to apply at once in MB. Default: 1GB.')
     parser.add_argument('--tmpdir', dest='tmpdir',
             help='Directory to use for temporary files. Default: directory of input file')
     parser.add_argument('--ignore-osmosis-headers', dest='ignore_headers',
                         action='store_true',
-                        help="""Ignore potential replication information in the
+                        help=h("""Ignore potential replication information in the
                                 header of the input file and search for the
-                                newest OSM object in the file instead.""")
+                                newest OSM object in the file instead."""))
     parser.add_argument('-b', '--wind-back', dest='wind_back', type=int, default=60,
-                        help="""Number of minutes to start downloading before
+                        help=h("""Number of minutes to start downloading before
                                 the newest addition to input data. (Ignored when
-                                the file contains a sequence ID.) Default: 60.""")
+                                the file contains a sequence ID.) Default: 60."""))
     parser.add_argument('--force-update-of-old-planet', action='store_true',
                         dest='force_update',
                         help="Apply update even if the input data is really old.")
 
-    options = parser.parse_args()
+    return parser
+
+if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stderr,
+                        format='%(asctime)s %(levelname)s: %(message)s')
+
+    options = get_arg_parser(from_main=True).parse_args()
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
     try:
