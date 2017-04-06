@@ -40,7 +40,7 @@ class Node(OSMObject):
         if base is None:
             self.location = location
         else:
-            self.location = loctation if location is not None else base.location
+            self.location = location if location is not None else base.location
 
 
 class Way(OSMObject):
