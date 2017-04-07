@@ -1,5 +1,5 @@
 """
-This example shows how to filter and modify tags and write the rusults back.
+This example shows how to filter and modify tags and write the results back.
 It changes all tag values 'yes/no' to '1/0'.
 """
 
@@ -9,7 +9,7 @@ import sys
 class BoolNormalizer(o.SimpleHandler):
 
     def __init__(self, writer):
-        o.SimpleHandler.__init__(self)
+        super(BoolNormalizer, self).__init__()
         self.writer = writer
 
     def normalize(self, o):

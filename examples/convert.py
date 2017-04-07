@@ -11,7 +11,7 @@ import sys
 class Convert(o.SimpleHandler):
 
     def __init__(self, writer):
-        o.SimpleHandler.__init__(self)
+        super(Convert, self).__init__()
         self.writer = writer
 
     def node(self, n):

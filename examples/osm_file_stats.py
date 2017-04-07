@@ -7,8 +7,9 @@ import osmium as o
 import sys
 
 class FileStatsHandler(o.SimpleHandler):
+
     def __init__(self):
-        o.SimpleHandler.__init__(self)
+        super(FileStatsHandler, self).__init__()
         self.nodes = 0
         self.ways = 0
         self.rels = 0

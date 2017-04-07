@@ -32,7 +32,7 @@ class Stats(object):
 
 class FileStatsHandler(o.SimpleHandler):
     def __init__(self):
-        o.SimpleHandler.__init__(self)
+        super(FileStatsHandler, self).__init__()
         self.nodes = Stats()
         self.ways = Stats()
         self.rels = Stats()

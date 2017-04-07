@@ -21,15 +21,15 @@ class Stats(object):
         else:
             self.modified += 1
 
-
     def outstats(self, prefix):
         print("%s added: %d" % (prefix, self.added))
         print("%s modified: %d" % (prefix, self.modified))
         print("%s deleted: %d" % (prefix, self.deleted))
 
+
 class FileStatsHandler(o.SimpleHandler):
     def __init__(self):
-        o.SimpleHandler.__init__(self)
+        super(FileStatsHandler, self).__init__()
         self.nodes = Stats()
         self.ways = Stats()
         self.rels = Stats()

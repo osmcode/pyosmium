@@ -14,7 +14,7 @@ import sys
 class WayFilter(o.SimpleHandler):
 
     def __init__(self):
-        o.SimpleHandler.__init__(self)
+        super(WayFilter, self).__init__()
         self.nodes = set()
 
     def way(self, w):
@@ -26,7 +26,7 @@ class WayFilter(o.SimpleHandler):
 class CoastlineWriter(o.SimpleHandler):
 
     def __init__(self, writer, nodes):
-        o.SimpleHandler.__init__(self)
+        super(CoastlineWriter, self).__init__()
         self.writer = writer
         self.nodes = nodes
 

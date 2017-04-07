@@ -8,7 +8,7 @@ import sys
 
 class RoadLengthHandler(o.SimpleHandler):
     def __init__(self):
-        o.SimpleHandler.__init__(self)
+        super(RoadLengthHandler, self).__init__()
         self.length = 0.0
 
     def way(self, w):
