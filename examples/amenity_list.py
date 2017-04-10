@@ -14,7 +14,7 @@ wkbfab = o.geom.WKBFactory()
 class AmenityListHandler(o.SimpleHandler):
 
     def print_amenity(amenity, tags, lon, lat):
-        name = tags['name'] if 'name' in tags else ''
+        name = tags.get('name', '')
         print("%f %f %-15s %s" % (lon, lat, tags['amenity'], name))
 
     def node(self, n):

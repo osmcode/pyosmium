@@ -7,7 +7,7 @@ import sys
 class NamesHandler(osmium.SimpleHandler):
 
     def output_pubs(self, tags):
-        if 'amenity' in tags and tags['amenity'] == 'pub':
+        if tags.get('amenity') == 'pub':
             if 'name' in tags:
                 print(tags['name'])
 
@@ -22,6 +22,5 @@ if __name__ == '__main__':
         print("Usage: python pub_names.py <osmfile>")
         sys.exit(-1)
 
-    h = NamesHandler()
-    h.apply_file(sys.argv[1])
+    NamesHandler().apply_file(sys.argv[1])
 

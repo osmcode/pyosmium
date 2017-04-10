@@ -14,7 +14,7 @@ class BoolNormalizer(o.SimpleHandler):
 
     def normalize(self, o):
         # if there are no tags we are done
-        if len(o.tags) == 0:
+        if not o.tags:
             return o
 
         # new tags should be kept in a list so that the order is preserved
