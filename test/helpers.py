@@ -3,6 +3,7 @@
 import random
 import tempfile
 import os
+from textwrap import dedent
 import osmium
 
 def _complete_object(o):
@@ -87,6 +88,15 @@ def create_osm_file(data):
 
     return fname
 
+def create_opl_file(data):
+    with tempfile.NamedTemporaryFile(dir='/tmp', suffix='.opl', delete=False) as fd:
+        fname = fd.name
+        fd.write(dedent(data).encode('utf-8'))
+        fd.write(b'\n')
+
+    return fname
+
+
 def osmobj(kind, **args):
     ret = dict(args)
     ret['type'] = kind
@@ -99,7 +109,11 @@ class HandlerTestBase:
     apply_idx = 'sparse_mem_array'
 
     def test_func(self):
-        fn = create_osm_file(self.data)
+        if isinstance(self.data, (list, tuple)):
+            fn = create_osm_file(self.data)
+        else:
+            fn = create_opl_file(self.data)
+
         try:
             self.Handler().apply_file(fn, self.apply_locations, self.apply_idx)
         finally:

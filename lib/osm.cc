@@ -8,19 +8,31 @@
 
 #include "std_pair.hpp"
 
-
-inline const char *get_tag_by_key(osmium::TagList const& obj, const char *value)
+inline const char *get_tag_by_key(osmium::TagList const& obj, const char *key)
 {
-    const char* v = obj.get_value_by_key(value);
-    if (!v)
+    if (!key) {
+        PyErr_SetString(PyExc_KeyError, "Key 'None' not allowed.");
+        boost::python::throw_error_already_set();
+    }
+
+    const char* v = obj.get_value_by_key(key);
+    if (!v) {
         PyErr_SetString(PyExc_KeyError, "No tag with that key.");
+        boost::python::throw_error_already_set();
+    }
     return v;
 }
 
-inline bool taglist_contains_tag(osmium::TagList const& obj, const char *value)
+inline const char *get_tag_by_key_with_none(osmium::TagList const& obj,
+                                            const char *key)
 {
-    const char* v = obj.get_value_by_key(value);
-    return v;
+    return key ? obj.get_value_by_key(key) : nullptr;
+}
+
+
+inline bool taglist_contains_tag(osmium::TagList const& obj, const char *key)
+{
+    return key && obj.has_key(key);
 }
 
 inline const char member_item_type(osmium::RelationMember& obj)
@@ -132,6 +144,9 @@ BOOST_PYTHON_MODULE(_osm)
         .def("__getitem__", &get_tag_by_key)
         .def("__contains__", &taglist_contains_tag)
         .def("__iter__", iterator<osmium::TagList,return_internal_reference<>>())
+        .def("get", &osmium::TagList::get_value_by_key,
+             (arg("self"), arg("key"), arg("default")))
+        .def("get", &get_tag_by_key_with_none)
     ;
     class_<osmium::NodeRef>("NodeRef",
         "A reference to a OSM node that also caches the nodes location.")
