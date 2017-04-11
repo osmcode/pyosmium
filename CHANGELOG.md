@@ -12,6 +12,26 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.12.1] - 2017-04-11
+
+### Added
+
+- geometry factories for WKT and GeoJSON
+- man pages for new tools
+- get() function for TagList
+- tests for TagList
+
+### Changed
+
+- example code simplified
+- use current libosmium
+
+### Fixed
+
+- area creator always called (#32)
+- various typos
+- TagList [] accessor properly throws KeyError on missing element
+
 ## [2.12.0] - 2017-03-19
 
 ### Added
