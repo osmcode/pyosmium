@@ -24,7 +24,7 @@ def get_versions():
         The file cannot be directly imported because it is not installed
         yet.
     """
-    version_py = os.path.join(os.path.split(__file__)[0], "osmium/version.py")
+    version_py = os.path.join(os.path.split(__file__)[0], "src/osmium/version.py")
     v = {}
     with open(version_py) as version_file:
         # Execute the code in version.py.
@@ -148,7 +148,8 @@ setup (name = 'osmium',
        scripts=['tools/pyosmium-get-changes', 'tools/pyosmium-up-to-date'],
        classifiers=classifiers,
        packages = packages,
-       cmdclass={'sdist' : My_sdist },
+       package_dir = {'' : 'src'},
+       cmdclass={'sdist' : My_sdist},
        ext_modules = extensions)
 
 
