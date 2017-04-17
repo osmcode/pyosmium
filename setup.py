@@ -1,5 +1,6 @@
 from setuptools import setup, Extension
 from setuptools.command.sdist import sdist as orig_sdist
+from distutils.command import build_ext as setuptools_build_ext
 from subprocess import call
 from sys import version_info as pyversion, platform as osplatform
 from ctypes.util import find_library
@@ -61,6 +62,25 @@ for suf in suffixes:
 else:
     raise Exception("Cannot find boost_python library")
 
+
+orig_compiler = setuptools_build_ext.customize_compiler
+
+def cpp_compiler(compiler):
+    retval = orig_compiler(compiler)
+    # force C++ compiler
+    # Note that we only exchange the compiler as we want to keep the
+    # original Python cflags.
+    if len(compiler.compiler_cxx) > 0:
+        compiler.compiler_so[0] = compiler.compiler_cxx[0]
+    # remove warning that does not make sense for C++
+    try:
+        compiler.compiler_so.remove('-Wstrict-prototypes')
+    except (ValueError, AttributeError):
+        pass
+    return retval
+
+setuptools_build_ext.customize_compiler = cpp_compiler
+
 ### osmium dependencies
 osmium_prefixes = [ 'libosmium-' + libosmium_version, '../libosmium' ]
 if 'LIBOSMIUM_PREFIX' in os.environ:
@@ -102,6 +122,7 @@ for ext in ('io', 'index', 'geom'):
            libraries = libs,
            library_dirs = libdirs,
            language = 'c++',
+           compiler = 'c++',
            extra_compile_args = extra_compile_args
          ))
 
