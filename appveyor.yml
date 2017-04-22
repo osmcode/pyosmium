@@ -1,0 +1,51 @@
+environment:
+  PYTHON: "C:\\Python36-x64"
+  PYTHON_VERSION: "3.6.x" # currently 3.6.0
+  PYTHON_ARCH: "64"
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+# Operating system (build VM template)
+os: Visual Studio 2015
+
+install:
+  - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python --version
+  - cd c:\dev 
+  - git clone --depth 10 https://github.com/osmcode/libosmium.git
+  - dir c:\dev
+  - IF NOT EXIST pyosmium_libs_Release.7z ECHO downloading dependencies pack... && powershell Invoke-WebRequest https://github.com/alex85k/pyosmium_libs/releases/download/0.1/pyosmium_libs_Release.7z -OutFile pyosmium_libs_Release.7z
+  - cd c:\
+  - 7z x c:\dev\pyosmium_libs_Release.7z
+  - dir c:\libs\include
+  - dir c:\libs\lib
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf input
+
+# clone directory
+clone_folder: c:\dev\pyosmium
+
+platform: x64
+configuration: Release
+
+build_script:
+  - cd c:\dev\pyosmium
+  - SET LIBS_PREFIX=c:/libs
+  - SET BOOST_PREFIX=c:/libs
+  - python setup.py build
+  - python setup.py install --user
+
+test_script:
+  - set PATH=%BOOST_PREFIX:/=\%\lib;%PATH%
+  - cd test
+  - python run_tests.py
+  
+#artifacts:
+#  - path: pyosmium_libs_Release.7z
+#    name: pyosmium_libs_Release.7z
