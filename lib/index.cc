@@ -2,6 +2,7 @@
 
 #include <osmium/osm.hpp>
 #include <osmium/index/map/all.hpp>
+#include <osmium/index/node_locations_map.hpp>
 
 using namespace boost::python;
 
@@ -16,7 +17,7 @@ PyObject *map_types() {
     const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
 
     boost::python::list* l = new boost::python::list();
-    for(auto const &e : map_factory.map_types())
+    for (auto const &e : map_factory.map_types())
         (*l).append(e);
 
     return l->ptr();
