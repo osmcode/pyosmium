@@ -57,6 +57,14 @@ class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
         def node(self, n):
             assert_equals(n.positive_id(), 34)
 
+class TestNodeLargeId(HandlerTestBase, unittest.TestCase):
+    data = [osmobj('N', id=17179869418, version=5, changeset=58674, uid=42,
+                   timestamp='2014-01-31T06:23:35Z', user='anonymous')]
+
+    class Handler(o.SimpleHandler):
+        def node(self, n):
+            assert_equals(n.id, 17179869418)
+
 
 class TestWayAttributes(HandlerTestBase, unittest.TestCase):
 
