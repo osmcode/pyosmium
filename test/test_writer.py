@@ -23,7 +23,7 @@ else:
 
 @contextmanager
 def WriteExpect(expected):
-    fname = tempfile.mktemp(dir='/tmp', suffix='.opl')
+    fname = tempfile.mktemp(dir=tempfile.gettempdir(), suffix='.opl')
     writer = o.SimpleWriter(fname, 1024*1024)
     try:
         yield writer
