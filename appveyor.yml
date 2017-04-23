@@ -23,6 +23,7 @@ install:
   - 7z x c:\dev\pyosmium_libs_Release.7z
   - dir c:\libs\include
   - dir c:\libs\lib
+  - pip install nose
 
 # scripts that are called at very beginning, before repo cloning
 init:
