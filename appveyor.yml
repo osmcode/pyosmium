@@ -1,9 +1,9 @@
 environment:
-  PYTHON: "C:\\Python36-x64"
-  PYTHON_VERSION: "3.6.x" # currently 3.6.0
-  PYTHON_ARCH: "64"
 
-# Operating system (build VM template)
+  matrix:
+    #- PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python36-x64"
+
 os: Visual Studio 2015
 
 install:
@@ -17,7 +17,7 @@ install:
   - 7z x c:\dev\pyosmium_libs_Release.7z
   - dir c:\libs\include
   - dir c:\libs\lib
-  - pip install nose
+  - pip install nose wheel
 
 # scripts that are called at very beginning, before repo cloning
 init:
@@ -25,9 +25,6 @@ init:
 
 # clone directory
 clone_folder: c:\dev\pyosmium
-
-platform: x64
-configuration: Release
 
 build_script:
   - cd c:\dev\pyosmium
@@ -40,7 +37,10 @@ test_script:
   - set PATH=%BOOST_PREFIX:/=\%\lib;%PATH%
   - cd test
   - python run_tests.py
-  
-#artifacts:
-#  - path: pyosmium_libs_Release.7z
-#    name: pyosmium_libs_Release.7z
+
+after_test:
+  - cd c:\dev\pyosmium
+  - "%PYTHON%\\python.exe setup.py bdist_wheel"
+
+artifacts:
+  - path: dist\*
