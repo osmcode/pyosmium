@@ -3,12 +3,6 @@ environment:
   PYTHON_VERSION: "3.6.x" # currently 3.6.0
   PYTHON_ARCH: "64"
 
-# branches to build
-branches:
-  # whitelist
-  only:
-    - master
-
 # Operating system (build VM template)
 os: Visual Studio 2015
 
@@ -37,8 +31,8 @@ configuration: Release
 
 build_script:
   - cd c:\dev\pyosmium
-  - SET LIBS_PREFIX=c:/libs
   - SET BOOST_PREFIX=c:/libs
+  - SET BOOST_VERSION=1_63
   - python setup.py build
   - python setup.py install --user
 
