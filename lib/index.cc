@@ -4,6 +4,8 @@
 #include <osmium/index/map/all.hpp>
 #include <osmium/index/node_locations_map.hpp>
 
+#include "win_boost_fix.hpp"
+
 using namespace boost::python;
 
 typedef osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location> LocationTable;

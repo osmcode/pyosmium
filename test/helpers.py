@@ -75,7 +75,7 @@ def create_osm_file(data):
        the memberlist.
     """
     data.sort(key=lambda x:('NWR'.find(x['type']), x['id']))
-    with tempfile.NamedTemporaryFile(dir='/tmp', suffix='.osm', delete=False) as fd:
+    with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.osm', delete=False) as fd:
         fname = fd.name
         fd.write("<?xml version='1.0' encoding='UTF-8'?>\n".encode('utf-8'))
         fd.write('<osm version="0.6" generator="test-pyosmium" timestamp="2014-08-26T20:22:02Z">\n'.encode('utf-8'))
@@ -89,7 +89,7 @@ def create_osm_file(data):
     return fname
 
 def create_opl_file(data):
-    with tempfile.NamedTemporaryFile(dir='/tmp', suffix='.opl', delete=False) as fd:
+    with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.opl', delete=False) as fd:
         fname = fd.name
         fd.write(dedent(data).encode('utf-8'))
         fd.write(b'\n')

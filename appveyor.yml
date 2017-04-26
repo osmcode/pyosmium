@@ -1,0 +1,46 @@
+environment:
+
+  matrix:
+    #- PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python36-x64"
+
+os: Visual Studio 2015
+
+install:
+  - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python --version
+  - cd c:\dev 
+  - git clone --depth 10 https://github.com/osmcode/libosmium.git
+  - dir c:\dev
+  - IF NOT EXIST pyosmium_libs_Release.7z ECHO downloading dependencies pack... && powershell Invoke-WebRequest https://github.com/alex85k/pyosmium_libs/releases/download/0.1/pyosmium_libs_Release.7z -OutFile pyosmium_libs_Release.7z
+  - cd c:\
+  - 7z x c:\dev\pyosmium_libs_Release.7z
+  - dir c:\libs\include
+  - dir c:\libs\lib
+  - pip install nose wheel
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf input
+
+# clone directory
+clone_folder: c:\dev\pyosmium
+
+build_script:
+  - cd c:\dev\pyosmium
+  - SET BOOST_PREFIX=c:/libs
+  - SET BOOST_VERSION=1_63
+  - python setup.py build
+  - python setup.py install --user
+
+test_script:
+  - set PATH=%BOOST_PREFIX:/=\%\lib;%PATH%
+  - cd test
+  - python run_tests.py
+
+after_test:
+  - cd c:\dev\pyosmium
+  - "%PYTHON%\\python.exe setup.py bdist_wheel"
+
+artifacts:
+  - path: dist\*

@@ -8,6 +8,20 @@
 #include "generic_handler.hpp"
 #include "merged_input.hpp"
 #include "write_handler.hpp"
+#include "win_boost_fix.hpp"
+
+// workarodund for Visual Studio 2015 Update 3
+// https://connect.microsoft.com/VisualStudio/Feedback/Details/2852624
+#if (_MSC_VER > 1800 && _MSC_FULL_VER > 190023918)
+namespace boost {
+    template<>
+    const volatile SimpleHandlerWrap*
+    get_pointer(const volatile SimpleHandlerWrap* p)
+    {
+        return p;
+    }
+}
+#endif
 
 template <typename T>
 void apply_reader_simple(osmium::io::Reader &rd, T &h) {

@@ -64,6 +64,7 @@ BOOST_PYTHON_MODULE(_osm)
     std_pair_to_python_converter<int, int>();
     std_pair_to_python_converter<unsigned int, unsigned int>();
     std_pair_to_python_converter<unsigned long, unsigned long>();
+    std_pair_to_python_converter<uint64_t, uint64_t>();
 
     enum_<osmium::osm_entity_bits::type>("osm_entity_bits")
         .value("NOTHING", osmium::osm_entity_bits::nothing)

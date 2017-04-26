@@ -36,11 +36,20 @@ def get_versions():
 pyosmium_release, libosmium_version = get_versions()
 
 ## boost dependencies
-includes.append(os.path.join(os.environ.get('BOOST_PREFIX', '/usr'), 'include'))
-if 'BOOST_PREFIX' in os.environ:
-    libdirs.append(os.path.join(os.environ['BOOST_PREFIX'], 'lib'))
+boost_prefix = os.environ.get('BOOST_PREFIX',
+                              'c:/libs' if osplatform == "win32" else '/usr')
+
+includes.append(os.path.join(boost_prefix, 'include'))
+if 'BOOST_VERSION' in os.environ:
+    includes.append(os.path.join(boost_prefix, 'include',
+                                 "boost-%s" %os.environ['BOOST_VERSION']))
+
+if 'BOOST_VERSION' in os.environ:
+    libdirs.append(os.path.join(boost_prefix, 'lib'))
 elif osplatform in ["linux", "linux2"]:
     libdirs.append('/usr/lib/x86_64-linux-gnu/')
+else:
+    libdirs.append(os.path.join(boost_prefix, 'lib'))
 
 # try to find the boost library matching the python version
 suffixes = [ # Debian naming convention for version installed in parallel
@@ -60,26 +69,28 @@ for suf in suffixes:
         libs.append("boost_python%s" % suf)
         break
 else:
-    raise Exception("Cannot find boost_python library")
+    # Visual C++ supports auto-linking, no library needed
+    if osplatform != "win32":
+        raise Exception("Cannot find boost_python library")
 
+if osplatform != "win32":
+    orig_compiler = setuptools_build_ext.customize_compiler
 
-orig_compiler = setuptools_build_ext.customize_compiler
+    def cpp_compiler(compiler):
+        retval = orig_compiler(compiler)
+        # force C++ compiler
+        # Note that we only exchange the compiler as we want to keep the
+        # original Python cflags.
+        if len(compiler.compiler_cxx) > 0:
+            compiler.compiler_so[0] = compiler.compiler_cxx[0]
+        # remove warning that does not make sense for C++
+        try:
+            compiler.compiler_so.remove('-Wstrict-prototypes')
+        except (ValueError, AttributeError):
+            pass
+        return retval
 
-def cpp_compiler(compiler):
-    retval = orig_compiler(compiler)
-    # force C++ compiler
-    # Note that we only exchange the compiler as we want to keep the
-    # original Python cflags.
-    if len(compiler.compiler_cxx) > 0:
-        compiler.compiler_so[0] = compiler.compiler_cxx[0]
-    # remove warning that does not make sense for C++
-    try:
-        compiler.compiler_so.remove('-Wstrict-prototypes')
-    except (ValueError, AttributeError):
-        pass
-    return retval
-
-setuptools_build_ext.customize_compiler = cpp_compiler
+    setuptools_build_ext.customize_compiler = cpp_compiler
 
 ### osmium dependencies
 osmium_prefixes = [ 'libosmium-' + libosmium_version, '../libosmium' ]
@@ -99,11 +110,16 @@ else:
     else:
         print("Using global libosmium.")
 
-osmium_libs = ('expat', 'pthread', 'z', 'bz2')
+if osplatform == "win32" :
+    osmium_libs = ('expat', 'zlib', 'bzip2', 'ws2_32')
+    extra_compile_args = [ '-DWIN32_LEAN_AND_MEAN', '-D_CRT_SECURE_NO_WARNINGS', '-DNOMINMAX', '/wd4996', '/EHsc' ]
+else:
+    osmium_libs = ('expat', 'pthread', 'z', 'bz2')
+    extra_compile_args = [ '-std=c++11', '-D_LARGEFILE_SOURCE', '-D_FILE_OFFSET_BITS=64', '-D__STDC_FORMAT_MACROS' ]
+
 libs.extend(osmium_libs)
 
 extensions = []
-extra_compile_args = [ '-std=c++11', '-D_LARGEFILE_SOURCE', '-D_FILE_OFFSET_BITS=64', '-D__STDC_FORMAT_MACROS' ]
 
 extensions.append(Extension('osmium._osmium',
        sources = ['lib/osmium.cc'],
@@ -122,7 +138,6 @@ for ext in ('io', 'index', 'geom'):
            libraries = libs,
            library_dirs = libdirs,
            language = 'c++',
-           compiler = 'c++',
            extra_compile_args = extra_compile_args
          ))
 
