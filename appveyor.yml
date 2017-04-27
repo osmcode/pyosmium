@@ -1,20 +1,27 @@
 environment:
 
   matrix:
-    #- PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python27-x64"
+      DEVPACK: pyosmium_libs27-b63.7z
     - PYTHON: "C:\\Python36-x64"
+      DEVPACK: pyosmium_libs36-b63.7z
 
 os: Visual Studio 2015
 
 install:
   - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - SET VS90COMNTOOLS=%VS140COMNTOOLS%
+  - cd "c:\Users\appveyor\AppData\Local\Programs\Common\Microsoft\"
+  - ren "Visual C++ for Python" "Visual C++ for Python Do Not Use"
+  - cd "C:\Program Files (x86)\"
+  - ren "Microsoft Visual Studio 9.0" "Microsoft Visual Studio 9.0 Do Not Use"
   - python --version
   - cd c:\dev 
   - git clone --depth 10 https://github.com/osmcode/libosmium.git
   - dir c:\dev
-  - IF NOT EXIST pyosmium_libs_Release.7z ECHO downloading dependencies pack... && powershell Invoke-WebRequest https://github.com/alex85k/pyosmium_libs/releases/download/0.1/pyosmium_libs_Release.7z -OutFile pyosmium_libs_Release.7z
+  - IF NOT EXIST pyosmium_libs_Release.7z ECHO downloading dependencies pack... && powershell Invoke-WebRequest https://github.com/alex85k/pyosmium_libs/releases/download/0.3/%DEVPACK% -OutFile %DEVPACK%
   - cd c:\
-  - 7z x c:\dev\pyosmium_libs_Release.7z
+  - 7z x c:\dev\%DEVPACK%
   - dir c:\libs\include
   - dir c:\libs\lib
   - pip install nose wheel
