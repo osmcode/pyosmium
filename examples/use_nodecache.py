@@ -4,7 +4,7 @@ import sys
 class WayHandler(o.SimpleHandler):
 
     def __init__(self, idx):
-        super(WayHandler).__init__()
+        super(WayHandler, self).__init__()
         self.idx = idx
 
     def way(self, w):
