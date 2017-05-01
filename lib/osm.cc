@@ -285,6 +285,11 @@ BOOST_PYTHON_MODULE(_osm)
                       "(read-only) Ordered list of relation members. "
                       "See :py:class:`osmium.osm.RelationMemberList`")
     ;
+    class_<osmium::memory::ItemIteratorRange<osmium::InnerRing const> >("InnerRingIterator",
+            "Iterator over inner rings.",
+            no_init)
+        .def("__iter__", iterator<osmium::memory::ItemIteratorRange<osmium::InnerRing const>, return_internal_reference<> >())
+    ;
     class_<osmium::Area, bases<osmium::OSMObject>, boost::noncopyable>("Area",
             "Areas are a special kind of meta-object representing a polygon. "
             "They can either be derived from closed ways or from relations "
@@ -310,10 +315,8 @@ BOOST_PYTHON_MODULE(_osm)
                 &osmium::Area::cbegin<osmium::OuterRing>,
                 &osmium::Area::cend<osmium::OuterRing>),
              "Return an iterator over all outer rings of the multipolygon.")
-        .def("inner_rings", 
-              range<return_internal_reference<> >(
-                &osmium::Area::cbegin<osmium::InnerRing>,
-                &osmium::Area::cend<osmium::InnerRing>),
+        .def("inner_rings", &osmium::Area::inner_rings,
+                (arg("self"), arg("outer_ring")),
              "Return an iterator over all inner rings of the multipolygon.")
     ;
     class_<osmium::Changeset, boost::noncopyable>("Changeset",
