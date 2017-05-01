@@ -142,7 +142,7 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_true(oring.is_closed())
             assert_true(oring.ends_have_same_id())
             assert_true(oring.ends_have_same_location())
-            assert_equals(len(list(n.inner_rings())), 0)
+            assert_equals(len(list(n.inner_rings(oring))), 0)
 
 class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('C', id=34, created_at="2005-04-09T19:54:13Z",
