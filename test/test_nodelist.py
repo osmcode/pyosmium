@@ -1,4 +1,3 @@
-
 from nose.tools import *
 import unittest
 import os
@@ -33,3 +32,34 @@ class TestNodeIds(HandlerTestBase, unittest.TestCase):
             eq_(34359737784, w.nodes[2].ref)
             eq_(-34, w.nodes[3].ref)
             eq_(0, w.nodes[4].ref)
+
+class TestMissingRef(HandlerTestBase, unittest.TestCase):
+    data = """\
+           n1 x0.5 y10.0
+           w4 Nn1
+           """
+
+    class Handler(o.SimpleHandler):
+
+        def way(self, w):
+            eq_(1, w.nodes[0].ref)
+            assert_false(w.nodes[0].location.valid())
+            with assert_raises(o.InvalidLocationError):
+                w.nodes[0].location.lat
+            with assert_raises(o.InvalidLocationError):
+                w.nodes[0].location.lon
+
+class TestValidRefs(HandlerTestBase, unittest.TestCase):
+    data = """\
+           n1 x0.5 y10.0
+           w4 Nn1
+           """
+    apply_locations = True
+
+    class Handler(o.SimpleHandler):
+
+        def way(self, w):
+            eq_(1, w.nodes[0].ref)
+            assert_true(w.nodes[0].location.valid())
+            assert_almost_equal(w.nodes[0].location.lat, 10.0)
+            assert_almost_equal(w.nodes[0].location.lon, 0.5)
