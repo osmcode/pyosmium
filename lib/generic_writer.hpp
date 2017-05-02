@@ -16,7 +16,9 @@ class SimpleWriterWrap {
 public:
     SimpleWriterWrap(const char* filename, size_t bufsz=4096*1024)
     : writer(filename),
-      buffer(bufsz < 2*BUFFER_WRAP ? 2*BUFFER_WRAP : bufsz, osmium::memory::Buffer::auto_grow::yes)
+      buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
+             osmium::memory::Buffer::auto_grow::yes),
+      buffer_size(buffer.capacity()) // same rounding to BUFFER_WRAP
     {}
 
     virtual ~SimpleWriterWrap()
@@ -261,8 +263,8 @@ private:
     void flush_buffer() {
         buffer.commit();
 
-        if (buffer.committed() > buffer.capacity() - BUFFER_WRAP) {
-            osmium::memory::Buffer new_buffer(buffer.capacity(), osmium::memory::Buffer::auto_grow::yes);
+        if (buffer.committed() > buffer_size - BUFFER_WRAP) {
+            osmium::memory::Buffer new_buffer(buffer_size, osmium::memory::Buffer::auto_grow::yes);
             using std::swap;
             swap(buffer, new_buffer);
             writer(std::move(new_buffer));
@@ -271,6 +273,7 @@ private:
 
     osmium::io::Writer writer;
     osmium::memory::Buffer buffer;
+    size_t buffer_size;
 };
 
 #endif // PYOSMIUM_GENERIC_WRITER_HPP
