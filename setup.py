@@ -185,6 +185,7 @@ setup (name = 'osmium',
        classifiers=classifiers,
        packages = packages,
        package_dir = {'' : 'src'},
+       package_data = { 'osmium' : [ '*.dll' ] },
        cmdclass={'sdist' : My_sdist},
        ext_modules = extensions)
 

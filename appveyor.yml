@@ -47,6 +47,7 @@ test_script:
 
 after_test:
   - cd c:\dev\pyosmium
+  - copy c:\libs\lib\*.dll c:\dev\pyosmium\src\osmium
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
 
 artifacts:
