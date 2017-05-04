@@ -12,9 +12,14 @@ LocationTable *create_map(const std::string& config_string) {
     return map_factory.create_map(config_string).release();
 }
 
-std::vector<std::string> map_types() {
+PyObject *map_types() {
     const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
-    return map_factory.map_types();
+
+    boost::python::list* l = new boost::python::list();
+    for(auto const &e : map_factory.map_types())
+        (*l).append(e);
+
+    return l->ptr();
 }
 
 BOOST_PYTHON_MODULE(index)
