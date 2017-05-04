@@ -13,6 +13,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 
+## [2.11.1] - 2017-05-04
+
+### Added
+
+### Changed
+
+### Fixed
+
+- prevent unnecessary calls to callbacks
+- correctly throw KeyError in taglist accessor
+- fix output type of index.map_types() function
+- don't overgrow writer buffers over requested size
+
 ## [2.11.0] - 2017-01-15
 
 ### Changed
@@ -123,7 +136,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.11.0...HEAD
+[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.11.1...HEAD
+[2.11.1]: https://github.com/osmcode/pyosmium/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/osmcode/pyosmium/compare/v2.10.2...v2.11.0
 [2.10.2]: https://github.com/osmcode/pyosmium/compare/v2.9.0...v2.10.2
 [2.9.0]: https://github.com/osmcode/pyosmium/compare/v2.8.0...v2.9.0
