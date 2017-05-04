@@ -12,6 +12,25 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.12.2] - 2017-05-04
+
+### Added
+
+- build support for Windows
+- various tests
+
+### Changed
+
+- python sources moved into src/ directory
+- use current libosmium
+- area.inner_rings() now takes an outer ring as parameter and returns an iterator
+
+### Fixed
+
+- force use of C++ compiler
+- output type of index.map_types() function
+- write buffers growing unbound
+
 ## [2.12.1] - 2017-04-11
 
 ### Added
@@ -158,7 +177,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.12.0...HEAD
+[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.12.2...HEAD
+[2.12.2]: https://github.com/osmcode/pyosmium/compare/v2.12.1...v2.12.2
+[2.12.1]: https://github.com/osmcode/pyosmium/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/osmcode/pyosmium/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/osmcode/pyosmium/compare/v2.10.2...v2.11.0
 [2.10.2]: https://github.com/osmcode/pyosmium/compare/v2.9.0...v2.10.2
