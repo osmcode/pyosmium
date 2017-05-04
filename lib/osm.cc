@@ -9,11 +9,18 @@
 #include "std_pair.hpp"
 
 
-inline const char *get_tag_by_key(osmium::TagList const& obj, const char *value)
+inline const char *get_tag_by_key(osmium::TagList const& obj, const char *key)
 {
-    const char* v = obj.get_value_by_key(value);
-    if (!v)
+    if (!key) {
+        PyErr_SetString(PyExc_KeyError, "Key 'None' not allowed.");
+        boost::python::throw_error_already_set();
+    }
+
+    const char* v = obj.get_value_by_key(key);
+    if (!v) {
         PyErr_SetString(PyExc_KeyError, "No tag with that key.");
+        boost::python::throw_error_already_set();
+    }
     return v;
 }
 
