@@ -12,6 +12,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.12.3] - 2017-05-25
+
+### Added
+
+- links to appropriate mailing lists and issue trackers
+
+### Changed
+
+### Fixed
+
+- handler functions not called when using replication service (#38)
+- pyosmium-get-updates: bad variable name
+
 ## [2.12.2] - 2017-05-04
 
 ### Added
@@ -177,7 +190,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.12.2...HEAD
+[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.12.3...HEAD
+[2.12.3]: https://github.com/osmcode/pyosmium/compare/v2.12.2...v2.12.3
 [2.12.2]: https://github.com/osmcode/pyosmium/compare/v2.12.1...v2.12.2
 [2.12.1]: https://github.com/osmcode/pyosmium/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/osmcode/pyosmium/compare/v2.11.0...v2.12.0
