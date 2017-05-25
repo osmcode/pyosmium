@@ -86,11 +86,18 @@ For building the man pages for the tools run:
     cd doc
     make man
 
+## Bugs and Questions
+
+If you find bugs or have feature requests, please report those in the
+[github issue tracker](https://github.com/osmcode/pyosmium/issues/).
+
+For general questions about using pyosmium you can use the
+[OSM development mailing list](https://lists.openstreetmap.org/listinfo/dev)
+or ask on [OSM help](https://help.openstreetmap.org/).
 
 ## License
 
 Pyosmium is available under the BSD 2-Clause License. See LICENSE.TXT.
-
 
 ## Authors
 
