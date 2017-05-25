@@ -12,6 +12,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.11.2] - 2017-05-25
+
+### Added
+
+### Changed
+
+### Fixed
+
+- handler functions not called when using replication service (#38)
 
 ## [2.11.1] - 2017-05-04
 
