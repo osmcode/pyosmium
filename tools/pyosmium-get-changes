@@ -69,7 +69,7 @@ class ReplicationStart(object):
             if python_version >= (3,0):
                 date = date.replace(tzinfo=dt.timezone.utc)
         except ValueError:
-            raise ArgumentTypeError("Date needs to be in ISO8601 format (e.g. 2015-12-24T08:08Z).")
+            raise ArgumentTypeError("Date needs to be in ISO8601 format (e.g. 2015-12-24T08:08:08Z).")
 
         return ReplicationStart(date=date)
 
@@ -104,7 +104,7 @@ def write_end_sequence(fname, seqid):
         print(seqid)
     else:
         with open(fname, 'w') as fd:
-            fd.write(str(startseq))
+            fd.write(str(seqid))
 
 def get_arg_parser(from_main=False):
     def h(s):
