@@ -25,8 +25,9 @@ protected:
     };
 
 public:
+virtual void apply_start() {};
 // handler functions
-virtual void node(const osmium::Node&)= 0;
+virtual void node(const osmium::Node&) = 0;
 virtual void way(const osmium::Way&) = 0;
 virtual void relation(const osmium::Relation&) = 0;
 virtual void changeset(const osmium::Changeset&) = 0;
@@ -163,14 +164,7 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
         apply_object(osmium::io::File(cbuf, len, cfmt), locations, idx);
     }
 
-private:
-    void apply_object(osmium::io::File file, bool locations, const std::string &idx)
-    {
-        osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nothing;
-        BaseHandler::pre_handler handler = locations?
-                                            BaseHandler::location_handler
-                                            :BaseHandler::no_handler;
-
+    void apply_start() override {
         m_callbacks = osmium::osm_entity_bits::nothing;
         if (hasfunc("node"))
             m_callbacks |= osmium::osm_entity_bits::node;
@@ -182,6 +176,18 @@ private:
             m_callbacks |= osmium::osm_entity_bits::area;
         if (hasfunc("changeset"))
             m_callbacks |= osmium::osm_entity_bits::changeset;
+    }
+
+
+private:
+    void apply_object(osmium::io::File file, bool locations, const std::string &idx)
+    {
+        osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nothing;
+        BaseHandler::pre_handler handler = locations?
+                                            BaseHandler::location_handler
+                                            :BaseHandler::no_handler;
+
+        apply_start();
 
         if (m_callbacks & osmium::osm_entity_bits::area)
         {
@@ -201,6 +207,7 @@ private:
 
         apply(file, entities, handler, idx);
     }
+
 
     bool hasfunc(char const *name) {
         reference_existing_object::apply<SimpleHandlerWrap*>::type converter;

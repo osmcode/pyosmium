@@ -52,6 +52,7 @@ namespace pyosmium {
 class MergeInputReader {
 public:
     void apply(BaseHandler& handler, bool simplify = true) {
+        handler.apply_start();
         if (simplify) {
             objects.sort(osmium::object_order_type_id_reverse_version());
             osmium::item_type prev_type = osmium::item_type::undefined;

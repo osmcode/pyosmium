@@ -28,11 +28,16 @@ void apply_reader_simple(osmium::io::Reader &rd, T &h) {
     osmium::apply(rd, h);
 }
 
+void apply_reader_simple(osmium::io::Reader &rd, BaseHandler &h) {
+    h.apply_start();
+    osmium::apply(rd, h);
+}
 
 template <typename T>
 void apply_reader_simple_with_location(osmium::io::Reader &rd,
                          osmium::handler::NodeLocationsForWays<T> &l,
                          BaseHandler &h) {
+    h.apply_start();
     osmium::apply(rd, l, h);
 }
 
