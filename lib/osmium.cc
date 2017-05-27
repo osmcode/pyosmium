@@ -28,6 +28,7 @@ void apply_reader_simple(osmium::io::Reader &rd, T &h) {
     osmium::apply(rd, h);
 }
 
+template <>
 void apply_reader_simple(osmium::io::Reader &rd, BaseHandler &h) {
     h.apply_start();
     osmium::apply(rd, h);
