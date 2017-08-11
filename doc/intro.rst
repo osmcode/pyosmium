@@ -115,7 +115,7 @@ If you want the cache to be persistent across invocations, you
 can use `dense_file_array` giving an additional file location for the
 cache like that::
 
-    h.apply_file("test.osm.pbf", locations=True, idx='sparse_file_array,example.nodecache')
+    h.apply_file("test.osm.pbf", locations=True, idx='dense_file_array,example.nodecache')
 
 where `example.nodecache` is the name of the cache file.
 
