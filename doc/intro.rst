@@ -9,7 +9,7 @@ For a more detailed introduction into the design of the osmium library, the
 reader is referred to the `osmium documentation`_.
 
 .. _OSM data model: http://wiki.openstreetmap.org/wiki/Elements
-.. _osmium documentation: http://osmcode.org/libosmium/manual/libosmium-manual.html
+.. _osmium documentation: http://osmcode.org/osmium-concepts/
 
 Reading OSM Data
 ----------------
@@ -117,7 +117,10 @@ cache like that::
 
     h.apply_file("test.osm.pbf", locations=True, idx='dense_file_array,example.nodecache')
 
-where `example.nodecache` is the name of the cache file.
+where `example.nodecache` is the name of the cache file. For more details
+on the different kind of indexes, see the `Index section in the Osmium Manual`_.
+
+.. _Index section in the Osmium Manual: http://osmcode.org/osmium-concepts/#indexes
 
 Interfacing with Shapely
 ^^^^^^^^^^^^^^^^^^^^^^^^
