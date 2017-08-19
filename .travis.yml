@@ -25,7 +25,7 @@ matrix:
         - os: osx
           osx_image: xcode6.4
           compiler: clang
-          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX= BOOST_PYTHON_OPTION=
+          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX=2 BOOST_PYTHON_OPTION=
         - os: osx
           osx_image: xcode6.4
           compiler: clang
