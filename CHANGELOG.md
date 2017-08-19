@@ -12,6 +12,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.12.4] - 2017-08-19
+
+### Added
+
+### Changed
+
+### Fixed
+
+- make apply_reader_simple a template again
+- minor fised to documentation
+
 ## [2.12.3] - 2017-05-25
 
 ### Added
