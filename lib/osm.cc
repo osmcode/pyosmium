@@ -29,6 +29,18 @@ inline const char *get_tag_by_key_with_none(osmium::TagList const& obj,
     return key ? obj.get_value_by_key(key) : nullptr;
 }
 
+inline const osmium::NodeRef &get_item_nodereflist(osmium::NodeRefList const& list, ssize_t idx)
+{
+    auto sz = list.size();
+    osmium::NodeRefList::size_type iout = (idx >= 0 ? idx : (ssize_t) sz + idx);
+
+    if (iout >= sz) {
+        PyErr_SetString(PyExc_IndexError, "Bad index.");
+        boost::python::throw_error_already_set();
+    }
+
+    return list[iout];
+}
 
 inline bool taglist_contains_tag(osmium::TagList const& obj, const char *key)
 {
@@ -184,8 +196,8 @@ BOOST_PYTHON_MODULE(_osm)
         "is normally not used directly, use one of its subclasses instead.",
         no_init)
         .def("__len__", &osmium::NodeRefList::size)
-        .def("__getitem__",
-             make_function(static_cast<const osmium::NodeRef& (osmium::NodeRefList::*)(osmium::NodeRefList::size_type) const>(&osmium::NodeRefList::operator[]), return_value_policy<reference_existing_object>()))
+        .def("__getitem__", make_function(&get_item_nodereflist,
+                             return_value_policy<reference_existing_object>()))
         .def("__iter__", iterator<osmium::NodeRefList,return_internal_reference<>>())
         .def("is_closed", &osmium::NodeRefList::is_closed, args("self"),
              "True if the start and end node are the same (synonym for "

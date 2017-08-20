@@ -32,6 +32,7 @@ class TestNodeIds(HandlerTestBase, unittest.TestCase):
             eq_(34359737784, w.nodes[2].ref)
             eq_(-34, w.nodes[3].ref)
             eq_(0, w.nodes[4].ref)
+            eq_(0, w.nodes[-1].ref)
 
 class TestMissingRef(HandlerTestBase, unittest.TestCase):
     data = """\
