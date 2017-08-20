@@ -115,7 +115,10 @@ class HandlerTestBase:
             fn = create_opl_file(self.data)
 
         try:
-            self.Handler().apply_file(fn, self.apply_locations, self.apply_idx)
+            self.handler = self.Handler()
+            self.handler.apply_file(fn, self.apply_locations, self.apply_idx)
         finally:
             os.remove(fn)
 
+        if hasattr(self, "check_result"):
+            self.check_result()

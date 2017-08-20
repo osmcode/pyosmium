@@ -10,8 +10,12 @@ class TestWkbCreateNode(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1)]
 
     class Handler(o.SimpleHandler):
+        wkbs = []
         def node(self, n):
-            wkb = wkbfab.create_point(n)
+            self.wkbs.append(wkbfab.create_point(n))
+
+    def check_result(self):
+        assert_equals(1, len(self.handler.wkbs))
 
 class TestWkbCreateWay(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -21,10 +25,14 @@ class TestWkbCreateWay(HandlerTestBase, unittest.TestCase):
     apply_locations = True
 
     class Handler(o.SimpleHandler):
+        wkbs = []
         def way(self, w):
-            wkb = wkbfab.create_linestring(w)
-            wkb = wkbfab.create_linestring(w, direction=o.geom.direction.BACKWARD)
-            wkb = wkbfab.create_linestring(w, use_nodes=o.geom.use_nodes.ALL)
+            self.wkbs.append(wkbfab.create_linestring(w))
+            self.wkbs.append(wkbfab.create_linestring(w, direction=o.geom.direction.BACKWARD))
+            self.wkbs.append(wkbfab.create_linestring(w, use_nodes=o.geom.use_nodes.ALL))
+
+    def check_result(self):
+        assert_equals(3, len(self.handler.wkbs))
 
 class TestWkbCreatePoly(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -36,5 +44,10 @@ class TestWkbCreatePoly(HandlerTestBase, unittest.TestCase):
     apply_locations = True
 
     class Handler(o.SimpleHandler):
+        wkbs = []
+
         def area(self, a):
-            wkb = wkbfab.create_multipolygon(a)
+            self.wkbs.append(wkbfab.create_multipolygon(a))
+
+    def check_result(self):
+        assert_equals(1, len(self.handler.wkbs))
