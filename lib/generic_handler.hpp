@@ -2,7 +2,7 @@
 #define PYOSMIUM_GENERIC_HANDLER_HPP
 
 #include <osmium/area/assembler.hpp>
-#include <osmium/area/multipolygon_collector.hpp>
+#include <osmium/area/multipolygon_manager.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/handler/node_locations_for_ways.hpp>
 #include <osmium/index/map/all.hpp>
@@ -44,7 +44,7 @@ void apply_with_location(osmium::io::Reader &r, const std::string &idx) {
 }
 
 void apply_with_area(osmium::io::Reader &r,
-                     osmium::area::MultipolygonCollector<osmium::area::Assembler> &collector,
+                     osmium::area::MultipolygonManager<osmium::area::Assembler> &mp_manager,
                      const std::string &idx) {
     const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
     std::unique_ptr<index_type> index = map_factory.create_map(idx);
@@ -52,7 +52,7 @@ void apply_with_area(osmium::io::Reader &r,
     location_handler.ignore_errors();
 
     osmium::apply(r, location_handler, *this,
-                  collector.handler([this](const osmium::memory::Buffer& area_buffer) {
+                  mp_manager.handler([this](const osmium::memory::Buffer& area_buffer) {
                        osmium::apply(area_buffer, *this);
                   })
                  );
@@ -82,14 +82,12 @@ void apply(const osmium::io::File &file, osmium::osm_entity_bits::type types,
     case area_handler:
         {
             osmium::area::Assembler::config_type assembler_config;
-            osmium::area::MultipolygonCollector<osmium::area::Assembler> collector(assembler_config);
+            osmium::area::MultipolygonManager<osmium::area::Assembler> mp_manager{assembler_config};
 
-            osmium::io::Reader reader1(file);
-            collector.read_relations(reader1);
-            reader1.close();
+            osmium::relations::read_relations(file, mp_manager);
 
             osmium::io::Reader reader2(file);
-            apply_with_area(reader2, collector, idx);
+            apply_with_area(reader2, mp_manager, idx);
             reader2.close();
             break;
         }
