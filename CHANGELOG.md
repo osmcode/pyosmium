@@ -12,6 +12,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.11.3] - 2017-08-20
+
+### Added
+
+### Changed
+
+- updated to latest libosmium 2.11 bugfix release
+
+### Fixed
+
+- handler functions not called when using Reader instead of file
+
 ## [2.11.2] - 2017-05-25
 
 ### Added
