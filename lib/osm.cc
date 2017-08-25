@@ -100,6 +100,12 @@ BOOST_PYTHON_MODULE(_osm)
         .def("valid", &osmium::Location::valid, args("self"),
                       "Check that the location is a valid WGS84 coordinate, i.e. "
                       "that it is within the usual bounds.")
+        .def("lat_without_check", &osmium::Location::lat_without_check, args("self"),
+             "Return latitude (y coordinate) without checking if the location "
+             "is valid.")
+        .def("lon_without_check", &osmium::Location::lon_without_check, args("self"),
+             "Return longitude (x coordinate) without checking if the location "
+             "is valid.")
     ;
     class_<osmium::Box>("Box",
         "A bounding box around a geographic area. It is defined by an "
