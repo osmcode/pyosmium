@@ -14,7 +14,7 @@ else:
         return datetime(*args)
 
 
-from helpers import create_osm_file, osmobj, HandlerTestBase
+from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase
 
 import osmium as o
 
@@ -23,6 +23,7 @@ class TestLocation(unittest.TestCase):
     def test_invalid_location(self):
         loc = o.osm.Location()
         assert_false(loc.valid())
+        assert_true(check_repr(loc))
 
     def test_valid_location(self):
         loc = o.osm.Location(1,10)
@@ -30,6 +31,8 @@ class TestLocation(unittest.TestCase):
         assert_equals(loc.lat, 10, 0.00001)
         assert_equals(loc.x, 10000000)
         assert_equals(loc.y, 100000000)
+        assert_true(check_repr(loc))
+
 
 class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, version=5, changeset=58674, uid=42,
@@ -47,6 +50,7 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), 1)
+            assert_true(check_repr(n))
 
 
 class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
@@ -91,6 +95,8 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_false(n.is_closed())
             assert_false(n.ends_have_same_id())
             assert_false(n.ends_have_same_location())
+            assert_true(check_repr(n))
+            assert_true(check_repr(n.nodes))
 
 class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
@@ -109,6 +115,8 @@ class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
             assert_equals(n.user, 'anonymous')
             assert_equals(n.positive_id(), 1)
+            assert_true(check_repr(n))
+            assert_true(check_repr(n.members))
 
 class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -167,3 +175,4 @@ class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(515288620, c.bounds.top_right.y)
             assert_equals(-1465242, c.bounds.bottom_left.x)
             assert_equals(515288506, c.bounds.bottom_left.y)
+            assert_true(check_repr(c))

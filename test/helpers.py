@@ -102,6 +102,8 @@ def osmobj(kind, **args):
     ret['type'] = kind
     return ret
 
+def check_repr(o):
+    return not str(o).startswith('<') and not repr(o).startswith('<')
 
 class HandlerTestBase:
 

@@ -4,7 +4,7 @@ import os
 import sys
 from datetime import datetime
 
-from helpers import create_osm_file, osmobj, HandlerTestBase
+from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase
 
 import osmium as o
 
@@ -72,6 +72,7 @@ class TestTagContains(HandlerTestBase, unittest.TestCase):
             assert_not_in("x", n.tags)
             assert_not_in(None, n.tags)
             assert_not_in("", n.tags)
+            assert_true(check_repr(n.tags))
 
 class TestTagIndexOp(HandlerTestBase, unittest.TestCase):
     data = "n234 Tabba=x,2=vvv,xx=abba"
