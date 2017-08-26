@@ -78,12 +78,27 @@ class ReplicationServer(object):
 
         return DownloadResult(current_id - 1, rd, newest.sequence)
 
-    def apply_diffs(self, handler, start_id, max_size=1024, simplify=True):
+    def apply_diffs(self, handler, start_id, max_size=1024, idx="", simplify=True):
         """ Download diffs starting with sequence id `start_id`, merge them
             together and then apply them to handler `handler`. `max_size`
             restricts the number of diffs that are downloaded. The download
             stops as soon as either a diff cannot be downloaded or the
             unpacked data in memory exceeds `max_size` kB.
+
+            If `idx` is set, a location cache will be created and applied to
+            the way nodes. You should be aware that diff files usually do not
+            contain the complete set of nodes when a way is modified. That means
+            that you cannot just create a new location cache, apply it to a diff
+            and expect to get complete way geometries back. Instead you need to
+            do an initial data import using a persistent location cache to
+            obtain a full set of node locations and then reuse this location
+            cache here when applying diffs.
+
+            Diffs may contain multiple versions of the same object when it was
+            changed multiple times during the period covered by the diff. If
+            `simplify` is set to False then all versions are returned. If it
+            is True (the default) then only the most recent version will be
+            sent to the handler.
 
             The function returns the sequence id of the last diff that was
             downloaded or None if the download failed completely.
@@ -93,7 +108,7 @@ class ReplicationServer(object):
         if diffs is None:
             return None
 
-        diffs.reader.apply(handler, simplify)
+        diffs.reader.apply(handler, idx=idx, simplify=simplify)
 
         return diffs.id
 

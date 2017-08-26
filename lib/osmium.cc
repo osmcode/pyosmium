@@ -174,10 +174,16 @@ BOOST_PYTHON_MODULE(_osmium)
         "Collects data from multiple input files and sorts and optionally "
         "deduplicates the data before applying it to a handler.")
         .def("apply", &pyosmium::MergeInputReader::apply,
-            (arg("self"), arg("handler"), arg("simplify")=true),
+            (arg("self"), arg("handler"), arg("idx")="", arg("simplify")=true),
             "Apply collected data to a handler. The data will be sorted first. "
             "If `simplify` is true (default) then duplicates will be eliminated "
-            "and only the newest version of each object kept. After the data "
+            "and only the newest version of each object kept. If `idx` is given "
+            "a node location cache with the given type will be created and "
+            "applied when creating the ways. Note that a diff file normally does "
+            "not contain all node locations to reconstruct changed ways. If the "
+            "full way geometries are needed, create a persistent node location "
+            "cache during initial import of the area and reuse it when processing "
+            "diffs. After the data "
             "has been applied the buffer of the MergeInputReader is empty and "
             "new data can be added for the next round of application.")
         .def("apply_to_reader", &pyosmium::MergeInputReader::apply_to_reader,

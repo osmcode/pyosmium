@@ -10,6 +10,8 @@
 #include <osmium/io/any_output.hpp>
 #include <osmium/io/output_iterator.hpp>
 #include <osmium/handler.hpp>
+#include <osmium/handler/node_locations_for_ways.hpp>
+#include <osmium/index/map/all.hpp>
 #include <osmium/object_pointer_collection.hpp>
 #include <osmium/visitor.hpp>
 
@@ -50,8 +52,7 @@ namespace {
 namespace pyosmium {
 
 class MergeInputReader {
-public:
-    void apply(BaseHandler& handler, bool simplify = true) {
+    void apply_without_location(BaseHandler& handler, bool simplify = true) {
         handler.apply_start();
         if (simplify) {
             objects.sort(osmium::object_order_type_id_reverse_version());
@@ -71,6 +72,43 @@ public:
 
         objects = osmium::ObjectPointerCollection();
         changes.clear();
+    }
+
+    void apply_with_location(BaseHandler& handler, const std::string &idx,
+                             bool simplify = true) {
+        const auto& map_factory = osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>::instance();
+        std::unique_ptr<index_type> index = map_factory.create_map(idx);
+        osmium::handler::NodeLocationsForWays<index_type> location_handler(*index);
+        location_handler.ignore_errors();
+
+        handler.apply_start();
+        if (simplify) {
+            objects.sort(osmium::object_order_type_id_reverse_version());
+            osmium::item_type prev_type = osmium::item_type::undefined;
+            osmium::object_id_type prev_id = 0;
+            for (auto &item: objects) {
+                if (item.type() != prev_type || item.id() != prev_id) {
+                    prev_type = item.type();
+                    prev_id = item.id();
+                    osmium::apply_item(item, location_handler, handler);
+                }
+            }
+        } else {
+            objects.sort(osmium::object_order_type_id_version());
+            osmium::apply(objects.begin(), objects.end(), location_handler, handler);
+        }
+
+        objects = osmium::ObjectPointerCollection();
+        changes.clear();
+    }
+
+public:
+    void apply(BaseHandler& handler, const std::string &idx = "",
+               bool simplify = true) {
+        if (idx.empty())
+            apply_without_location(handler, simplify);
+        else
+            apply_with_location(handler, idx, simplify);
     }
 
     void apply_to_reader(osmium::io::Reader &reader, osmium::io::Writer &writer,

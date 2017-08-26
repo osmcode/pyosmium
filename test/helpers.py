@@ -3,8 +3,20 @@
 import random
 import tempfile
 import os
+import sys
 from textwrap import dedent
 import osmium
+from datetime import datetime
+
+if sys.version_info[0] == 3:
+    from datetime import timezone
+
+    def mkdate(*args):
+        return datetime(*args, tzinfo=timezone.utc)
+else:
+    def mkdate(*args):
+        return datetime(*args)
+
 
 def _complete_object(o):
     """Takes a hash with an incomplete OSM object description and returns a
@@ -124,3 +136,22 @@ class HandlerTestBase:
 
         if hasattr(self, "check_result"):
             self.check_result()
+
+
+class CountingHandler(osmium.SimpleHandler):
+
+    def __init__(self):
+        super(CountingHandler, self).__init__()
+        self.counts = [0, 0, 0, 0]
+
+    def node(self, _):
+        self.counts[0] += 1
+
+    def way(self, _):
+        self.counts[1] += 1
+
+    def relation(self, _):
+        self.counts[2] += 1
+
+    def area(self, _):
+        self.counts[3] += 1

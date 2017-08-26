@@ -2,19 +2,7 @@ from nose.tools import *
 import unittest
 import os
 import sys
-from datetime import datetime
-
-if sys.version_info[0] == 3:
-    from datetime import timezone
-
-    def mkdate(*args):
-        return datetime(*args, tzinfo=timezone.utc)
-else:
-    def mkdate(*args):
-        return datetime(*args)
-
-
-from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase
+from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase, mkdate
 
 import osmium as o
 
