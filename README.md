@@ -61,7 +61,7 @@ There is a small test suite in the test directory. This provides regression
 test for the python bindings, it is not meant to be a test suite for Libosmium.
 
 You'll need the Python `nose` module. On Debian/Ubuntu install the package
-`python-nose`.
+`python-nose`. For Python2 `mock` is required as well (package `python-mock`).
 
 The suite can be run with:
 

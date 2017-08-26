@@ -3,8 +3,10 @@ environment:
   matrix:
     - PYTHON: "C:\\Python27-x64"
       DEVPACK: pyosmium_libs27-b63.7z
+      PIPINSTALLS: nose wheel mock
     - PYTHON: "C:\\Python36-x64"
       DEVPACK: pyosmium_libs36-b63.7z
+      PIPINSTALLS: nose wheel
 
 os: Visual Studio 2015
 
@@ -24,7 +26,7 @@ install:
   - 7z x c:\dev\%DEVPACK%
   - dir c:\libs\include
   - dir c:\libs\lib
-  - pip install nose wheel
+  - pip install %PIPINSTALLS%
 
 # scripts that are called at very beginning, before repo cloning
 init:
