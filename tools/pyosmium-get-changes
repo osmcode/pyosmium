@@ -188,6 +188,9 @@ if __name__ == '__main__':
     svr = rserv.ReplicationServer(url)
 
     startseq = options.start.get_sequence(svr)
+    if startseq is None:
+        log.error("Cannot read state file from server. Is the URL correct?")
+        exit(1)
 
     if options.outfile is None:
         write_end_sequence(options.seq_file, startseq)
