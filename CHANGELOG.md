@@ -12,6 +12,26 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.13.0] - 2017-08-31
+
+### Added
+
+- tests for WKB factories and replication server
+- str() and repr() implementations for all classes in osmium.osm
+- when applying diffs to a handler, a location cache may be used
+
+### Changed
+
+- use new MultipolygonManager for building areas
+- allow to access nodes in a NodeRefList with negative index
+- use current libosmium
+
+### Fixed
+
+- pyosmium-get-changes exits with an error when no start sequence can
+  be found
+
+
 ## [2.12.4] - 2017-08-19
 
 ### Added
@@ -21,7 +41,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - make apply_reader_simple a template again
-- minor fised to documentation
+- minor fixes to documentation
+
 
 ## [2.12.3] - 2017-05-25
 
@@ -201,20 +222,4 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - Exception not caught in test.
 
-[unreleased]: https://github.com/osmcode/pyosmium/compare/v2.12.3...HEAD
-[2.12.3]: https://github.com/osmcode/pyosmium/compare/v2.12.2...v2.12.3
-[2.12.2]: https://github.com/osmcode/pyosmium/compare/v2.12.1...v2.12.2
-[2.12.1]: https://github.com/osmcode/pyosmium/compare/v2.12.0...v2.12.1
-[2.12.0]: https://github.com/osmcode/pyosmium/compare/v2.11.0...v2.12.0
-[2.11.0]: https://github.com/osmcode/pyosmium/compare/v2.10.2...v2.11.0
-[2.10.2]: https://github.com/osmcode/pyosmium/compare/v2.9.0...v2.10.2
-[2.9.0]: https://github.com/osmcode/pyosmium/compare/v2.8.0...v2.9.0
-[2.8.0]: https://github.com/osmcode/pyosmium/compare/v2.7.1...v2.8.0
-[2.7.1]: https://github.com/osmcode/pyosmium/compare/v2.6.0...v2.7.1
-[2.6.0]: https://github.com/osmcode/pyosmium/compare/v2.5.4...v2.6.0
-[2.5.4]: https://github.com/osmcode/pyosmium/compare/v2.5.3...v2.5.4
-[2.5.3]: https://github.com/osmcode/pyosmium/compare/v2.4.1...v2.5.3
-[2.4.1]: https://github.com/osmcode/pyosmium/compare/v2.3.0...v2.4.1
-[2.3.0]: https://github.com/osmcode/pyosmium/compare/v2.2.0...v2.3.0
-[2.2.0]: https://github.com/osmcode/pyosmium/compare/v2.1.0...v2.2.0
 
