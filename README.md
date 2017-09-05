@@ -7,27 +7,54 @@ manner.
 [![Travis Build Status](https://api.travis-ci.org/osmcode/pyosmium.svg)](http://travis-ci.org/osmcode/pyosmium)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/osmcode/pyosmium?svg=true)](https://ci.appveyor.com/project/Mapbox/pyosmium)
 
-
 ## Dependencies
 
 Python >= 2.7 is supported but a version >= 3.3 is strongly recommended.
 
-You'll need Python setuptools. On Debian/Ubuntu install `python-setuptools`.
+Other requirements are:
 
-pyosmium uses [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
-to create the bindings. On Debian/Ubuntu install `libboost-python-dev`. OS X run
-`brew install boost-python` or `brew install boost-python --with-python3`
-depending on which python version you want to use. You can also (re)install
-both.
+ * Python setuptools
+ * [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
+ * expat, libz, libbz2 and Boost iterator
+   (see also [Libosmium dependencies](http://osmcode.org/libosmium/manual.html#dependencies))
+ * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
 
-Other dependencies are expat, libz, libbz2 and Boost iterator.
-See [Libosmium dependencies](http://osmcode.org/libosmium/manual.html#dependencies)
-for required packages for various distributions.
-
-You have to compile with the same compiler version python is compiled with on
+You have to compile with the same compiler version that Python is compiled with on
 your system, otherwise it might not work.
 
+### Debian/Ubuntu
+
+On Debian/Ubuntu systems all required dependencies can be installed with:
+
+    sudo apt-get install build-essentials libboost-python-dev \
+                         libexpat1-dev zlib1g-dev libbz2-dev
+
+### Homebrew (OS X)
+
+On OS x Boost.Python needs to be installed with
+`brew install boost-python` or `brew install boost-python --with-python3`
+depending on which Python version you want to use. You can also (re)install
+both.
+
 ## Installation
+
+### Using Pip
+
+The recommended way to install pyosmium is via pip:
+
+    pip install osmium
+
+There are also experimental binary wheels for Windows available.
+
+### Compiling from Source
+
+When compiling from source, you need to get the latest libosmium version
+first. It is recommended to put it next to the pyosmium source. The setup
+script uses per default either a globally installed libosmium or
+looks for the source in `../libosmium`. You can set a custom location with
+`LIBOSMIUM_PREFIX`.
+
+To use a custom boost installation, set `BOOST_PREFIX`.
 
 To compile the bindings, run
 
@@ -43,11 +70,6 @@ to install only for your user, or
 
 to install globally.
 
-The setup script uses per default either a globally installed libosmium or
-looks for the source in `../libosmium`. You can set a custom location with
-`LIBOSMIUM_PREFIX`.
-
-To use a custom boost installation, set `BOOST_PREFIX`.
 
 ## Examples
 
