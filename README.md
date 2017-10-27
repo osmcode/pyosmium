@@ -26,7 +26,7 @@ your system, otherwise it might not work.
 
 On Debian/Ubuntu systems all required dependencies can be installed with:
 
-    sudo apt-get install build-essentials libboost-python-dev \
+    sudo apt-get install build-essential libboost-python-dev \
                          libexpat1-dev zlib1g-dev libbz2-dev
 
 ### Homebrew (OS X)
