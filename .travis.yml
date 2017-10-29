@@ -62,6 +62,7 @@ addons:
 install:
     - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git ../libosmium
     - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
+          brew update;
           brew install python$PYTHON_SUFFIX google-sparsehash;
           brew install boost-python $BOOST_PYTHON_OPTION;
           pip$PYTHON_SUFFIX install -q nose mock;
