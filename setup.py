@@ -110,6 +110,12 @@ else:
     else:
         print("Using global libosmium.")
 
+### protozero dependencies
+for prefix in [ '../protozero' ]:
+    if os.path.isfile(os.path.join(prefix, 'include/protozero/version.hpp')):
+        print("protozero found in '%s'" % prefix)
+        includes.insert(0, os.path.join(prefix, 'include'))
+
 if osplatform == "win32" :
     osmium_libs = ('expat', 'zlib', 'bzip2', 'ws2_32')
     extra_compile_args = [ '-DWIN32_LEAN_AND_MEAN', '-D_CRT_SECURE_NO_WARNINGS', '-DNOMINMAX', '/wd4996', '/EHsc' ]

@@ -20,6 +20,7 @@ install:
   - python --version
   - cd c:\dev 
   - git clone --depth 10 https://github.com/osmcode/libosmium.git
+  - git clone --depth 10 https://github.com/mapbox/protozero.git
   - dir c:\dev
   - IF NOT EXIST pyosmium_libs_Release.7z ECHO downloading dependencies pack... && powershell Invoke-WebRequest https://github.com/alex85k/pyosmium_libs/releases/download/0.3/%DEVPACK% -OutFile %DEVPACK%
   - cd c:\

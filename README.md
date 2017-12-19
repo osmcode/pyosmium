@@ -15,7 +15,7 @@ Other requirements are:
 
  * Python setuptools
  * [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
- * expat, libz, libbz2 and Boost iterator
+ * protozero, expat, libz, libbz2 and Boost iterator
    (see also [Libosmium dependencies](http://osmcode.org/libosmium/manual.html#dependencies))
  * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
 
