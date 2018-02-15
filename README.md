@@ -32,7 +32,7 @@ On Debian/Ubuntu systems all required dependencies can be installed with:
 ### Homebrew (OS X)
 
 On OS x Boost.Python needs to be installed with
-`brew install boost-python` or `brew install boost-python --with-python3`
+`brew install boost-python` or `brew install boost-python3`
 depending on which Python version you want to use. You can also (re)install
 both.
 
