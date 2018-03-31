@@ -18,6 +18,10 @@ class My_sdist(orig_sdist):
         tarball = 'https://github.com/osmcode/libosmium/archive/v%s.tar.gz' % libosmium_version
         print("Downloading and adding libosmium sources from", tarball)
         call('cd %s && wget -O - -q %s | tar xz' % (base_dir, tarball), shell=True)
+        # checkout protozero in the required version
+        tarball = 'https://github.com/mapbox/protozero/archive/v%s.tar.gz' % protozero_version
+        print("Downloading and adding protozero sources from", tarball)
+        call('cd %s && wget -O - -q %s | tar xz' % (base_dir, tarball), shell=True)
 
 def get_versions():
     """ Read the version file.
@@ -31,9 +35,9 @@ def get_versions():
         # Execute the code in version.py.
         exec(compile(version_file.read(), version_py, 'exec'), v)
 
-    return v['pyosmium_release'], v['libosmium_version']
+    return v['pyosmium_release'], v['libosmium_version'], v['protozero_version']
 
-pyosmium_release, libosmium_version = get_versions()
+pyosmium_release, libosmium_version, protozero_version = get_versions()
 
 ## boost dependencies
 boost_prefix = os.environ.get('BOOST_PREFIX',
@@ -111,7 +115,7 @@ else:
         print("Using global libosmium.")
 
 ### protozero dependencies
-for prefix in [ '../protozero' ]:
+for prefix in [ 'protozero-' + protozero_version, '../protozero' ]:
     if os.path.isfile(os.path.join(prefix, 'include/protozero/version.hpp')):
         print("protozero found in '%s'" % prefix)
         includes.insert(0, os.path.join(prefix, 'include'))

@@ -9,3 +9,5 @@ pyosmium_release = '2.13.0'
 
 # libosmium version shipped with the Pip release
 libosmium_version = '2.13.1'
+# protozero version shipped with the Pip release
+protozero_version = '1.6.2'
