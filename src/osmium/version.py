@@ -3,11 +3,11 @@ Version information.
 """
 
 # the major version
-pyosmium_major = '2.13'
+pyosmium_major = '2.14'
 # current release (Pip version)
-pyosmium_release = '2.13.0'
+pyosmium_release = '2.14.0'
 
 # libosmium version shipped with the Pip release
-libosmium_version = '2.13.1'
+libosmium_version = '2.14.0'
 # protozero version shipped with the Pip release
 protozero_version = '1.6.2'

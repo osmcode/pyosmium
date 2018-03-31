@@ -12,6 +12,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.14.0] - 2018-03-31
+
+### Added
+
+### Changed
+
+- use current libosmium
+- install protozero separately from libosmium
+- installation documentation updated
+
+### Fixed
+
 ## [2.13.0] - 2017-08-31
 
 ### Added
