@@ -23,22 +23,6 @@ matrix:
         - os: linux
           compiler: gcc
           env: USE_PYTHON_VERSION=3
-        - os: osx
-          osx_image: xcode6.4
-          compiler: clang
-          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX=2 BOOST_PYTHON_OPTION=
-        - os: osx
-          osx_image: xcode6.4
-          compiler: clang
-          env: USE_PYTHON_VERSION=3 PYTHON_SUFFIX=3 BOOST_PYTHON_OPTION="--with-python3 --without-python"
-        - os: osx
-          osx_image: xcode7
-          compiler: clang
-          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX= BOOST_PYTHON_OPTION=
-        - os: osx
-          osx_image: xcode7
-          compiler: clang
-          env: USE_PYTHON_VERSION=3 PYTHON_SUFFIX=3 BOOST_PYTHON_OPTION="--with-python3 --without-python"
 
 # http://docs.travis-ci.com/user/apt/
 addons:
