@@ -60,6 +60,8 @@ suffixes = [ # Debian naming convention for version installed in parallel
              "-py%d%d" % (pyversion.major, pyversion.minor),
              # Gentoo naming convention for version installed in parallel
              "-%d.%d" % (pyversion.major, pyversion.minor),
+             # Darwin
+             "%d%d" % (pyversion.major, pyversion.minor),
              # standard suffix for Python3
              "%d" % (pyversion.major),
              # standard naming
@@ -68,9 +70,10 @@ suffixes = [ # Debian naming convention for version installed in parallel
              "-mt"
            ]
 for suf in suffixes:
-    lib = find_library("boost_python%s" % suf)
-    if lib is not None:
-        libs.append("boost_python%s" % suf)
+    libboost = "boost_python%s" % suf
+    found = find_library(libboost)
+    if found:
+        libs.append(libboost)
         break
 else:
     # Visual C++ supports auto-linking, no library needed
