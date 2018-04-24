@@ -12,6 +12,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.14.1] - 2018-04-24
+
+### Added
+
+### Changed
+
+### Fixed
+
+- fix build script to find libboost-python on Darwin
+
 ## [2.14.0] - 2018-03-31
 
 ### Added
