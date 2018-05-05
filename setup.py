@@ -6,6 +6,7 @@ from sys import version_info as pyversion, platform as osplatform
 from ctypes.util import find_library
 import os
 import os.path as osp
+import sys
 
 includes = []
 libs = []
@@ -206,6 +207,15 @@ classifiers = [
 descfile=open('README.rst')
 long_description = descfile.read()
 descfile.close()
+base_data_files_folder = os.path.join("lib", "python{}.{}".format(*sys.version_info[:2]), "site-packages", "osmium")
+
+
+def path_join_list(path_prefix, lst):
+    ret = []
+    for p in lst:
+        ret.append(os.path.join(path_prefix, p))
+    return ret
+
 
 setup (name = 'osmium',
        version = pyosmium_release,
@@ -225,5 +235,29 @@ setup (name = 'osmium',
        package_dir = {'' : 'src'},
        package_data = { 'osmium' : [ '*.dll' ] },
        cmdclass={'sdist' : My_sdist},
-       ext_modules = extensions)
+       ext_modules = extensions,
+       data_files = [
+           (
+               base_data_files_folder,
+               path_join_list(
+                   os.path.join("src", "osmium"),
+                   ["index.pyi", "io.pyi", "geom.pyi", "_osmium.pyi"]
+               )
+           ),
+           (
+               os.path.join(base_data_files_folder, "replication"),
+               path_join_list(
+                   os.path.join("src", "osmium", "replication"),
+                   ["server.pyi", "_replication.pyi", "utils.pyi"]
+               )
+           ),
+           (
+               os.path.join(base_data_files_folder, "osm"),
+               path_join_list(
+                   os.path.join("src", "osmium", "osm"),
+                   ["mutable.pyi", "__init__.pyi", "_osm.pyi"]
+               )
+           )
+           ],
+       )
 

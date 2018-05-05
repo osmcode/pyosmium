@@ -1,0 +1,19 @@
+import typing
+
+from .osm import Location
+
+
+class LocationTable:
+    def clear(self): ...
+
+    def get(self, id: int) -> Location: ...
+
+    def set(self, id: int, loc: Location): ...
+
+    def used_memory(self) -> int: ...
+
+
+def create_map(map_type: str) -> LocationTable: ...
+
+
+def map_types() -> typing.List[str]: ...
