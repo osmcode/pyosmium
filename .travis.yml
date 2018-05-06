@@ -6,65 +6,103 @@
 
 language: cpp
 
-sudo: false
-dist: trusty
-
 matrix:
     include:
-        - os: linux
+        - sudo: required
+          services:
+              - docker
+          env: DOCKER_IMAGE=quay.io/pypa/manylinux1_x86_64 DOCKER_TESTS=yes
+        - sudo: required
+          services:
+              - docker
+          env: DOCKER_IMAGE=quay.io/pypa/manylinux1_i686
+               PRE_CMD=linux32
+        - os: osx
+          osx_image: xcode8.3
           compiler: clang
-          env: USE_PYTHON_VERSION=2
-        - os: linux
+          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX=
+        - os: osx
+          osx_image: xcode8.3
           compiler: clang
-          env: USE_PYTHON_VERSION=3
-        - os: linux
-          compiler: gcc
-          env: USE_PYTHON_VERSION=2
-        - os: linux
-          compiler: gcc
-          env: USE_PYTHON_VERSION=3
+          env: USE_PYTHON_VERSION=3 PYTHON_SUFFIX=3
+        - os: osx
+          osx_image: xcode7.3
+          compiler: clang
+          env: USE_PYTHON_VERSION=2 PYTHON_SUFFIX=
+        - os: osx
+          osx_image: xcode7.3
+          compiler: clang
+          env: USE_PYTHON_VERSION=3 PYTHON_SUFFIX=3
 
 # http://docs.travis-ci.com/user/apt/
-addons:
-    apt:
-        sources:
-            - boost-latest
-        packages:
-            - g++-4.8
-            - gcc-4.8
-            - libboost-python1.55-dev
-            - libboost1.55-dev
-            - libsparsehash-dev
-            - python-dev
-            - python-nose
-            - python-mock
-            - python3
-            - python3-dev
-            - python3-nose
-            - python3-setuptools
+
 
 install:
-    - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git ../libosmium
-    - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
-    - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
-          brew update;
-          brew install python$PYTHON_SUFFIX google-sparsehash;
-          brew install boost-python $BOOST_PYTHON_OPTION;
-          pip$PYTHON_SUFFIX install -q nose mock;
+    - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git libosmium
+    - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git protozero
+    - if [ "${TRAVIS_OS_NAME}" = 'osx' ]; then
+            brew update &&
+            brew install google-sparsehash &&
+            brew install boost-python$PYTHON_SUFFIX ;
       fi
 
 script:
-    - if [ "${CXX}" = 'g++' ]; then
-          CXX=g++-4.8;
-          CC=gcc-4.8;
+    - if [ "${TRAVIS_OS_NAME}" = 'osx' ]; then
+          export PYTHON="python${USE_PYTHON_VERSION}" ;
+          travis/build_macos.sh ;
+      else
+          docker run --rm -v `pwd`:/io $DOCKER_IMAGE $PRE_CMD /io/travis/build_manylinux.sh ;
       fi
     - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
-          PYTHON=python${USE_PYTHON_VERSION};
+          $PYTHON -m virtualenv venv_runtime &&
+          venv_runtime/bin/pip install osmium --no-index -f ./dist &&
+          venv_runtime/bin/pip install nose mock &&
+          venv_runtime/bin/python -c 'import osmium; print("import osmium successful")' &&
+          (cd test && ../venv_runtime/bin/python run_tests.py )
       else
-          PYTHON=/usr/bin/python${USE_PYTHON_VERSION};
+          docker run --rm -v `pwd`:/io:ro $DOCKER_IMAGE $PRE_CMD /io/travis/test_manylinux.sh ;
       fi
-    - $PYTHON --version
-    - $PYTHON setup.py build
-    - cd test
-    - $PYTHON run_tests.py
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh debian 2 && echo Tests Debian 2 OK ; fi
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh debian 3 && echo Tests Debian 3 OK ; fi
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh ubuntu 2 && echo Tests Ubuntu 2 OK ; fi
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh ubuntu 3 && echo Tests Ubuntu 3 OK ; fi
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh centos 2 && echo Tests Centos 2 OK ; fi
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh centos 3 && echo Tests Centos 3 OK ; fi
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh archlinux 2 && echo Tests ArchLinux 2 OK ; fi
+    - if [ "x$DOCKER_TESTS" = "xyes" ]; then travis/test_docker.sh archlinux 3 && echo Tests ArchLinux 3 OK ; fi
 
+deploy:
+  provider: s3
+  skip_cleanup: true
+  acl: public_read
+  region: eu-west-1
+  local_dir: dist
+  access_key_id: ${AWS_ACCESS_KEY_ID}
+  secret_access_key: ${AWS_SECRET}
+  bucket: pyosmium
+  on:
+    all_branches: true
+
+deploy:
+  provider: releases
+  api-key: ${GITHUB_ACCESS_KEY}
+  file_glob: true
+  file: dist/*whl
+  draft: true
+  prerelease: false
+  on:
+    tags: true
+    condition: ${TRAVIS_TAG:0:1} = "v"
+  skip_cleanup: true
+
+deploy:
+  provider: releases
+  api-key: ${GITHUB_ACCESS_KEY}
+  file_glob: true
+  file: dist/*whl
+  draft: true
+  prerelease: true
+  on:
+    tags: fasle
+    branch: travis_wheel
+  skip_cleanup: true
