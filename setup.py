@@ -5,6 +5,7 @@ from subprocess import call
 from sys import version_info as pyversion, platform as osplatform
 from ctypes.util import find_library
 import os
+import os.path as osp
 
 includes = []
 libs = []
@@ -36,6 +37,30 @@ def get_versions():
         exec(compile(version_file.read(), version_py, 'exec'), v)
 
     return v['pyosmium_release'], v['libosmium_version'], v['protozero_version']
+
+
+def find_includes(libname, chk_file=None, prefix=None, version_postfix=None):
+    if chk_file is None:
+        chk_file = osp.join('include', libname, 'version.hpp')
+
+    if prefix is not None:
+        if not os.path.isfile(osp.join(prefix, chk_file)):
+            raise RuntimeError("Prefix for %s set but library not found in '%s'."
+                               % (libname, prefix))
+        return osp.join(prefix, 'include')
+
+    search_paths = []
+    if version_postfix:
+        search_paths.append('%s-%s' % (libname, version_postfix))
+    search_paths.append(osp.join('..', libname))
+
+    for p in search_paths:
+        if os.path.isfile(osp.join(p, chk_file)):
+            print("%s found in '%s'." % (libname, p))
+            return osp.join(p, 'include')
+
+    print("Using global %s" % libname)
+
 
 pyosmium_release, libosmium_version, protozero_version = get_versions()
 
@@ -109,38 +134,19 @@ if osplatform != "win32":
     setuptools_build_ext.customize_compiler = cpp_compiler
 
 ### osmium dependencies
-osmium_prefixes = [ 'libosmium-' + libosmium_version, '../libosmium' ]
-if 'LIBOSMIUM_PREFIX' in os.environ:
-    lo_version_h = os.path.join(os.environ['LIBOSMIUM_PREFIX'],
-                                'include/osmium/version.hpp')
-    if not os.path.isfile(lo_version_h):
-        raise RuntimeError("LIBOSMIUM_PREFIX is set but no libosmium was found in '%s'" % os.environ['LIBOSMIUM_PREFIX'])
-    includes.insert(0, os.path.join(os.environ['LIBOSMIUM_PREFIX'], 'include'))
-else:
-    # default search paths for libosmium
-    for prefix in [ 'libosmium-' + libosmium_version, '../libosmium' ]:
-        if os.path.isfile(os.path.join(prefix, 'include/osmium/version.hpp')):
-            print("libosmium found in '%s'" % prefix)
-            includes.insert(0, os.path.join(prefix, 'include'))
-            break
-    else:
-        print("Using global libosmium.")
+osmium_inc = find_includes('libosmium',
+                           chk_file=osp.join('include', 'osmium', 'version.hpp'),
+                           prefix=os.environ.get('LIBOSMIUM_PREFIX'),
+                           version_postfix=libosmium_version)
+if osmium_inc is not None:
+    includes.insert(0, osmium_inc)
 
 ### protozero dependencies
-if 'PROTOZERO_PREFIX' in os.environ:
-    pz_version_h = os.path.join(os.environ['PROTOZERO_PREFIX'],
-                                'include', 'protozero', 'version.hpp')
-    if not os.path.isfile(pz_version_h):
-        raise RuntimeError("PROTOZERO_PREFIX is set but no protozero was found in '%s'" % os.environ['PROTOZERO_PREFIX'])
-    includes.insert(0, os.path.join(os.environ['PROTOZERO_PREFIX'], 'include'))
-else:
-    for prefix in [ 'protozero-' + protozero_version, '../protozero', 'protozero' ]:
-        if os.path.isfile(os.path.join(prefix, 'include/protozero/version.hpp')):
-            print("protozero found in '%s'" % prefix)
-            includes.insert(0, os.path.join(prefix, 'include'))
-            break
-    else:
-        raise RuntimeError("Protozero not found")
+protozero_inc = find_includes('protozero',
+                              prefix=os.environ.get('PROTOZERO_PREFIX'),
+                              version_postfix=protozero_version)
+if protozero_inc is not None:
+    includes.insert(0, protozero_inc)
 
 if osplatform == "win32" :
     osmium_libs = ('expat', 'zlib', 'bzip2', 'ws2_32')
