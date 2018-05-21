@@ -45,12 +45,21 @@ boost_prefix = os.environ.get('BOOST_PREFIX',
 
 includes.append(os.path.join(boost_prefix, 'include'))
 if 'BOOST_VERSION' in os.environ:
-    includes.append(os.path.join(boost_prefix, 'include',
-                                 "boost-%s" %os.environ['BOOST_VERSION']))
+    for boost_dir in ('boost-%s', 'boost%s'):
+        if os.path.isdir(os.path.join(boost_prefix, 'include', boost_dir % os.environ['BOOST_VERSION'])):
+            includes.append(os.path.join(boost_prefix, 'include', boost_dir %os.environ['BOOST_VERSION']))
+            break
+    else:
+        raise Exception("Cannot find boost headers")
+elif 'BOOST_PREFIX' in os.environ:
+    if os.path.isdir(os.path.join(boost_prefix, 'include', 'boost')):
+        includes.append(os.path.join(boost_prefix, 'include', 'boost'))
+    else:
+        raise Exception("Cannot find boost headers")
 
-if 'BOOST_VERSION' in os.environ:
+if 'BOOST_PREFIX' in os.environ:
     libdirs.append(os.path.join(boost_prefix, 'lib'))
-elif osplatform in ["linux", "linux2"]:
+elif osplatform in ["linux", "linux2"] and os.path.isdir('/usr/lib/x86_64-linux-gnu/'):
     libdirs.append('/usr/lib/x86_64-linux-gnu/')
 else:
     libdirs.append(os.path.join(boost_prefix, 'lib'))
@@ -118,10 +127,20 @@ else:
         print("Using global libosmium.")
 
 ### protozero dependencies
-for prefix in [ 'protozero-' + protozero_version, '../protozero' ]:
-    if os.path.isfile(os.path.join(prefix, 'include/protozero/version.hpp')):
-        print("protozero found in '%s'" % prefix)
-        includes.insert(0, os.path.join(prefix, 'include'))
+if 'PROTOZERO_PREFIX' in os.environ:
+    pz_version_h = os.path.join(os.environ['PROTOZERO_PREFIX'],
+                                'include', 'protozero', 'version.hpp')
+    if not os.path.isfile(pz_version_h):
+        raise RuntimeError("PROTOZERO_PREFIX is set but no protozero was found in '%s'" % os.environ['PROTOZERO_PREFIX'])
+    includes.insert(0, os.path.join(os.environ['PROTOZERO_PREFIX'], 'include'))
+else:
+    for prefix in [ 'protozero-' + protozero_version, '../protozero', 'protozero' ]:
+        if os.path.isfile(os.path.join(prefix, 'include/protozero/version.hpp')):
+            print("protozero found in '%s'" % prefix)
+            includes.insert(0, os.path.join(prefix, 'include'))
+            break
+    else:
+        raise RuntimeError("Protozero not found")
 
 if osplatform == "win32" :
     osmium_libs = ('expat', 'zlib', 'bzip2', 'ws2_32')
@@ -201,5 +220,4 @@ setup (name = 'osmium',
        package_data = { 'osmium' : [ '*.dll' ] },
        cmdclass={'sdist' : My_sdist},
        ext_modules = extensions)
-
 
