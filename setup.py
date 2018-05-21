@@ -57,9 +57,7 @@ elif 'BOOST_PREFIX' in os.environ:
     else:
         raise Exception("Cannot find boost headers")
 
-if 'BOOST_VERSION' in os.environ:
-    libdirs.append(os.path.join(boost_prefix, 'lib'))
-elif 'BOOST_PREFIX' in os.environ:
+if 'BOOST_PREFIX' in os.environ:
     libdirs.append(os.path.join(boost_prefix, 'lib'))
 elif osplatform in ["linux", "linux2"] and os.path.isdir('/usr/lib/x86_64-linux-gnu/'):
     libdirs.append('/usr/lib/x86_64-linux-gnu/')
