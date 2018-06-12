@@ -250,9 +250,12 @@ class ReplicationServer(object):
             returns `None`.
         """
         opener = urlrequest.build_opener()
-        opener.addheaders = [('Cookie', self.str_cookie.strip('\n'))]
-
-        response = opener.open(self.get_state_url(seq))
+        if self.str_cookie is not None:
+            opener.addheaders = [('Cookie', self.str_cookie.strip('\n'))]
+        try:
+            response = opener.open(self.get_state_url(seq))
+        except:
+            return None
 
         ts = None
         seq = None
