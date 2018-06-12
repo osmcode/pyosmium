@@ -21,12 +21,19 @@ there is still data available on the server (either because the size
 limit has been reached or there was a network error which could not be
 resolved). Any other error results in a return code larger than 1. The
 output file is guaranteed to be unmodified in that case.
+
+Some OSM data sources require a cookie to be sent with the HTTP requests. 
+Pyosmium-up-to-date does not fetch the cookie from these services for you. 
+The Cookie can be read from a plain text file containing the cookie only.
+A cookie file should look like this (example from the Geofabrik download service): :
+
+   gf_download_oauth="login|test-2018-04-12|7MisSGpxOGtHu4zRlPtIeADuY09mahpq-V80R4EceqBLOVtrXu2KQGuP8AyMuuuObUQx-iSOFVUDhnUePaYBB7nrSn-BO5F-MC0fLf5YXE8S1gO6Nc5u5vzIT4FQrDgvvSb61C0K-WDRa1G4TQdEZNBcgEweQdMjE_GqXiI1os_UZ1MSLdyVVRHLfpFF28iGfvUrrbXNOHpaK2qXXb-oTvSP78V5pUH_pzHAOOiJ_cHoJOMF59CbvSE9ybBK_SQo5FJ0npdPzEcn05NXrw=="; expires=Tue, 12 Jun 2018 16:35:23 GMT; HttpOnly
+
 """
 
 import re
 import sys
 import logging
-import os
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
@@ -53,13 +60,12 @@ def update_from_osm_server(ts, options):
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
 
-    cookiefile = options.cookie
-    with open(cookiefile) as f:
-        cookiefile = f.readlines()
-    cookie_join = '\n'.join(cookiefile)
-    str_cookie = cookie_join.rsplit(';', 3)
-    del str_cookie[1:4]
-    str_cookie = ''.join(str_cookie)
+    str_cookie = None
+    if options.cookie is not None:
+        with open(options.cookie, "r") as f:
+            cookiefile = f.read().strip()
+        str_cookie = cookiefile.split(';')[0]
+
 
     svr = rserv.ReplicationServer(url, "osc.gz", str_cookie)
     log.info("Using replication service at %s" % url)
