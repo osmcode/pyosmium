@@ -26,6 +26,7 @@ output file is guaranteed to be unmodified in that case.
 import re
 import sys
 import logging
+import os
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
@@ -52,7 +53,15 @@ def update_from_osm_server(ts, options):
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
 
-    svr = rserv.ReplicationServer(url)
+    cookiefile = options.cookie
+    with open(cookiefile) as f:
+        cookiefile = f.readlines()
+    cookie_join = '\n'.join(cookiefile)
+    str_cookie = cookie_join.rsplit(';', 3)
+    del str_cookie[1:4]
+    str_cookie = ''.join(str_cookie)
+
+    svr = rserv.ReplicationServer(url, "osc.gz", str_cookie)
     log.info("Using replication service at %s" % url)
 
     if seq is None:
@@ -174,6 +183,7 @@ def get_arg_parser(from_main=False):
     parser.add_argument('--force-update-of-old-planet', action='store_true',
                         dest='force_update',
                         help="Apply update even if the input data is really old.")
+    parser.add_argument('-c', '--cookie', dest='cookie', help="""For internal download: txt file for Cookie support""")
 
     return parser
 
