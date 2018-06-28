@@ -45,6 +45,15 @@ from textwrap import dedent as msgfmt
 from tempfile import mktemp
 import os.path
 
+try:
+    import urllib.request as urlrequest
+except ImportError:
+    import urllib2 as urlrequest
+try:
+    import urllib.error as urlerror
+except ImportError:
+    import urllib2 as urlerror
+
 log = logging.getLogger()
 
 def update_from_osm_server(ts, options):
@@ -59,15 +68,9 @@ def update_from_osm_server(ts, options):
 
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
-
-    str_cookie = None
+    svr = rserv.ReplicationServer(url, "osc.gz")
     if options.cookie is not None:
-        with open(options.cookie, "r") as f:
-            cookiefile = f.read().strip()
-        str_cookie = cookiefile.split(';')[0]
-
-
-    svr = rserv.ReplicationServer(url, "osc.gz", str_cookie)
+        svr.open_url = open_with_cookie
     log.info("Using replication service at %s" % url)
 
     if seq is None:
@@ -193,11 +196,17 @@ def get_arg_parser(from_main=False):
 
     return parser
 
+def open_with_cookie(url):
+    return opener.open(url)
+
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr,
                         format='%(asctime)s %(levelname)s: %(message)s')
 
     options = get_arg_parser(from_main=True).parse_args()
+    opener = urlrequest.build_opener()
+    if options.cookie is not None:
+        opener.addheaders = [('Cookie', options.cookie)]
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
     try:

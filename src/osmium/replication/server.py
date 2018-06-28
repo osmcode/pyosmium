@@ -30,10 +30,12 @@ class ReplicationServer(object):
         the full dataset again.
     """
 
-    def __init__(self, url, diff_type='osc.gz', str_cookie=None):
+    def __init__(self, url, diff_type='osc.gz'):
         self.baseurl = url
         self.diff_type = diff_type
-        self.str_cookie = str_cookie
+
+    def open_url(self, url):
+        return urlrequest.urlopen(url)
 
     def collect_diffs(self, start_id, max_size=1024):
         """ Create a MergeInputReader and download diffs starting with sequence
@@ -249,12 +251,10 @@ class ReplicationServer(object):
             `sequence` and `timestamp` is returned, otherwise the function
             returns `None`.
         """
-        opener = urlrequest.build_opener()
-        if self.str_cookie is not None:
-            opener.addheaders = [('Cookie', self.str_cookie.strip('\n'))]
         try:
-            response = opener.open(self.get_state_url(seq))
-        except:
+            response = self.open_url(self.get_state_url(seq))
+        except Exception as err:
+            logging.error(err)
             return None
 
         ts = None
@@ -286,10 +286,7 @@ class ReplicationServer(object):
             (or `urllib2.HTTPError` in python2)
             if the file cannot be downloaded.
         """
-        opener = urlrequest.build_opener()
-        if self.str_cookie is not None:
-            opener.addheaders = [('Cookie', self.str_cookie.strip('\n'))]
-        return opener.open(self.get_diff_url(seq)).read()
+        return self.open_url(self.get_diff_url(seq)).read()
 
 
     def get_state_url(self, seq):
