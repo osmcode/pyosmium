@@ -46,6 +46,10 @@ from tempfile import mktemp
 import os.path
 
 try:
+    import http.cookiejar as cookiejarlib
+except ImportError:
+    import cookielib as cookiejarlib
+try:
     import urllib.request as urlrequest
 except ImportError:
     import urllib2 as urlrequest
@@ -204,9 +208,11 @@ if __name__ == '__main__':
                         format='%(asctime)s %(levelname)s: %(message)s')
 
     options = get_arg_parser(from_main=True).parse_args()
-    opener = urlrequest.build_opener()
+    # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
+    cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
     if options.cookie is not None:
-        opener.addheaders = [('Cookie', options.cookie)]
+        cookie_jar.load(options.cookie)
+    opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
     try:
@@ -219,5 +225,9 @@ if __name__ == '__main__':
         ret = update_from_osm_server(ts, options)
     else:
         ret = update_from_custom_server(url, seq, ts, options)
+
+    # save cookies
+    if options.cookie:
+        cookie_jar.save(options.cookie)
 
     exit(ret)
