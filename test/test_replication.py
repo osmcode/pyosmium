@@ -53,7 +53,7 @@ def test_get_diff_url():
     for i, o in data:
         assert_equals(o, svr.get_diff_url(i))
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_get_state_valid(mock):
     mock.set_result("""\
         #Sat Aug 26 11:04:04 UTC 2017
@@ -79,7 +79,7 @@ def test_get_state_server_timeout(mock):
     svr = rserv.ReplicationServer("http://test.io")
     assert_is_none(svr.get_state_info())
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_diffs_count(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -96,7 +96,7 @@ def test_apply_diffs_count(mock):
 
     assert_equals(h.counts, [1, 1, 1, 0])
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_diffs_without_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -113,7 +113,7 @@ def test_apply_diffs_without_simplify(mock):
     assert_equals(100, svr.apply_diffs(h, 100, 10000, simplify=False))
     assert_equals([2, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_diffs_with_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -130,7 +130,7 @@ def test_apply_diffs_with_simplify(mock):
     assert_equals(100, svr.apply_diffs(h, 100, 10000, simplify=True))
     assert_equals([1, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_with_location(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -158,7 +158,7 @@ def test_apply_with_location(mock):
 
 
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_reader_without_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -179,7 +179,7 @@ def test_apply_reader_without_simplify(mock):
     diffs.reader.apply(h, simplify=False)
     assert_equals([2, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_reader_with_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -199,7 +199,7 @@ def test_apply_reader_with_simplify(mock):
     diffs.reader.apply(h, simplify=True)
     assert_equals([1, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.OpenerDirector.open', new_callable=UrllibMock)
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_reader_with_location(mock):
     mock.set_script(("""\
         sequenceNumber=100
