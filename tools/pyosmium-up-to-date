@@ -193,7 +193,7 @@ def get_arg_parser(from_main=False):
     parser.add_argument('--force-update-of-old-planet', action='store_true',
                         dest='force_update',
                         help="Apply update even if the input data is really old.")
-    parser.add_argument('-c', '--cookie', dest='cookie',
+    parser.add_argument('--cookie', dest='cookie',
                         help="Netscape-style cookie jar file to read cookies from")
 
     return parser
