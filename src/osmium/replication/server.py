@@ -35,6 +35,24 @@ class ReplicationServer(object):
         self.diff_type = diff_type
 
     def open_url(self, url):
+        """ Download a resource from the given URL and return a byte sequence
+            of the content.
+
+            This method has no support for cookies or any special authentication
+            methods. If you need these, you have to provide your own custom URL
+            opener. The method has to return an object which supports the
+            `read()` and `readline()` methods to access the content. Example:
+
+            ```
+            def my_open_url(self, url):
+                opener = urlrequest.build_opener()
+                opener.addheaders = [('X-Fancy-Header', 'important_content')]
+                return opener.open(url)
+
+            svr = ReplicationServer()
+            svr.open_url = my_open_url
+            ```
+        """
         return urlrequest.urlopen(url)
 
     def collect_diffs(self, start_id, max_size=1024):
