@@ -16,9 +16,9 @@ number where to continue updates in the next run. This output can also be
 written to (and later read from) a file.
 
 Some OSM data sources require a cookie to be sent with the HTTP requests.
-Pyosmium-up-to-date does not fetch the cookie from these services for you.
+pyosmium-get-changes does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
-cookies to the server and save received cookies to the jar file.
+cookies to the server and will save received cookies to the jar file.
 """
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
@@ -135,7 +135,8 @@ def get_arg_parser(from_main=False):
     parser.add_argument('--server', action='store', dest='server_url',
                         help='Base URL of the replication server')
     parser.add_argument('--cookie', dest='cookie',
-                        help="Netscape-style cookie jar file to read cookies from")
+                        help="""Netscape-style cookie jar file to read cookies from
+                              and where received cookies will be written to.""")
     parser.add_argument('-s', '--size', dest='outsize', type=int, default=100,
                         help='Maximum data to load in MB (default: 100MB).')
     group = parser.add_mutually_exclusive_group()

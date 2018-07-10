@@ -25,7 +25,7 @@ output file is guaranteed to be unmodified in that case.
 Some OSM data sources require a cookie to be sent with the HTTP requests. 
 Pyosmium-up-to-date does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
-cookies to the server and save received cookies to the jar file.
+cookies to the server and will save received cookies to the jar file.
 """
 
 import re
@@ -194,7 +194,8 @@ def get_arg_parser(from_main=False):
                         dest='force_update',
                         help="Apply update even if the input data is really old.")
     parser.add_argument('--cookie', dest='cookie',
-                        help="Netscape-style cookie jar file to read cookies from")
+                        help="""Netscape-style cookie jar file to read cookies from and where
+                              received cookies will be written to.""")
 
     return parser
 
