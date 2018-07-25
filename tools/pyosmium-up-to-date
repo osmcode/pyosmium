@@ -50,10 +50,6 @@ try:
     import urllib.request as urlrequest
 except ImportError:
     import urllib2 as urlrequest
-try:
-    import urllib.error as urlerror
-except ImportError:
-    import urllib2 as urlerror
 
 log = logging.getLogger()
 
@@ -71,7 +67,11 @@ def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
     svr = rserv.ReplicationServer(url, "osc.gz")
     if options.cookie is not None:
-        svr.open_url = open_with_cookie
+        # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
+        cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
+        cookie_jar.load(options.cookie)
+        opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
+        svr.open_url = opener.open
     log.info("Using replication service at %s" % url)
 
     if seq is None:
@@ -125,6 +125,10 @@ def update_from_custom_server(url, seq, ts, options):
         os.rename(ofname, infile)
 
     log.info("Downloaded until %d. Server has data available until %d." % outseqs)
+
+    # save cookies
+    if options.cookie:
+        cookie_jar.save(options.cookie)
 
     return 0 if outseqs[1] == outseqs[0] else 1
 
@@ -207,11 +211,6 @@ if __name__ == '__main__':
                         format='%(asctime)s %(levelname)s: %(message)s')
 
     options = get_arg_parser(from_main=True).parse_args()
-    # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
-    cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
-    if options.cookie is not None:
-        cookie_jar.load(options.cookie)
-    opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
     try:
@@ -224,9 +223,5 @@ if __name__ == '__main__':
         ret = update_from_osm_server(ts, options)
     else:
         ret = update_from_custom_server(url, seq, ts, options)
-
-    # save cookies
-    if options.cookie:
-        cookie_jar.save(options.cookie)
 
     exit(ret)
