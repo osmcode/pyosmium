@@ -164,10 +164,6 @@ def get_arg_parser(from_main=False):
     return parser
 
 
-def open_with_cookie(url):
-    return opener.open(url)
-
-
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr,
                         format='%(levelname)s: %(message)s')
@@ -213,7 +209,7 @@ if __name__ == '__main__':
         cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie, None, cookie_policy)
         cookie_jar.load(options.cookie)
         opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
-        svr.open_url = open_with_cookie
+        svr.open_url = opener.open
 
     startseq = options.start.get_sequence(svr)
     if startseq is None:
