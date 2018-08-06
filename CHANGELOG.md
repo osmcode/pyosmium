@@ -12,6 +12,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [2.14.2] - 2018-08-07
+
+### Added
+
+- expose Coordinates struct and mercator projection functions
+
+### Changed
+
+- use current libosmium and protozero
+
+### Fixed
+
+
 ## [2.14.1] - 2018-04-24
 
 ### Added
