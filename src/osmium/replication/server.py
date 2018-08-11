@@ -113,7 +113,7 @@ class ReplicationServer(object):
         return diffs.id
 
     def apply_diffs_to_file(self, infile, outfile, start_id, max_size=1024,
-                            set_replication_header=True):
+                            set_replication_header=True, extra_headers={}):
         """ Download diffs starting with sequence id `start_id`, merge them
             with the data from the OSM file named `infile` and write the result
             into a file with the name `outfile`. The output file must not yet
@@ -127,6 +127,9 @@ class ReplicationServer(object):
             server and the sequence id and timestamp of the last diff applied
             will be written into the `writer`. Note that this currently works
             only for the PBF format.
+
+            `extra_headers` is a dict with additional header fields to be set.
+            Most notably, the 'generator' can be set this way.
 
             The function returns a tuple of last downloaded sequence id and
             newest available sequence id if new data has been written or None
@@ -147,6 +150,8 @@ class ReplicationServer(object):
             h.set("osmosis_replication_sequence_number", str(diffs.id))
             info = self.get_state_info(diffs.id)
             h.set("osmosis_replication_timestamp", info.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        for k,v in extra_headers.items():
+            h.set(k, v)
 
         writer = oio.Writer(outfile, h)
 

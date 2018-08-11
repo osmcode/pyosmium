@@ -33,6 +33,7 @@ from sys import version_info as python_version
 from osmium.replication import server as rserv
 from osmium.replication.utils import get_replication_header
 from osmium.replication import newest_change_from_file
+from osmium.version import pyosmium_release
 from textwrap import dedent as msgfmt
 from tempfile import mktemp
 import os.path
@@ -95,8 +96,10 @@ def update_from_custom_server(url, seq, ts, options):
     else:
         ofname = outfile
 
+    extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
     outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
-                                     max_size=options.outsize*1024)
+                                     max_size=options.outsize*1024,
+                                     extra_headers=extra_headers)
 
     if outseqs is None:
         log.info("No new updates found.")
