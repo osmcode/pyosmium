@@ -166,7 +166,7 @@ if __name__ == '__main__':
               needs to begiven."""))
             exit(1)
 
-        with open(opt.start_file, 'r') as f:
+        with open(options.start_file, 'r') as f:
             seq = f.readline()
             options.start = ReplicationStart_from_id(seq)
 
