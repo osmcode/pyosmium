@@ -111,7 +111,7 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
         }
     }
 
-    void way(const osmium::Way& way) {
+    void way(const osmium::Way& way) override {
         if (!(m_callbacks & osmium::osm_entity_bits::way))
             return;
 
@@ -119,7 +119,7 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
             f(boost::ref(way));
     }
 
-    void relation(const osmium::Relation& rel) {
+    void relation(const osmium::Relation& rel) override {
         if (!(m_callbacks & osmium::osm_entity_bits::relation))
             return;
 
@@ -127,7 +127,7 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
             f(boost::ref(rel));
     }
 
-    void changeset(const osmium::Changeset& cs) {
+    void changeset(const osmium::Changeset& cs) override {
         if (!(m_callbacks & osmium::osm_entity_bits::changeset))
             return;
 
@@ -135,7 +135,7 @@ struct SimpleHandlerWrap: BaseHandler, wrapper<BaseHandler> {
             f(boost::ref(cs));
     }
 
-    void area(const osmium::Area& area) {
+    void area(const osmium::Area& area) override {
         if (!(m_callbacks & osmium::osm_entity_bits::area))
             return;
 
