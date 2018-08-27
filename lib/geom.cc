@@ -1,5 +1,7 @@
 #include <boost/python.hpp>
 
+#include <osmium/geom/mercator_projection.hpp>
+#include <osmium/geom/coordinates.hpp>
 #include <osmium/geom/haversine.hpp>
 #include <osmium/geom/factory.hpp>
 #include <osmium/geom/wkb.hpp>
@@ -37,6 +39,23 @@ BOOST_PYTHON_MODULE(geom)
         "Compute the distance using the Haversine algorithm which takes the "
         "curvature of earth into account. If a :py:class:`WayNodeList` is given "
         "as a parameter the total length of the way in meters is computed.");
+
+    def("lonlat_to_mercator", &osmium::geom::lonlat_to_mercator,
+        arg("coordinate"),
+        "Convert coordinates from WGS84 to Mercator projection.");
+
+    def("mercator_to_lonlat", &osmium::geom::mercator_to_lonlat,
+        arg("coordinate"),
+        "Convert coordinates from WGS84 to Mercator projection.");
+
+    class_<osmium::geom::Coordinates>("Coordinates",
+        "A pair of coordiante values.")
+        .def(init<double, double>())
+        .def(init<osmium::Location const &>())
+        .add_property("x", &osmium::geom::Coordinates::x)
+        .add_property("y", &osmium::geom::Coordinates::y)
+        .def("valid", &osmium::geom::Coordinates::valid,
+             "Coordinates are invalid if they have been default constructed.");
 
     class_<WKBFactory>("WKBFactory",
         "Factory that creates WKB from osmium geometries.")
