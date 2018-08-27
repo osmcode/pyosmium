@@ -14,6 +14,11 @@ memory during download.
 On success, the program will print a single number to stdout, the sequence
 number where to continue updates in the next run. This output can also be
 written to (and later read from) a file.
+
+Some OSM data sources require a cookie to be sent with the HTTP requests.
+pyosmium-get-changes does not fetch the cookie from these services for you.
+However, it can read cookies from a Netscape-style cookie jar file, send these
+cookies to the server and will save received cookies to the jar file.
 """
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
@@ -23,6 +28,15 @@ from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
 from osmium import SimpleHandler, WriteHandler
+
+try:
+    import http.cookiejar as cookiejarlib
+except ImportError:
+    import cookielib as cookiejarlib
+try:
+    import urllib.request as urlrequest
+except ImportError:
+    import urllib2 as urlrequest
 
 import re
 import sys
@@ -120,6 +134,9 @@ def get_arg_parser(from_main=False):
                               sequence ID will be printed where updates would start."""))
     parser.add_argument('--server', action='store', dest='server_url',
                         help='Base URL of the replication server')
+    parser.add_argument('--cookie', dest='cookie',
+                        help="""Netscape-style cookie jar file to read cookies from
+                              and where received cookies will be written to.""")
     parser.add_argument('-s', '--size', dest='outsize', type=int, default=100,
                         help='Maximum data to load in MB (default: 100MB).')
     group = parser.add_mutually_exclusive_group()
@@ -185,7 +202,14 @@ if __name__ == '__main__':
             or 'https://planet.osm.org/replication/minute/'
     logging.info("Using replication server at %s" % url)
 
+
     svr = rserv.ReplicationServer(url)
+    if options.cookie is not None:
+        # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
+        cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie, None, cookie_policy)
+        cookie_jar.load(options.cookie)
+        opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
+        svr.open_url = opener.open
 
     startseq = options.start.get_sequence(svr)
     if startseq is None:
@@ -202,6 +226,10 @@ if __name__ == '__main__':
     endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
                              simplify=options.simplify)
     outhandler.close()
+
+    # save cookies
+    if options.cookie:
+        cookie_jar.save(options.cookie)
 
     if endseq is None:
         exit(3)

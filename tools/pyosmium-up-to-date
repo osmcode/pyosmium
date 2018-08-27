@@ -21,6 +21,11 @@ there is still data available on the server (either because the size
 limit has been reached or there was a network error which could not be
 resolved). Any other error results in a return code larger than 1. The
 output file is guaranteed to be unmodified in that case.
+
+Some OSM data sources require a cookie to be sent with the HTTP requests. 
+Pyosmium-up-to-date does not fetch the cookie from these services for you.
+However, it can read cookies from a Netscape-style cookie jar file, send these
+cookies to the server and will save received cookies to the jar file.
 """
 
 import re
@@ -38,6 +43,15 @@ from textwrap import dedent as msgfmt
 from tempfile import mktemp
 import os.path
 
+try:
+    import http.cookiejar as cookiejarlib
+except ImportError:
+    import cookielib as cookiejarlib
+try:
+    import urllib.request as urlrequest
+except ImportError:
+    import urllib2 as urlrequest
+
 log = logging.getLogger()
 
 def update_from_osm_server(ts, options):
@@ -52,8 +66,13 @@ def update_from_osm_server(ts, options):
 
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
-
-    svr = rserv.ReplicationServer(url)
+    svr = rserv.ReplicationServer(url, "osc.gz")
+    if options.cookie is not None:
+        # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
+        cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
+        cookie_jar.load(options.cookie)
+        opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
+        svr.open_url = opener.open
     log.info("Using replication service at %s" % url)
 
     if seq is None:
@@ -109,6 +128,10 @@ def update_from_custom_server(url, seq, ts, options):
         os.rename(ofname, infile)
 
     log.info("Downloaded until %d. Server has data available until %d." % outseqs)
+
+    # save cookies
+    if options.cookie:
+        cookie_jar.save(options.cookie)
 
     return 0 if outseqs[1] == outseqs[0] else 1
 
@@ -177,8 +200,14 @@ def get_arg_parser(from_main=False):
     parser.add_argument('--force-update-of-old-planet', action='store_true',
                         dest='force_update',
                         help="Apply update even if the input data is really old.")
+    parser.add_argument('--cookie', dest='cookie',
+                        help="""Netscape-style cookie jar file to read cookies from and where
+                              received cookies will be written to.""")
 
     return parser
+
+def open_with_cookie(url):
+    return opener.open(url)
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr,
