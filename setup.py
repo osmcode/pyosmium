@@ -96,6 +96,8 @@ suffixes = [ # Debian naming convention for version installed in parallel
              "-%d.%d" % (pyversion.major, pyversion.minor),
              # Darwin
              "%d%d" % (pyversion.major, pyversion.minor),
+             # Darwin installed by MacPorts
+             "%d-mt" % (pyversion.major),
              # standard suffix for Python3
              "%d" % (pyversion.major),
              # standard naming
