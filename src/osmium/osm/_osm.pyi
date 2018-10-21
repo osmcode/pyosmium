@@ -5,9 +5,9 @@ import typing
 from osmium.osm import mutable
 from osmium.replication.utils import Timestamp
 
-OSMObjectIdType = typing.NewType('OSMObjectId', int)
+OSMObjectIdType = typing.NewType('OSMObjectIdType', int)
 UnsginedOSMObjectIdType = typing.NewType('UnsginedOSMObjectIdType', OSMObjectIdType)
-UidType = typing.NewType('UserId', int)
+UidType = typing.NewType('UidType', int)
 VersionType = typing.NewType('VersionType', int)
 
 
@@ -72,7 +72,7 @@ class Box:
     top_right: Location
 
     @typing.overload
-    def __init__(self): ...
+    def __init__(self) -> None: ...
 
     @typing.overload
     def __init__(self, arg2: float, arg3: float, arg4: float, arg5: float): ...
@@ -173,7 +173,7 @@ class TagList:
     def __iter__(self) -> typing.Iterable[Tag]: ...  # ???
 
     @typing.overload
-    def get(self, arg2) -> str: ...
+    def get(self, arg: str) -> str: ...
 
     @typing.overload
     def get(self, key: str, default: str) -> str: ...

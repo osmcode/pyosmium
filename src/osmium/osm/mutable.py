@@ -42,6 +42,8 @@ class Node(OSMObject):
         else:
             self.location = location if location is not None else base.location
 
+    def new(self, some):
+        return "new"
 
 class Way(OSMObject):
     """The mutable version of ``osmium.osm.Way``. It inherits all attributes
