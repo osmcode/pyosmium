@@ -1,11 +1,12 @@
-#ifndef PYOSMIUM_WRITE_HANDLER_HPP
-#define PYOSMIUM_WRITE_HANDLER_HPP
+#include <pybind11/pybind11.h>
 
 #include <osmium/io/any_output.hpp>
 #include <osmium/io/writer.hpp>
 #include <osmium/memory/buffer.hpp>
 
 #include "base_handler.h"
+
+namespace {
 
 class WriteHandler : public BaseHandler
 {
@@ -72,4 +73,28 @@ private:
     osmium::memory::Buffer buffer;
 };
 
-#endif // PYOSMIUM_WRITE_HANDLER_HPP
+}
+
+namespace py = pybind11;
+
+void init_write_handler(pybind11::module &m)
+{
+    py::class_<WriteHandler, BaseHandler>(m, "WriteHandler",
+        "Handler function that writes all data directly to a file."
+        "The handler takes a file name as its mandatory parameter. The file "
+        "must not yet exist. The file type to output is determined from the "
+        "file extension. "
+        "The second (optional) parameter is the buffer size. osmium caches the "
+        "output data in an internal memory buffer before writing it on disk. This "
+        "parameter allows changing the default buffer size of 4MB. Larger buffers "
+        "are normally better but you should be aware that there are normally multiple "
+        "buffers in use during the write process.")
+        .def(py::init<const char*, unsigned long>())
+        .def(py::init<const char*>())
+        .def("close", &WriteHandler::close,
+             "Flush the remaining buffers and close the writer. While it is not "
+             "strictly necessary to call this function explicitly, it is still "
+             "strongly recommended to close the writer as soon as possible, so "
+             "that the buffer memory can be freed.")
+    ;
+}

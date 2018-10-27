@@ -1,6 +1,3 @@
-#ifndef PYOSMIUM_SIMPLE_WRITER_HPP
-#define PYOSMIUM_SIMPLE_WRITER_HPP
-
 #include <pybind11/pybind11.h>
 
 #include <osmium/osm.hpp>
@@ -11,6 +8,10 @@
 #include <boost/python.hpp>
 
 #include "cast.h"
+
+namespace py = pybind11;
+
+namespace {
 
 class SimpleWriter
 {
@@ -33,9 +34,9 @@ public:
         flush_buffer();
     }
 
-    void add_node(pybind11::object o)
+    void add_node(py::object o)
     {
-        if (pybind11::isinstance<osmium::Node>(o)) {
+        if (py::isinstance<osmium::Node>(o)) {
             buffer.add_item(o.cast<osmium::Node &>());
         } else {
             osmium::builder::NodeBuilder builder(buffer);
@@ -54,9 +55,9 @@ public:
         flush_buffer();
     }
 
-    void add_way(pybind11::object o)
+    void add_way(py::object o)
     {
-        if (pybind11::isinstance<osmium::Way>(o)) {
+        if (py::isinstance<osmium::Way>(o)) {
             buffer.add_item(o.cast<osmium::Way &>());
         } else {
             osmium::builder::WayBuilder builder(buffer);
@@ -73,9 +74,9 @@ public:
         flush_buffer();
     }
 
-    void add_relation(pybind11::object o)
+    void add_relation(py::object o)
     {
-        if (pybind11::isinstance<osmium::Relation>(o)) {
+        if (py::isinstance<osmium::Relation>(o)) {
             buffer.add_item(o.cast<osmium::Relation &>());
         } else {
             osmium::builder::RelationBuilder builder(buffer);
@@ -102,7 +103,7 @@ public:
     }
 
 private:
-    void set_object_attributes(pybind11::object o, osmium::OSMObject& t)
+    void set_object_attributes(py::object o, osmium::OSMObject& t)
     {
         if (hasattr(o, "id"))
             t.set_id(o.attr("id").cast<osmium::object_id_type>());
@@ -120,7 +121,7 @@ private:
     }
 
     template <typename T>
-    void set_common_attributes(pybind11::object o, T& builder)
+    void set_common_attributes(py::object o, T& builder)
     {
         set_object_attributes(o, builder.object());
 
@@ -130,10 +131,10 @@ private:
     }
 
     template <typename T>
-    void set_taglist(pybind11::object o, T& obuilder)
+    void set_taglist(py::object o, T& obuilder)
     {
         // original taglist
-        if (pybind11::isinstance<osmium::TagList>(o)) {
+        if (py::isinstance<osmium::TagList>(o)) {
             auto &otl = o.cast<osmium::TagList&>();
             if (otl.size() > 0)
                 obuilder.add_item(otl);
@@ -141,12 +142,12 @@ private:
         }
 
         // dict
-        if (pybind11::isinstance<pybind11::dict>(o)) {
-            if (pybind11::len(o) == 0)
+        if (py::isinstance<py::dict>(o)) {
+            if (py::len(o) == 0)
                 return;
 
             osmium::builder::TagListBuilder builder(buffer, &obuilder);
-            for (auto item : o.cast<pybind11::dict>()) {
+            for (auto item : o.cast<py::dict>()) {
                 builder.add_tag(item.first.cast<std::string>(),
                                 item.second.cast<std::string>());
             }
@@ -154,27 +155,27 @@ private:
         }
 
         // else must be an iterable other iterable
-        auto it = o.cast<pybind11::iterable>();
+        auto it = o.cast<py::iterable>();
 
-        if (pybind11::len(o) == 0)
+        if (py::len(o) == 0)
             return;
 
         osmium::builder::TagListBuilder builder(buffer, &obuilder);
         for (auto item : it) {
-            if (pybind11::isinstance<osmium::Tag>(item)) {
+            if (py::isinstance<osmium::Tag>(item)) {
                 builder.add_tag(item.cast<osmium::Tag &>());
             } else {
-                auto tag = item.cast<pybind11::tuple>();
+                auto tag = item.cast<py::tuple>();
                 builder.add_tag(tag[0].cast<std::string>(),
                                 tag[1].cast<std::string>());
             }
         }
     }
 
-    void set_nodelist(pybind11::object o, osmium::builder::WayBuilder *builder)
+    void set_nodelist(py::object o, osmium::builder::WayBuilder *builder)
     {
         // original nodelist
-        if (pybind11::isinstance<osmium::NodeRefList>(o)) {
+        if (py::isinstance<osmium::NodeRefList>(o)) {
             auto &onl = o.cast<osmium::NodeRefList &>();
             if (onl.size() > 0)
                 builder->add_item(onl);
@@ -182,25 +183,25 @@ private:
         }
 
         // accept an iterable of IDs otherwise
-        auto it = o.cast<pybind11::iterable>();
+        auto it = o.cast<py::iterable>();
 
-        if (pybind11::len(o) == 0)
+        if (py::len(o) == 0)
             return;
 
         osmium::builder::WayNodeListBuilder wnl_builder(buffer, builder);
 
         for (auto ref : it) {
-            if (pybind11::isinstance<osmium::NodeRef>(ref))
+            if (py::isinstance<osmium::NodeRef>(ref))
                 wnl_builder.add_node_ref(ref.cast<osmium::NodeRef>());
             else
                 wnl_builder.add_node_ref(ref.cast<osmium::object_id_type>());
         }
     }
 
-    void set_memberlist(pybind11::object o, osmium::builder::RelationBuilder *builder)
+    void set_memberlist(py::object o, osmium::builder::RelationBuilder *builder)
     {
         // original memberlist
-        if (pybind11::isinstance<osmium::RelationMemberList>(o)) {
+        if (py::isinstance<osmium::RelationMemberList>(o)) {
             auto &oml = o.cast<osmium::RelationMemberList &>();
             if (oml.size() > 0)
                 builder->add_item(oml);
@@ -208,15 +209,15 @@ private:
         }
 
         // accept an iterable of (type, id, role) otherwise
-        auto it = o.cast<pybind11::iterable>();
+        auto it = o.cast<py::iterable>();
 
-        if (pybind11::len(o) == 0)
+        if (py::len(o) == 0)
             return;
 
         osmium::builder::RelationMemberListBuilder rml_builder(buffer, builder);
 
         for (auto m: it) {
-            auto member = m.cast<pybind11::tuple>();
+            auto member = m.cast<py::tuple>();
             auto type = member[0].cast<std::string>();
             auto id = member[1].cast<osmium::object_id_type>();
             auto role = member[2].cast<std::string>();
@@ -224,14 +225,14 @@ private:
         }
     }
 
-    osmium::Location get_location(pybind11::object o)
+    osmium::Location get_location(py::object o)
     {
-        if (pybind11::isinstance<osmium::Location>(o)) {
+        if (py::isinstance<osmium::Location>(o)) {
             return o.cast<osmium::Location>();
         }
 
         // default is a tuple with two floats
-        auto l = o.cast<pybind11::tuple>();
+        auto l = o.cast<py::tuple>();
         return osmium::Location(l[0].cast<float>(), l[1].cast<float>());
     }
 
@@ -247,12 +248,45 @@ private:
         }
     }
 
-    bool hasattr(pybind11::object o, char const *attr) const
-    { return pybind11::hasattr(o, attr) && !o.attr(attr).is_none(); }
+    bool hasattr(py::object o, char const *attr) const
+    { return py::hasattr(o, attr) && !o.attr(attr).is_none(); }
 
     osmium::io::Writer writer;
     osmium::memory::Buffer buffer;
     size_t buffer_size;
 };
 
-#endif // PYOSMIUM_SIMPLE_WRITER_HPP
+}
+
+void init_simple_writer(pybind11::module &m)
+{
+    py::class_<SimpleWriter>(m, "SimpleWriter",
+        "The most generic class to write osmium objects into a file. The writer "
+        "takes a file name as its mandatory parameter. The file must not yet "
+        "exist. The file type to output is determined from the file extension. "
+        "The second (optional) parameter is the buffer size. osmium caches the "
+        "output data in an internal memory buffer before writing it on disk. This "
+        "parameter allows changing the default buffer size of 4MB. Larger buffers "
+        "are normally better but you should be aware that there are normally multiple "
+        "buffers in use during the write process.")
+        .def(py::init<const char*, unsigned long>())
+        .def(py::init<const char*>())
+        .def("add_node", &SimpleWriter::add_node, py::arg("node"),
+             "Add a new node to the file. The node may be an ``osmium.osm.Node`` object, "
+             "an ``osmium.osm.mutable.Node`` object or any other Python object that "
+             "implements the same attributes.")
+        .def("add_way", &SimpleWriter::add_way, py::arg("way"),
+             "Add a new way to the file. The way may be an ``osmium.osm.Way`` object, "
+             "an ``osmium.osm.mutable.Way`` object or any other Python object that "
+             "implements the same attributes.")
+        .def("add_relation", &SimpleWriter::add_relation, py::arg("relation"),
+             "Add a new relation to the file. The relation may be an "
+             "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Way`` "
+             "object or any other Python object that implements the same attributes.")
+        .def("close", &SimpleWriter::close,
+             "Flush the remaining buffers and close the writer. While it is not "
+             "strictly necessary to call this function explicitly, it is still "
+             "strongly recommended to close the writer as soon as possible, so "
+             "that the buffer memory can be freed.")
+    ;
+}

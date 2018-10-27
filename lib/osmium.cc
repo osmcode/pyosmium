@@ -6,8 +6,6 @@
 #include <osmium/handler/node_locations_for_ways.hpp>
 
 #include "simple_handler.h"
-#include "simple_writer.h"
-#include "write_handler.h"
 #include "osmium_module.h"
 
 namespace py = pybind11;
@@ -61,54 +59,7 @@ PYBIND11_MODULE(_osmium, m) {
              "byte string.")
         ;
 
-    py::class_<WriteHandler, BaseHandler>(m, "WriteHandler",
-        "Handler function that writes all data directly to a file."
-        "The handler takes a file name as its mandatory parameter. The file "
-        "must not yet exist. The file type to output is determined from the "
-        "file extension. "
-        "The second (optional) parameter is the buffer size. osmium caches the "
-        "output data in an internal memory buffer before writing it on disk. This "
-        "parameter allows changing the default buffer size of 4MB. Larger buffers "
-        "are normally better but you should be aware that there are normally multiple "
-        "buffers in use during the write process.")
-        .def(py::init<const char*, unsigned long>())
-        .def(py::init<const char*>())
-        .def("close", &WriteHandler::close,
-             "Flush the remaining buffers and close the writer. While it is not "
-             "strictly necessary to call this function explicitly, it is still "
-             "strongly recommended to close the writer as soon as possible, so "
-             "that the buffer memory can be freed.")
-    ;
-
-    py::class_<SimpleWriter>(m, "SimpleWriter",
-        "The most generic class to write osmium objects into a file. The writer "
-        "takes a file name as its mandatory parameter. The file must not yet "
-        "exist. The file type to output is determined from the file extension. "
-        "The second (optional) parameter is the buffer size. osmium caches the "
-        "output data in an internal memory buffer before writing it on disk. This "
-        "parameter allows changing the default buffer size of 4MB. Larger buffers "
-        "are normally better but you should be aware that there are normally multiple "
-        "buffers in use during the write process.")
-        .def(py::init<const char*, unsigned long>())
-        .def(py::init<const char*>())
-        .def("add_node", &SimpleWriter::add_node, py::arg("node"),
-             "Add a new node to the file. The node may be an ``osmium.osm.Node`` object, "
-             "an ``osmium.osm.mutable.Node`` object or any other Python object that "
-             "implements the same attributes.")
-        .def("add_way", &SimpleWriter::add_way, py::arg("way"),
-             "Add a new way to the file. The way may be an ``osmium.osm.Way`` object, "
-             "an ``osmium.osm.mutable.Way`` object or any other Python object that "
-             "implements the same attributes.")
-        .def("add_relation", &SimpleWriter::add_relation, py::arg("relation"),
-             "Add a new relation to the file. The relation may be an "
-             "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Way`` "
-             "object or any other Python object that implements the same attributes.")
-        .def("close", &SimpleWriter::close,
-             "Flush the remaining buffers and close the writer. While it is not "
-             "strictly necessary to call this function explicitly, it is still "
-             "strongly recommended to close the writer as soon as possible, so "
-             "that the buffer memory can be freed.")
-    ;
-
     init_merge_input_reader(m);
+    init_write_handler(m);
+    init_simple_writer(m);
 };

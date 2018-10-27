@@ -21,7 +21,11 @@ foreach (PYMOD geom index io)
 endforeach()
 
 pybind11_add_module(_osm lib/osm.cc)
-pybind11_add_module(_osmium lib/osmium.cc lib/merge_input_reader.cc)
+pybind11_add_module(_osmium
+                    lib/osmium.cc
+                    lib/merge_input_reader.cc
+                    lib/simple_writer.cc
+                    lib/write_handler.cc)
 pybind11_add_module(_replication lib/replication.cc)
 
 set_target_properties(_osm PROPERTIES
