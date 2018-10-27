@@ -86,7 +86,7 @@ class TestWriteTags(unittest.TestCase):
      ((("foo", "bar"), ), 'Tfoo=bar'),
      ((("foo", "bar"), ("2", "1")), 'Tfoo=bar,2=1'),
      ({'test' : 'drive'}, 'Ttest=drive'),
-     (OrderedDict((('a', 'b'), ('c', '3'))), 'Tc=3,a=b'),
+     (OrderedDict((('a', 'b'), ('c', '3'))), 'Ta=b,c=3'),
     )
 
     def test_node_tags(self):

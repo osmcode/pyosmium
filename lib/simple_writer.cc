@@ -147,14 +147,15 @@ private:
                 return;
 
             osmium::builder::TagListBuilder builder(buffer, &obuilder);
-            for (auto item : o.cast<py::dict>()) {
-                builder.add_tag(item.first.cast<std::string>(),
-                                item.second.cast<std::string>());
+            auto dict = o.cast<py::dict>();
+            for (auto k : o) {
+                builder.add_tag(k.cast<std::string>(),
+                                dict[k].cast<std::string>());
             }
             return;
         }
 
-        // else must be an iterable other iterable
+        // else must be an iterable
         auto it = o.cast<py::iterable>();
 
         if (py::len(o) == 0)
