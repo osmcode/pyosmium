@@ -8,6 +8,7 @@
 #include "simple_handler.h"
 #include "simple_writer.h"
 #include "write_handler.h"
+#include "osmium_module.h"
 
 namespace py = pybind11;
 
@@ -52,7 +53,13 @@ PYBIND11_MODULE(_osmium, m) {
              "further selected in idx. If an area callback is implemented, then\n"
              "the file will be scanned twice and a location handler and a\n"
              "handler for assembling multipolygons and areas from ways will\n"
-             "be executed.");
+             "be executed.")
+        .def("apply_buffer", &SimpleHandler::apply_buffer,
+             py::arg("buffer"), py::arg("format"),
+             py::arg("locations")=false, py::arg("idx")="sparse_mem_array",
+             "Apply the handler to a string buffer. The buffer must be a\n"
+             "byte string.")
+        ;
 
     py::class_<WriteHandler, BaseHandler>(m, "WriteHandler",
         "Handler function that writes all data directly to a file."
@@ -102,4 +109,6 @@ PYBIND11_MODULE(_osmium, m) {
              "strongly recommended to close the writer as soon as possible, so "
              "that the buffer memory can be freed.")
     ;
+
+    init_merge_input_reader(m);
 };

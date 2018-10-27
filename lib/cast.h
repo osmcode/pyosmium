@@ -28,7 +28,7 @@ namespace pybind11 { namespace detail {
             }
 
             auto ts = src.attr("timestamp")();
-            value = (unsigned) ts.cast<float>();
+            value = (unsigned) ts.cast<double>();
 
             return true;
         }
@@ -40,12 +40,7 @@ namespace pybind11 { namespace detail {
             if (!PyDateTimeAPI) { PyDateTime_IMPORT; }
 
             std::time_t tt = src.seconds_since_epoch();
-            // this function uses static memory so it's best to copy it out asap just in case
-            // otherwise other code that is using localtime may break this (not just python code)
             std::tm localtime = *std::gmtime(&tt);
-
-            // Declare these special duration types so the conversions happen with the correct primitive types (int)
-            using us_t = duration<int, std::micro>;
 
             handle pydate = PyDateTime_FromDateAndTime(localtime.tm_year + 1900,
                                                      localtime.tm_mon + 1,

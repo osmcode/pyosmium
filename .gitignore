@@ -2,3 +2,4 @@ build
 dist
 osmium.egg-info
 *.pyc
+.ycm_extra_conf.py

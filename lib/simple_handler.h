@@ -18,19 +18,17 @@ public:
         apply_object(osmium::io::File(filename), locations, idx);
     }
 
-    /*void apply_buffer(const boost::python::object &buf,
-                      const boost::python::str &format,
+    void apply_buffer(pybind11::buffer const &buf, std::string const &format,
                       bool locations = false,
                       const std::string &idx = "sparse_mem_array")
     {
         Py_buffer pybuf;
         PyObject_GetBuffer(buf.ptr(), &pybuf, PyBUF_C_CONTIGUOUS);
-        size_t len = (size_t) pybuf.len;
-        const char *cbuf = reinterpret_cast<const char *>(pybuf.buf);
-        const char *cfmt = boost::python::extract<const char *>(format);
 
-        apply_object(osmium::io::File(cbuf, len, cfmt), locations, idx);
-    }*/
+        apply_object(osmium::io::File(reinterpret_cast<const char *>(pybuf.buf),
+                                      (size_t) pybuf.len, format.c_str()),
+                     locations, idx);
+    }
 
 private:
     void apply_object(osmium::io::File file, bool locations, const std::string &idx)

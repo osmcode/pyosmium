@@ -21,7 +21,8 @@ foreach (PYMOD geom index io)
 endforeach()
 
 pybind11_add_module(_osm lib/osm.cc)
-pybind11_add_module(_osmium lib/osmium.cc)
+pybind11_add_module(_osmium lib/osmium.cc lib/merge_input_reader.cc)
+pybind11_add_module(_replication lib/replication.cc)
 
 set_target_properties(_osm PROPERTIES
                       LIBRARY_OUTPUT_DIRECTORY
@@ -29,5 +30,9 @@ set_target_properties(_osm PROPERTIES
 set_target_properties(_osmium PROPERTIES
                       LIBRARY_OUTPUT_DIRECTORY
                           ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/osmium)
+set_target_properties(_replication PROPERTIES
+                      LIBRARY_OUTPUT_DIRECTORY
+                          ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/osmium/replication)
 
 target_link_libraries(_osmium PRIVATE ${OSMIUM_LIBRARIES})
+target_link_libraries(_replication PRIVATE ${OSMIUM_LIBRARIES})
