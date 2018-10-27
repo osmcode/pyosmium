@@ -14,7 +14,7 @@ Python >= 2.7 is supported but a version >= 3.3 is strongly recommended.
 Other requirements are:
 
  * Python setuptools
- * [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
+ * CMake
  * protozero, expat, libz, libbz2 and Boost iterator
    (see also [Libosmium dependencies](http://osmcode.org/libosmium/manual.html#dependencies))
  * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
@@ -26,15 +26,7 @@ your system, otherwise it might not work.
 
 On Debian/Ubuntu systems all required dependencies can be installed with:
 
-    sudo apt-get install build-essential libboost-python-dev \
-                         libexpat1-dev zlib1g-dev libbz2-dev
-
-### Homebrew (OS X)
-
-On OS x Boost.Python needs to be installed with
-`brew install boost-python` or `brew install boost-python3`
-depending on which Python version you want to use. You can also (re)install
-both.
+    sudo apt-get install build-essential libexpat1-dev zlib1g-dev libbz2-dev
 
 ## Installation
 
@@ -53,8 +45,6 @@ first. It is recommended to put it next to the pyosmium source. The setup
 script uses per default either a globally installed libosmium or
 looks for the source in `../libosmium`. You can set a custom location with
 `LIBOSMIUM_PREFIX`.
-
-To use a custom boost installation, set `BOOST_PREFIX`.
 
 To compile the bindings, run
 

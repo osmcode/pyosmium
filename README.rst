@@ -16,17 +16,14 @@ pyosmium can be installed with pip:
     pip install osmium
 
 The Pypi source package already comes bundled with a matching version of
-libosmium. The library uses `Boost.Python`_ to create the C++ bindings.
-On Debian/Ubuntu install `libboost-python-dev`. 
-On OS X run `brew install boost-python` or `brew install boost-python --with-python3`
-depending on which python version you want to use. You can also (re)install both.
+libosmium. The library uses `pybind11`_ to create the C++ bindings.
 
 Python >= 2.7 is supported but a version >= 3.3 is strongly recommended.
 
 Other dependencies are expat, libz, libbz2 and Boost iterator.
 See `Libosmium dependencies`_ for required packages for various distributions.
 
-.. _Boost.Python: http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html
+.. _pybind11: https://github.com/pybind/pybind11
 .. _Libosmium dependencies: http://osmcode.org/libosmium/manual.html#dependencies
 
 Documentation
