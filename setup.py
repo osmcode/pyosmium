@@ -51,6 +51,10 @@ class CMakeBuild(build_ext):
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
+        if env.get('LIBOSMIUM_PREFIX'):
+            cmake_args.append('-DLIBOSMIUM_PREFIX=' + env.get('LIBOSMIUM_PREFIX'))
+        if env.get('PROTOZERO_PREFIX'):
+            cmake_args.append('-DPROTOZERO_INCLUDE_DIR=' + env.get('PROTOZERO_PREFIX') +'/include')
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
@@ -64,6 +68,7 @@ setup(
     description='Python bindings for libosmium, the data processing library for OSM data',
     long_description='',
     ext_modules=[CMakeExtension('cmake_example')],
+    install_requires=['pybind11>=2.2'],
     packages = ['osmium', 'osmium/osm', 'osmium/replication'],
     package_dir = {'' : 'src'},
     package_data = { 'osmium' : [ '*.dll' ] },
