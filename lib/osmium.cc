@@ -21,14 +21,17 @@ PYBIND11_MODULE(_osmium, m) {
 
     m.def("apply", [](osmium::io::Reader &rd, BaseHandler &h)
                    { osmium::apply(rd, h); },
-        "Apply a chain of handlers.");
+          py::arg("reader"), py::arg("handler"),
+          "Apply a chain of handlers.");
     m.def("apply", [](osmium::io::Reader &rd, NodeLocationHandler &h)
                    { osmium::apply(rd, h); },
-        "Apply a chain of handlers.");
+          py::arg("reader"), py::arg("handler"),
+          "Apply a chain of handlers.");
     m.def("apply", [](osmium::io::Reader &rd, NodeLocationHandler &l,
                       BaseHandler &h)
                      { osmium::apply(rd, l, h); },
-        "Apply a chain of handlers.");
+          py::arg("reader"), py::arg("node_handler"), py::arg("handler"),
+          "Apply a chain of handlers.");
 
     py::class_<BaseHandler>(m, "BaseHandler");
 

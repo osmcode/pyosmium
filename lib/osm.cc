@@ -264,7 +264,7 @@ PYBIND11_MODULE(_osm, m) {
              "See :py:class:`osmium.osm.Location`.")
     ;
 
-    py::class_<osmium::Way, osmium::OSMObject>(m, "Way"
+    py::class_<osmium::Way, osmium::OSMObject>(m, "Way",
         "Represents a OSM way. It inherits the attributes from OSMObjects and "
         "adds an ordered list of nodes that describes the way.")
         .def_property_readonly("nodes",

@@ -281,7 +281,7 @@ void init_simple_writer(pybind11::module &m)
              "implements the same attributes.")
         .def("add_relation", &SimpleWriter::add_relation, py::arg("relation"),
              "Add a new relation to the file. The relation may be an "
-             "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Way`` "
+             "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Relation`` "
              "object or any other Python object that implements the same attributes.")
         .def("close", &SimpleWriter::close,
              "Flush the remaining buffers and close the writer. While it is not "
