@@ -7,7 +7,11 @@ find_package(Osmium 2.14 REQUIRED COMPONENTS io proj)
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
-add_subdirectory(contrib/pybind11)
+if (PYBIND11_PREFIX)
+    add_subdirectory(${PYBIND11_PREFIX} contrib/pybind11)
+else()
+    find_package(pybind11 REQUIRED)
+endif()
 
 set (PYOSMIUM_MODULES geom index io)
 

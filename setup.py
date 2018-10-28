@@ -8,6 +8,21 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
+BASEDIR = os.path.split(__file__)[0]
+
+def get_versions():
+    """ Read the version file.
+
+        The file cannot be directly imported because it is not installed
+        yet.
+    """
+    version_py = os.path.join(BASEDIR, "src/osmium/version.py")
+    v = {}
+    with open(version_py) as version_file:
+        # Execute the code in version.py.
+        exec(compile(version_file.read(), version_py, 'exec'), v)
+
+    return v
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -51,18 +66,60 @@ class CMakeBuild(build_ext):
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
+
+        if 'LIBOSMIUM_PREFIX' in env:
+            cmake_args += ['-DOSMIUM_INCLUDE_DIR={}/include'.format(env['LIBOSMIUM_PREFIX'])]
+        elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'libosmium', 'include', 'osmium', 'version.hpp')):
+            cmake_args += ['-DOSMIUM_INCLUDE_DIR=contrib/libosmium/include']
+
+        if 'PROTOZERO_PREFIX' in env:
+            cmake_args += ['-DPROTOZERO_INCLUDE_DIR={}/include'.format(env['PROTOZERO_PREFIX'])]
+        elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'protozero', 'include', 'osmium', 'version.hpp')):
+            cmake_args += ['-DOSMIUM_INCLUDE_DIR=contrib/protozero/include']
+
+        if 'PYBIND11_PREFIX' in env:
+            cmake_args += ['-DPYBIND11_PREFIX={}'.format(env['PYBIND11_PREFIX'])]
+        elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'pybind11')):
+            cmake_args += ['-DPYBIND11_PREFIX=contrib/pybind11']
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+versions = get_versions()
+
+with open('README.rst', 'r') as descfile:
+    long_description = descfile.read()
+
 setup(
     name='osmium',
-    version='0.0.1',
+    version=versions['pyosmium_release'],
+    description='Python bindings for libosmium, the data processing library for OSM data',
+    long_description=long_description,
     author='Sarah Hoffmann',
     author_email='lonvia@denofr.de',
-    description='Python bindings for libosmium, the data processing library for OSM data',
-    long_description='',
+    maintainer='Sarah Hoffmann',
+    maintainer_email='lonvia@denofr.de',
+    download_url='https://github.com/osmcode/pyosmium',
+    url='http://osmcode.org/pyosmium',
+    keywords=["OSM", "OpenStreetMap", "Osmium"],
+    license='BSD',
+    scripts=['tools/pyosmium-get-changes', 'tools/pyosmium-up-to-date'],
+    classifiers = [
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: C++",
+        ],
+
     ext_modules=[CMakeExtension('cmake_example')],
     packages = ['osmium', 'osmium/osm', 'osmium/replication'],
     package_dir = {'' : 'src'},
