@@ -10,7 +10,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 if (PYBIND11_PREFIX)
     add_subdirectory(${PYBIND11_PREFIX} contrib/pybind11)
 else()
-    find_package(pybind11 REQUIRED)
+    find_package(pybind11 2.2 REQUIRED)
 endif()
 
 set (PYOSMIUM_MODULES geom index io)
