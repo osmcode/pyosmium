@@ -6,9 +6,29 @@ import subprocess
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+from setuptools.command.sdist import sdist as orig_sdist
 from distutils.version import LooseVersion
 
-BASEDIR = os.path.split(__file__)[0]
+BASEDIR = os.path.split(os.path.abspath(__file__))[0]
+
+class Pyosmium_sdist(orig_sdist):
+
+    contrib = (
+        ('libosmium', 'https://github.com/osmcode/libosmium/archive/v{}.tar.gz'),
+        ('protozero', 'https://github.com/mapbox/protozero/archive/v{}.tar.gz'),
+        ('pybind11', 'https://github.com/pybind/pybind11/archive/v{}.tar.gz'),
+    )
+
+    def make_release_tree(self, base_dir, files):
+        orig_sdist.make_release_tree(self, base_dir, files)
+
+        # add additional dependecies in the required version
+        for name, tar_src in self.contrib:
+            tarball = tar_src.format(versions[name + '_version'])
+            print("Downloading and adding {} sources from {}".format(name, tarball))
+            subprocess.call('wget -O - -q {} | tar xz -C {} --one-top-level=contrib/{} --strip-components=1'.format(
+                   tarball, base_dir, name), shell=True)
+
 
 def get_versions():
     """ Read the version file.
@@ -70,17 +90,17 @@ class CMakeBuild(build_ext):
         if 'LIBOSMIUM_PREFIX' in env:
             cmake_args += ['-DOSMIUM_INCLUDE_DIR={}/include'.format(env['LIBOSMIUM_PREFIX'])]
         elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'libosmium', 'include', 'osmium', 'version.hpp')):
-            cmake_args += ['-DOSMIUM_INCLUDE_DIR=contrib/libosmium/include']
+            cmake_args += ['-DOSMIUM_INCLUDE_DIR={}/contrib/libosmium/include'.format(BASEDIR)]
 
         if 'PROTOZERO_PREFIX' in env:
             cmake_args += ['-DPROTOZERO_INCLUDE_DIR={}/include'.format(env['PROTOZERO_PREFIX'])]
-        elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'protozero', 'include', 'osmium', 'version.hpp')):
-            cmake_args += ['-DOSMIUM_INCLUDE_DIR=contrib/protozero/include']
+        elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'protozero', 'include', 'protozero', 'version.hpp')):
+            cmake_args += ['-DPROTOZERO_INCLUDE_DIR={}/contrib/protozero/include'.format(BASEDIR)]
 
         if 'PYBIND11_PREFIX' in env:
             cmake_args += ['-DPYBIND11_PREFIX={}'.format(env['PYBIND11_PREFIX'])]
         elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'pybind11')):
-            cmake_args += ['-DPYBIND11_PREFIX=contrib/pybind11']
+            cmake_args += ['-DPYBIND11_PREFIX={}/contrib/pybind11'.format(BASEDIR)]
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
@@ -123,7 +143,7 @@ setup(
     ext_modules=[CMakeExtension('cmake_example')],
     packages = ['osmium', 'osmium/osm', 'osmium/replication'],
     package_dir = {'' : 'src'},
-    package_data = { 'osmium' : [ '*.dll' ] },
-    cmdclass=dict(build_ext=CMakeBuild),
+    package_data = { 'osmium' : [ '*.dll' ]},
+    cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,
 )
