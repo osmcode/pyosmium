@@ -32,9 +32,9 @@ addons:
         packages:
             - g++-4.8
             - gcc-4.8
-            - libboost-python1.55-dev
             - libboost1.55-dev
             - libsparsehash-dev
+            - libproj-dev
             - python-dev
             - python-nose
             - python-mock
@@ -44,12 +44,12 @@ addons:
             - python3-setuptools
 
 install:
-    - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git ../libosmium
-    - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git ../protozero
+    - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
+    - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
+    - git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
     - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
           brew update;
           brew install python$PYTHON_SUFFIX google-sparsehash;
-          brew install boost-python $BOOST_PYTHON_OPTION;
           pip$PYTHON_SUFFIX install -q nose mock;
       fi
 

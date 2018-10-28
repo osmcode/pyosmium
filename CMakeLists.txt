@@ -7,6 +7,12 @@ find_package(Osmium 2.14 REQUIRED COMPONENTS io proj)
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
+if ( MSVC )
+    set(PYBIND11_CPP_STANDARD /std:c++14)
+else()
+    set(PYBIND11_CPP_STANDARD -std=c++11)
+endif()
+
 if (PYBIND11_PREFIX)
     add_subdirectory(${PYBIND11_PREFIX} contrib/pybind11)
 else()
