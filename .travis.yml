@@ -34,7 +34,6 @@ addons:
             - gcc-4.8
             - libboost1.55-dev
             - libsparsehash-dev
-            - libproj-dev
             - python-dev
             - python-nose
             - python-mock
