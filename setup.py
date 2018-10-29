@@ -102,6 +102,9 @@ class CMakeBuild(build_ext):
         elif os.path.exists(os.path.join(BASEDIR, 'contrib', 'pybind11')):
             cmake_args += ['-DPYBIND11_PREFIX={}/contrib/pybind11'.format(BASEDIR)]
 
+        if 'BOOST_PREFIX' in env:
+            cmake_args += ['-DBOOST_ROOT={}'.format(env['BOOST_PREFIX'])]
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
@@ -143,7 +146,6 @@ setup(
     ext_modules=[CMakeExtension('cmake_example')],
     packages = ['osmium', 'osmium/osm', 'osmium/replication'],
     package_dir = {'' : 'src'},
-    package_data = { 'osmium' : [ '*.dll' ]},
     cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,
 )

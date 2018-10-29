@@ -5,7 +5,6 @@
 #include <osmium/io/writer.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
-#include <boost/python.hpp>
 
 #include "cast.h"
 
