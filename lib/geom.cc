@@ -36,6 +36,18 @@ PYBIND11_MODULE(geom, m)
         .export_values()
     ;
 
+    py::class_<osmium::geom::Coordinates>(m, "Coordinates",
+        "Class representing coordinates")
+        .def(py::init<>())
+        .def(py::init<double, double>())
+        .def_readonly("x", &osmium::geom::Coordinates::x,
+            "(read-only) X coordinate.")
+        .def_readonly("y", &osmium::geom::Coordinates::y,
+            "(read-only) Y coordinate.")
+        .def("valid", &osmium::geom::Coordinates::valid,
+            "True if coordinates are valid")
+    ;
+
     m.def("haversine_distance",
           (double (*)(const osmium::WayNodeList&)) &og::haversine::distance,
           py::arg("list"),
