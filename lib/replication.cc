@@ -4,6 +4,7 @@
 #include <osmium/io/any_input.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/visitor.hpp>
+#include "cast.h"
 
 namespace py = pybind11;
 
