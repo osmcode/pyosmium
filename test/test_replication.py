@@ -1,8 +1,8 @@
-from nose.tools import *
-import unittest
 from io import BytesIO
 from textwrap import dedent
+
 from helpers import mkdate, CountingHandler
+from nose.tools import *
 
 try:
     from urllib.error import URLError
@@ -16,6 +16,9 @@ except ImportError:
 
 import osmium as o
 import osmium.replication.server as rserv
+import osmium.replication
+import tempfile
+import datetime
 
 class UrllibMock(MagicMock):
 
@@ -227,3 +230,16 @@ def test_apply_reader_with_location(mock):
     diffs.reader.apply(h, idx="flex_mem")
 
     assert_equals(h.counts, [1, 1, 0, 0])
+
+def test_get_newest_change_from_file():
+    with tempfile.NamedTemporaryFile("w", suffix='.osc') as temp:
+        temp.write("""
+        <osmChange version="0.6" generator="OsmSax">
+        <create>
+        <node id="31337" version="1" timestamp="2018-10-29T03:56:07Z" uid="8369524" user="x" changeset="63965061" lat="55.8149396" lon="-4.2601767"/>
+        </create>
+        </osmChange>
+        """)
+        temp.seek(0)
+        val = osmium.replication.newest_change_from_file(temp.name)
+        assert_equals(val, datetime.datetime(2018, 10, 29, 3, 56, 7, tzinfo=datetime.timezone.utc))
