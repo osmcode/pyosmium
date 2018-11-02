@@ -242,4 +242,4 @@ def test_get_newest_change_from_file():
         """)
         temp.seek(0)
         val = osmium.replication.newest_change_from_file(temp.name)
-        assert_equals(val, datetime.datetime(2018, 10, 29, 3, 56, 7, tzinfo=datetime.timezone.utc))
+        assert_equals(val, mkdate(2018, 10, 29, 3, 56, 7))
