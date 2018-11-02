@@ -57,3 +57,9 @@ set_module_output(_replication osmium/replication)
 
 target_link_libraries(_osmium PRIVATE ${OSMIUM_LIBRARIES})
 target_link_libraries(_replication PRIVATE ${OSMIUM_LIBRARIES})
+
+# workaround for https://github.com/pybind/pybind11/issues/1272
+if (APPLE)
+set_target_properties(_osmium PROPERTIES CXX_VISIBILITY_PRESET "default")
+set_target_properties(_osm PROPERTIES CXX_VISIBILITY_PRESET "default")
+endif ()
