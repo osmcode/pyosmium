@@ -12,6 +12,8 @@
 class SimpleHandler: public BaseHandler
 {
 public:
+    virtual ~SimpleHandler() = default;
+
     void apply_file(const std::string &filename, bool locations = false,
                     const std::string &idx = "sparse_mem_array")
     {

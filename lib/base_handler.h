@@ -25,6 +25,7 @@ protected:
     };
 
 public:
+    virtual ~BaseHandler() = default;
     virtual osmium::osm_entity_bits::type enabled_callbacks() = 0;
 
     // work around pybind's bad copy policy
