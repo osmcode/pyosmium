@@ -63,11 +63,7 @@ namespace pybind11 { namespace detail {
 #if PY_VERSION_HEX < 0x03000000
             return pydate;
 #else
-#if PY_VERSION_HEX >= 0x03070000
-            auto utc = PyDateTime_TimeZone_UTC;
-#else
             auto utc = pybind11::module::import("datetime").attr("timezone").attr("utc");
-#endif
             using namespace pybind11::literals;
             return pydate.attr("replace")("tzinfo"_a=utc).inc_ref();
 #endif
