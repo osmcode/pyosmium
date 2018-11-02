@@ -1,31 +1,31 @@
 from ._osm import *
-import osmium.osm.mutable
-
-def create_mutable_node(node, **args):
-    """ Create a mutable node replacing the properties given in the
-        named parameters. Note that this function only creates a shallow
-        copy which is still bound to the scope of the original object.
-    """
-    return osmium.osm.mutable.Node(base=node, **args)
-
-def create_mutable_way(way, **args):
-    """ Create a mutable way replacing the properties given in the
-        named parameters. Note that this function only creates a shallow
-        copy which is still bound to the scope of the original object.
-    """
-    return osmium.osm.mutable.Way(base=way, **args)
-
-def create_mutable_relation(rel, **args):
-    """ Create a mutable relation replacing the properties given in the
-        named parameters. Note that this function only creates a shallow
-        copy which is still bound to the scope of the original object.
-    """
-    return osmium.osm.mutable.Relation(base=rel, **args)
-
-Node.replace = create_mutable_node
-Way.replace = create_mutable_way
-Relation.replace = create_mutable_relation
-
+# import osmium.osm.mutable
+# 
+# def create_mutable_node(node, **args):
+#     """ Create a mutable node replacing the properties given in the
+#         named parameters. Note that this function only creates a shallow
+#         copy which is still bound to the scope of the original object.
+#     """
+#     return osmium.osm.mutable.Node(base=node, **args)
+# 
+# def create_mutable_way(way, **args):
+#     """ Create a mutable way replacing the properties given in the
+#         named parameters. Note that this function only creates a shallow
+#         copy which is still bound to the scope of the original object.
+#     """
+#     return osmium.osm.mutable.Way(base=way, **args)
+# 
+# def create_mutable_relation(rel, **args):
+#     """ Create a mutable relation replacing the properties given in the
+#         named parameters. Note that this function only creates a shallow
+#         copy which is still bound to the scope of the original object.
+#     """
+#     return osmium.osm.mutable.Relation(base=rel, **args)
+# 
+# Node.replace = create_mutable_node
+# Way.replace = create_mutable_way
+# Relation.replace = create_mutable_relation
+# 
 Location.__repr__ = lambda l : 'osmium.osm.Location(x=%r, y=%r)' \
                                % (l.x, l.y) \
                                if l.valid() else 'osmium.osm.Location()'
@@ -70,9 +70,9 @@ Node.__repr__ = lambda o : '%s(id=%r, deleted=%r, visible=%r, version=%r, change
 Node.__str__ = lambda n : 'n%d: location=%s tags=%s' \
                           % (n.id, n.location, _str_ellipse(n.tags))
 
-Way.__repr__ = lambda o : '%s(id=%r, deleted=%r, visible=%r, version=%r, changeset=%r, uid=%r, timestamp=%r, user=%r, tags=%r, nodes=%r)'% (o.__class__.__name__, o.id, o.deleted, o.visible, o.version, o.changeset, o.uid, o.timestamp, o.user, o.tags, o.nodes)
-Way.__str__ = lambda o : 'w%d: nodes=%s tags=%s' \
-                         % (o.id, _str_ellipse(o.nodes), _str_ellipse(o.tags))
+#Way.__repr__ = lambda o : '%s(id=%r, deleted=%r, visible=%r, version=%r, changeset=%r, uid=%r, timestamp=%r, user=%r, tags=%r, nodes=%r)'% (o.__class__.__name__, o.id, o.deleted, o.visible, o.version, o.changeset, o.uid, o.timestamp, o.user, o.tags, o.nodes)
+#Way.__str__ = lambda o : 'w%d: nodes=%s tags=%s' \
+#                         % (o.id, _str_ellipse(o.nodes), _str_ellipse(o.tags))
 
 Relation.__repr__ = lambda o : '%s(id=%r, deleted=%r, visible=%r, version=%r, changeset=%r, uid=%r, timestamp=%r, user=%r, tags=%r, members=%r)'% (o.__class__.__name__, o.id, o.deleted, o.visible, o.version, o.changeset, o.uid, o.timestamp, o.user, o.tags, o.members)
 Relation.__str__ = lambda o : 'r%d: members=%s, tags=%s' \
