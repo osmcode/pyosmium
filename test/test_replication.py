@@ -1,7 +1,8 @@
 from io import BytesIO
+import os
 from textwrap import dedent
 
-from helpers import mkdate, CountingHandler
+from helpers import mkdate, osmobj, create_osm_file, CountingHandler
 from nose.tools import *
 
 try:
@@ -232,14 +233,13 @@ def test_apply_reader_with_location(mock):
     assert_equals(h.counts, [1, 1, 0, 0])
 
 def test_get_newest_change_from_file():
-    with tempfile.NamedTemporaryFile("w", suffix='.osc') as temp:
-        temp.write("""
-        <osmChange version="0.6" generator="OsmSax">
-        <create>
-        <node id="31337" version="1" timestamp="2018-10-29T03:56:07Z" uid="8369524" user="x" changeset="63965061" lat="55.8149396" lon="-4.2601767"/>
-        </create>
-        </osmChange>
-        """)
-        temp.seek(0)
-        val = osmium.replication.newest_change_from_file(temp.name)
+    data = [osmobj('N', id=1, version=1, changeset=63965061, uid=8369524,
+                   timestamp='2018-10-29T03:56:07Z', user='x')]
+    fn = create_osm_file(data)
+
+
+    try:
+        val = osmium.replication.newest_change_from_file(fn)
         assert_equals(val, mkdate(2018, 10, 29, 3, 56, 7))
+    finally:
+        os.remove(fn)
