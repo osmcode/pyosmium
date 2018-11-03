@@ -6,7 +6,10 @@ Shows how to use input from strings.
 """
 import osmium as o
 import sys
-import urllib.request
+try:
+    import urllib.request as urlrequest
+except ImportError:
+    import urllib2 as urlrequest
 
 class FileStatsHandler(o.SimpleHandler):
     def __init__(self):
@@ -31,7 +34,7 @@ if __name__ == '__main__':
         sys.exit(-1)
 
 
-    data = urllib.request.urlopen(sys.argv[1]).read()
+    data = urlrequest.urlopen(sys.argv[1]).read()
 
     h = FileStatsHandler()
     h.apply_buffer(data, sys.argv[1])
