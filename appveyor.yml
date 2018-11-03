@@ -1,45 +1,57 @@
 environment:
-
+  global:
+    BZIP2_VER: 1.0.6
+    EXPAT_VER: 2.2.5
+    ZLIB_VER: 1.2.11
+    BOOST_PREFIX: C:\Libraries\boost_1_67_0
   matrix:
     - PYTHON: "C:\\Python27-x64"
-      DEVPACK: pyosmium_libs27-b63.7z
       PIPINSTALLS: nose wheel mock
+      arch: x64
     - PYTHON: "C:\\Python36-x64"
-      DEVPACK: pyosmium_libs36-b63.7z
       PIPINSTALLS: nose wheel
+      arch: x64
 
 os: Visual Studio 2015
 
-install:
-  - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
-  - SET VS90COMNTOOLS=%VS140COMNTOOLS%
-  - cd "c:\Users\appveyor\AppData\Local\Programs\Common\Microsoft\"
-  - ren "Visual C++ for Python" "Visual C++ for Python Do Not Use"
-  - cd "C:\Program Files (x86)\"
-  - ren "Microsoft Visual Studio 9.0" "Microsoft Visual Studio 9.0 Do Not Use"
-  - python --version
-  - cd c:\dev 
-  - git clone --depth 10 https://github.com/osmcode/libosmium.git
-  - git clone --depth 10 https://github.com/mapbox/protozero.git
-  - dir c:\dev
-  - IF NOT EXIST pyosmium_libs_Release.7z ECHO downloading dependencies pack... && powershell Invoke-WebRequest https://github.com/alex85k/pyosmium_libs/releases/download/0.3/%DEVPACK% -OutFile %DEVPACK%
-  - cd c:\
-  - 7z x c:\dev\%DEVPACK%
-  - dir c:\libs\include
-  - dir c:\libs\lib
-  - pip install %PIPINSTALLS%
+clone_depth: 1
 
-# scripts that are called at very beginning, before repo cloning
 init:
   - git config --global core.autocrlf input
+  - if "%arch%"=="x86" (
+      set vcvarsall_arg=x86&&
+      set conda_path=C:\Miniconda36\Scripts&&
+      set conda_library_path=C:\Miniconda36\envs\pyosmium\Library&&
+      set build_type=Release)
+  - if "%arch%"=="x64" (
+      set vcvarsall_arg=amd64&&
+      set conda_path=C:\Miniconda36-x64\Scripts&&
+      set conda_library_path=C:\Miniconda36-x64\envs\pyosmium\Library&&
+      set build_type=Release)
+  - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" %vcvarsall_arg%'
+
+install:
+  - set PATH=%PATH%;%conda_path%
+  - cd c:\
+  - conda config --set always_yes yes
+  - conda create --name pyosmium
+  - activate pyosmium
+  - conda install bzip2=%BZIP2_VER% expat=%EXPAT_VER% zlib=%ZLIB_VER%
+  - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python --version
+  - cd c:\dev
+  - git clone --depth 10 https://github.com/osmcode/libosmium.git pyosmium/contrib/libosmium
+  - git clone --depth 10 https://github.com/mapbox/protozero.git pyosmium/contrib/protozero
+  - git clone --depth 10 https://github.com/pybind/pybind11.git pyosmium/contrib/pybind11
+  - dir c:\dev
+  - cd c:\
+  - pip install %PIPINSTALLS%
 
 # clone directory
 clone_folder: c:\dev\pyosmium
 
 build_script:
   - cd c:\dev\pyosmium
-  - SET BOOST_PREFIX=c:/libs
-  - SET BOOST_VERSION=1_63
   - python setup.py build
   - python setup.py install --user
 
@@ -50,7 +62,9 @@ test_script:
 
 after_test:
   - cd c:\dev\pyosmium
-  - copy c:\libs\lib\*.dll c:\dev\pyosmium\src\osmium
+  - copy /y %conda_library_path%\bin\zlib.dll c:\dev\pyosmium\contrib
+  - copy /y %conda_library_path%\bin\expat.dll c:\dev\pyosmium\contrib
+  - copy /y %conda_library_path%\bin\libbz2.dll c:\dev\pyosmium\contrib
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
 
 artifacts:

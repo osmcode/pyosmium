@@ -3,6 +3,7 @@ import unittest
 
 from helpers import create_osm_file, osmobj, HandlerTestBase
 import osmium as o
+import osmium.geom
 
 wkbfab = o.geom.WKBFactory()
 
@@ -70,3 +71,10 @@ class TestCoordinates(unittest.TestCase):
         c = o.geom.Coordinates(o.osm.Location(10.0, -3.0))
         assert_almost_equals(c.x, 10.0)
         assert_almost_equals(c.y, -3.0)
+
+
+class TestLonLatToMercator(unittest.TestCase):
+    def test_1(self):
+        ret = osmium.geom.lonlat_to_mercator(osmium.geom.Coordinates(1,1))
+        self.assertAlmostEquals(ret.x, 111319.49079327)
+        self.assertAlmostEquals(ret.y, 111325.14285463)

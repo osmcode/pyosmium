@@ -14,27 +14,17 @@ Python >= 2.7 is supported but a version >= 3.3 is strongly recommended.
 Other requirements are:
 
  * Python setuptools
- * [Boost.Python](http://www.boost.org/doc/libs/1_56_0/libs/python/doc/index.html)
- * protozero, expat, libz, libbz2 and Boost iterator
-   (see also [Libosmium dependencies](http://osmcode.org/libosmium/manual.html#dependencies))
+ * [cmake](https://cmake.org/)
+ * [Pybind11](https://github.com/pybind/pybind11) >= 2.2
+ * libosmium, protozero
+ * expat, libz, libbz2 and Boost variant and iterator
  * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
 
-You have to compile with the same compiler version that Python is compiled with on
-your system, otherwise it might not work.
+On Debian/Ubuntu-like systems the following should install all
+dependencies required for installing via pip:
 
-### Debian/Ubuntu
-
-On Debian/Ubuntu systems all required dependencies can be installed with:
-
-    sudo apt-get install build-essential libboost-python-dev \
+    sudo apt-get install build-essential cmake libboost-dev \
                          libexpat1-dev zlib1g-dev libbz2-dev
-
-### Homebrew (OS X)
-
-On OS x Boost.Python needs to be installed with
-`brew install boost-python` or `brew install boost-python3`
-depending on which Python version you want to use. You can also (re)install
-both.
 
 ## Installation
 
@@ -44,15 +34,16 @@ The recommended way to install pyosmium is via pip:
 
     pip install osmium
 
-There are also experimental binary wheels for Windows available.
+You need to install development packages first for the dependencies
+mentioned above. For Windows, there are also experimental binary wheels
+available with all required dependencies packed already.
 
 ### Compiling from Source
 
-When compiling from source, you need to get the latest libosmium version
-first. It is recommended to put it next to the pyosmium source. The setup
-script uses per default either a globally installed libosmium or
-looks for the source in `../libosmium`. You can set a custom location with
-`LIBOSMIUM_PREFIX`.
+Get the latest versions of libosmium, protozero and pybind11. It is
+recommended that you put them in a subdirectory `contrib`. You can also
+set custom locations with `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
+`PYBIND11_PREFIX` respectively.
 
 To use a custom boost installation, set `BOOST_PREFIX`.
 
@@ -62,13 +53,7 @@ To compile the bindings, run
 
 To compile and install the bindings, run
 
-    python setup.py install --user
-
-to install only for your user, or
-
-    python setup.py install
-
-to install globally.
+    python setup.py install [--user]
 
 
 ## Examples
