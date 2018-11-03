@@ -40,6 +40,7 @@ PYBIND11_MODULE(geom, m)
         "Class representing coordinates")
         .def(py::init<>())
         .def(py::init<double, double>())
+        .def(py::init<osmium::Location const &>())
         .def_readonly("x", &osmium::geom::Coordinates::x,
             "(read-only) X coordinate.")
         .def_readonly("y", &osmium::geom::Coordinates::y,
