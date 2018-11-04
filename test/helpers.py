@@ -120,7 +120,7 @@ def check_repr(o):
 class HandlerTestBase:
 
     apply_locations = False
-    apply_idx = 'sparse_mem_array'
+    apply_idx = 'flex_mem'
 
     def test_func(self):
         if isinstance(self.data, (list, tuple)):

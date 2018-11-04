@@ -47,7 +47,7 @@ PYBIND11_MODULE(_osmium, m) {
         .def(py::init<>())
         .def("apply_file", &SimpleHandler::apply_file,
              py::arg("filename"), py::arg("locations")=false,
-             py::arg("idx")="sparse_mem_array",
+             py::arg("idx")="flex_mem",
              "Apply the handler to the given file. If locations is true, then\n"
              "a location handler will be applied before, which saves the node\n"
              "positions. In that case, the type of this position index can be\n"
@@ -57,7 +57,7 @@ PYBIND11_MODULE(_osmium, m) {
              "be executed.")
         .def("apply_buffer", &SimpleHandler::apply_buffer,
              py::arg("buffer"), py::arg("format"),
-             py::arg("locations")=false, py::arg("idx")="sparse_mem_array",
+             py::arg("locations")=false, py::arg("idx")="flex_mem",
              "Apply the handler to a string buffer. The buffer must be a\n"
              "byte string.")
         ;

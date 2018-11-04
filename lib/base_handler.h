@@ -71,7 +71,7 @@ private:
 protected:
     void apply(const osmium::io::File &file, osmium::osm_entity_bits::type types,
                pre_handler pre = no_handler,
-               const std::string &idx = "sparse_mem_array")
+               const std::string &idx = "flex_mem")
     {
          switch (pre) {
             case no_handler:

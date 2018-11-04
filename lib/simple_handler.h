@@ -15,14 +15,14 @@ public:
     virtual ~SimpleHandler() = default;
 
     void apply_file(const std::string &filename, bool locations = false,
-                    const std::string &idx = "sparse_mem_array")
+                    const std::string &idx = "flex_mem")
     {
         apply_object(osmium::io::File(filename), locations, idx);
     }
 
     void apply_buffer(pybind11::buffer const &buf, std::string const &format,
                       bool locations = false,
-                      const std::string &idx = "sparse_mem_array")
+                      const std::string &idx = "flex_mem")
     {
         Py_buffer pybuf;
         PyObject_GetBuffer(buf.ptr(), &pybuf, PyBUF_C_CONTIGUOUS);
