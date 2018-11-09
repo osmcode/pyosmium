@@ -142,3 +142,17 @@ def test_coordinate_from_location():
     c = o.geom.Coordinates(o.osm.Location(10.0, -3.0))
     assert_almost_equals(c.x, 10.0)
     assert_almost_equals(c.y, -3.0)
+
+def test_haversine():
+    data = [osmobj('N', id=1, lat=0, lon=0),
+                osmobj('N', id=2, lat=0, lon=1),
+                osmobj('N', id=3, lat=1, lon=0),
+                osmobj('W', id=1, nodes = [1,2,3])]
+
+    results = []
+    def call_haversine(w):
+        results.append(o.geom.haversine_distance(w.nodes))
+    HandlerFunction(way=call_haversine).run(data, apply_locations=True)
+
+    assert_equal(1, len(results))
+    assert_almost_equals(268520, results[0], 0)
