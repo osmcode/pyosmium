@@ -16,11 +16,10 @@ PYBIND11_MODULE(_osmium, m) {
     using NodeLocationHandler =
         osmium::handler::NodeLocationsForWays<LocationTable>;
 
+    py::register_exception<osmium::invalid_location>(m, "InvalidLocationError");
     py::register_exception_translator([](std::exception_ptr p) {
         try {
             if (p) std::rethrow_exception(p);
-        } catch (const osmium::invalid_location &e) {
-            PyErr_SetString(PyExc_RuntimeError, e.what());
         } catch (const osmium::not_found &e) {
             PyErr_SetString(PyExc_KeyError, e.what());
         }
