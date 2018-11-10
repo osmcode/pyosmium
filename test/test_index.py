@@ -23,7 +23,7 @@ class TestLocationTable(unittest.TestCase):
         assert_almost_equal(-5.6, l.lat, 5)
 
     def test_get_unset(self):
-        with assert_raises(o.OsmiumKeyError):
+        with assert_raises(KeyError):
             self.table.get(56)
 
     def test_set_negative(self):
@@ -38,6 +38,6 @@ class TestLocationTable(unittest.TestCase):
         self.table.set(593, o.osm.Location(0.35, 45.3))
         self.table.get(593)
         self.table.clear()
-        with assert_raises(o.OsmiumKeyError):
+        with assert_raises(KeyError):
             self.table.get(593)
 
