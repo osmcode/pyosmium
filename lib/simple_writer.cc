@@ -231,9 +231,9 @@ private:
             return o.cast<osmium::Location>();
         }
 
-        // default is a tuple with two floats
+        // default is a tuple with two doubles
         auto l = o.cast<py::tuple>();
-        return osmium::Location(l[0].cast<float>(), l[1].cast<float>());
+        return osmium::Location(l[0].cast<double>(), l[1].cast<double>());
     }
 
     void flush_buffer()
