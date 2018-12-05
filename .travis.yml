@@ -6,7 +6,6 @@
 
 language: cpp
 
-sudo: false
 dist: trusty
 
 matrix:
