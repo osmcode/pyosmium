@@ -20,13 +20,15 @@ Other requirements are:
  * expat, libz, libbz2 and Boost variant and iterator
  * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
 
+## Installation
+
+### Installing prerequisites
+
 On Debian/Ubuntu-like systems the following should install all
 dependencies required for installing via pip:
 
     sudo apt-get install build-essential cmake libboost-dev \
                          libexpat1-dev zlib1g-dev libbz2-dev
-
-## Installation
 
 ### Using Pip
 

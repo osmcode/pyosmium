@@ -4,6 +4,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.15.0] - 2018-12-09
+
+### Added
+
+- more tests
+
+### Changed
+
+- replace boost-python with header only pybind11 library
+- switch to cmake for configuration (called through setup.py)
+- default node cache changed to flex_mem
+
 ## [2.14.4] - 2018-10-30
 
 ### Added
