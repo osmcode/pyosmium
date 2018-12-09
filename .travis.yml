@@ -23,13 +23,9 @@ matrix:
           compiler: gcc
           env: USE_PYTHON_VERSION=3
         - os: osx
-          osx_image: xcode8.3
+          osx_image: xcode7
           compiler: clang
-          env: USE_PYTHON_VERSION=3
-        - os: osx
-          osx_image: xcode9.4
-          compiler: clang
-          env: USE_PYTHON_VERSION=3
+          env: USE_PYTHON_VERSION=
         - os: osx
           osx_image: xcode10.1
           compiler: clang
