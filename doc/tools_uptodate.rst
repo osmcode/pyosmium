@@ -5,4 +5,4 @@ Usage
 -----
 
 .. autoprogram:: pyosmium-up-to-date:get_arg_parser()
-    :prog: 
+    :prog: pyosmium-up-to-date.py

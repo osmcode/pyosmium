@@ -176,7 +176,7 @@ def get_arg_parser(from_main=False):
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='count', default=0,
                         help='Increase verbosity')
-    parser.add_argument('infile', metavar='<OSM file>', help="OSM file to update")
+    parser.add_argument('infile', metavar='<osm file>', help="OSM file to update")
     parser.add_argument('-o', '--outfile', dest='outfile',
                         help=h("""Name output of file. If missing, the input file
                                 will be overwritten."""))
