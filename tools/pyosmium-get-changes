@@ -183,9 +183,9 @@ if __name__ == '__main__':
               needs to begiven."""))
             exit(1)
 
-        with open(options.start_file, 'r') as f:
+        with open(options.seq_file, 'r') as f:
             seq = f.readline()
-            options.start = ReplicationStart_from_id(seq)
+            options.start = ReplicationStart.from_id(seq)
 
     if options.server_url is not None and options.start.source is not None:
         if options.server_url != options.start.source:
