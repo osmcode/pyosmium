@@ -18,6 +18,19 @@ else:
         return datetime(*args)
 
 
+def load_script(filename):
+    """ Load an executable script into its own private environment.
+    """
+    src = os.path.normpath(filename)
+    globvars = dict()
+    if sys.version_info[0] >= 3:
+        exec(compile(open(src, "rb").read(), src, 'exec'), globvars)
+    else:
+        execfile(src, globvars)
+
+    return globvars
+
+
 def _complete_object(o):
     """Takes a hash with an incomplete OSM object description and returns a
        complete one.
