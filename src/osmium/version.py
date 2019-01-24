@@ -5,7 +5,7 @@ Version information.
 # the major version
 pyosmium_major = '2.15'
 # current release (Pip version)
-pyosmium_release = '2.15.0'
+pyosmium_release = '2.15.1'
 
 # libosmium version shipped with the Pip release
 libosmium_version = '2.15.0'

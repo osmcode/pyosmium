@@ -4,6 +4,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.15.1] - 2019-01-24
+
+### Added
+
+- tests for pyosmium-get-changes
+
+### Changed
+
+- do not read data when checking for replication headers
+
+### Fixed
+
+- fix typo in sequence file reading of pyosmium-get-changes
+
 ## [2.15.0] - 2018-12-09
 
 ### Added
