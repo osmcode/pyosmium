@@ -4,6 +4,7 @@ import logging
 import datetime as dt
 from collections import namedtuple
 from osmium.io import Reader as oreader
+from osmium.osm import NOTHING
 from sys import version_info as python_version
 
 log = logging.getLogger('pyosmium')
@@ -21,7 +22,7 @@ def get_replication_header(fname):
         a `RuntimeError` is raised.
     """
 
-    r = oreader(fname)
+    r = oreader(fname, NOTHING)
     h = r.header()
 
     ts = h.get("osmosis_replication_timestamp")
