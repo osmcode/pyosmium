@@ -9,6 +9,7 @@ from os import path as osp
 from textwrap import dedent
 import sys
 import tempfile
+from os import unlink
 
 try:
     from cStringIO import StringIO
@@ -76,17 +77,26 @@ class TestPyosmiumGetChanges(unittest.TestCase):
         assert_equals('1', self.stdout[0])
 
     def test_init_to_file(self):
-        with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.seq') as fd:
-            assert_equals(0, self.main('-I', '453', '-f', fd.name))
-            content = fd.read()
-            assert_equals('454', content.decode('utf-8'))
+        fd = tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.seq', delete=False)
+        fname = fd.name
+        fd.close()
+
+        assert_equals(0, self.main('-I', '453', '-f', fd.name))
+        fd = open(fname, 'r')
+        content = fd.read()
+        try:
+            assert_equals('454', content)
+            fd.close()
+        finally:
+            unlink(fname)
 
     def test_init_from_seq_file(self):
-        with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.seq') as fd:
+        with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.seq', delete=False) as fd:
             fd.write('453'.encode('utf-8'))
-            fd.flush()
-            assert_equals(0, self.main('-f', fd.name))
-            fd.seek(0)
-            content = fd.read()
-            assert_equals('454', content.decode('utf-8'))
+            fname = fd.name
+
+        assert_equals(0, self.main('-f', fname))
+        fd = open(fname, 'r')
+        content = fd.read()
+        assert_equals('454', content)
 
