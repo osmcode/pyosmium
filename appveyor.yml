@@ -7,9 +7,15 @@ environment:
   matrix:
     - PYTHON: "C:\\Python27-x64"
       PIPINSTALLS: nose wheel mock
+      MINICONDA: "C:\\Miniconda-x64"
       arch: x64
     - PYTHON: "C:\\Python36-x64"
       PIPINSTALLS: nose wheel
+      MINICONDA: "C:\\Miniconda36-x64"
+      arch: x64
+    - PYTHON: "C:\\Python37-x64"
+      PIPINSTALLS: nose wheel
+      MINICONDA: "C:\\Miniconda37-x64"
       arch: x64
 
 os: Visual Studio 2015
@@ -20,15 +26,13 @@ init:
   - git config --global core.autocrlf input
   - if "%arch%"=="x86" (
       set vcvarsall_arg=x86&&
-      set conda_path=C:\Miniconda36\Scripts&&
-      set conda_library_path=C:\Miniconda36\envs\pyosmium\Library&&
       set build_type=Release)
   - if "%arch%"=="x64" (
       set vcvarsall_arg=amd64&&
-      set conda_path=C:\Miniconda36-x64\Scripts&&
-      set conda_library_path=C:\Miniconda36-x64\envs\pyosmium\Library&&
       set build_type=Release)
   - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" %vcvarsall_arg%'
+  - set conda_path=%MINICONDA%\Scripts
+  - set conda_library_path=%MINICONDA%\envs\pyosmium\Library
 
 install:
   - set PATH=%PATH%;%conda_path%
@@ -40,9 +44,9 @@ install:
   - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
   - python --version
   - cd c:\dev
-  - git clone --depth 10 https://github.com/osmcode/libosmium.git pyosmium/contrib/libosmium
-  - git clone --depth 10 https://github.com/mapbox/protozero.git pyosmium/contrib/protozero
-  - git clone --depth 10 https://github.com/pybind/pybind11.git pyosmium/contrib/pybind11
+  - git clone --depth 1 https://github.com/osmcode/libosmium.git pyosmium/contrib/libosmium
+  - git clone --depth 1 https://github.com/mapbox/protozero.git pyosmium/contrib/protozero
+  - git clone --depth 1 https://github.com/pybind/pybind11.git pyosmium/contrib/pybind11
   - dir c:\dev
   - cd c:\
   - pip install %PIPINSTALLS%
