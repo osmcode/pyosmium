@@ -6,7 +6,7 @@
 
 language: cpp
 
-dist: trusty
+dist: xenial
 
 matrix:
     include:
@@ -41,9 +41,7 @@ addons:
         sources:
             - boost-latest
         packages:
-            - g++-4.8
-            - gcc-4.8
-            - libboost1.55-dev
+            - libboost1.58-dev
             - python-dev
             - python-nose
             - python-mock
@@ -61,10 +59,6 @@ install:
       fi
 
 script:
-    - if [ "${CXX}" = 'g++' ]; then
-          CXX=g++-4.8;
-          CC=gcc-4.8;
-      fi
     - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
           PYTHON=python${USE_PYTHON_VERSION};
       else
