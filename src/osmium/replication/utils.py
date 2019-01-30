@@ -7,12 +7,24 @@ from osmium.io import Reader as oreader
 from osmium.osm import NOTHING
 from sys import version_info as python_version
 
-log = logging.getLogger('pyosmium')
+MYPY = False
+if MYPY:
+    import typing
+    import datetime
+
+    Sequence = typing.NewType('Sequence', int)
+    Timestamp = typing.NewType('Timestamp', datetime.datetime)
+    ReplicationHeader = typing.NamedTuple('ReplicationHeader',
+                                          [('url', str), ('sequence', Sequence), ('timestamp', Timestamp)])
+
+log = logging.getLogger('pyosmium')  # type: logging.Logger
 
 ReplicationHeader = namedtuple('ReplicationHeader',
                                 ['url', 'sequence', 'timestamp'])
 
+
 def get_replication_header(fname):
+    # type: (str) -> ReplicationHeader
     """ Scans the given file for an Osmosis replication header. It returns
         a namedtuple with `url`, `sequence` and `timestamp`. Each or all fields
         may be None, if the piece of information is not avilable. If any of
@@ -25,7 +37,7 @@ def get_replication_header(fname):
     r = oreader(fname, NOTHING)
     h = r.header()
 
-    ts = h.get("osmosis_replication_timestamp")
+    ts = h.get("osmosis_replication_timestamp")  # type: Timestamp
     url = h.get("osmosis_replication_base_url")
 
     if url or ts:
@@ -34,7 +46,7 @@ def get_replication_header(fname):
     if url:
         log.debug("Replication URL: %s" % url)
         # the sequence ID is only considered valid, if an URL is given
-        seq = h.get("osmosis_replication_sequence_number")
+        seq = h.get("osmosis_replication_sequence_number")  # type: Sequence
         if seq:
             log.debug("Replication sequence: %s" % seq)
             try:
@@ -54,7 +66,7 @@ def get_replication_header(fname):
     if ts:
         log.debug("Replication timestamp: %s" % ts)
         try:
-            ts = dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
+            ts = dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ") # type: Timestamp
             if python_version >= (3,0):
                 ts = ts.replace(tzinfo=dt.timezone.utc)
 
