@@ -169,12 +169,6 @@ versions = get_versions()
 with open('README.rst', 'r') as descfile:
     long_description = descfile.read()
 
-base_data_files_folder = os.path.join("lib", "python{}.{}".format(*sys.version_info[:2]), "site-packages", "osmium")
-
-
-def path_join_list(path_prefix, lst):
-    return [os.path.join(path_prefix, p) for p in lst]
-
 
 setup(
     name='osmium',
