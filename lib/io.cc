@@ -7,6 +7,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(io, m)
 {
+    py::module::import("osmium.osm"); // needed to get proper type for osmium::io::Header::box
     py::class_<osmium::io::Header>(m, "Header",
         "File header with global information about the file.")
         .def(py::init<>())

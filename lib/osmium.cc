@@ -25,6 +25,8 @@ PYBIND11_MODULE(_osmium, m) {
         }
     });
 
+    py::module::import("osmium.io"); // needed to get proper type for osmium::io::Reader
+
     m.def("apply", [](osmium::io::Reader &rd, BaseHandler &h)
                    { osmium::apply(rd, h); },
           py::arg("reader"), py::arg("handler"),
