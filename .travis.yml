@@ -51,17 +51,15 @@ install:
     - git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
     - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
     - git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
-    - pip${USE_PYTHON_VERSION} install -q -r build-requirements.txt
-    - pip${USE_PYTHON_VERSION} install -q -r test-requirements.txt
+    - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then pip${USE_PYTHON_VERSION}  install -U virtualenv ; fi
+    - virtualenv -p python${USE_PYTHON_VERSION} build_env
+    - virtualenv -p python${USE_PYTHON_VERSION} test_env
+    - build_env/bin/pip install -q -r build-requirements.txt
+    - test_env/bin/pip install -q -r test-requirements.txt
 
 script:
-    - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
-          PYTHON=python${USE_PYTHON_VERSION};
-      else
-          PYTHON=/usr/bin/python${USE_PYTHON_VERSION};
-      fi
-    - $PYTHON --version
-    - $PYTHON setup.py build
+    - build_env/bin/python --version
+    - build_env/bin/python setup.py build
     - cd test
-    - $PYTHON run_tests.py
+    - ../test_env/bin/python run_tests.py
 
