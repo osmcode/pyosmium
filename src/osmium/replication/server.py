@@ -41,17 +41,15 @@ class ReplicationServer(object):
             This method has no support for cookies or any special authentication
             methods. If you need these, you have to provide your own custom URL
             opener. The method has to return an object which supports the
-            `read()` and `readline()` methods to access the content. Example:
+            `read()` and `readline()` methods to access the content. Example::
 
-            ```
-            def my_open_url(self, url):
-                opener = urlrequest.build_opener()
-                opener.addheaders = [('X-Fancy-Header', 'important_content')]
-                return opener.open(url)
+                def my_open_url(self, url):
+                    opener = urlrequest.build_opener()
+                    opener.addheaders = [('X-Fancy-Header', 'important_content')]
+                    return opener.open(url)
 
-            svr = ReplicationServer()
-            svr.open_url = my_open_url
-            ```
+                svr = ReplicationServer()
+                svr.open_url = my_open_url
         """
         return urlrequest.urlopen(url)
 
@@ -305,8 +303,8 @@ class ReplicationServer(object):
 
     def get_diff_block(self, seq):
         """ Downloads the diff with the given sequence number and returns
-            it as a byte sequence. Throws a `urllib.error.HTTPError`
-            (or `urllib2.HTTPError` in python2)
+            it as a byte sequence. Throws a :code:`urllib.error.HTTPError`
+            (or :code:`urllib2.HTTPError` in python2)
             if the file cannot be downloaded.
         """
         return self.open_url(self.get_diff_url(seq)).read()

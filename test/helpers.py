@@ -18,6 +18,19 @@ else:
         return datetime(*args)
 
 
+def load_script(filename):
+    """ Load an executable script into its own private environment.
+    """
+    src = os.path.normpath(filename)
+    globvars = dict()
+    if sys.version_info[0] >= 3:
+        exec(compile(open(src, "rb").read(), src, 'exec'), globvars)
+    else:
+        execfile(src, globvars)
+
+    return globvars
+
+
 def _complete_object(o):
     """Takes a hash with an incomplete OSM object description and returns a
        complete one.
@@ -120,7 +133,7 @@ def check_repr(o):
 class HandlerTestBase:
 
     apply_locations = False
-    apply_idx = 'sparse_mem_array'
+    apply_idx = 'flex_mem'
 
     def test_func(self):
         if isinstance(self.data, (list, tuple)):
@@ -155,3 +168,25 @@ class CountingHandler(osmium.SimpleHandler):
 
     def area(self, _):
         self.counts[3] += 1
+
+
+class HandlerFunction(osmium.SimpleHandler):
+
+    def __init__(self, **kwargs):
+        super(HandlerFunction, self).__init__()
+
+        for cb in ('node', 'way', 'relation', 'area'):
+            if cb in kwargs:
+                setattr(self, cb, kwargs[cb])
+
+    def run(self, data, apply_locations=False, apply_idx='flex_mem'):
+        if isinstance(data, (list, tuple)):
+            fn = create_osm_file(data)
+        else:
+            fn = create_opl_file(data)
+
+        try:
+            self.apply_file(fn, apply_locations, apply_idx)
+        finally:
+            os.remove(fn)
+

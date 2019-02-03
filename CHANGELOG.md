@@ -4,13 +4,47 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [unreleased] -
+## [2.15.1] - 2019-01-24
 
 ### Added
 
+- tests for pyosmium-get-changes
+
 ### Changed
 
+- do not read data when checking for replication headers
+
 ### Fixed
+
+- fix typo in sequence file reading of pyosmium-get-changes
+
+## [2.15.0] - 2018-12-09
+
+### Added
+
+- more tests
+
+### Changed
+
+- replace boost-python with header only pybind11 library
+- switch to cmake for configuration (called through setup.py)
+- default node cache changed to flex_mem
+
+## [2.14.4] - 2018-10-30
+
+### Added
+
+- allow to add arbitrary headers when updating files
+- replication: custom URL opener
+- cookie support for pyosmium-get-changes and pyosmium-up-to-date
+
+### Changed
+
+- pyosmium-up-to-date declares itself as 'generator'
+
+### Fixed
+
+- bug when reading sequence ID files in pyosmium-get-changes
 
 ## [2.14.3] - 2018-08-08
 

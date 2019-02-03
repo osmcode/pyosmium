@@ -164,11 +164,11 @@ def get_arg_parser(from_main=False):
     return parser
 
 
-if __name__ == '__main__':
+def main(args):
     logging.basicConfig(stream=sys.stderr,
                         format='%(levelname)s: %(message)s')
 
-    options = get_arg_parser(from_main=True).parse_args()
+    options = get_arg_parser(from_main=True).parse_args(args)
 
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
@@ -181,11 +181,11 @@ if __name__ == '__main__':
               Don't know with which change to start. One of the parameters
                 -I / -D / -O / -f
               needs to begiven."""))
-            exit(1)
+            return 1
 
-        with open(options.start_file, 'r') as f:
+        with open(options.seq_file, 'r') as f:
             seq = f.readline()
-            options.start = ReplicationStart_from_id(seq)
+            options.start = ReplicationStart.from_id(seq)
 
     if options.server_url is not None and options.start.source is not None:
         if options.server_url != options.start.source:
@@ -196,7 +196,7 @@ if __name__ == '__main__':
                 %s
               If you really mean to overwrite the URL, use --ignore-osmosis-headers."""
               % (options.server_url, options.start.source)))
-            exit(2)
+            return 2
     url = options.server_url \
             or options.start.source \
             or 'https://planet.osm.org/replication/minute/'
@@ -214,11 +214,11 @@ if __name__ == '__main__':
     startseq = options.start.get_sequence(svr)
     if startseq is None:
         log.error("Cannot read state file from server. Is the URL correct?")
-        exit(1)
+        return 1
 
     if options.outfile is None:
         write_end_sequence(options.seq_file, startseq)
-        exit(0)
+        return 0
 
     log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
     outhandler = WriteHandler(options.outfile)
@@ -232,6 +232,12 @@ if __name__ == '__main__':
         cookie_jar.save(options.cookie)
 
     if endseq is None:
-        exit(3)
+        return 3
 
     write_end_sequence(options.seq_file, endseq)
+
+    return 0
+
+
+if __name__ == '__main__':
+    exit(main(sys.argv[1:]))

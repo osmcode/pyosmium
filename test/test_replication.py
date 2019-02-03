@@ -1,8 +1,9 @@
-from nose.tools import *
-import unittest
 from io import BytesIO
+import os
 from textwrap import dedent
-from helpers import mkdate, CountingHandler
+
+from helpers import mkdate, osmobj, create_osm_file, CountingHandler
+from nose.tools import *
 
 try:
     from urllib.error import URLError
@@ -16,6 +17,10 @@ except ImportError:
 
 import osmium as o
 import osmium.replication.server as rserv
+import osmium.replication.utils as rutil
+import osmium.replication
+import tempfile
+import datetime
 
 class UrllibMock(MagicMock):
 
@@ -227,3 +232,28 @@ def test_apply_reader_with_location(mock):
     diffs.reader.apply(h, idx="flex_mem")
 
     assert_equals(h.counts, [1, 1, 0, 0])
+
+def test_get_newest_change_from_file():
+    data = [osmobj('N', id=1, version=1, changeset=63965061, uid=8369524,
+                   timestamp='2018-10-29T03:56:07Z', user='x')]
+    fn = create_osm_file(data)
+
+
+    try:
+        val = osmium.replication.newest_change_from_file(fn)
+        assert_equals(val, mkdate(2018, 10, 29, 3, 56, 7))
+    finally:
+        os.remove(fn)
+
+def test_get_replication_header_empty():
+    data = [osmobj('N', id=1, version=1, changeset=63965061, uid=8369524,
+                   timestamp='2018-10-29T03:56:07Z', user='x')]
+    fn = create_osm_file(data)
+
+    try:
+        val = rutil.get_replication_header(fn)
+        assert_is_none(val.url)
+        assert_is_none(val.sequence)
+        assert_is_none(val.timestamp)
+    finally:
+        os.remove(fn)

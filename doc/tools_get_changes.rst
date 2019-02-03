@@ -5,4 +5,4 @@ Usage
 -----
 
 .. autoprogram:: pyosmium-get-changes:get_arg_parser()
-    :prog: 
+    :prog: pyosmium-get-changes.py

@@ -105,12 +105,15 @@ ways and areas. The :py:meth:`~!osmium.SimpleHandler.apply_file` method cannot
 deduce by itself if this cache is needed. Therefore locations need to be
 explicitly enabled by setting the locations parameter to True::
 
-    h.apply_file("test.osm.pbf", locations=True, idx='sparse_mem_array')
+    h.apply_file("test.osm.pbf", locations=True, idx='flex_mem')
 
 The third parameter `idx` is optional and states what kind of cache
-osmium is supposed to use. The default `sparse_mem_array` is a good
-choice for small to medium size extracts of OSM data. If you plan to
-process the whole planet file, `dense_mmap_array` is better suited.
+osmium is supposed to use. The default `flex_mem` is a good
+choice for most uses. If you plan to process large amount of data (e.g.
+Europe or planet) and are tight on RAM then `dense_mmap_array` may be
+better suited. This kind of index is able to temporarily store data on disk.
+However, it does not work on MacOS and Windows.
+
 If you want the cache to be persistent across invocations, you
 can use `dense_file_array` giving an additional file location for the
 cache like that::

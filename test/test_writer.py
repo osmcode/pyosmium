@@ -111,6 +111,10 @@ class TestWriteNode(unittest.TestCase):
         with WriteExpect('n0 v0 dV c0 t i0 u T x1.1234561 y0.1234561') as w:
             w.add_node(O(location=(1.1234561, 0.1234561)))
 
+    def test_location_rounding(self):
+        with WriteExpect('n0 v0 dV c0 t i0 u T x30.46 y50.37') as w:
+            w.add_node(O(location=(30.46, 50.37)))
+
     def test_location_none(self):
         with WriteExpect('n0 v0 dV c0 t i0 u T x y') as w:
             w.add_node(O(location=None))
