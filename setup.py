@@ -2,12 +2,17 @@ import os
 import re
 import sys
 import platform
+import shutil
 import subprocess
+import tempfile
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.sdist import sdist as orig_sdist
+from setuptools.command.build_py import build_py
 from distutils.version import LooseVersion
+from sys import executable, version_info as python_version
+
 
 BASEDIR = os.path.split(os.path.abspath(__file__))[0]
 
@@ -66,6 +71,8 @@ class CMakeBuild(build_ext):
         for ext in self.extensions:
             self.build_extension(ext)
 
+        self.generate_pyi()
+
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
@@ -110,10 +117,64 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
+    def generate_pyi(self):
+        # set python executable
+        if python_version >= (3, 4, 0):
+            python_name = executable
+        else:
+            if platform == 'win32':
+                python_name = 'py -3'
+            else:
+                python_name = 'python3'
+
+        # set target directory
+        dst = self.build_lib
+        # test that everything is OK
+        env = os.environ.copy()
+        env['PYTHONPATH'] = dst
+
+        # test if there is no errors in osmium, stubgen doesn't report error on import error
+        import_test = subprocess.Popen([python_name, '-c', 'import osmium'], env=env, stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+        if import_test.wait():
+            error = ""
+            if import_test.stdout:
+                error += "\n".join(x.decode('utf-8') for x in import_test.stdout.readlines())
+            if import_test.stderr:
+                error += "\n".join(x.decode('utf-8') for x in import_test.stderr.readlines())
+            raise Exception("Failure importing osmium: \n" + error)
+
+        # generate pyi files
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = subprocess.Popen([python_name, '-m', 'mypy.stubgen', '-p', 'osmium', '-o', tmpdir], env=env,
+                                 stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            retcode = p.wait()
+            error = ""
+            if p.stdout:
+                error += "\n".join(x.decode('utf-8') for x in p.stdout.readlines())
+            if p.stderr:
+                error += "\n".join(x.decode('utf-8') for x in p.stderr.readlines())
+            if retcode:
+                raise Exception("Failure calling stubgen: \n" + error)
+            for pyi in (os.path.join("osmium", "osm", "_osm.pyi"),
+                        os.path.join("osmium", "replication", "_replication.pyi"),
+                        os.path.join("osmium", '_osmium.pyi'),
+                        os.path.join("osmium", 'geom.pyi'),
+                        os.path.join("osmium", 'index.pyi'),
+                        os.path.join("osmium", 'io.pyi')):
+                shutil.copyfile(os.path.join(tmpdir, pyi), os.path.join(dst, pyi))
+
 versions = get_versions()
 
 with open('README.rst', 'r') as descfile:
     long_description = descfile.read()
+
+base_data_files_folder = os.path.join("lib", "python{}.{}".format(*sys.version_info[:2]), "site-packages", "osmium")
+
+
+def path_join_list(path_prefix, lst):
+    return [os.path.join(path_prefix, p) for p in lst]
+
 
 setup(
     name='osmium',
