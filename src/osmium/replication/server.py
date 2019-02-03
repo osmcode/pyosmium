@@ -18,6 +18,17 @@ from osmium import io as oio
 
 import logging
 
+MYPY = False
+if MYPY:
+    import typing
+    from ..replication.utils import Sequence, Timestamp
+    from http.client import HTTPResponse
+    from .. import BaseHandler
+
+    OsmosisState = typing.NamedTuple('OsmosisState', [('sequence', Sequence), ('timestamp', Timestamp)])
+    DownloadResult = typing.NamedTuple('DownloadResult',
+                                       [('id', Sequence), ('reader', MergeInputReader), ('newest', Sequence)])
+
 log = logging.getLogger('pyosmium')
 log.addHandler(logging.NullHandler())
 
@@ -31,10 +42,12 @@ class ReplicationServer(object):
     """
 
     def __init__(self, url, diff_type='osc.gz'):
-        self.baseurl = url
-        self.diff_type = diff_type
+        # type: (str, str) -> None
+        self.baseurl = url  # type: str
+        self.diff_type = diff_type  # type: str
 
     def open_url(self, url):
+        # type: (str) -> HTTPResponse
         """ Download a resource from the given URL and return a byte sequence
             of the content.
 
@@ -54,6 +67,7 @@ class ReplicationServer(object):
         return urlrequest.urlopen(url)
 
     def collect_diffs(self, start_id, max_size=1024):
+        # type:  (Sequence, int) -> typing.Optional[DownloadResult]
         """ Create a MergeInputReader and download diffs starting with sequence
             id `start_id` into it. `max_size`
             restricts the number of diffs that are downloaded. The download
@@ -98,6 +112,7 @@ class ReplicationServer(object):
         return DownloadResult(current_id - 1, rd, newest.sequence)
 
     def apply_diffs(self, handler, start_id, max_size=1024, idx="", simplify=True):
+        # type: (BaseHandler, Sequence, int, str, bool) -> typing.Optional[Sequence]
         """ Download diffs starting with sequence id `start_id`, merge them
             together and then apply them to handler `handler`. `max_size`
             restricts the number of diffs that are downloaded. The download
@@ -133,6 +148,7 @@ class ReplicationServer(object):
 
     def apply_diffs_to_file(self, infile, outfile, start_id, max_size=1024,
                             set_replication_header=True, extra_headers={}):
+        # type: (str, str, Sequence, int, bool, typing.Dict[str, str]) -> typing.Optional[typing.Tuple[Sequence, Sequence]]
         """ Download diffs starting with sequence id `start_id`, merge them
             with the data from the OSM file named `infile` and write the result
             into a file with the name `outfile`. The output file must not yet
@@ -183,8 +199,8 @@ class ReplicationServer(object):
 
         return (diffs.id, diffs.newest)
 
-
     def timestamp_to_sequence(self, timestamp, balanced_search=False):
+        # type: (Timestamp, bool) -> typing.Optional[Sequence]
         """ Get the sequence number of the replication file that contains the
             given timestamp. The search algorithm is optimised for replication
             servers that publish updates in regular intervals. For servers
@@ -265,8 +281,8 @@ class ReplicationServer(object):
             if lower.sequence + 1 >= upper.sequence:
                 return lower.sequence
 
-
     def get_state_info(self, seq=None):
+        # type: (typing.Optional[Sequence]) -> typing.Optional[OsmosisState]
         """ Downloads and returns the state information for the given
             sequence. If the download is successful, a namedtuple with
             `sequence` and `timestamp` is returned, otherwise the function
@@ -302,6 +318,7 @@ class ReplicationServer(object):
         return OsmosisState(sequence=seq, timestamp=ts)
 
     def get_diff_block(self, seq):
+        # type: (Sequence) -> bytes
         """ Downloads the diff with the given sequence number and returns
             it as a byte sequence. Throws a :code:`urllib.error.HTTPError`
             (or :code:`urllib2.HTTPError` in python2)
@@ -311,6 +328,7 @@ class ReplicationServer(object):
 
 
     def get_state_url(self, seq):
+        # type: (Sequence) -> str
         """ Returns the URL of the state.txt files for a given sequence id.
 
             If seq is `None` the URL for the latest state info is returned,
@@ -325,6 +343,7 @@ class ReplicationServer(object):
 
 
     def get_diff_url(self, seq):
+        # type: (Sequence) -> str
         """ Returns the URL to the diff file for the given sequence id.
         """
         return '%s/%03i/%03i/%03i.%s' % (self.baseurl,

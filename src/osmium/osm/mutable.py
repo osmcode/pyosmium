@@ -1,3 +1,27 @@
+MYPY = False
+if MYPY:
+    import typing
+    from typing import Optional
+    from . import TagList
+    from ..replication.utils import Timestamp
+    from . import Location
+    from .. import osm
+
+    OSMObjectIdType = typing.NewType('OSMObjectId', int)
+    VersionType = typing.NewType('VersionType', int)
+    UnsginedOSMObjectIdType = typing.NewType('UnsginedOSMObjectIdType', OSMObjectIdType)
+    UidType = typing.NewType('UserId', int)
+    ChangesetId = typing.NewType('ChangesetId', int)
+    LocationType = typing.Union[Location, typing.Tuple[float, float]]
+
+    NodeListType = typing.Union[osm.WayNodeList, typing.List[osm.NodeRef], typing.List[int]]
+    RelationMembersType = typing.Union[
+        osm.RelationMemberList,
+        typing.List[osm.RelationMember],
+        typing.List[typing.Tuple[str, int, str]]
+    ]
+
+
 class OSMObject(object):
     """Mutable version of ``osmium.osm.OSMObject``. It exposes the following
        attributes ``id``, ``version``, ``visible``, ``changeset``, ``timestamp``,
@@ -11,14 +35,15 @@ class OSMObject(object):
 
     def __init__(self, base=None, id=None, version=None, visible=None, changeset=None,
             timestamp=None, uid=None, tags=None):
+        # type: (Optional[typing.Any], Optional[OSMObjectIdType], Optional[VersionType], bool, ChangesetId, Timestamp, UidType, typing.Union[TagList, typing.Dict[str, str]]) -> None
         if base is None:
-            self.id = id
-            self.version = version
-            self.visible = visible
-            self.changeset = changeset
-            self.timestamp = timestamp
-            self.uid = uid
-            self.tags = tags
+            self.id = id  # type: OSMObjectIdType
+            self.version = version  # type: VersionType
+            self.visible = visible  # type: bool
+            self.changeset = changeset  # type: ChangesetId
+            self.timestamp = timestamp  # type: Timestamp
+            self.uid = uid  # type: UidType
+            self.tags = tags  # typing.Union[TagList, typing.Dict[str, str]]
         else:
             self.id = base.id if id is None else id
             self.version = base.version if version is None else version
@@ -36,9 +61,10 @@ class Node(OSMObject):
     """
 
     def __init__(self, base=None, location=None, **attrs):
+        # type: (Optional[osm.Node], Optional[LocationType], typing.Any) -> None
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
-            self.location = location
+            self.location = location  # type: LocationType
         else:
             self.location = location if location is not None else base.location
 
@@ -53,11 +79,13 @@ class Way(OSMObject):
     """
 
     def __init__(self, base=None, nodes=None, **attrs):
+        # type: (Optional[osm.Way], Optional[NodeListType], typing.Any) -> None
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
-            self.nodes = nodes
+            self.nodes = nodes  # type: NodeListType
         else:
             self.nodes = nodes if nodes is not None else base.nodes
+
 
 class Relation(OSMObject):
     """The mutable version of ``osmium.osm.Relation``. It inherits all attributes
@@ -68,9 +96,10 @@ class Relation(OSMObject):
     """
 
     def __init__(self, base=None, members=None, **attrs):
+        # type: (Optional[osm.Relation], Optional[RelationMembersType], typing.Any) -> None
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
-            self.members = members
+            self.members = members  # type: RelationMembersType
         else:
             self.members = members if members is not None else base.members
 
