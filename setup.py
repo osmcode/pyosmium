@@ -127,6 +127,9 @@ class CMakeBuild(build_ext):
             else:
                 python_name = 'python3'
 
+        if python_version[0] < 3:
+            return # no mypy for python2
+
         # set target directory
         dst = self.build_lib
         # test that everything is OK

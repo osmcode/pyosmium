@@ -1,1 +1,1 @@
-mypy
+mypy; python_version > '3.0
