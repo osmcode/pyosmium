@@ -98,7 +98,7 @@ class ReplicationServer(object):
             try:
                 diffdata = self.get_diff_block(current_id)
             except:
-                diffdata = ''
+                diffdata = b''
             if len(diffdata) == 0:
                 if start_id == current_id:
                     return None
@@ -184,6 +184,7 @@ class ReplicationServer(object):
             h.set("osmosis_replication_base_url", self.baseurl)
             h.set("osmosis_replication_sequence_number", str(diffs.id))
             info = self.get_state_info(diffs.id)
+            # TODO: what if info is None?
             h.set("osmosis_replication_timestamp", info.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
         for k,v in extra_headers.items():
             h.set(k, v)
@@ -328,7 +329,7 @@ class ReplicationServer(object):
 
 
     def get_state_url(self, seq):
-        # type: (Sequence) -> str
+        # type: (typing.Optional[Sequence]) -> str
         """ Returns the URL of the state.txt files for a given sequence id.
 
             If seq is `None` the URL for the latest state info is returned,

@@ -204,6 +204,7 @@ setup(
     ext_modules=[CMakeExtension('cmake_example')],
     packages = ['osmium', 'osmium/osm', 'osmium/replication'],
     package_dir = {'' : 'src'},
+    package_data={'osmium': ['py.typed']},
     cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,
 )

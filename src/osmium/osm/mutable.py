@@ -2,15 +2,14 @@ MYPY = False
 if MYPY:
     import typing
     from typing import Optional
-    from . import TagList
+    from ._osm import TagList, Location
     from ..replication.utils import Timestamp
-    from . import Location
-    from .. import osm
+    from . import _osm as osm
 
-    OSMObjectIdType = typing.NewType('OSMObjectId', int)
+    OSMObjectIdType = typing.NewType('OSMObjectIdType', int)
     VersionType = typing.NewType('VersionType', int)
     UnsginedOSMObjectIdType = typing.NewType('UnsginedOSMObjectIdType', OSMObjectIdType)
-    UidType = typing.NewType('UserId', int)
+    UidType = typing.NewType('UidType', int)
     ChangesetId = typing.NewType('ChangesetId', int)
     LocationType = typing.Union[Location, typing.Tuple[float, float]]
 
@@ -35,15 +34,15 @@ class OSMObject(object):
 
     def __init__(self, base=None, id=None, version=None, visible=None, changeset=None,
             timestamp=None, uid=None, tags=None):
-        # type: (Optional[typing.Any], Optional[OSMObjectIdType], Optional[VersionType], bool, ChangesetId, Timestamp, UidType, typing.Union[TagList, typing.Dict[str, str]]) -> None
+        # type: (Optional[typing.Any], Optional[OSMObjectIdType], Optional[VersionType], Optional[bool], Optional[ChangesetId], Optional[Timestamp], Optional[UidType], Optional[typing.Union[TagList, typing.Dict[str, str]]]) -> None
         if base is None:
-            self.id = id  # type: OSMObjectIdType
-            self.version = version  # type: VersionType
-            self.visible = visible  # type: bool
-            self.changeset = changeset  # type: ChangesetId
-            self.timestamp = timestamp  # type: Timestamp
-            self.uid = uid  # type: UidType
-            self.tags = tags  # typing.Union[TagList, typing.Dict[str, str]]
+            self.id = id  # type: Optional[OSMObjectIdType]
+            self.version = version  # type: Optional[VersionType]
+            self.visible = visible  # type: Optional[bool]
+            self.changeset = changeset  # type: Optional[ChangesetId]
+            self.timestamp = timestamp  # type: Optional[Timestamp]
+            self.uid = uid  # type: Optional[UidType]
+            self.tags = tags  # type: Optional[typing.Union[TagList, typing.Dict[str, str]]]
         else:
             self.id = base.id if id is None else id
             self.version = base.version if version is None else version
@@ -64,7 +63,7 @@ class Node(OSMObject):
         # type: (Optional[osm.Node], Optional[LocationType], typing.Any) -> None
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
-            self.location = location  # type: LocationType
+            self.location = location  # type: Optional[LocationType]
         else:
             self.location = location if location is not None else base.location
 
@@ -82,7 +81,7 @@ class Way(OSMObject):
         # type: (Optional[osm.Way], Optional[NodeListType], typing.Any) -> None
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
-            self.nodes = nodes  # type: NodeListType
+            self.nodes = nodes  # type: Optional[NodeListType]
         else:
             self.nodes = nodes if nodes is not None else base.nodes
 
@@ -99,7 +98,7 @@ class Relation(OSMObject):
         # type: (Optional[osm.Relation], Optional[RelationMembersType], typing.Any) -> None
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
-            self.members = members  # type: RelationMembersType
+            self.members = members  # type: Optional[RelationMembersType]
         else:
             self.members = members if members is not None else base.members
 

@@ -1,5 +1,5 @@
-from ._osm import *
 import osmium.osm.mutable
+from osmium.osm._osm import *
 
 MYPY = False
 if MYPY:
