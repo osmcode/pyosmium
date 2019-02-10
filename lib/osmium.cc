@@ -26,16 +26,16 @@ PYBIND11_MODULE(_osmium, m) {
     });
 
     m.def("apply", [](osmium::io::Reader &rd, BaseHandler &h)
-                   { osmium::apply(rd, h); },
+                   { py::gil_scoped_release release; osmium::apply(rd, h); },
           py::arg("reader"), py::arg("handler"),
           "Apply a chain of handlers.");
     m.def("apply", [](osmium::io::Reader &rd, NodeLocationHandler &h)
-                   { osmium::apply(rd, h); },
+                   { py::gil_scoped_release release; osmium::apply(rd, h); },
           py::arg("reader"), py::arg("handler"),
           "Apply a chain of handlers.");
     m.def("apply", [](osmium::io::Reader &rd, NodeLocationHandler &l,
                       BaseHandler &h)
-                     { osmium::apply(rd, l, h); },
+                     { py::gil_scoped_release release; osmium::apply(rd, l, h); },
           py::arg("reader"), py::arg("node_handler"), py::arg("handler"),
           "Apply a chain of handlers.");
 

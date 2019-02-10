@@ -58,6 +58,7 @@ private:
         if (callbacks & osmium::osm_entity_bits::changeset)
             entities |= osmium::osm_entity_bits::changeset;
 
+        pybind11::gil_scoped_release release;
         apply(file, entities, handler, idx);
     }
 };
@@ -86,19 +87,34 @@ public:
 
     // handler functions
     void node(osmium::Node const *n) override
-    { PYBIND11_OVERLOAD(void, SimpleHandler, node, n); }
+    {
+        pybind11::gil_scoped_acquire acquire;
+        PYBIND11_OVERLOAD(void, SimpleHandler, node, n);
+    }
 
     void way(osmium::Way const *w) override
-    { PYBIND11_OVERLOAD(void, SimpleHandler, way, w); }
+    {
+        pybind11::gil_scoped_acquire acquire;
+        PYBIND11_OVERLOAD(void, SimpleHandler, way, w);
+    }
 
     void relation(osmium::Relation const *r) override
-    { PYBIND11_OVERLOAD(void, SimpleHandler, relation, r); }
+    {
+        pybind11::gil_scoped_acquire acquire;
+        PYBIND11_OVERLOAD(void, SimpleHandler, relation, r);
+    }
 
     void changeset(osmium::Changeset const *c) override
-    { PYBIND11_OVERLOAD(void, SimpleHandler, changeset, c); }
+    {
+        pybind11::gil_scoped_acquire acquire;
+        PYBIND11_OVERLOAD(void, SimpleHandler, changeset, c);
+    }
 
     void area(osmium::Area const *a) override
-    { PYBIND11_OVERLOAD(void, SimpleHandler, area, a); }
+    {
+        pybind11::gil_scoped_acquire acquire;
+        PYBIND11_OVERLOAD(void, SimpleHandler, area, a);
+    }
 
 private:
     bool hasfunc(char const *name)
