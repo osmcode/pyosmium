@@ -191,7 +191,10 @@ PYBIND11_MODULE(_osm, m) {
              "True if the start and end node are exactly the same.")
         .def("ends_have_same_location", &osmium::NodeRefList::ends_have_same_location,
              "True if the start and end node of the way are at the same location. "
-             "Throws an exception if the location of one of the nodes is missing.")
+             "Expects that the coordinates of the way nodes have been loaded "
+             "(see :py:func:`osmium.SimpleHandler.apply_buffer` and "
+             ":py:func:`osmium.SimpleHandler.apply_file`). "
+             "If the locations are not present then the function returns always true.")
     ;
 
     py::class_<osmium::WayNodeList, osmium::NodeRefList>(m, "WayNodeList",
@@ -280,7 +283,10 @@ PYBIND11_MODULE(_osm, m) {
              "True if the start and end node are exactly the same.")
         .def("ends_have_same_location", &osmium::Way::ends_have_same_location,
              "True if the start and end node of the way are at the same location."
-             "Throws an exception if the location of one of the nodes is missing.")
+             "Expects that the coordinates of the way nodes have been loaded "
+             "(see :py:func:`osmium.SimpleHandler.apply_buffer` and "
+             ":py:func:`osmium.SimpleHandler.apply_file`). "
+             "If the locations are not present then the function returns always true.")
     ;
 
     py::class_<osmium::Relation, osmium::OSMObject>(m, "Relation",
