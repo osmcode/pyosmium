@@ -1,3 +1,4 @@
+# vim: set fileencoding=utf-8 :
 from nose.tools import *
 import unittest
 import os
@@ -47,10 +48,10 @@ class TestTagEmptyTagListIndexOp(HandlerTestBase, unittest.TestCase):
                 n.tags[None]
 
 class TestTagListLen(HandlerTestBase, unittest.TestCase):
-    data = """\
+    data = u"""\
            n1 x0 y0 Ta=a
-           n2 Tkey=value
-           n3 Tfoo=1,bar=2,foobar=33
+           n2 Tkeyñ=value
+           n3 Tfoo=1ß,bar=2,foobar=33
            """
     class Handler(o.SimpleHandler):
 
@@ -59,6 +60,7 @@ class TestTagListLen(HandlerTestBase, unittest.TestCase):
         def node(self, n):
             assert_true(n.tags)
             assert_equals(self.expected_len[n.id], len(n.tags))
+            assert_true(check_repr(n.tags))
 
 class TestTagContains(HandlerTestBase, unittest.TestCase):
     data = "n234 Tabba=x,2=vvv,xx=abba"

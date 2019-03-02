@@ -1,3 +1,4 @@
+# vim: set fileencoding=utf-8 :
 from nose.tools import *
 import unittest
 import os
@@ -24,7 +25,7 @@ class TestLocation(unittest.TestCase):
 
 class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, version=5, changeset=58674, uid=42,
-                   timestamp='2014-01-31T06:23:35Z', user='anonymous')]
+                   timestamp='2014-01-31T06:23:35Z', user=u'änonymous')]
 
     class Handler(o.SimpleHandler):
         def node(self, n):
@@ -36,7 +37,7 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
             assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
-            assert_equals(n.user, 'anonymous')
+            assert_equals(n.user, u'änonymous')
             assert_equals(n.positive_id(), 1)
             assert_true(check_repr(n))
 
@@ -88,7 +89,7 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
 
 class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
-                   timestamp='2014-01-31T06:23:35Z', user='anonymous',
+                   timestamp='2014-01-31T06:23:35Z', user=' anonymous',
                    members=[('way',1,'')])]
 
     class Handler(o.SimpleHandler):
@@ -101,7 +102,7 @@ class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.uid, 42)
             assert_equals(n.user_is_anonymous(), False)
             assert_equals(n.timestamp, mkdate(2014, 1, 31, 6, 23, 35))
-            assert_equals(n.user, 'anonymous')
+            assert_equals(n.user, ' anonymous')
             assert_equals(n.positive_id(), 1)
             assert_true(check_repr(n))
             assert_true(check_repr(n.members))

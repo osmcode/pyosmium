@@ -1,5 +1,6 @@
 from ._osm import *
 import osmium.osm.mutable
+from sys import version_info as python_version
 
 def create_mutable_node(node, **args):
     """ Create a mutable node replacing the properties given in the
@@ -36,8 +37,12 @@ Box.__repr__ = lambda b : 'osmium.osm.Box(bottom_left=%r, top_right=%r)' \
                           % (b.bottom_left, b.top_right)
 Box.__str__ = lambda b : '(%s %s)' % (b.bottom_left, b.top_right)
 
-Tag.__repr__ = lambda t : 'osmium.osm.Tag(k=%s, v=%s)' % (t.k, t.v)
-Tag.__str__ = lambda t : '%s=%s' % (t.k, t.v)
+Tag.__repr__ = lambda t : 'osmium.osm.Tag(k=%r, v=%r)' % (t.k, t.v)
+
+if python_version >= (3,0):
+    Tag.__str__ = lambda t : '%s=%s' % (t.k, t.v)
+else:
+    Tag.__str__ = lambda t : '%s=%s' % (t.k.encode('utf-8'), t.v.encode('utf-8'))
 
 TagList.__repr__ = lambda t : "osmium.osm.TagList({%s})" \
                               % ",".join(["%r=%r" % (i.k, i.v) for i in t])

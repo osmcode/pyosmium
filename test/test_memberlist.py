@@ -1,11 +1,11 @@
-
+# vim: set fileencoding=utf-8 :
 from nose.tools import *
 import unittest
 import os
 import sys
 from datetime import datetime
 
-from helpers import create_osm_file, osmobj, HandlerTestBase
+from helpers import create_osm_file, osmobj, HandlerTestBase, check_repr
 
 import osmium as o
 
@@ -23,7 +23,7 @@ class TestLength(HandlerTestBase, unittest.TestCase):
             assert_equals(self.expected_length[r.id], len(r.members))
 
 class TestMembers(HandlerTestBase, unittest.TestCase):
-    data = """r34 Mn23@,n12@foo,w5@.,r34359737784@()"""
+    data = u"""r34 Mn23@,n12@foo,w5@.,r34359737784@(ü)"""
 
     class Handler(o.SimpleHandler):
 
@@ -41,4 +41,5 @@ class TestMembers(HandlerTestBase, unittest.TestCase):
             eq_('.', m[2].role)
             eq_(34359737784, m[3].ref)
             eq_('r', m[3].type)
-            eq_('()', m[3].role)
+            eq_(u'(ü)', m[3].role)
+            assert_true(check_repr(m))
