@@ -13,6 +13,13 @@ class TestLocation(unittest.TestCase):
         loc = o.osm.Location()
         assert_false(loc.valid())
         assert_true(check_repr(loc))
+        with assert_raises(o.InvalidLocationError):
+            lat = loc.lat
+        with assert_raises(o.InvalidLocationError):
+            lon = loc.lon
+        # these two don't raise an exception
+        lat = loc.lat_without_check()
+        lon = loc.lon_without_check()
 
     def test_valid_location(self):
         loc = o.osm.Location(1,10)

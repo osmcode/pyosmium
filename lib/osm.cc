@@ -31,9 +31,13 @@ PYBIND11_MODULE(_osm, m) {
         .def_property_readonly("y", &osmium::Location::y,
              "(read-only) Y coordinate (latitude) as a fixed-point integer.")
         .def_property_readonly("lon", &osmium::Location::lon,
-             "(read-only) Longitude (x coordinate) as floating point number.")
+             "(read-only) Longitude (x coordinate) as floating point number."
+             "Raises an :py:class:`osmium.InvalidLocationError` when the "
+             "location is invalid.")
         .def_property_readonly("lat", &osmium::Location::lat,
-             "(read-only) Latitude (y coordinate) as floating point number.")
+             "(read-only) Latitude (y coordinate) as floating point number."
+             "Raises an :py:class:`osmium.InvalidLocationError` when the "
+             "location is invalid.")
         .def("valid", &osmium::Location::valid,
              "Check that the location is a valid WGS84 coordinate, i.e. "
              "that it is within the usual bounds.")
