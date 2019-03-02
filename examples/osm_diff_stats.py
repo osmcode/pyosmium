@@ -44,15 +44,20 @@ class FileStatsHandler(o.SimpleHandler):
         self.rels.add(r)
 
 
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: python osm_file_stats.py <osmfile>")
-        sys.exit(-1)
-
+def main(osmfile):
     h = FileStatsHandler()
 
-    h.apply_file(sys.argv[1])
+    h.apply_file(osmfile)
 
     h.nodes.outstats("Nodes")
     h.ways.outstats("Ways")
     h.rels.outstats("Relations")
+
+    return 0
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python %s <osmfile>" % sys.argv[0])
+        sys.exit(-1)
+
+    exit(main(sys.argv[1]))

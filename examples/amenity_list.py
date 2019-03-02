@@ -29,11 +29,17 @@ class AmenityListHandler(o.SimpleHandler):
             self.print_amenity(a.tags, centroid.x, centroid.y)
 
 
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: python amenity_list.py <osmfile>")
-        sys.exit(-1)
+def main(osmfile):
 
     handler = AmenityListHandler()
 
-    handler.apply_file(sys.argv[1])
+    handler.apply_file(osmfile)
+
+    return 0
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python %s <osmfile>" % sys.argv[0])
+        sys.exit(-1)
+
+    exit(main(sys.argv[1]))
