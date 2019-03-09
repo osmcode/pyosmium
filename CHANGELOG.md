@@ -4,6 +4,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.15.2] - 2019-03-09
+
+### Added
+
+- NodeLocationsForWays (accidentally removed in 2.15.0)
+- more tests
+
+### Changed
+
+- GIL lock now released while apply() is in C++ code
+
+### Fixed
+
+- unicode output of tag str() representation for python 2
+- handling of tempfile in test for pyosmium_get_changes
+- documentation for ends_have_same_location()
+
 ## [2.15.1] - 2019-01-24
 
 ### Added
