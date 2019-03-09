@@ -66,9 +66,9 @@ test_script:
 
 after_test:
   - cd c:\dev\pyosmium
-  - copy /y %conda_library_path%\bin\zlib.dll c:\dev\pyosmium\contrib
-  - copy /y %conda_library_path%\bin\expat.dll c:\dev\pyosmium\contrib
-  - copy /y %conda_library_path%\bin\libbz2.dll c:\dev\pyosmium\contrib
+  - copy /y %conda_library_path%\bin\zlib.dll c:\dev\pyosmium\src\osmium
+  - copy /y %conda_library_path%\bin\expat.dll c:\dev\pyosmium\src\osmium
+  - copy /y %conda_library_path%\bin\libbz2.dll c:\dev\pyosmium\src\osmium
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
 
 artifacts:
