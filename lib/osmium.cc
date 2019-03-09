@@ -25,6 +25,12 @@ PYBIND11_MODULE(_osmium, m) {
         }
     });
 
+    py::class_<osmium::handler::NodeLocationsForWays<LocationTable>>(
+        m, "NodeLocationsForWays")
+        .def(py::init<LocationTable&>())
+        .def("ignore_errors", &osmium::handler::NodeLocationsForWays<LocationTable>::ignore_errors)
+    ;
+
     m.def("apply", [](osmium::io::Reader &rd, BaseHandler &h)
                    { py::gil_scoped_release release; osmium::apply(rd, h); },
           py::arg("reader"), py::arg("handler"),
