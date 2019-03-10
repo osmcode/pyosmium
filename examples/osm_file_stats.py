@@ -25,10 +25,6 @@ class FileStatsHandler(o.SimpleHandler):
 
 
 def main(osmfile):
-    if len(sys.argv) != 2:
-        print("Usage: python osm_file_stats.py <osmfile>")
-        sys.exit(-1)
-
     h = FileStatsHandler()
 
     h.apply_file(osmfile)

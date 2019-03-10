@@ -17,10 +17,14 @@ class NamesHandler(osmium.SimpleHandler):
     def way(self, w):
         self.output_pubs(w.tags)
 
+def main(osmfile):
+    NamesHandler().apply_file(osmfile)
+
+    return 0
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("Usage: python pub_names.py <osmfile>")
+        print("Usage: python %s <osmfile>" % sys.argv[0])
         sys.exit(-1)
 
-    NamesHandler().apply_file(sys.argv[1])
-
+    exit(main(sys.argv[1]))

@@ -11,7 +11,7 @@ TEST_FILE='example-test.pbf'
 TEST_DIFF='example-test.osc.gz'
 
 try:
-    from cStringIO import StringIO
+    from StringIO import StringIO
 except:
     from io import StringIO
 
@@ -39,6 +39,23 @@ def test_amenity_list():
     eq_('1.535245 42.556681 parking', output[0].strip())
     eq_('1.570729 42.529562 parking         Aparcament Comunal', output[-1].strip())
 
+def test_road_length():
+    script = load_example("road_length")
+
+    with Capturing() as output:
+        eq_(0, script['main'](TEST_FILE))
+
+    eq_(output, ["Total way length: 1590.82 km"])
+
+
+def test_pub_names():
+    script = load_example("pub_names")
+
+    with Capturing() as output:
+        eq_(0, script['main'](TEST_FILE))
+
+    eq_(output, ['Kyu', 'Havana Club', "Mulligan's", 'Bar Broques',
+                 'The Camden - English Pub', 'Aspen', 'el Raval'])
 
 def test_osm_diff_stats():
     script = load_example("osm_diff_stats")

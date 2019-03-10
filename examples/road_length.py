@@ -20,14 +20,19 @@ class RoadLengthHandler(o.SimpleHandler):
                 # where nodes of ways near the boundary are missing.
                 print("WARNING: way %d incomplete. Ignoring." % w.id)
 
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: python road_length.py <osmfile>")
-        sys.exit(-1)
-
+def main(osmfile):
     h = RoadLengthHandler()
     # As we need the geometry, the node locations need to be cached. Therefore
     # set 'locations' to true.
-    h.apply_file(sys.argv[1], locations=True)
+    h.apply_file(osmfile, locations=True)
 
     print('Total way length: %.2f km' % (h.length/1000))
+
+    return 0
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python %s <osmfile>" % sys.argv[0])
+        sys.exit(-1)
+
+    exit(main(sys.argv[1]))
