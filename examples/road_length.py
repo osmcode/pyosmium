@@ -1,7 +1,7 @@
 """
 Compute the total length of highways in an osm file.
 
-Shows how extract the geometry of a way.
+Shows how to extract the geometry of a way.
 """
 import osmium as o
 import sys
