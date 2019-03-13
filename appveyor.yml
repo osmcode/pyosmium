@@ -3,34 +3,29 @@ environment:
     BZIP2_VER: 1.0.6
     EXPAT_VER: 2.2.5
     ZLIB_VER: 1.2.11
+    SHAPELY_VER: 1.6.4
     BOOST_PREFIX: C:\Libraries\boost_1_67_0
   matrix:
-    - PYTHON: "C:\\Python27-x64"
+    - PYTHON_VER: 2.7
       PIPINSTALLS: nose wheel mock
       MINICONDA: "C:\\Miniconda-x64"
       arch: x64
-    - PYTHON: "C:\\Python36-x64"
+    - PYTHON_VER: 3.6
       PIPINSTALLS: nose wheel
       MINICONDA: "C:\\Miniconda36-x64"
       arch: x64
-    - PYTHON: "C:\\Python37-x64"
+    - PYTHON_VER: 3.7
       PIPINSTALLS: nose wheel
       MINICONDA: "C:\\Miniconda37-x64"
       arch: x64
 
-os: Visual Studio 2015
+os: Visual Studio 2017
 
 clone_depth: 1
 
 init:
   - git config --global core.autocrlf input
-  - if "%arch%"=="x86" (
-      set vcvarsall_arg=x86&&
-      set build_type=Release)
-  - if "%arch%"=="x64" (
-      set vcvarsall_arg=amd64&&
-      set build_type=Release)
-  - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" %vcvarsall_arg%'
+  - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" amd64'
   - set conda_path=%MINICONDA%\Scripts
   - set conda_library_path=%MINICONDA%\envs\pyosmium\Library
 
@@ -38,18 +33,15 @@ install:
   - set PATH=%PATH%;%conda_path%
   - cd c:\
   - conda config --set always_yes yes
-  - conda create --name pyosmium
+  - conda create --name pyosmium python=%PYTHON_VER%
   - activate pyosmium
-  - conda install bzip2=%BZIP2_VER% expat=%EXPAT_VER% zlib=%ZLIB_VER%
-  - SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - conda install bzip2=%BZIP2_VER% expat=%EXPAT_VER% zlib=%ZLIB_VER% shapely=%SHAPELY_VER% %PIPINSTALLS%
+  - SET PATH=%MINICONDA%\envs\pyosmium\Scripts;%PATH%
   - python --version
   - cd c:\dev
   - git clone --depth 1 https://github.com/osmcode/libosmium.git pyosmium/contrib/libosmium
   - git clone --depth 1 https://github.com/mapbox/protozero.git pyosmium/contrib/protozero
   - git clone --depth 1 https://github.com/pybind/pybind11.git pyosmium/contrib/pybind11
-  - dir c:\dev
-  - cd c:\
-  - pip install %PIPINSTALLS%
 
 # clone directory
 clone_folder: c:\dev\pyosmium
@@ -69,7 +61,7 @@ after_test:
   - copy /y %conda_library_path%\bin\zlib.dll c:\dev\pyosmium\src\osmium
   - copy /y %conda_library_path%\bin\expat.dll c:\dev\pyosmium\src\osmium
   - copy /y %conda_library_path%\bin\libbz2.dll c:\dev\pyosmium\src\osmium
-  - "%PYTHON%\\python.exe setup.py bdist_wheel"
+  - python.exe setup.py bdist_wheel
 
 artifacts:
   - path: dist\*
