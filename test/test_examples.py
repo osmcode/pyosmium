@@ -8,7 +8,7 @@ from helpers import load_script
 from os import path as osp
 
 TEST_FILE='example-test.pbf'
-TEST_DIFF='example-test.osc.gz'
+TEST_DIFF='example-test.osc'
 
 try:
     from StringIO import StringIO
