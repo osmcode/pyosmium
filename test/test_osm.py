@@ -176,7 +176,7 @@ class TestAreaFromMultipolygonRelation(HandlerTestBase, unittest.TestCase):
             assert_equals(n.positive_id(), 3)
             assert_equals(n.orig_id(), 1)
             assert_equals(n.from_way(), False)
-            assert_equals(n.is_multipolygon(), True)
+            assert_equals(n.is_multipolygon(), False)
             assert_equals(n.num_rings(), (1, 0))
             assert_equals(len(list(n.outer_rings())), 1)
             oring = list(n.outer_rings())[0]
@@ -215,7 +215,7 @@ class TestAreaFromBoundaryRelation(HandlerTestBase, unittest.TestCase):
             assert_equals(n.positive_id(), 3)
             assert_equals(n.orig_id(), 1)
             assert_equals(n.from_way(), False)
-            assert_equals(n.is_multipolygon(), True)
+            assert_equals(n.is_multipolygon(), False)
             assert_equals(n.num_rings(), (1, 0))
             assert_equals(len(list(n.outer_rings())), 1)
             oring = list(n.outer_rings())[0]
