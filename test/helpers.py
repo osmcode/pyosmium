@@ -150,6 +150,26 @@ class HandlerTestBase:
         if hasattr(self, "check_result"):
             self.check_result()
 
+    def test_func2(self):
+        if isinstance(self.data, (list, tuple)):
+            fn = create_osm_file(self.data)
+        else:
+            fn = create_opl_file(self.data)
+
+        try:
+            self.handler = self.Handler()
+            mir = osmium.MergeInputReader()
+            with open(fn, "rb") as f:
+                data = f.read()
+                mir.add_buffer(data, format='osm')
+            mir.add_file(fn)
+            mir.apply(self.handler, idx=self.apply_idx)
+        finally:
+            os.remove(fn)
+
+        if hasattr(self, "check_result"):
+            self.check_result()
+
 
 class CountingHandler(osmium.SimpleHandler):
 

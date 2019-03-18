@@ -5,6 +5,7 @@ import os
 import sys
 from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase, mkdate
 
+
 import osmium as o
 
 class TestLocation(unittest.TestCase):
@@ -33,6 +34,10 @@ class TestLocation(unittest.TestCase):
 class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user=u'änonymous')]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def node(self, n):
@@ -47,23 +52,44 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.user, u'änonymous')
             assert_equals(n.positive_id(), 1)
             assert_true(check_repr(n))
+            TestNodeAttributes.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
 
 
 class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=-34, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous')]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def node(self, n):
             assert_equals(n.positive_id(), 34)
+            TestNodePositiveId.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
+
 
 class TestNodeLargeId(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=17179869418, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous')]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def node(self, n):
             assert_equals(n.id, 17179869418)
+            TestNodeLargeId.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
 
 
 class TestWayAttributes(HandlerTestBase, unittest.TestCase):
@@ -75,6 +101,10 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             osmobj('W', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous',
                    nodes = [1,2,3])]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def way(self, n):
@@ -93,11 +123,20 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_false(n.ends_have_same_location())
             assert_true(check_repr(n))
             assert_true(check_repr(n.nodes))
+            TestWayAttributes.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
+
 
 class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user=' anonymous',
                    members=[('way',1,'')])]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def relation(self, n):
@@ -113,6 +152,11 @@ class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.positive_id(), 1)
             assert_true(check_repr(n))
             assert_true(check_repr(n.members))
+            TestRelationAttributes.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
+
 
 class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -120,8 +164,12 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
             osmobj('N', id=3, lat=1, lon=0),
             osmobj('W', id=23, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous',
-                   nodes = [1,2,3,1], tags = { "area" : "yes" }),
+                   nodes=[1, 2, 3, 1], tags={"area": "yes"}),
            ]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def area(self, n):
@@ -147,6 +195,11 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_true(oring.ends_have_same_id())
             assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings(oring))), 0)
+            TestAreaFromWayAttributes.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
+
 
 class TestAreaFromMultipolygonRelation(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -161,6 +214,10 @@ class TestAreaFromMultipolygonRelation(HandlerTestBase, unittest.TestCase):
             osmobj('R', id=1, version=3, changeset=7654, uid=42, timestamp='2014-01-31T06:23:35Z', user='Anon',
                    members=[('way', 23, 'outer'), ('way', 24, 'outer')], tags={'type': 'multipolygon'}),
             ]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def area(self, n):
@@ -186,6 +243,11 @@ class TestAreaFromMultipolygonRelation(HandlerTestBase, unittest.TestCase):
             assert_true(oring.ends_have_same_id())
             assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings(oring))), 0)
+            TestAreaFromMultipolygonRelation.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
+
 
 class TestAreaFromBoundaryRelation(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -200,6 +262,10 @@ class TestAreaFromBoundaryRelation(HandlerTestBase, unittest.TestCase):
             osmobj('R', id=1, version=3, changeset=7654, uid=42, timestamp='2014-01-31T06:23:35Z', user='Anon',
                    members=[('way', 23, 'outer'), ('way', 24, 'outer')], tags={'type': 'boundary'}),
             ]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def area(self, n):
@@ -225,6 +291,10 @@ class TestAreaFromBoundaryRelation(HandlerTestBase, unittest.TestCase):
             assert_true(oring.ends_have_same_id())
             assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings(oring))), 0)
+            TestAreaFromBoundaryRelation.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
 
 
 class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
@@ -234,6 +304,10 @@ class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
                 min_lat=51.5288506, max_lon=-0.1464925,
                 max_lat=51.5288620, user="Steve", uid="1")
            ]
+    has_ran = False
+
+    def setUp(self):
+        type(self).has_ran = False
 
     class Handler(o.SimpleHandler):
         def changeset(self,c):
@@ -251,3 +325,7 @@ class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(-1465242, c.bounds.bottom_left.x)
             assert_equals(515288506, c.bounds.bottom_left.y)
             assert_true(check_repr(c))
+            TestChangesetAttributes.has_ran = True
+
+    def check_result(self):
+        assert_equals(type(self).has_ran, True)
