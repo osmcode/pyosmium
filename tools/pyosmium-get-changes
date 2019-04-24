@@ -180,7 +180,7 @@ def main(args):
             log.error(msgfmt("""
               Don't know with which change to start. One of the parameters
                 -I / -D / -O / -f
-              needs to begiven."""))
+              needs to be given."""))
             return 1
 
         with open(options.seq_file, 'r') as f:
