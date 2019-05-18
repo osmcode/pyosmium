@@ -275,7 +275,6 @@ class ReplicationServer(object):
         try:
             response = self.open_url(self.get_state_url(seq))
         except Exception as err:
-            logging.error(err)
             return None
 
         ts = None
