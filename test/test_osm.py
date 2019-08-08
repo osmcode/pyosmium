@@ -3,7 +3,7 @@ from nose.tools import *
 import unittest
 import os
 import sys
-from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase, mkdate
+from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase, mkdate, ExecutedHandler
 
 import osmium as o
 
@@ -34,7 +34,7 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user=u'änonymous')]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def node(self, n):
             assert_equals(n.id, 1)
             assert_equals(n.deleted, False)
@@ -47,23 +47,26 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.user, u'änonymous')
             assert_equals(n.positive_id(), 1)
             assert_true(check_repr(n))
+            self.has_run = True
 
 
 class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=-34, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous')]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def node(self, n):
             assert_equals(n.positive_id(), 34)
+            self.has_run = True
 
 class TestNodeLargeId(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=17179869418, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous')]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def node(self, n):
             assert_equals(n.id, 17179869418)
+            self.has_run = True
 
 
 class TestWayAttributes(HandlerTestBase, unittest.TestCase):
@@ -76,7 +79,7 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
                    timestamp='2014-01-31T06:23:35Z', user='anonymous',
                    nodes = [1,2,3])]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def way(self, n):
             assert_equals(n.id, 1)
             assert_equals(n.deleted, False)
@@ -93,13 +96,14 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_false(n.ends_have_same_location())
             assert_true(check_repr(n))
             assert_true(check_repr(n.nodes))
+            self.has_run = True
 
 class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user=' anonymous',
                    members=[('way',1,'')])]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def relation(self, n):
             assert_equals(n.id, 1)
             assert_equals(n.deleted, False)
@@ -113,6 +117,7 @@ class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(n.positive_id(), 1)
             assert_true(check_repr(n))
             assert_true(check_repr(n.members))
+            self.has_run = True
 
 class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -123,7 +128,7 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
                    nodes = [1,2,3,1], tags = { "area" : "yes" }),
            ]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def area(self, n):
             assert_equals(n.id, 46)
             assert_equals(n.deleted, False)
@@ -147,6 +152,7 @@ class TestAreaFromWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_true(oring.ends_have_same_id())
             assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings(oring))), 0)
+            self.has_run = True
 
 class TestAreaFromMultipolygonRelation(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -162,7 +168,7 @@ class TestAreaFromMultipolygonRelation(HandlerTestBase, unittest.TestCase):
                    members=[('way', 23, 'outer'), ('way', 24, 'outer')], tags={'type': 'multipolygon'}),
             ]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def area(self, n):
             assert_equals(n.id, 3)
             assert_equals(n.deleted, False)
@@ -186,6 +192,7 @@ class TestAreaFromMultipolygonRelation(HandlerTestBase, unittest.TestCase):
             assert_true(oring.ends_have_same_id())
             assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings(oring))), 0)
+            self.has_run = True
 
 class TestAreaFromBoundaryRelation(HandlerTestBase, unittest.TestCase):
     data = [osmobj('N', id=1, lat=0, lon=0),
@@ -201,7 +208,7 @@ class TestAreaFromBoundaryRelation(HandlerTestBase, unittest.TestCase):
                    members=[('way', 23, 'outer'), ('way', 24, 'outer')], tags={'type': 'boundary'}),
             ]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def area(self, n):
             assert_equals(n.id, 3)
             assert_equals(n.deleted, False)
@@ -225,6 +232,7 @@ class TestAreaFromBoundaryRelation(HandlerTestBase, unittest.TestCase):
             assert_true(oring.ends_have_same_id())
             assert_true(oring.ends_have_same_location())
             assert_equals(len(list(n.inner_rings(oring))), 0)
+            self.has_run = True
 
 
 class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
@@ -235,7 +243,7 @@ class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
                 max_lat=51.5288620, user="Steve", uid="1")
            ]
 
-    class Handler(o.SimpleHandler):
+    class Handler(ExecutedHandler):
         def changeset(self,c):
             assert_equals(34, c.id)
             assert_equals(1, c.uid)
@@ -251,3 +259,4 @@ class TestChangesetAttributes(HandlerTestBase, unittest.TestCase):
             assert_equals(-1465242, c.bounds.bottom_left.x)
             assert_equals(515288506, c.bounds.bottom_left.y)
             assert_true(check_repr(c))
+            self.has_run = True

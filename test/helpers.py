@@ -7,6 +7,7 @@ import sys
 from textwrap import dedent
 import osmium
 from datetime import datetime
+from nose.tools import *
 
 if sys.version_info[0] == 3:
     from datetime import timezone
@@ -150,6 +151,9 @@ class HandlerTestBase:
         if hasattr(self, "check_result"):
             self.check_result()
 
+        if hasattr(self.handler, "check_result"):
+            self.handler.check_result()
+
 
 class CountingHandler(osmium.SimpleHandler):
 
@@ -168,6 +172,16 @@ class CountingHandler(osmium.SimpleHandler):
 
     def area(self, _):
         self.counts[3] += 1
+
+
+class ExecutedHandler(osmium.SimpleHandler):
+
+    def __init__(self):
+        super(ExecutedHandler, self).__init__()
+        self.has_run = False
+
+    def check_result(self):
+        assert_true(self.has_run)
 
 
 class HandlerFunction(osmium.SimpleHandler):
