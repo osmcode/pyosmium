@@ -136,7 +136,7 @@ class HandlerTestBase:
     apply_locations = False
     apply_idx = 'flex_mem'
 
-    def test_func(self):
+    def test_apply_file(self):
         if isinstance(self.data, (list, tuple)):
             fn = create_osm_file(self.data)
         else:
@@ -145,6 +145,31 @@ class HandlerTestBase:
         try:
             self.handler = self.Handler()
             self.handler.apply_file(fn, self.apply_locations, self.apply_idx)
+        finally:
+            os.remove(fn)
+
+        if hasattr(self, "check_result"):
+            self.check_result()
+
+        if hasattr(self.handler, "check_result"):
+            self.handler.check_result()
+
+class HandlerTestWithMergeInput(HandlerTestBase):
+
+    def test_merge_input_reader(self):
+        if isinstance(self.data, (list, tuple)):
+            fn = create_osm_file(self.data)
+        else:
+            fn = create_opl_file(self.data)
+
+        try:
+            self.handler = self.Handler()
+            mir = osmium.MergeInputReader()
+            with open(fn, "rb") as f:
+                data = f.read()
+                mir.add_buffer(data, format='osm')
+            mir.add_file(fn)
+            mir.apply(self.handler, idx=self.apply_idx)
         finally:
             os.remove(fn)
 

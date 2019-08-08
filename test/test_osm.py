@@ -3,7 +3,8 @@ from nose.tools import *
 import unittest
 import os
 import sys
-from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase, mkdate, ExecutedHandler
+from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase,\
+                    HandlerTestWithMergeInput, mkdate, ExecutedHandler
 
 import osmium as o
 
@@ -30,7 +31,7 @@ class TestLocation(unittest.TestCase):
         assert_true(check_repr(loc))
 
 
-class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
+class TestNodeAttributes(HandlerTestWithMergeInput, unittest.TestCase):
     data = [osmobj('N', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user=u'änonymous')]
 
@@ -50,7 +51,7 @@ class TestNodeAttributes(HandlerTestBase, unittest.TestCase):
             self.has_run = True
 
 
-class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
+class TestNodePositiveId(HandlerTestWithMergeInput, unittest.TestCase):
     data = [osmobj('N', id=-34, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous')]
 
@@ -59,7 +60,7 @@ class TestNodePositiveId(HandlerTestBase, unittest.TestCase):
             assert_equals(n.positive_id(), 34)
             self.has_run = True
 
-class TestNodeLargeId(HandlerTestBase, unittest.TestCase):
+class TestNodeLargeId(HandlerTestWithMergeInput, unittest.TestCase):
     data = [osmobj('N', id=17179869418, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user='anonymous')]
 
@@ -69,7 +70,7 @@ class TestNodeLargeId(HandlerTestBase, unittest.TestCase):
             self.has_run = True
 
 
-class TestWayAttributes(HandlerTestBase, unittest.TestCase):
+class TestWayAttributes(HandlerTestWithMergeInput, unittest.TestCase):
 
     apply_locations = True
 
@@ -98,7 +99,7 @@ class TestWayAttributes(HandlerTestBase, unittest.TestCase):
             assert_true(check_repr(n.nodes))
             self.has_run = True
 
-class TestRelationAttributes(HandlerTestBase, unittest.TestCase):
+class TestRelationAttributes(HandlerTestWithMergeInput, unittest.TestCase):
     data = [osmobj('R', id=1, version=5, changeset=58674, uid=42,
                    timestamp='2014-01-31T06:23:35Z', user=' anonymous',
                    members=[('way',1,'')])]
