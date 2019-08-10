@@ -101,3 +101,15 @@ class TestTagGet(HandlerTestBase, unittest.TestCase):
             eq_("43 fg", n.tags.get("_", "43 fg"))
             assert_is_none(n.tags.get("gerger4"))
             assert_is_none(n.tags.get("ffleo", None))
+
+class TestTagToDict(HandlerTestBase, unittest.TestCase):
+    data = "n234 Tabba=x,2=vvv,xx=abba"
+
+    class Handler(o.SimpleHandler):
+
+        def node(self, n):
+            d = dict(n.tags)
+            eq_(len(d), 3)
+            eq_(d['abba'], 'x')
+            eq_(d['2'], 'vvv')
+            eq_(d['xx'], 'abba')

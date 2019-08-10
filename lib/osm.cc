@@ -7,6 +7,33 @@
 
 namespace py = pybind11;
 
+class TagIterator
+{
+public:
+    TagIterator(osmium::Tag const &t, py::object r)
+    : tag(t), ref(r)
+    {}
+
+    char const *next()
+    {
+        switch (index) {
+            case 0:
+                ++index;
+                return tag.key();
+            case 1:
+                ++index;
+                return tag.value();
+        };
+
+        throw py::stop_iteration();
+    }
+
+private:
+    osmium::Tag const &tag;
+    py::object ref; // keep a reference
+    size_t index = 0;
+};
+
 
 PYBIND11_MODULE(_osm, m) {
     py::enum_<osmium::osm_entity_bits::type>(m, "osm_entity_bits")
@@ -90,12 +117,20 @@ PYBIND11_MODULE(_osm, m) {
              "Check if the given location is inside the box.")
     ;
 
+    py::class_<TagIterator>(m, "TagIterator")
+        .def("__iter__", [](TagIterator &it) -> TagIterator& { return it; })
+        .def("__next__", &TagIterator::next)
+        .def("__len__", [](TagIterator const &it) { return 2; })
+    ;
+
     py::class_<osmium::Tag>(m, "Tag",
         "A single OSM tag.")
         .def_property_readonly("k", &osmium::Tag::key,
              "(read-only) Tag key.")
         .def_property_readonly("v", &osmium::Tag::value,
              "(read-only) Tag value.")
+        .def("__iter__", [](py::object s)
+                         { return TagIterator(s.cast<osmium::Tag const &>(), s); })
     ;
 
     py::class_<osmium::TagList>(m, "TagList",
