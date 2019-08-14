@@ -5,7 +5,7 @@ library, a library for working with OpenStreetMap data in a fast and flexible
 manner.
 
 [![Travis Build Status](https://api.travis-ci.org/osmcode/pyosmium.svg)](http://travis-ci.org/osmcode/pyosmium)
-[![Appeveyor Build status](https://ci.appveyor.com/api/projects/status/dr69wsw855lwrg8w/branch/master?svg=true)](https://ci.appveyor.com/project/lonvia/pyosmium/branch/master)
+[![Appeveyor Build status](https://ci.appveyor.com/api/projects/status/ch3gwxucycytako4/branch/master?svg=true)](https://ci.appveyor.com/project/lonvia/pyosmium/branch/master)
 
 
 
