@@ -4,6 +4,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.15.3] - 2019-08-16
+
+### Added
+
+- `make_simple_handler()` convenience wrapper
+- iterator for Tag type (for allowing to convert TagLists into python dicts)
+- tests for examples
+- tests for MP building and MergeInputReader
+
+### Changed
+
+- use current libosmium and protozero
+
+### Fixed
+
+- remove spurious 404 error message when downloading OSM diffs
+
 ## [2.15.2] - 2019-03-09
 
 ### Added

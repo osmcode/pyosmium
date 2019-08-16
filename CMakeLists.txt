@@ -3,7 +3,7 @@ project(pyosmium)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-find_package(Osmium 2.14 REQUIRED COMPONENTS io pbf xml)
+find_package(Osmium 2.15 REQUIRED COMPONENTS io pbf xml)
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
