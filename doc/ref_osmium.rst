@@ -45,3 +45,5 @@ Low-level Functions and Classes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: osmium.apply
+
+.. autofunction:: osmium.make_simple_handler
