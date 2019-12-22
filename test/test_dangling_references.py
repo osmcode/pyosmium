@@ -1,6 +1,7 @@
 # vim: set fileencoding=utf-8 :
 from nose.tools import *
 import unittest
+from sys import version_info as python_version
 
 from helpers import create_osm_file
 
@@ -11,6 +12,7 @@ class DanglingReferenceBase(object):
         that was handed into the callback. We expect that the handler
         bails out with a runtime error in such a case.
     """
+
 
     node = None
     way = None
@@ -24,10 +26,16 @@ class DanglingReferenceBase(object):
     def test_keep_reference(self):
         h = o.make_simple_handler(node=self.node, way=self.way,
                                   relation=self.relation, area=self.area)
-        with self.assertRaisesRegex(RuntimeError, "callback keeps reference"):
-            h.apply_file('example-test.pbf')
+        if python_version < (3,0):
+            with self.assertRaisesRegexp(RuntimeError, "callback keeps reference"):
+                h.apply_file('example-test.pbf')
+        else:
+            with self.assertRaisesRegex(RuntimeError, "callback keeps reference"):
+                h.apply_file('example-test.pbf')
         assert_greater(len(self.refkeeper), 0)
-        self.refkeeper.clear()
+        while len(self.refkeeper) > 0:
+            self.refkeeper.pop()
+#        self.refkeeper.clear()
 
 
 class TestKeepNodeRef(DanglingReferenceBase, unittest.TestCase):
@@ -138,7 +146,9 @@ class NotADanglingReferenceBase(object):
         # Does not rise a dangling reference excpetion
         h.apply_file('example-test.pbf')
         assert_greater(len(self.refkeeper), 0)
-        self.refkeeper.clear()
+        #self.refkeeper.clear()
+        while len(self.refkeeper) > 0:
+            self.refkeeper.pop()
 
 class TestKeepId(NotADanglingReferenceBase, unittest.TestCase):
 
