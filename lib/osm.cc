@@ -363,7 +363,9 @@ PYBIND11_MODULE(_osm, m) {
                                                        a.cend<osmium::OuterRing>()); },
                             py::keep_alive<0, 1>(),
              "Return an iterator over all outer rings of the multipolygon.")
-        .def("inner_rings", &osmium::Area::inner_rings, py::arg("outer_ring"),
+        .def("inner_rings", &osmium::Area::inner_rings,
+                            py::keep_alive<0, 1>(),
+             py::arg("outer_ring"),
              "Return an iterator over all inner rings of the multipolygon.")
     ;
 
