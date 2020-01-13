@@ -71,15 +71,15 @@ public:
     osmium::osm_entity_bits::type enabled_callbacks() override
     {
         auto callbacks = osmium::osm_entity_bits::nothing;
-        if (hasfunc("node"))
+        if (callback("node"))
             callbacks |= osmium::osm_entity_bits::node;
-        if (hasfunc("way"))
+        if (callback("way"))
             callbacks |= osmium::osm_entity_bits::way;
-        if (hasfunc("relation"))
+        if (callback("relation"))
             callbacks |= osmium::osm_entity_bits::relation;
-        if (hasfunc("area"))
+        if (callback("area"))
             callbacks |= osmium::osm_entity_bits::area;
-        if (hasfunc("changeset"))
+        if (callback("changeset"))
             callbacks |= osmium::osm_entity_bits::changeset;
 
         return callbacks;
@@ -89,36 +89,76 @@ public:
     void node(osmium::Node const *n) override
     {
         pybind11::gil_scoped_acquire acquire;
-        PYBIND11_OVERLOAD(void, SimpleHandler, node, n);
+        auto func = callback("node");
+        if (func) {
+            auto obj = pybind11::cast(n, pybind11::return_value_policy::reference);
+
+            func(obj);
+
+            if (obj.ref_count() != 1)
+                throw std::runtime_error("Node callback keeps reference to OSM object. This is not allowed.");
+        }
     }
 
     void way(osmium::Way const *w) override
     {
         pybind11::gil_scoped_acquire acquire;
-        PYBIND11_OVERLOAD(void, SimpleHandler, way, w);
+        auto func = callback("way");
+        if (func) {
+            auto obj = pybind11::cast(w, pybind11::return_value_policy::reference);
+
+            func(obj);
+
+            if (obj.ref_count() != 1)
+                throw std::runtime_error("Way callback keeps reference to OSM object. This is not allowed.");
+        }
     }
 
     void relation(osmium::Relation const *r) override
     {
         pybind11::gil_scoped_acquire acquire;
-        PYBIND11_OVERLOAD(void, SimpleHandler, relation, r);
+        auto func = callback("relation");
+        if (func) {
+            auto obj = pybind11::cast(r, pybind11::return_value_policy::reference);
+
+            func(obj);
+
+            if (obj.ref_count() != 1)
+                throw std::runtime_error("Relation callback keeps reference to OSM object. This is not allowed.");
+        }
     }
 
     void changeset(osmium::Changeset const *c) override
     {
         pybind11::gil_scoped_acquire acquire;
-        PYBIND11_OVERLOAD(void, SimpleHandler, changeset, c);
+        auto func = callback("changeset");
+        if (func) {
+            auto obj = pybind11::cast(c, pybind11::return_value_policy::reference);
+
+            func(obj);
+
+            if (obj.ref_count() != 1)
+                throw std::runtime_error("Changeset callback keeps reference to OSM object. This is not allowed.");
+        }
     }
 
     void area(osmium::Area const *a) override
     {
         pybind11::gil_scoped_acquire acquire;
-        PYBIND11_OVERLOAD(void, SimpleHandler, area, a);
+        auto func = callback("area");
+        if (func) {
+            auto obj = pybind11::cast(a, pybind11::return_value_policy::reference);
+
+            func(obj);
+
+            if (obj.ref_count() != 1)
+                throw std::runtime_error("Area callback keeps reference to OSM object. This is not allowed.");
+        }
     }
 
 private:
-    bool hasfunc(char const *name)
-    { return (bool)pybind11::get_overload(static_cast<SimpleHandler const *>(this), name); }
+    pybind11::function callback(char const *name)
+    { return pybind11::get_overload(static_cast<SimpleHandler const *>(this), name); }
 };
 
 #endif // PYOSMIUM_SIMPLE_HANDLER_HPP

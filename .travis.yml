@@ -57,7 +57,7 @@ install:
     - git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
     - git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
     - if [ "$TRAVIS_OS_NAME" = 'osx' ]; then
-          pip${USE_PYTHON_VERSION} install -q nose mock shapely;
+          pip${USE_PYTHON_VERSION} install --user -q nose mock shapely;
       fi
 
 script:
