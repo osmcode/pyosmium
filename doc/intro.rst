@@ -68,11 +68,11 @@ or relations, so handler functions for all three types need to be implemented::
 
     class HotelCounterHandler(osmium.SimpleHandler):
         def __init__(self):
-            osmium.SimpleHandler.__init__(self)
+            super(HotelCounterHandler, self).__init__()
             self.num_nodes = 0
 
         def count_hotel(self, tags):
-            if tags['tourism'] == 'hotel':
+            if tags.get('tourism') == 'hotel':
                 self.num_nodes += 1
 
         def node(self, n):
@@ -90,11 +90,72 @@ listed in :py:class:`osmium.osm.OSMObject`, and some that are specific to
 each type. As all objects have tags, it is possible to reuse the same
 implementation for all types. The main function remains the same.
 
-It is important to remember that the object
-references that are handed to the handler are only temporary. They will
-become invalid as soon as the function returns. Handler functions *must*
-copy any data that should be kept for later use into their own data
-structures. This also includes attributes like tag lists.
+.. _intro-copying-data-from-object:
+
+Collecting data from an OSM file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Let's say that we do not only want to count the hotels in the file but
+we want to print their names in alphabetical order. For simplicity, lets
+restrict outself to nodes tagged as hotels. A naive implementation
+might want to simply collect all hotels and then print their names::
+
+
+    class HotelHandler(osmium.SimpleHandler):
+        def __init__(self):
+            super(HotelHandler, self).__init__()
+            self.hotels = []
+
+        def node(self, o):
+            if o.tags.get('tourism') == 'hotel':
+                self.hotels.append(o)       # THIS IS WRONG!
+
+
+    h = HotelHandler()
+    h.apply_file(some_file)
+
+    hotel_names = []
+    for o in h.hotels:
+        if 'name' in o.tags:
+            self.hotels.append(o.tags['name'])
+
+    print(sorted(hotel_names))
+
+If you try to execute this, then python will immediately return with a
+Runtime error::
+
+    RuntimeError: Node callback keeps reference to OSM object. This is not allowed.
+
+The object references that are handed to the handler are only temporary.
+Osmium reads the object from the file, gives them to the handler function
+and then discards them to free the memory. If you keep a reference
+after the handler function returns, it points to invalid memory. Pyosmium
+does not allow that and throws the runtime error above. If you want to keep
+data for later use *the data must be copied out*.
+
+For the example, with the list of hotels, we only need to keep the name
+of each hotel. So a correct implementation is::
+
+    class HotelHandler(osmium.SimpleHandler):
+        def __init__(self):
+            super(HotelHandler, self).__init__()
+            self.hotels = []
+
+        def node(self, o):
+            if o.tags.get('tourism') == 'hotel' and 'name' in o.tags:
+                self.hotels.append(o.tags['name'])
+
+
+    h = HotelHandler()
+    h.apply_file(some_file)
+
+    print(sorted(h.hotels))
+
+Not only the object itself is a temporary reference. Also the tags, node and
+member lists must be copied, when they need to be store. As a general rule,
+it is good practise to store as little information as possible. In the example
+above, we could have stored the tags of all objects and then done the filtering
+later but that would need much more memory.
 
 Handling Geometries
 ^^^^^^^^^^^^^^^^^^^
