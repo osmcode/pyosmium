@@ -15,6 +15,10 @@ On success, the program will print a single number to stdout, the sequence
 number where to continue updates in the next run. This output can also be
 written to (and later read from) a file.
 
+*Note:* you may pipe the diff also to standard output using '-o -'. Then
+the sequence number will not be printed. You must write it to a file in that
+case.
+
 Some OSM data sources require a cookie to be sent with the HTTP requests.
 pyosmium-get-changes does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
@@ -132,6 +136,8 @@ def get_arg_parser(from_main=False):
     parser.add_argument('-o', '--outfile', dest='outfile',
                         help=h("""Name of diff output file. If omitted, only the
                               sequence ID will be printed where updates would start."""))
+    parser.add_argument('--format', dest='outformat', metavar='FORMAT',
+                        help="Format the data should be saved in.")
     parser.add_argument('--server', action='store', dest='server_url',
                         help='Base URL of the replication server')
     parser.add_argument('--cookie', dest='cookie',
@@ -221,7 +227,10 @@ def main(args):
         return 0
 
     log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
-    outhandler = WriteHandler(options.outfile)
+    if options.outformat is not None:
+        outhandler = WriteHandler(options.outfile, 4096*1024, options.outformat)
+    else:
+        outhandler = WriteHandler(options.outfile)
 
     endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
                              simplify=options.simplify)
@@ -234,7 +243,8 @@ def main(args):
     if endseq is None:
         return 3
 
-    write_end_sequence(options.seq_file, endseq)
+    if options.outfile != '-' or options.seq_file is not None:
+        write_end_sequence(options.seq_file, endseq)
 
     return 0
 

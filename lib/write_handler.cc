@@ -19,6 +19,13 @@ public:
              osmium::memory::Buffer::auto_grow::yes)
     {}
 
+    WriteHandler(const char* filename, size_t bufsz,
+                 const std::string& filetype)
+    : writer(osmium::io::File(filename, filetype)),
+      buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
+             osmium::memory::Buffer::auto_grow::yes)
+    {}
+
     virtual ~WriteHandler()
     { close(); }
 
@@ -82,13 +89,17 @@ void init_write_handler(pybind11::module &m)
     py::class_<WriteHandler, BaseHandler>(m, "WriteHandler",
         "Handler function that writes all data directly to a file."
         "The handler takes a file name as its mandatory parameter. The file "
-        "must not yet exist. The file type to output is determined from the "
-        "file extension. "
+        "must not yet exist. If '-' is given, then stdout is used. "
         "The second (optional) parameter is the buffer size. osmium caches the "
         "output data in an internal memory buffer before writing it on disk. This "
         "parameter allows changing the default buffer size of 4MB. Larger buffers "
         "are normally better but you should be aware that there are normally multiple "
-        "buffers in use during the write process.")
+        "buffers in use during the write process."
+        "The third (optional) parameter defines the file type. Normally this "
+        "can be omitted because osmium determines the file type directly from "
+        "the filename. Only when stdout is used, then the parameter is "
+        "mandatory.")
+        .def(py::init<const char*, unsigned long, const char*>())
         .def(py::init<const char*, unsigned long>())
         .def(py::init<const char*>())
         .def("close", &WriteHandler::close,
