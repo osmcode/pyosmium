@@ -15,6 +15,7 @@ and profits from its fast implementation.
 
    intro
    reference
+   troubleshooting
    tools
     
 
