@@ -178,6 +178,10 @@ def main(args):
 
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
+    if options.outfile == '-' and options.outformat is None:
+        log.error("You must define a format when using stdout. See --format.")
+        return 1
+
     if options.start_file is not None:
         options.start = ReplicationStart.from_osm_file(options.start_file,
                                                        options.ignore_headers)
