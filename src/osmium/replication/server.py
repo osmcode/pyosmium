@@ -266,39 +266,47 @@ class ReplicationServer(object):
                 return lower.sequence
 
 
-    def get_state_info(self, seq=None):
+    def get_state_info(self, seq=None, retries=2):
         """ Downloads and returns the state information for the given
             sequence. If the download is successful, a namedtuple with
             `sequence` and `timestamp` is returned, otherwise the function
-            returns `None`.
+            returns `None`. `retries` sets the number of times the download
+            is retried when pyosmium detects a truncated state file.
         """
-        try:
-            response = self.open_url(self.get_state_url(seq))
-        except Exception as err:
-            return None
+        for retry in range(retries + 1):
+            try:
+                response = self.open_url(self.get_state_url(seq))
+            except Exception as err:
+                return None
 
-        ts = None
-        seq = None
-        line = response.readline()
-        while line:
-            line = line.decode('utf-8')
-            if '#' in line:
-                line = line[0:line.index('#')]
-            else:
-                line = line.strip()
-            if line:
-                kv = line.split('=', 2)
-                if len(kv) != 2:
-                    return None
-                if kv[0] == 'sequenceNumber':
-                    seq = int(kv[1])
-                elif kv[0] == 'timestamp':
-                    ts = dt.datetime.strptime(kv[1], "%Y-%m-%dT%H\\:%M\\:%SZ")
-                    if sys.version_info >= (3,0):
-                        ts = ts.replace(tzinfo=dt.timezone.utc)
+            ts = None
+            seq = None
             line = response.readline()
+            while line:
+                line = line.decode('utf-8')
+                if '#' in line:
+                    line = line[0:line.index('#')]
+                else:
+                    line = line.strip()
+                if line:
+                    kv = line.split('=', 2)
+                    if len(kv) != 2:
+                        return None
+                    if kv[0] == 'sequenceNumber':
+                        seq = int(kv[1])
+                    elif kv[0] == 'timestamp':
+                        try:
+                            ts = dt.datetime.strptime(kv[1], "%Y-%m-%dT%H\\:%M\\:%SZ")
+                        except ValueError:
+                            break
+                        if sys.version_info >= (3,0):
+                            ts = ts.replace(tzinfo=dt.timezone.utc)
+                line = response.readline()
 
-        return OsmosisState(sequence=seq, timestamp=ts)
+            if ts is not None and seq is not None:
+                return OsmosisState(sequence=seq, timestamp=ts)
+
+        return None
 
     def get_diff_block(self, seq):
         """ Downloads the diff with the given sequence number and returns

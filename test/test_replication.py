@@ -77,6 +77,99 @@ def test_get_state_valid(mock):
 
     assert_equal(mock.call_count, 1)
 
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+def test_get_state_sequence_cut(mock):
+    mock.set_script(("""\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=259""",
+        """\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=2017-08-26T11\:04\:02Z"""))
+
+    res = rserv.ReplicationServer("http://test.io").get_state_info()
+
+    assert_is_not_none(res)
+    assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
+    assert_equals(res.sequence, 2594669)
+
+    assert_equal(mock.call_count, 2)
+
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+def test_get_state_date_cut(mock):
+    mock.set_script(("""\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=2017-08-2""",
+        """\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=2017-08-26T11\:04\:02Z"""))
+
+    res = rserv.ReplicationServer("http://test.io").get_state_info()
+
+    assert_is_not_none(res)
+    assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
+    assert_equals(res.sequence, 2594669)
+
+    assert_equal(mock.call_count, 2)
+
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+def test_get_state_timestamp_cut(mock):
+    mock.set_script(("""\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=""",
+        """\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=2017-08-26T11\:04\:02Z"""))
+
+    res = rserv.ReplicationServer("http://test.io").get_state_info()
+
+    assert_is_not_none(res)
+    assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
+    assert_equals(res.sequence, 2594669)
+
+    assert_equal(mock.call_count, 2)
+
+@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+def test_get_state_too_many_retries(mock):
+    mock.set_script(("""\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=""",
+        """\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=""",
+        """\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=""",
+        """\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=2017-08-26T11\:04\:02Z"""))
+
+    res = rserv.ReplicationServer("http://test.io").get_state_info()
+
+    assert_is_none(res)
+
+    assert_equal(mock.call_count, 3)
+
+
+
 @patch('osmium.replication.server.urlrequest.urlopen')
 def test_get_state_server_timeout(mock):
     mock.side_effect = URLError(reason='Mock')
