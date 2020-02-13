@@ -15,6 +15,7 @@ from collections import namedtuple
 from math import ceil
 from osmium import MergeInputReader
 from osmium import io as oio
+from osmium import version
 
 import logging
 
@@ -33,6 +34,10 @@ class ReplicationServer(object):
     def __init__(self, url, diff_type='osc.gz'):
         self.baseurl = url
         self.diff_type = diff_type
+
+    def make_request(self, url):
+        headers = {"User-Agent" : "pyosmium/{}".format(version.pyosmium_release)}
+        return urlrequest.Request(url, headers=headers)
 
     def open_url(self, url):
         """ Download a resource from the given URL and return a byte sequence
@@ -275,8 +280,9 @@ class ReplicationServer(object):
         """
         for retry in range(retries + 1):
             try:
-                response = self.open_url(self.get_state_url(seq))
+                response = self.open_url(self.make_request(self.get_state_url(seq)))
             except Exception as err:
+                log.debug("Loading state info {} failed with: {}".format(seq, str(err)))
                 return None
 
             ts = None
@@ -314,7 +320,7 @@ class ReplicationServer(object):
             (or :code:`urllib2.HTTPError` in python2)
             if the file cannot be downloaded.
         """
-        return self.open_url(self.get_diff_url(seq)).read()
+        return self.open_url(self.make_request(self.get_diff_url(seq))).read()
 
 
     def get_state_url(self, seq):

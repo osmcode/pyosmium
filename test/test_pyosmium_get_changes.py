@@ -44,7 +44,7 @@ class TestPyosmiumGetChanges(unittest.TestCase):
                                            "../../tools/pyosmium-get-changes"))
         self.url_mock = MagicMock()
         self.urls = dict()
-        self.url_mock.side_effect = lambda url : self.urls[url]
+        self.url_mock.side_effect = lambda url : self.urls[url.get_full_url()]
         self.script['rserv'].urlrequest.urlopen = self.url_mock
 
     def url(self, url, result):
