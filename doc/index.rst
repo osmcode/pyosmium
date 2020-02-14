@@ -8,15 +8,15 @@ Welcome to Pyosmium's documentation!
 
 Pyosmium is a library to process OSM files in different formats. It is
 a wrapper of the C++ library `osmium <http://osmcode.org/libosmium/>`_
-and profits from its fast implementation.
+and allows fast and efficent sequential processing of OpenStreetMap data.
 
 .. toctree::
    :maxdepth: 2
 
    intro
    reference
-   troubleshooting
    tools
+   troubleshooting
     
 
 * :ref:`genindex`
