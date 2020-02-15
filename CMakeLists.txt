@@ -19,7 +19,7 @@ else()
     find_package(pybind11 2.2 REQUIRED)
 endif()
 
-find_package(Boost 1.55 REQUIRED COMPONENTS)
+find_package(Boost 1.41 REQUIRED COMPONENTS)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 function(set_module_output module outdir)
