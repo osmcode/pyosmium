@@ -56,15 +56,55 @@ changes and updates the given file with the data. You can repeat this command
 whenever you want to have newer data. The command automatically picks up at
 the same point where it left off after the previous update.
 
-Without any parameters
-it downloads at a maximum about 1GB of changes. That corresponds to about
-3 days of planet-wide changes. You can increase the amount using the
-additional `--size` parameter::
+Choosing the replication source
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+OSM files in PBF format are able to save the replication source and the
+current status on their own. If you want to switch the replication source
+or have a file that does not have the information, you need to bootstrap
+the update process and manually point `pyosmium-up-to-date` to the right
+service::
+
+  pyosmium-up-to-date --ignore-osmosis-headers --server <replication URL> <osmfile.osm.pbf>
+
+`pyosmium-up-to-date` automatically finds the right sequence ID to use
+by looking at the age of the data in your OSM file. It updates the file
+and stores the new replication source in the file. The additional parameters
+are then not necessary anymore for subsequent updates.
+
+.. ATTENTION::
+   Always use the PBF format to store your data. Other format do not support
+   to save the replication information. pyosmium-up-to-date is still able to
+   update these kind of files if you manually point to the replication server
+   but the process is always more costly because it needs to find the right
+   starting point for updates first.
+
+Updating larger amounts of data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When used without any parameters, pyosmium downloads at a maximum about
+1GB of changes. That corresponds to about 3 days of planet-wide changes.
+You can increase the amount using the additional `--size` parameter::
 
   pyosmium-up-to-date --size=10000 planet.osm.pbf
 
 This would download about 10GB or 30 days of change data. If your OSM data file is
 older than that, downloading the full file anew is likely going to be faster.
+
+`pyosmium-up-to-date` uses return codes to signal if it has downloaded all
+available updates. A return code of 0 means that it has downloaded and
+applied all available data. A return code of 1 indicates that it has applied
+some updates but more are available.
+
+A minimal script that updates a file until it is really up-to-date with the
+replcaition source would look like this::
+
+  status=1  # we wnat more data
+  while [ $status -eq 1 ]; do
+    pyosmium-up-to-date planet.osm.pbf
+    # save the return code
+    status=$?
+  done
 
 Creating change files for updating databases
 --------------------------------------------
