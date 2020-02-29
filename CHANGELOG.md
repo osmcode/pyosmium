@@ -4,6 +4,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.15.4] - 2020-02-29
+
+### Added
+
+- pyosmium-get-changes: allow to pipe updates to stdout
+- doc: add more information about file updates
+
+### Changed
+
+- check for dangling references in callbacks
+- use a custom HTTP user agent when requesting diffs
+- use current libosmium
+
+### Fixed
+
+- replication: retry downloading truncated state files
+
 ## [2.15.3] - 2019-08-16
 
 ### Added
