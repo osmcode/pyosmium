@@ -12,6 +12,7 @@ manner.
 ## Dependencies
 
 Python >= 2.7 is supported but a version >= 3.3 is strongly recommended.
+Pypy is known to not work.
 
 Other requirements are:
 
