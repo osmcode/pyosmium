@@ -60,8 +60,6 @@ matrix:
 # http://docs.travis-ci.com/user/apt/
 addons:
     apt:
-        sources:
-            - boost-latest
         packages:
             - libboost-dev
             - python3
