@@ -27,18 +27,8 @@ namespace pybind11 { namespace detail {
                 return false;
             }
 
-#if PY_VERSION_HEX >= 0x03040000
             auto ts = src.attr("timestamp")();
             value = (unsigned) ts.cast<double>();
-#else
-            // XXX terribly inefficient because of the double string conversion
-            //     but the only painless method for converting a datetime
-            //     in python < 3.3.
-            auto ts = src.attr("strftime")("%Y-%m-%dT%H:%M:%SZ");
-
-            value = osmium::Timestamp(ts.cast<std::string>());
-
-#endif
 
             return true;
         }
@@ -60,13 +50,9 @@ namespace pybind11 { namespace detail {
                                                      localtime.tm_sec,
                                                      0);
 
-#if PY_VERSION_HEX < 0x03000000
-            return pydate;
-#else
             auto utc = pybind11::module::import("datetime").attr("timezone").attr("utc");
             using namespace pybind11::literals;
             return pydate.attr("replace")("tzinfo"_a=utc).inc_ref();
-#endif
         }
 
         PYBIND11_TYPE_CASTER(type, _("datetime.datetime"));

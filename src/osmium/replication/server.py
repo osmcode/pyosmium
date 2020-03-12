@@ -1,7 +1,6 @@
 """ Helper functions to communicate with replication servers.
 """
 
-import sys
 try:
     import urllib.request as urlrequest
 except ImportError:
@@ -305,8 +304,7 @@ class ReplicationServer(object):
                             ts = dt.datetime.strptime(kv[1], "%Y-%m-%dT%H\\:%M\\:%SZ")
                         except ValueError:
                             break
-                        if sys.version_info >= (3,0):
-                            ts = ts.replace(tzinfo=dt.timezone.utc)
+                        ts = ts.replace(tzinfo=dt.timezone.utc)
                 line = response.readline()
 
             if ts is not None and seq is not None:

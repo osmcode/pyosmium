@@ -7,12 +7,7 @@ manner.
 [![Travis Build Status](https://api.travis-ci.org/osmcode/pyosmium.svg)](http://travis-ci.org/osmcode/pyosmium)
 [![Appeveyor Build status](https://ci.appveyor.com/api/projects/status/ch3gwxucycytako4/branch/master?svg=true)](https://ci.appveyor.com/project/lonvia/pyosmium/branch/master)
 
-
-
 ## Dependencies
-
-Python >= 2.7 is supported but a version >= 3.3 is strongly recommended.
-Pypy is known to not work.
 
 Other requirements are:
 
@@ -25,13 +20,7 @@ Other requirements are:
 
 ## Installation
 
-### Installing prerequisites
-
-On Debian/Ubuntu-like systems the following should install all
-dependencies required for installing via pip:
-
-    sudo apt-get install build-essential cmake libboost-dev \
-                         libexpat1-dev zlib1g-dev libbz2-dev
+Pyosmium works with Python >= 3.4. Pypy is known to not work.
 
 ### Using Pip
 
@@ -39,9 +28,33 @@ The recommended way to install pyosmium is via pip:
 
     pip install osmium
 
-You need to install development packages first for the dependencies
-mentioned above. For Windows, there are also experimental binary wheels
-available with all required dependencies packed already.
+We provide binary wheels for Linux and Windows 64 for all actively
+maintained Python versions.
+
+For other versions, a source wheel is provided. Make sure to install all
+external dependencies first. On Deian/Ubuntu-like systems, the following
+command installs all required packages:
+
+    sudo apt-get install build-essential cmake libboost-dev \
+                         libexpat1-dev zlib1g-dev libbz2-dev
+
+
+### Installing from source
+
+#### Prerequisites
+
+pyosmium has the following dependencies:
+
+ * [libosmium](https://github.com/osmcode/libosmium)
+ * [protozero](https://github.com/mapbox/protozero)
+ * [cmake](https://cmake.org/)
+ * [Pybind11](https://github.com/pybind/pybind11) >= 2.2
+ * [expat](https://libexpat.github.io/)
+ * [libz](https://www.zlib.net/)
+ * [libbz2](https://www.sourceware.org/bzip2/)
+ * [Boost](https://www.boost.org/) variant and iterator >= 1.41
+ * Python setuptools
+ * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
 
 ### Compiling from Source
 
