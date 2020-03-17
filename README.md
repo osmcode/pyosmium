@@ -7,17 +7,6 @@ manner.
 [![Travis Build Status](https://api.travis-ci.org/osmcode/pyosmium.svg)](http://travis-ci.org/osmcode/pyosmium)
 [![Appeveyor Build status](https://ci.appveyor.com/api/projects/status/ch3gwxucycytako4/branch/master?svg=true)](https://ci.appveyor.com/project/lonvia/pyosmium/branch/master)
 
-## Dependencies
-
-Other requirements are:
-
- * Python setuptools
- * [cmake](https://cmake.org/)
- * [Pybind11](https://github.com/pybind/pybind11) >= 2.2
- * libosmium, protozero
- * expat, libz, libbz2 and Boost variant and iterator
- * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
-
 ## Installation
 
 Pyosmium works with Python >= 3.4. Pypy is known to not work.
