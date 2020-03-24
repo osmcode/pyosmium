@@ -7,6 +7,20 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(io, m)
 {
+    py::class_<osmium::io::File>(m, "File",
+        "A data file.")
+        .def(py::init<std::string>())
+        .def(py::init<std::string, std::string>())
+        .def_property("has_multiple_object_versions",
+                      &osmium::io::File::has_multiple_object_versions,
+                      &osmium::io::File::set_has_multiple_object_versions,
+                      "True if there may be more than one version of the same "
+                      "object in the file. This happens normally only in history "
+                      "files.")
+        .def("parse_format", &osmium::io::File::parse_format,
+             "Set the format of the file from a format string.")
+    ;
+
     py::class_<osmium::io::Header>(m, "Header",
         "File header with global information about the file.")
         .def(py::init<>())
@@ -48,7 +62,9 @@ PYBIND11_MODULE(io, m)
         "OSM file,. Have a look `osmium.SimpleWriter` for a high-level interface "
         "for writing out data.")
         .def(py::init<std::string>())
+        .def(py::init<osmium::io::File>())
         .def(py::init<std::string, osmium::io::Header>())
+        .def(py::init<osmium::io::File, osmium::io::Header>())
         .def("close", &osmium::io::Writer::close,
              "Close any open file handles. The writer is unusable afterwards.")
     ;

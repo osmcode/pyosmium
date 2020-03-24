@@ -136,7 +136,8 @@ class ReplicationServer(object):
         return diffs.id
 
     def apply_diffs_to_file(self, infile, outfile, start_id, max_size=1024,
-                            set_replication_header=True, extra_headers={}):
+                            set_replication_header=True, extra_headers={},
+                            outformat=None):
         """ Download diffs starting with sequence id `start_id`, merge them
             with the data from the OSM file named `infile` and write the result
             into a file with the name `outfile`. The output file must not yet
@@ -153,6 +154,9 @@ class ReplicationServer(object):
 
             `extra_headers` is a dict with additional header fields to be set.
             Most notably, the 'generator' can be set this way.
+
+            `outformat` sets the format of the output file. If None, the format
+            is determined from the file name.
 
             The function returns a tuple of last downloaded sequence id and
             newest available sequence id if new data has been written or None
@@ -176,7 +180,12 @@ class ReplicationServer(object):
         for k,v in extra_headers.items():
             h.set(k, v)
 
-        writer = oio.Writer(outfile, h)
+        if outformat is None:
+            of = oio.File(outfile)
+        else:
+            of = oio.File(outfile, outformat)
+
+        writer = oio.Writer(of, h)
 
         log.debug("Merging changes into OSM file.")
 

@@ -118,7 +118,8 @@ def update_from_custom_server(url, seq, ts, options):
     extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
     outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
                                      max_size=options.outsize*1024,
-                                     extra_headers=extra_headers)
+                                     extra_headers=extra_headers,
+                                     outformat=options.outformat)
 
     if outseqs is None:
         log.info("No new updates found.")
@@ -180,6 +181,8 @@ def get_arg_parser(from_main=False):
     parser.add_argument('-o', '--outfile', dest='outfile',
                         help=h("""Name output of file. If missing, the input file
                                 will be overwritten."""))
+    parser.add_argument('--format', dest='outformat', metavar='FORMAT',
+                        help="Format the data should be saved in.")
     parser.add_argument('--server', action='store', dest='server_url',
             help=h("""Base URL of the replication server. Default:
                     'https://planet.osm.org/replication/hour/'
