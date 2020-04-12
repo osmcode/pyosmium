@@ -127,7 +127,7 @@ Method 1: Starting from the import file
 If you still have the OSM file you used to set up your database, then
 create a state file as follows::
 
-  pyosmium-get-changes -O <osmfile.osm.obf> -f sequence.state -v
+  pyosmium-get-changes -O <osmfile.osm.pbf> -f sequence.state -v
 
 Note that there is no output file yet. This creates a new file `sequence.state`
 with the sequence ID where updates should start and prints the URL of the
