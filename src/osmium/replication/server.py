@@ -55,7 +55,7 @@ class ReplicationServer(object):
                 svr = ReplicationServer()
                 svr.open_url = my_open_url
         """
-        return urlrequest.urlopen(url)
+        return urlrequest.urlopen(url, timeout=30)
 
     def collect_diffs(self, start_id, max_size=1024):
         """ Create a MergeInputReader and download diffs starting with sequence
