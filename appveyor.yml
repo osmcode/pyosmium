@@ -4,18 +4,20 @@ environment:
     EXPAT_VER: 2.2.5
     ZLIB_VER: 1.2.11
     SHAPELY_VER: 1.6.4
-    BOOST_PREFIX: C:\Libraries\boost_1_67_0
+    BOOST_PREFIX: C:\Libraries\boost_1_71_0
+    PIPINSTALLS: nose wheel
   matrix:
     - PYTHON_VER: 3.6
-      PIPINSTALLS: nose wheel
       MINICONDA: "C:\\Miniconda36-x64"
       arch: x64
     - PYTHON_VER: 3.7
-      PIPINSTALLS: nose wheel
       MINICONDA: "C:\\Miniconda37-x64"
       arch: x64
+    - PYTHON_VER: 3.8
+      MINICONDA: "C:\\Miniconda38-x64"
+      arch: x64
 
-os: Visual Studio 2017
+os: Visual Studio 2019
 
 clone_depth: 1
 
