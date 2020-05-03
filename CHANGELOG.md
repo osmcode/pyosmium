@@ -4,6 +4,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2020-05-03
+
+### Added
+
+- socket timeouts for pyosmium-get-changes and pyosmium-up-to-date
+- pyosmium-up-to-date: allow writing the diff to stdout (requires format option)
+
+### Changed
+
+- remove support for Python2 and Python 3.3
+
 ## [2.15.4] - 2020-02-29
 
 ### Added
