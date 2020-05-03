@@ -28,6 +28,7 @@ cookies to the server and will save received cookies to the jar file.
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import datetime as dt
 from sys import version_info as python_version
+import socket
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
@@ -166,6 +167,8 @@ def get_arg_parser(from_main=False):
                                 header and search for the newest OSM object."""))
     parser.add_argument('-d', '--no-deduplicate', action='store_false', dest='simplify',
                         help='Do not deduplicate and sort diffs.')
+    parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
+                        help='Set timeout for file downloads.')
 
     return parser
 
@@ -212,6 +215,7 @@ def main(args):
             or 'https://planet.osm.org/replication/minute/'
     logging.info("Using replication server at %s" % url)
 
+    socket.setdefaulttimeout(options.socket_timeout)
 
     svr = rserv.ReplicationServer(url)
     if options.cookie is not None:

@@ -88,6 +88,7 @@ class ReplicationServer(object):
             try:
                 diffdata = self.get_diff_block(current_id)
             except:
+                log.debug("Error during diff download. Bailing out.")
                 diffdata = ''
             if len(diffdata) == 0:
                 if start_id == current_id:

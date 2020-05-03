@@ -31,6 +31,7 @@ cookies to the server and will save received cookies to the jar file.
 import re
 import sys
 import logging
+import socket
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
@@ -206,6 +207,8 @@ def get_arg_parser(from_main=False):
     parser.add_argument('--cookie', dest='cookie',
                         help="""Netscape-style cookie jar file to read cookies from and where
                               received cookies will be written to.""")
+    parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
+                        help='Set timeout for file downloads.')
 
     return parser
 
@@ -218,6 +221,8 @@ if __name__ == '__main__':
 
     options = get_arg_parser(from_main=True).parse_args()
     log.setLevel(max(3 - options.loglevel, 0) * 10)
+
+    socket.setdefaulttimeout(options.socket_timeout)
 
     try:
         url, seq, ts = compute_start_point(options)
