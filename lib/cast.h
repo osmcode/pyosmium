@@ -41,18 +41,19 @@ namespace pybind11 { namespace detail {
 
             std::time_t tt = src.seconds_since_epoch();
             std::tm localtime = *std::gmtime(&tt);
-
             handle pydate = PyDateTime_FromDateAndTime(localtime.tm_year + 1900,
-                                                     localtime.tm_mon + 1,
-                                                     localtime.tm_mday,
-                                                     localtime.tm_hour,
-                                                     localtime.tm_min,
-                                                     localtime.tm_sec,
-                                                     0);
+                                                       localtime.tm_mon + 1,
+                                                       localtime.tm_mday,
+                                                       localtime.tm_hour,
+                                                       localtime.tm_min,
+                                                       localtime.tm_sec,
+                                                       0);
 
-            auto utc = pybind11::module::import("datetime").attr("timezone").attr("utc");
-            using namespace pybind11::literals;
-            return pydate.attr("replace")("tzinfo"_a=utc).inc_ref();
+            static auto utc = module::import("datetime").attr("timezone").attr("utc");
+            using namespace literals;
+            handle with_utc = pydate.attr("replace")("tzinfo"_a=utc).inc_ref();
+            pydate.dec_ref();
+            return with_utc;
         }
 
         PYBIND11_TYPE_CASTER(type, _("datetime.datetime"));
