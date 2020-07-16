@@ -10,7 +10,7 @@ class OSMObject(object):
     """
 
     def __init__(self, base=None, id=None, version=None, visible=None, changeset=None,
-            timestamp=None, uid=None, tags=None):
+            timestamp=None, uid=None, tags=None, user=None):
         if base is None:
             self.id = id
             self.version = version
@@ -19,6 +19,7 @@ class OSMObject(object):
             self.timestamp = timestamp
             self.uid = uid
             self.tags = tags
+            self.user = user
         else:
             self.id = base.id if id is None else id
             self.version = base.version if version is None else version
@@ -27,6 +28,7 @@ class OSMObject(object):
             self.timestamp = base.timestamp if timestamp is None else timestamp
             self.uid = base.uid if uid is None else uid
             self.tags = base.tags if tags is None else tags
+            self.user = base.user if user is None else user
 
 
 class Node(OSMObject):
