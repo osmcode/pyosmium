@@ -4,6 +4,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.1] - 2020-07-25
+
+### Added
+
+- allow to set user in mutable object
+
+### Changed
+
+- use current libosmium and protozero
+
+### Fixed
+
+- avoid leaking Python handle in timestamp conversion
+
 ## [3.0.0] - 2020-05-03
 
 ### Added
