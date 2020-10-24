@@ -33,14 +33,15 @@ There are multiple sources for OSM change files available:
    for planet-wide updates. There are change files for
    minutely, hourly and daily intervals available.
 
- * `Geofabrik <http://download.geofabrik.de>`_ offers daily change files
+ * `Geofabrik <https://download.geofabrik.de>`_ offers daily change files
    for all its updates. See the extract page for a link to the replication URL.
    Note that change files go only about 3 months back. Older files are deleted.
 
- * `openstreetmap.fr <http://download.geofabrik.de>`_ offers minutely change
-   files for all its extracts.
+ * download.openstreetmap.fr offers
+   `minutely change files <https://download.openstreetmap.fr/replication/>`_
+   for all its `extracts <https://download.openstreetmap.fr/extracts/>`_.
 
-For other services also check out the list of services on the
+For other services also check out the list of providers on the
 `OSM wiki <https://wiki.openstreetmap.org/wiki/Planet.osm>`_.
 
 Updating a planet or extract
