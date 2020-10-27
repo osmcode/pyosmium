@@ -166,7 +166,7 @@ def get_arg_parser(from_main=False):
                                 ignore potential replication information in the
                                 header and search for the newest OSM object."""))
     parser.add_argument('-d', '--no-deduplicate', action='store_false', dest='simplify',
-                        help='Do not deduplicate and sort diffs.')
+                        help='Do not deduplicate diffs.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
 
