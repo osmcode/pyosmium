@@ -186,6 +186,7 @@ class ReplicationServer(object):
         else:
             of = oio.File(outfile, outformat)
 
+        of.has_multiple_object_versions = has_history
         writer = oio.Writer(of, h)
 
         log.debug("Merging changes into OSM file.")
