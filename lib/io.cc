@@ -59,7 +59,7 @@ PYBIND11_MODULE(io, m)
 
     py::class_<osmium::io::Writer>(m, "Writer",
         "Class for writing OSM data to a file. This class just encapsulates an "
-        "OSM file,. Have a look `osmium.SimpleWriter` for a high-level interface "
+        "OSM file. Have a look `osmium.SimpleWriter` for a high-level interface "
         "for writing out data.")
         .def(py::init<std::string>())
         .def(py::init<osmium::io::File>())
