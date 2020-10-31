@@ -31,15 +31,15 @@ class UrllibMock(MagicMock):
         self.side_effect = [BytesIO(dedent(s).encode()) for s in files]
 
 def test_get_state_url():
-    svr = rserv.ReplicationServer("http://text.org")
+    svr = rserv.ReplicationServer("https://text.org")
 
     data = [
-        (None,      'http://text.org/state.txt'),
-        (1,         'http://text.org/000/000/001.state.txt'),
-        (999,       'http://text.org/000/000/999.state.txt'),
-        (1000,      'http://text.org/000/001/000.state.txt'),
-        (573923,    'http://text.org/000/573/923.state.txt'),
-        (3290012,   'http://text.org/003/290/012.state.txt'),
+        (None,      'https://text.org/state.txt'),
+        (1,         'https://text.org/000/000/001.state.txt'),
+        (999,       'https://text.org/000/000/999.state.txt'),
+        (1000,      'https://text.org/000/001/000.state.txt'),
+        (573923,    'https://text.org/000/573/923.state.txt'),
+        (3290012,   'https://text.org/003/290/012.state.txt'),
     ]
 
     for i, o in data:
@@ -69,7 +69,7 @@ def test_get_state_valid(mock):
         txnMax=1219304113
         txnActiveList=1219303583,1219304054,1219304104""")
 
-    res = rserv.ReplicationServer("http://test.io").get_state_info()
+    res = rserv.ReplicationServer("https://test.io").get_state_info()
 
     assert_is_not_none(res)
     assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
@@ -89,7 +89,7 @@ def test_get_state_sequence_cut(mock):
         sequenceNumber=2594669
         timestamp=2017-08-26T11\:04\:02Z"""))
 
-    res = rserv.ReplicationServer("http://test.io").get_state_info()
+    res = rserv.ReplicationServer("https://test.io").get_state_info()
 
     assert_is_not_none(res)
     assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
@@ -110,7 +110,7 @@ def test_get_state_date_cut(mock):
         sequenceNumber=2594669
         timestamp=2017-08-26T11\:04\:02Z"""))
 
-    res = rserv.ReplicationServer("http://test.io").get_state_info()
+    res = rserv.ReplicationServer("https://test.io").get_state_info()
 
     assert_is_not_none(res)
     assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
@@ -131,7 +131,7 @@ def test_get_state_timestamp_cut(mock):
         sequenceNumber=2594669
         timestamp=2017-08-26T11\:04\:02Z"""))
 
-    res = rserv.ReplicationServer("http://test.io").get_state_info()
+    res = rserv.ReplicationServer("https://test.io").get_state_info()
 
     assert_is_not_none(res)
     assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
@@ -162,7 +162,7 @@ def test_get_state_too_many_retries(mock):
         sequenceNumber=2594669
         timestamp=2017-08-26T11\:04\:02Z"""))
 
-    res = rserv.ReplicationServer("http://test.io").get_state_info()
+    res = rserv.ReplicationServer("https://test.io").get_state_info()
 
     assert_is_none(res)
 
@@ -174,7 +174,7 @@ def test_get_state_too_many_retries(mock):
 def test_get_state_server_timeout(mock):
     mock.side_effect = URLError(reason='Mock')
 
-    svr = rserv.ReplicationServer("http://test.io")
+    svr = rserv.ReplicationServer("https://test.io")
     assert_is_none(svr.get_state_info())
 
 @patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
@@ -187,7 +187,7 @@ def test_apply_diffs_count(mock):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer("http://test.io", "opl")
+    svr = rserv.ReplicationServer("https://test.io", "opl")
 
     h = CountingHandler()
     assert_equals(100, svr.apply_diffs(h, 100, 10000))
@@ -205,7 +205,7 @@ def test_apply_diffs_without_simplify(mock):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer("http://test.io", "opl")
+    svr = rserv.ReplicationServer("https://test.io", "opl")
 
     h = CountingHandler()
     assert_equals(100, svr.apply_diffs(h, 100, 10000, simplify=False))
@@ -222,7 +222,7 @@ def test_apply_diffs_with_simplify(mock):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer("http://test.io", "opl")
+    svr = rserv.ReplicationServer("https://test.io", "opl")
 
     h = CountingHandler()
     assert_equals(100, svr.apply_diffs(h, 100, 10000, simplify=True))
@@ -237,7 +237,7 @@ def test_apply_with_location(mock):
         n1 x10.0 y23.0
         w1 Nn1,n2
     """))
-    svr = rserv.ReplicationServer("http://test.io", "opl")
+    svr = rserv.ReplicationServer("https://test.io", "opl")
 
     class Handler(CountingHandler):
         def way(self, w):
@@ -267,7 +267,7 @@ def test_apply_reader_without_simplify(mock):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer("http://test.io", "opl")
+    svr = rserv.ReplicationServer("https://test.io", "opl")
 
     h = CountingHandler()
 
@@ -288,7 +288,7 @@ def test_apply_reader_with_simplify(mock):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer("http://test.io", "opl")
+    svr = rserv.ReplicationServer("https://test.io", "opl")
 
     h = CountingHandler()
     diffs = svr.collect_diffs(100, 100000)
@@ -306,7 +306,7 @@ def test_apply_reader_with_location(mock):
         n1 x10.0 y23.0
         w1 Nn1,n2
     """))
-    svr = rserv.ReplicationServer("http://test.io", "opl")
+    svr = rserv.ReplicationServer("https://test.io", "opl")
 
     class Handler(CountingHandler):
         def way(self, w):
