@@ -220,7 +220,8 @@ def open_with_cookie(url):
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr,
-                        format='%(asctime)s %(levelname)s: %(message)s')
+                        format='%(asctime)s %(levelname)s: %(message)s'),
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
     options = get_arg_parser(from_main=True).parse_args()
     log.setLevel(max(3 - options.loglevel, 0) * 10)
