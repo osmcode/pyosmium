@@ -105,6 +105,9 @@ class CMakeBuild(build_ext):
         if 'BOOST_PREFIX' in env:
             cmake_args += ['-DBOOST_ROOT={}'.format(env['BOOST_PREFIX'])]
 
+        if 'CMAKE_CXX_STANDARD' in env:
+            cmake_args += ['-DCMAKE_CXX_STANDARD={}'.format(env['CMAKE_CXX_STANDARD'])]
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)

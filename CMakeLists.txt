@@ -7,11 +7,22 @@ find_package(Osmium 2.15 REQUIRED COMPONENTS io pbf xml)
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
-if(MSVC)
-    set(PYBIND11_CPP_STANDARD /std:c++14)
-else()
-    set(PYBIND11_CPP_STANDARD -std=c++11)
+if(NOT "${CMAKE_CXX_STANDARD}")
+    if(MSVC)
+        set(CMAKE_CXX_STANDARD 14)
+    else()
+        set(CMAKE_CXX_STANDARD 11)
+    endif()
 endif()
+
+# required for pybind11 < 2.6
+if(MSVC)
+    set(PYBIND11_CPP_STANDARD /std=c++${CMAKE_CXX_STANDARD})
+else()
+    set(PYBIND11_CPP_STANDARD -std=c++${CMAKE_CXX_STANDARD})
+endif()
+
+message(STATUS "Building in C++${CMAKE_CXX_STANDARD} mode")
 
 if(PYBIND11_PREFIX)
     add_subdirectory(${PYBIND11_PREFIX} contrib/pybind11)
