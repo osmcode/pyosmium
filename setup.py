@@ -115,8 +115,8 @@ class CMakeBuild(build_ext):
 
 versions = get_versions()
 
-if sys.version_info < (3,0):
-    raise RuntimeError("Python 3.3 or larger required.")
+if sys.version_info < (3,4):
+    raise RuntimeError("Python 3.4 or larger required.")
 
 with open('README.rst', 'r') as descfile:
     long_description = descfile.read()
