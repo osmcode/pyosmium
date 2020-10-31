@@ -175,7 +175,8 @@ def get_arg_parser(from_main=False):
 
 def main(args):
     logging.basicConfig(stream=sys.stderr,
-                        format='%(levelname)s: %(message)s')
+                        format='%(asctime)s %(levelname)s: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
     options = get_arg_parser(from_main=True).parse_args(args)
 
