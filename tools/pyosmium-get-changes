@@ -27,7 +27,6 @@ cookies to the server and will save received cookies to the jar file.
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import datetime as dt
-from sys import version_info as python_version
 import socket
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
@@ -85,8 +84,7 @@ class ReplicationStart(object):
     def from_date(datestr):
         try:
             date = dt.datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%SZ")
-            if python_version >= (3,0):
-                date = date.replace(tzinfo=dt.timezone.utc)
+            date = date.replace(tzinfo=dt.timezone.utc)
         except ValueError:
             raise ArgumentTypeError("Date needs to be in ISO8601 format (e.g. 2015-12-24T08:08:08Z).")
 

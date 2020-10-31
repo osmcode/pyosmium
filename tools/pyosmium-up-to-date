@@ -35,7 +35,6 @@ import socket
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
-from sys import version_info as python_version
 from osmium.replication import server as rserv
 from osmium.replication.utils import get_replication_header
 from osmium.replication import newest_change_from_file
@@ -94,8 +93,7 @@ def update_from_custom_server(url, seq, ts, options):
 
     if not options.force_update:
         cmpdate = dt.datetime.utcnow() - dt.timedelta(days=90)
-        if python_version >= (3,0):
-            cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
+        cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
         if ts < cmpdate:
             log.error(
               """The OSM file is more than 3 months old. You should download a
