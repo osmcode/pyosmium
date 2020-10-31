@@ -10,7 +10,7 @@ class OSMObject(object):
     """
 
     def __init__(self, base=None, id=None, version=None, visible=None, changeset=None,
-            timestamp=None, uid=None, tags=None, user=None):
+                 timestamp=None, uid=None, tags=None, user=None):
         if base is None:
             self.id = id
             self.version = version
@@ -73,5 +73,3 @@ class Relation(OSMObject):
             self.members = members
         else:
             self.members = members if members is not None else base.members
-
-

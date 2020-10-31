@@ -1,14 +1,7 @@
 """ Helper functions to communicate with replication servers.
 """
 
-try:
-    import urllib.request as urlrequest
-except ImportError:
-    import urllib2 as urlrequest
-try:
-    import urllib.error as urlerror
-except ImportError:
-    import urllib2 as urlerror
+import urllib.request as urlrequest
 import datetime as dt
 from collections import namedtuple
 from math import ceil
@@ -18,13 +11,13 @@ from osmium import version
 
 import logging
 
-log = logging.getLogger('pyosmium')
-log.addHandler(logging.NullHandler())
+LOG = logging.getLogger('pyosmium')
+LOG.addHandler(logging.NullHandler())
 
 OsmosisState = namedtuple('OsmosisState', ['sequence', 'timestamp'])
 DownloadResult = namedtuple('DownloadResult', ['id', 'reader', 'newest'])
 
-class ReplicationServer(object):
+class ReplicationServer:
     """ Represents a server that publishes replication data. Replication
         change files allow to keep local OSM data up-to-date without downloading
         the full dataset again.
@@ -88,7 +81,7 @@ class ReplicationServer(object):
             try:
                 diffdata = self.get_diff_block(current_id)
             except:
-                log.debug("Error during diff download. Bailing out.")
+                LOG.debug("Error during diff download. Bailing out.")
                 diffdata = ''
             if len(diffdata) == 0:
                 if start_id == current_id:
@@ -96,8 +89,8 @@ class ReplicationServer(object):
                 break
 
             left_size -= rd.add_buffer(diffdata, self.diff_type)
-            log.debug("Downloaded change %d. (%d kB available in download buffer)"
-                      % (current_id, left_size / 1024))
+            LOG.debug("Downloaded change %d. (%d kB available in download buffer)",
+                      current_id, left_size / 1024)
             current_id += 1
 
         return DownloadResult(current_id - 1, rd, newest.sequence)
@@ -137,7 +130,7 @@ class ReplicationServer(object):
         return diffs.id
 
     def apply_diffs_to_file(self, infile, outfile, start_id, max_size=1024,
-                            set_replication_header=True, extra_headers={},
+                            set_replication_header=True, extra_headers=None,
                             outformat=None):
         """ Download diffs starting with sequence id `start_id`, merge them
             with the data from the OSM file named `infile` and write the result
@@ -178,8 +171,9 @@ class ReplicationServer(object):
             h.set("osmosis_replication_sequence_number", str(diffs.id))
             info = self.get_state_info(diffs.id)
             h.set("osmosis_replication_timestamp", info.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
-        for k,v in extra_headers.items():
-            h.set(k, v)
+        if extra_headers is not None:
+            for k, v in extra_headers.items():
+                h.set(k, v)
 
         if outformat is None:
             of = oio.File(outfile)
@@ -189,7 +183,7 @@ class ReplicationServer(object):
         of.has_multiple_object_versions = has_history
         writer = oio.Writer(of, h)
 
-        log.debug("Merging changes into OSM file.")
+        LOG.debug("Merging changes into OSM file.")
 
         diffs.reader.apply_to_reader(reader, writer, has_history)
 
@@ -221,7 +215,7 @@ class ReplicationServer(object):
         lower = None
         lowerid = 0
         while lower is None:
-            log.debug("Trying with Id %s" % lowerid)
+            LOG.debug("Trying with Id %s", lowerid)
             lower = self.get_state_info(lowerid)
 
             if lower is not None and lower.timestamp >= timestamp:
@@ -288,11 +282,11 @@ class ReplicationServer(object):
             returns `None`. `retries` sets the number of times the download
             is retried when pyosmium detects a truncated state file.
         """
-        for retry in range(retries + 1):
+        for _ in range(retries + 1):
             try:
                 response = self.open_url(self.make_request(self.get_state_url(seq)))
             except Exception as err:
-                log.debug("Loading state info {} failed with: {}".format(seq, str(err)))
+                LOG.debug("Loading state info %s failed with: %s", seq, str(err))
                 return None
 
             ts = None
@@ -342,13 +336,14 @@ class ReplicationServer(object):
         if seq is None:
             return self.baseurl + '/state.txt'
 
-        return '%s/%03i/%03i/%03i.state.txt' % (self.baseurl,
-                     seq / 1000000, (seq % 1000000) / 1000, seq % 1000)
+        return '%s/%03i/%03i/%03i.state.txt' % \
+               (self.baseurl, seq / 1000000, (seq % 1000000) / 1000, seq % 1000)
 
 
     def get_diff_url(self, seq):
         """ Returns the URL to the diff file for the given sequence id.
         """
-        return '%s/%03i/%03i/%03i.%s' % (self.baseurl,
-                     seq / 1000000, (seq % 1000000) / 1000, seq % 1000,
-                     self.diff_type)
+        return '%s/%03i/%03i/%03i.%s' % \
+               (self.baseurl,
+                seq / 1000000, (seq % 1000000) / 1000, seq % 1000,
+                self.diff_type)

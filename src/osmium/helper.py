@@ -19,4 +19,3 @@ def make_simple_handler(node=None, way=None, relation=None, area=None):
         __HandlerWithCallbacks.area = staticmethod(area)
 
     return __HandlerWithCallbacks()
-
