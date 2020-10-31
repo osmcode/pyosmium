@@ -1,5 +1,5 @@
-from ._osm import *
 import osmium.osm.mutable
+from ._osm import *
 
 def create_mutable_node(node, **args):
     """ Create a mutable node replacing the properties given in the
@@ -26,59 +26,76 @@ Node.replace = create_mutable_node
 Way.replace = create_mutable_way
 Relation.replace = create_mutable_relation
 
-Location.__repr__ = lambda l: 'osmium.osm.Location(x=%r, y=%r)' \
-                               % (l.x, l.y) \
+def _make_repr(attr_list):
+    fmt_string = 'osmium.osm.{0}('\
+                 + ', '.join(['{0}={{1.{0}!r}}'.format(x) for x in attr_list])\
+                 + ')'
+
+    return lambda o: fmt_string.format(o.__class__.__name__, o)
+
+def _list_repr(obj):
+    return 'osmium.osm.{}([{}])'.format(obj.__class__.__name__,
+                                        ', '.join(map(repr, obj)))
+
+def _list_elipse(obj):
+    objects = ','.join(map(str, obj))
+    if len(objects) > 50:
+        objects = objects[:47] + '...'
+    return objects
+
+Location.__repr__ = lambda l: 'osmium.osm.Location(x={0.x!r}, y={0.y!r})'.format(l) \
                                if l.valid() else 'osmium.osm.Location()'
-Location.__str__ = lambda l: '%f/%f' % (l.lon_without_check(), l.lat_without_check()) \
+Location.__str__ = lambda l: '{:f}/{:f}'.format(l.lon_without_check(),
+                                                l.lat_without_check()) \
                              if l.valid() else 'invalid'
 
-Box.__repr__ = lambda b: 'osmium.osm.Box(bottom_left=%r, top_right=%r)' \
-                         % (b.bottom_left, b.top_right)
-Box.__str__ = lambda b: '(%s %s)' % (b.bottom_left, b.top_right)
+Box.__repr__ = _make_repr(['bottom_left', 'top_right'])
+Box.__str__ = lambda b: '({0.bottom_left!s} {0.top_right!s})'.format(b)
 
-Tag.__repr__ = lambda t: 'osmium.osm.Tag(k=%r, v=%r)' % (t.k, t.v)
-
-Tag.__str__ = lambda t: '%s=%s' % (t.k, t.v)
+Tag.__repr__ = _make_repr(['k', 'v'])
+Tag.__str__ = lambda t: '{0.k}={0.v}'.format(t)
 
 TagList.__repr__ = lambda t: "osmium.osm.TagList({%s})" \
-                              % ",".join(["%r=%r" % (i.k, i.v) for i in t])
-TagList.__str__ = lambda t: "{%s}" % ",".join([str(i) for i in t])
+                              % ', '.join(["%r: %r" % (i.k, i.v) for i in t])
+TagList.__str__ = lambda t: '{' + _list_elipse(t) + '}'
 
-NodeRef.__repr__ = lambda n: 'osmium.osm.NodeRef(ref=%r, location=%r)' % (n.ref, n.location)
-NodeRef.__str__ = lambda n: '%s@%s' % (n.ref, n.location) if n.location.valid() \
-                             else str(n.ref)
+NodeRef.__repr__ = _make_repr(['ref', 'location'])
+NodeRef.__str__ = lambda n: '{0.ref:d}@{0.location!s}'.format(n) \
+                            if n.location.valid() else str(n.ref)
 
-NodeRefList.__repr__ = lambda t: "%s([%s])" % (t.__class__.__name__,
-                                               ",".join([repr(i) for i in t]))
-NodeRefList.__str__ = lambda t: "[%s]" % ",".join([str(i) for i in t])
+NodeRefList.__repr__ = _list_repr
+NodeRefList.__str__ = lambda o: '[' + _list_elipse(o) + ']'
 
-RelationMember.__repr__ = lambda r: 'osmium.osm.RelationMember(ref=%r, type=%r, role=%r)' \
-                                     % (r.ref, r.type, r.role)
-RelationMember.__str__ = lambda r: '%s%d@%s' % (r.type, r.ref, r.role) \
-                                   if r.role else '%s%d' % (r.type, r.ref)
+RelationMember.__repr__ = _make_repr(['ref', 'type', 'role'])
+RelationMember.__str__ = lambda r: ('{0.type}{0.ref:d}@{0.role}' \
+                                   if r.role else '{0.type}{0.ref:d}').format(r)
 
-RelationMemberList.__repr__ = lambda t: "osmium.osm.RelationMemberList([%s])" \
-                                        % ",".join([repr(i) for i in t])
-RelationMemberList.__str__ = lambda t: "[%s]" % ",".join([str(i) for i in t])
+RelationMemberList.__repr__ = _list_repr
+RelationMemberList.__str__ = lambda o: '[' + _list_elipse(o) + ']'
 
-OSMObject.__repr__ = lambda o: '%s(id=%r, deleted=%r, visible=%r, version=%r, changeset=%r, uid=%r, timestamp=%r, user=%r, tags=%r)'% (o.__class__.__name__, o.id, o.deleted, o.visible, o.version, o.changeset, o.uid, o.timestamp, o.user, o.tags)
+OSMObject.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
+                                 'uid', 'timestamp', 'user', 'tags'])
 
-def _str_ellipse(s, length=50):
-    s = str(s)
-    return s if len(s) <= length else (s[:length - 4] + '...' + s[-1])
+def _str_ellipse(full, length=50):
+    full = str(full)
+    return full if len(full) <= length else (full[:length - 4] + '...' + full[-1])
 
-Node.__repr__ = lambda o: '%s(id=%r, deleted=%r, visible=%r, version=%r, changeset=%r, uid=%r, timestamp=%r, user=%r, tags=%r, location=%r)'% (o.__class__.__name__, o.id, o.deleted, o.visible, o.version, o.changeset, o.uid, o.timestamp, o.user, o.tags, o.location)
-Node.__str__ = lambda n: 'n%d: location=%s tags=%s' \
-                         % (n.id, n.location, _str_ellipse(n.tags))
+Node.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
+                            'uid', 'timestamp', 'user', 'tags', 'location'])
+Node.__str__ = lambda n: 'n{0.id:d}: location={0.location!s} tags={0.tags!s}'\
+                         .format(n)
 
-Way.__repr__ = lambda o: '%s(id=%r, deleted=%r, visible=%r, version=%r, changeset=%r, uid=%r, timestamp=%r, user=%r, tags=%r, nodes=%r)'% (o.__class__.__name__, o.id, o.deleted, o.visible, o.version, o.changeset, o.uid, o.timestamp, o.user, o.tags, o.nodes)
-Way.__str__ = lambda o: 'w%d: nodes=%s tags=%s' \
-                         % (o.id, _str_ellipse(o.nodes), _str_ellipse(o.tags))
+Way.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
+                           'uid', 'timestamp', 'user', 'tags', 'nodes'])
+Way.__str__ = lambda o: 'w{0.id:d}: nodes={0.nodes!s} tags={0.tags!s}' \
+                         .format(o)
 
-Relation.__repr__ = lambda o: '%s(id=%r, deleted=%r, visible=%r, version=%r, changeset=%r, uid=%r, timestamp=%r, user=%r, tags=%r, members=%r)'% (o.__class__.__name__, o.id, o.deleted, o.visible, o.version, o.changeset, o.uid, o.timestamp, o.user, o.tags, o.members)
-Relation.__str__ = lambda o: 'r%d: members=%s, tags=%s' \
-                              % (o.id, _str_ellipse(o.members), _str_ellipse(o.tags))
+Relation.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
+                                'uid', 'timestamp', 'user', 'tags', 'members'])
+Relation.__str__ = lambda o: 'r{0.id:d}: members={0.members!s}, tags={0.tags!s}' \
+                             .format(o)
 
-Changeset.__repr__ = lambda o: '%s(id=%r, uid=%r, created_at=%r, closed_at=%r, open=%r, num_changes=%r, bounds=%r, user=%r, tags=%s)' %(o.__class__.__name__, o.id, o.uid, o.created_at, o.closed_at, o.open, o.num_changes, o.bounds, o.user, o.tags)
-Changeset.__str__ = lambda o: 'c%d: closed_at=%s, bounds=%s, tags=%s' \
-                               % (o.id, o.closed_at, o.bounds, _str_ellipse(o.tags))
+Changeset.__repr__ = _make_repr(['id', 'uid', 'created_at', 'closed_at', 'open',
+                                 'num_changes', 'bounds', 'user', 'tags'])
+Changeset.__str__ = lambda o: 'c{0.id:d}: closed_at={0.closed_at!s}, bounds={0.bounds!s}, tags={0.tags!s}' \
+                              .format(o)
