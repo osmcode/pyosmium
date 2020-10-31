@@ -53,8 +53,7 @@ namespace {
 class MergeInputReader
 {
 public:
-    void apply(BaseHandler& handler, std::string const &idx = "",
-               bool simplify = true)
+    void apply(BaseHandler& handler, std::string const &idx, bool simplify)
     {
         if (idx.empty())
             apply_without_location(handler, simplify);
@@ -63,7 +62,7 @@ public:
     }
 
     void apply_to_reader(osmium::io::Reader &reader, osmium::io::Writer &writer,
-                         bool with_history = true)
+                         bool with_history)
     {
         auto input = osmium::io::make_input_iterator_range<osmium::OSMObject>(reader);
         if (with_history) {
@@ -110,7 +109,7 @@ public:
     }
 
 private:
-    void apply_without_location(BaseHandler& handler, bool simplify = true)
+    void apply_without_location(BaseHandler& handler, bool simplify)
     {
         if (simplify) {
             objects.sort(osmium::object_order_type_id_reverse_version());
@@ -133,7 +132,7 @@ private:
     }
 
     void apply_with_location(BaseHandler& handler, std::string const &idx,
-                             bool simplify = true)
+                             bool simplify)
     {
         using Index_fab =
             osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>;
