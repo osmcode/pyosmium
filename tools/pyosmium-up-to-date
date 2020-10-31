@@ -117,18 +117,25 @@ def update_from_custom_server(url, seq, ts, options):
     else:
         ofname = outfile
 
-    extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
-    outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
-                                     max_size=options.outsize*1024,
-                                     extra_headers=extra_headers,
-                                     outformat=options.outformat)
+    try:
+        extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
+        outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
+                                         max_size=options.outsize*1024,
+                                         extra_headers=extra_headers,
+                                         outformat=options.outformat)
 
-    if outseqs is None:
-        log.info("No new updates found.")
-        return 3
+        if outseqs is None:
+            log.info("No new updates found.")
+            return 3
 
-    if outfile is None:
-        os.rename(ofname, infile)
+        if outfile is None:
+            os.rename(ofname, infile)
+    finally:
+        if outfile is None:
+            try:
+                os.remove(ofname)
+            except FileNotFoundError:
+                pass
 
     log.info("Downloaded until %d. Server has data available until %d." % outseqs)
 
