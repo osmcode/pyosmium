@@ -217,6 +217,7 @@ def get_arg_parser(from_main=False):
                               received cookies will be written to.""")
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
+    parser.add_argument('--version', action='version', version='pyosmium ' + pyosmium_release)
 
     return parser
 
