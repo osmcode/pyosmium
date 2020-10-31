@@ -13,7 +13,7 @@ wkbfab = o.geom.WKBFactory()
 
 class AmenityListHandler(o.SimpleHandler):
 
-    def print_amenity(amenity, tags, lon, lat):
+    def print_amenity(self, tags, lon, lat):
         name = tags.get('name', '')
         print("%f %f %-15s %s" % (lon, lat, tags['amenity'], name))
 

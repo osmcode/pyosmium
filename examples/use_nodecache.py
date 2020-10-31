@@ -9,9 +9,8 @@ class WayHandler(o.SimpleHandler):
 
     def way(self, w):
         for n in w.nodes:
-            n.lat, n.lon # throws an exception if the coordinates are missing
             loc = idx.get(n.ref)
-        print("%d %s" %(w.id, len(w.nodes)))
+        print("%d %s" % (w.id, len(w.nodes)))
 
 if len(sys.argv) != 3:
     print("Usage: python create_nodecache.py <osm file> <node cache>")
