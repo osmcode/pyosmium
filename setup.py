@@ -131,7 +131,7 @@ setup(
     maintainer='Sarah Hoffmann',
     maintainer_email='lonvia@denofr.de',
     download_url='https://github.com/osmcode/pyosmium',
-    url='http://osmcode.org/pyosmium',
+    url='https://osmcode.org/pyosmium',
     keywords=["OSM", "OpenStreetMap", "Osmium"],
     license='BSD',
     scripts=['tools/pyosmium-get-changes', 'tools/pyosmium-up-to-date'],
