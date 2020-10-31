@@ -76,10 +76,6 @@ RelationMemberList.__str__ = lambda o: '[' + _list_elipse(o) + ']'
 OSMObject.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
                                  'uid', 'timestamp', 'user', 'tags'])
 
-def _str_ellipse(full, length=50):
-    full = str(full)
-    return full if len(full) <= length else (full[:length - 4] + '...' + full[-1])
-
 Node.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
                             'uid', 'timestamp', 'user', 'tags', 'location'])
 Node.__str__ = lambda n: 'n{0.id:d}: location={0.location!s} tags={0.tags!s}'\
