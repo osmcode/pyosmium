@@ -15,6 +15,9 @@ information from the osmosis headers. That means that after the first update,
 subsequent calls to pyosmium-up-to-date will continue the updates from the same
 server exactly where they have left of.
 
+This program can update normal OSM data files as well as OSM history files.
+It detects automatically on what type of file it is called.
+
 The program returns 0, if updates have been successfully applied up to
 the newest data. It returns 1, if some updates have been applied but
 there is still data available on the server (either because the size
