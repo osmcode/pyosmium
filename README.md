@@ -4,7 +4,7 @@ Provides Python bindings for the [Libosmium](https://github.com/osmcode/libosmiu
 library, a library for working with OpenStreetMap data in a fast and flexible
 manner.
 
-[![Travis Build Status](https://api.travis-ci.org/osmcode/pyosmium.svg)](http://travis-ci.org/osmcode/pyosmium)
+[![Github Actions Build Status](https://github.com/osmcode/pyosmium/workflows/CI/badge.svg)](https://github.com/osmcode/pyosmium/actions?query=workflow%3ACI)
 [![Appeveyor Build status](https://ci.appveyor.com/api/projects/status/ch3gwxucycytako4/branch/master?svg=true)](https://ci.appveyor.com/project/lonvia/pyosmium/branch/master)
 
 ## Installation
