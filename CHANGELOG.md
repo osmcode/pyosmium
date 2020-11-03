@@ -4,6 +4,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.0] - 2020-11-03
+
+### Added
+
+### Changed
+
+- improved help messages for update tools
+- update to pybind11 2.6
+
+### Fixed
+
+- pyosmium-up-to-date: fix missing flag when applying changes to history files
+- smaller linting and documentation issues
+
 ## [3.0.1] - 2020-07-25
 
 ### Added
