@@ -1,0 +1,141 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+    build-default:
+        runs-on: ubuntu-20.04
+
+        strategy:
+            matrix:
+                python-version: [3.6, 3.7, 3.8]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: Install packages
+              run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev
+
+            - uses: ./.github/actions/install-dependencies
+
+            - name: Build package
+              run: python setup.py build
+              shell: bash
+
+            - name: Run tests
+              run: python run_tests.py
+              shell: bash
+              working-directory: test
+
+
+    build-ubuntu-1604:
+        runs-on: ubuntu-16.04
+
+        strategy:
+            matrix:
+                compiler: [gcc, clang]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.5
+
+            - name: Install packages
+              run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev
+
+            - uses: ./.github/actions/install-dependencies
+
+            - name: Build package
+              run: python setup.py build
+              shell: bash
+              env:
+                CC: gcc-5
+                CXX: g++-5
+              if: ${{ matrix.compiler == 'gcc' }}
+
+            - name: Build package
+              run: python setup.py build
+              shell: bash
+              env:
+                CC: clang-6.0
+                CXX: clang++-6.0
+              if: ${{ matrix.compiler == 'clang' }}
+
+            - name: Run tests
+              run: python run_tests.py
+              shell: bash
+              working-directory: test
+
+    build-ubuntu-2004:
+        runs-on: ubuntu-20.04
+
+        strategy:
+            matrix:
+                compiler: [gcc, clang]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Install packages
+              run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev
+
+            - uses: ./.github/actions/install-dependencies
+
+            - name: Build package
+              run: python setup.py build
+              shell: bash
+              env:
+                CC: gcc-10
+                CXX: g++-10
+              if: ${{ matrix.compiler == 'gcc' }}
+
+            - name: Build package
+              run: python setup.py build
+              shell: bash
+              env:
+                CC: clang-10
+                CXX: clang++-10
+              if: ${{ matrix.compiler == 'clang' }}
+
+            - name: Run tests
+              run: python run_tests.py
+              shell: bash
+              working-directory: test
+
+    build-macos:
+        runs-on: macos-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3
+
+            - name: Install packages
+              run: brew install boost geos
+              shell: bash
+
+            - uses: ./.github/actions/install-dependencies
+
+            - name: Build package
+              run: python setup.py build
+              shell: bash
+
+            - name: Run tests
+              run: python run_tests.py
+              shell: bash
+              working-directory: test
+
+
