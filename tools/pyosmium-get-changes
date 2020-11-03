@@ -31,6 +31,7 @@ import socket
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
+from osmium.version import pyosmium_release
 from osmium import SimpleHandler, WriteHandler
 
 try:
@@ -167,6 +168,7 @@ def get_arg_parser(from_main=False):
                         help='Do not deduplicate diffs.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
+    parser.add_argument('--version', action='version', version='pyosmium ' + pyosmium_release)
 
     return parser
 
