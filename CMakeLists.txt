@@ -2,9 +2,27 @@ cmake_minimum_required(VERSION 2.8.12)
 project(pyosmium)
 set(PACKAGE_VERSION 3.0.1)
 
+option(WITH_LZ4 "Build with lz4 support for PBF files" ON)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-find_package(Osmium 2.15 REQUIRED COMPONENTS io pbf xml)
+find_package(Osmium 2.16 REQUIRED COMPONENTS io pbf xml)
+
+if(WITH_LZ4)
+find_package(LZ4)
+
+    if(LZ4_FOUND)
+        message(STATUS "lz4 library found, compiling with it")
+        add_definitions(-DOSMIUM_WITH_LZ4)
+        include_directories(SYSTEM ${LZ4_INCLUDE_DIRS})
+        list(APPEND OSMIUM_LIBRARIES ${LZ4_LIBRARIES})
+    else()
+        message(WARNING "lz4 library not found, compiling without it")
+    endif()
+else()
+    message(STATUS "Building without lz4 support: Set WITH_LZ4=ON to change this")
+endif()
+
 include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
