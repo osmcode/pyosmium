@@ -4,6 +4,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.1] - 2021-01-12
+
+### Added
+
+- support for lz4 compression (compled in when library is found)
+
+### Changed
+
+- update to libosmium 2.16.0
+- update to pybind11 2.6.1
+
 ## [3.1.0] - 2020-11-03
 
 ### Added
