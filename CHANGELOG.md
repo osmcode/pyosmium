@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.2] - 2021-01-13
+
+### Fixed
+
+- package pypi source wheel with correct libosmium version
+
 ## [3.1.1] - 2021-01-12
 
 ### Added
