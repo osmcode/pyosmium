@@ -282,7 +282,7 @@ class ReplicationServer:
             returns `None`. `retries` sets the number of times the download
             is retried when pyosmium detects a truncated state file.
         """
-        for _ in range(retries + 1):
+        for trial in range(retries + 1):
             try:
                 response = self.open_url(self.make_request(self.get_state_url(seq)))
             except Exception as err:
@@ -314,6 +314,8 @@ class ReplicationServer:
 
             if ts is not None and seq is not None:
                 return OsmosisState(sequence=seq, timestamp=ts)
+
+            LOG.debug("Loading state info %s retrying again (trial #%d)", seq, trial)
 
         return None
 
