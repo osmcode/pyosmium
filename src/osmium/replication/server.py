@@ -287,7 +287,7 @@ class ReplicationServer:
                 response = self.open_url(self.make_request(self.get_state_url(seq)))
             except Exception as err:
                 LOG.debug("Loading state info %s failed with: %s", seq, str(err))
-                return None
+                continue # retry again in case it is a temporary network issue
 
             ts = None
             seq = None

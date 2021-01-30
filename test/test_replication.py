@@ -177,6 +177,27 @@ def test_get_state_server_timeout(mock):
     svr = rserv.ReplicationServer("https://test.io")
     assert_is_none(svr.get_state_info())
 
+@patch('osmium.replication.server.urlrequest.urlopen')
+def test_get_state_server_timeout_retry(mock):
+    mock.side_effect = [URLError(reason='Mock'),
+                    BytesIO(dedent("""\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=2017-08-26T11\:04\:02Z
+        txnReadyList=
+        txnMax=1219304113
+        txnActiveList=1219303583,1219304054,1219304104""").encode())]
+
+    res = rserv.ReplicationServer("https://test.io").get_state_info()
+
+    assert_is_not_none(res)
+    assert_equals(res.timestamp, mkdate(2017, 8, 26, 11, 4, 2))
+    assert_equals(res.sequence, 2594669)
+
+    assert_equal(mock.call_count, 2)
+
+
 @patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
 def test_apply_diffs_count(mock):
     mock.set_script(("""\
