@@ -19,12 +19,11 @@ This program can update normal OSM data files as well as OSM history files.
 It detects automatically on what type of file it is called.
 
 The program returns 0, if updates have been successfully applied up to
-the newest data. It returns 1, if some updates have been applied but
-there is still data available on the server (either because the size
-limit has been reached or there was a network error which could not be
-resolved). It returns 2 when the file is already up to date.
-Any other error results in a return code larger than 1. The
-output file is guaranteed to be unmodified in that case.
+the newest data or no new data was available. It returns 1, if some updates
+have been applied but there is still data available on the server (either
+because the size limit has been reached or there was a network error which
+could not be resolved). Any other error results in a return code larger than 1.
+The output file is guaranteed to be unmodified in that case.
 
 Some OSM data sources require a cookie to be sent with the HTTP requests. 
 Pyosmium-up-to-date does not fetch the cookie from these services for you.
@@ -97,7 +96,7 @@ def update_from_custom_server(url, seq, ts, options):
     else:
         if seq >= current.sequence:
             log.info("File is already up to date.")
-            return 2
+            return 0
 
         log.debug("Using given sequence ID %d" % seq)
         startseq = seq + 1
