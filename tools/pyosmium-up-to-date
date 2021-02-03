@@ -22,7 +22,8 @@ The program returns 0, if updates have been successfully applied up to
 the newest data. It returns 1, if some updates have been applied but
 there is still data available on the server (either because the size
 limit has been reached or there was a network error which could not be
-resolved). Any other error results in a return code larger than 1. The
+resolved). It returns 2 when the file is already up to date.
+Any other error results in a return code larger than 1. The
 output file is guaranteed to be unmodified in that case.
 
 Some OSM data sources require a cookie to be sent with the HTTP requests. 
@@ -33,6 +34,7 @@ cookies to the server and will save received cookies to the jar file.
 
 import re
 import sys
+import traceback
 import logging
 import socket
 
@@ -76,7 +78,14 @@ def update_from_custom_server(url, seq, ts, options):
         cookie_jar.load(options.cookie)
         opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
         svr.open_url = opener.open
-    log.info("Using replication service at %s" % url)
+
+    log.info("Using replication service at %s", url)
+
+    current = svr.get_state_info()
+    if current is None:
+        log.error("Cannot download state information. Is the replication URL correct?")
+        return 3
+    log.debug("Server is at sequence %d (%s).", current.sequence, current.timestamp)
 
     if seq is None:
         log.info("Using timestamp %s as starting point." % ts)
@@ -86,6 +95,10 @@ def update_from_custom_server(url, seq, ts, options):
                       % (str(ts), url))
             return 3
     else:
+        if seq >= current.sequence:
+            log.info("File is already up to date.")
+            return 2
+
         log.debug("Using given sequence ID %d" % seq)
         startseq = seq + 1
         ts = svr.get_state_info(seq=startseq)
@@ -240,9 +253,13 @@ if __name__ == '__main__':
         log.error(str(e))
         exit(2)
 
-    if url is None:
-        ret = update_from_osm_server(ts, options)
-    else:
-        ret = update_from_custom_server(url, seq, ts, options)
+    try:
+        if url is None:
+            ret = update_from_osm_server(ts, options)
+        else:
+            ret = update_from_custom_server(url, seq, ts, options)
+    except:
+        traceback.print_exc()
+        exit(254)
 
     exit(ret)
