@@ -170,7 +170,8 @@ class ReplicationServer:
             h.set("osmosis_replication_base_url", self.baseurl)
             h.set("osmosis_replication_sequence_number", str(diffs.id))
             info = self.get_state_info(diffs.id)
-            h.set("osmosis_replication_timestamp", info.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
+            if info is not None:
+                h.set("osmosis_replication_timestamp", info.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
         if extra_headers is not None:
             for k, v in extra_headers.items():
                 h.set(k, v)
