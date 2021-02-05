@@ -4,6 +4,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.3] - 2021-02-05
+
+### Fixed
+
+- up-to-date: check if any updates are available before starting download
+- AttributeError when writing replication headers and network is unreachable
+
+### Changed
+
+- update to pybind11 2.6.2
+
 ## [3.1.2] - 2021-01-13
 
 ### Fixed
@@ -14,7 +25,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- support for lz4 compression (compled in when library is found)
+- support for lz4 compression (compiled in when library is found)
 
 ### Changed
 
