@@ -154,10 +154,10 @@ Creating a change file
 
 Now you can create change files using the state::
 
-  pyosmium-get-changes --server <replication server> -f sequence.state -o newchange.osm.gz
+  pyosmium-get-changes --server <replication server> -f sequence.state -o newchange.osc.gz
 
 This downloads the latest changes from the server, saves them in the file
-`newchange.osm.gz` and updates your state file. `<replication server>` is the
+`newchange.osc.gz` and updates your state file. `<replication server>` is the
 URL that was printed, when you set up the state file. The parameter can be
 omitted when you use minutely change files from openstreetmap.org.
 
@@ -180,12 +180,12 @@ A simple shell script can look like this::
 
   while true; do
     # get the next batch of changes
-    pyosmium-get-changes -f sequence.state -o newchange.osm.gz
+    pyosmium-get-changes -f sequence.state -o newchange.osc.gz
     # save the return code
     status=$?
 
     if [ $status -eq 0 ]; then
-      # apply newchange.osm.gz here
+      # apply newchange.osc.gz here
       ....
     elif [ $status -eq 3 ]; then
       # No new data, so sleep for a bit
