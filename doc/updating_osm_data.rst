@@ -160,6 +160,8 @@ This downloads the latest changes from the server, saves them in the file
 `newchange.osm.gz` and updates your state file. `<replication server>` is the
 URL that was printed, when you set up the state file. The parameter can be
 omitted when you use minutely change files from openstreetmap.org.
+This simplifies multiple edits of the same element into the final change. If you want to
+retain the full version history specify `--no-deduplicate`.
 
 `pyosmium-get-changes` loads only about 100MB worth of updates at once (about
 8 hours of planet updates). If you want more, then add a `--size` parameter.
