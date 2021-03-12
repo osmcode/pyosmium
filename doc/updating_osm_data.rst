@@ -181,6 +181,8 @@ All other error codes indicate fatal errors.
 A simple shell script can look like this::
 
   while true; do
+    # pyosmium-get-changes would not overwrite an existing changes file
+    rm -f newchange.osc.gz
     # get the next batch of changes
     pyosmium-get-changes -f sequence.state -o newchange.osc.gz
     # save the return code
