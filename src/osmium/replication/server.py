@@ -1,7 +1,7 @@
 """ Helper functions to communicate with replication servers.
 """
 
-import urllib.request as urlrequest
+import requests
 import datetime as dt
 from collections import namedtuple
 from math import ceil
@@ -26,10 +26,7 @@ class ReplicationServer:
     def __init__(self, url, diff_type='osc.gz'):
         self.baseurl = url
         self.diff_type = diff_type
-
-    def make_request(self, url):
-        headers = {"User-Agent" : "pyosmium/{}".format(version.pyosmium_release)}
-        return urlrequest.Request(url, headers=headers)
+        self.session = requests.Session()
 
     def open_url(self, url):
         """ Download a resource from the given URL and return a byte sequence
@@ -48,7 +45,8 @@ class ReplicationServer:
                 svr = ReplicationServer()
                 svr.open_url = my_open_url
         """
-        return urlrequest.urlopen(url)
+        headers = {"User-Agent" : "pyosmium/{}".format(version.pyosmium_release)}
+        return self.session.get(url, headers=headers, stream=True)
 
     def collect_diffs(self, start_id, max_size=1024):
         """ Create a MergeInputReader and download diffs starting with sequence
@@ -285,15 +283,14 @@ class ReplicationServer:
         """
         for _ in range(retries + 1):
             try:
-                response = self.open_url(self.make_request(self.get_state_url(seq)))
+                response = self.open_url(self.get_state_url(seq))
             except Exception as err:
                 LOG.debug("Loading state info %s failed with: %s", seq, str(err))
                 return None
 
             ts = None
             seq = None
-            line = response.readline()
-            while line:
+            for line in response.iter_lines():
                 line = line.decode('utf-8')
                 if '#' in line:
                     line = line[0:line.index('#')]
@@ -311,7 +308,6 @@ class ReplicationServer:
                         except ValueError:
                             break
                         ts = ts.replace(tzinfo=dt.timezone.utc)
-                line = response.readline()
 
             if ts is not None and seq is not None:
                 return OsmosisState(sequence=seq, timestamp=ts)
@@ -324,7 +320,7 @@ class ReplicationServer:
             (or :code:`urllib2.HTTPError` in python2)
             if the file cannot be downloaded.
         """
-        return self.open_url(self.make_request(self.get_diff_url(seq))).read()
+        return self.open_url(self.get_diff_url(seq)).content
 
 
     def get_state_url(self, seq):
