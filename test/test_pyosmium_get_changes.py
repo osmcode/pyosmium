@@ -16,6 +16,8 @@ try:
 except:
     from io import StringIO
 
+from requests import Session
+
 try:
     from urllib.error import URLError
 except ImportError:
@@ -36,6 +38,14 @@ class Capturing(list):
         del self._stringio    # free up some memory
         sys.stdout = self._stdout
 
+class RequestsResponses(BytesIO):
+
+    def __init__(self, bytes):
+       super(RequestsResponses, self).__init__(bytes)
+       self.content = bytes
+
+    def iter_lines(self):
+       return self.readlines()
 
 class TestPyosmiumGetChanges(unittest.TestCase):
 
@@ -47,8 +57,12 @@ class TestPyosmiumGetChanges(unittest.TestCase):
         self.url_mock.side_effect = lambda url : self.urls[url.get_full_url()]
         self.script['rserv'].urlrequest.urlopen = self.url_mock
 
+        self.urlreq_mock = MagicMock()
+        self.urlreq_mock.side_effect = lambda url,**kw : self.urls[url]
+        self.script['rserv'].requests.Session.get = self.urlreq_mock
+
     def url(self, url, result):
-        self.urls[url] = BytesIO(dedent(result).encode())
+        self.urls[url] = RequestsResponses(dedent(result).encode())
 
     def main(self, *args):
         with Capturing() as output:

@@ -22,13 +22,22 @@ import osmium.replication
 import tempfile
 import datetime
 
+class RequestsResponses(BytesIO):
+
+    def __init__(self, bytes):
+       super(RequestsResponses, self).__init__(bytes)
+       self.content = bytes
+
+    def iter_lines(self):
+       return self.readlines()
+
 class UrllibMock(MagicMock):
 
     def set_result(self, s):
-        self.return_value = BytesIO(dedent(s).encode())
+        self.return_value = RequestsResponses(dedent(s).encode())
 
     def set_script(self, files):
-        self.side_effect = [BytesIO(dedent(s).encode()) for s in files]
+        self.side_effect = [RequestsResponses(dedent(s).encode()) for s in files]
 
 def test_get_state_url():
     svr = rserv.ReplicationServer("https://text.org")
@@ -58,7 +67,7 @@ def test_get_diff_url():
     for i, o in data:
         assert_equals(o, svr.get_diff_url(i))
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_get_state_valid(mock):
     mock.set_result("""\
         #Sat Aug 26 11:04:04 UTC 2017
@@ -77,7 +86,7 @@ def test_get_state_valid(mock):
 
     assert_equal(mock.call_count, 1)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_get_state_sequence_cut(mock):
     mock.set_script(("""\
         #Sat Aug 26 11:04:04 UTC 2017
@@ -97,7 +106,7 @@ def test_get_state_sequence_cut(mock):
 
     assert_equal(mock.call_count, 2)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_get_state_date_cut(mock):
     mock.set_script(("""\
         #Sat Aug 26 11:04:04 UTC 2017
@@ -118,7 +127,7 @@ def test_get_state_date_cut(mock):
 
     assert_equal(mock.call_count, 2)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_get_state_timestamp_cut(mock):
     mock.set_script(("""\
         #Sat Aug 26 11:04:04 UTC 2017
@@ -139,7 +148,7 @@ def test_get_state_timestamp_cut(mock):
 
     assert_equal(mock.call_count, 2)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_get_state_too_many_retries(mock):
     mock.set_script(("""\
         #Sat Aug 26 11:04:04 UTC 2017
@@ -170,14 +179,14 @@ def test_get_state_too_many_retries(mock):
 
 
 
-@patch('osmium.replication.server.urlrequest.urlopen')
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_get_state_server_timeout(mock):
     mock.side_effect = URLError(reason='Mock')
 
     svr = rserv.ReplicationServer("https://test.io")
     assert_is_none(svr.get_state_info())
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_apply_diffs_count(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -194,7 +203,7 @@ def test_apply_diffs_count(mock):
 
     assert_equals(h.counts, [1, 1, 1, 0])
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_apply_diffs_without_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -211,7 +220,7 @@ def test_apply_diffs_without_simplify(mock):
     assert_equals(100, svr.apply_diffs(h, 100, 10000, simplify=False))
     assert_equals([2, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_apply_diffs_with_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -228,7 +237,7 @@ def test_apply_diffs_with_simplify(mock):
     assert_equals(100, svr.apply_diffs(h, 100, 10000, simplify=True))
     assert_equals([1, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_apply_with_location(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -256,7 +265,7 @@ def test_apply_with_location(mock):
 
 
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_apply_reader_without_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -277,7 +286,7 @@ def test_apply_reader_without_simplify(mock):
     diffs.reader.apply(h, simplify=False)
     assert_equals([2, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_apply_reader_with_simplify(mock):
     mock.set_script(("""\
         sequenceNumber=100
@@ -297,7 +306,7 @@ def test_apply_reader_with_simplify(mock):
     diffs.reader.apply(h, simplify=True)
     assert_equals([1, 1, 1, 0], h.counts)
 
-@patch('osmium.replication.server.urlrequest.urlopen', new_callable=UrllibMock)
+@patch('osmium.replication.server.requests.Session.get', new_callable=UrllibMock)
 def test_apply_reader_with_location(mock):
     mock.set_script(("""\
         sequenceNumber=100
