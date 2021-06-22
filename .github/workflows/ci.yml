@@ -33,8 +33,8 @@ jobs:
               working-directory: test
 
 
-    build-ubuntu-1604:
-        runs-on: ubuntu-16.04
+    build-ubuntu-1804:
+        runs-on: ubuntu-18.04
 
         strategy:
             matrix:
@@ -50,14 +50,18 @@ jobs:
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
 
+            - name: Install clang package
+              run: sudo apt-get install -y -qq clang-6.0
+              if: ${{ matrix.compiler == 'clang' }}
+
             - uses: ./.github/actions/install-dependencies
 
             - name: Build package
               run: python setup.py build
               shell: bash
               env:
-                CC: gcc-5
-                CXX: g++-5
+                CC: gcc-7
+                CXX: g++-7
               if: ${{ matrix.compiler == 'gcc' }}
 
             - name: Build package
