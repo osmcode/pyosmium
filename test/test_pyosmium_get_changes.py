@@ -95,8 +95,11 @@ class TestPyosmiumGetChanges(unittest.TestCase):
             fd.write('453'.encode('utf-8'))
             fname = fd.name
 
-        assert_equals(0, self.main('-f', fname))
-        fd = open(fname, 'r')
-        content = fd.read()
-        assert_equals('454', content)
+        try:
+            assert_equals(0, self.main('-f', fname))
+            fd = open(fname, 'r')
+            content = fd.read()
+            assert_equals('454', content)
+        finally:
+            unlink(fname)
 
