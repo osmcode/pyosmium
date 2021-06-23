@@ -91,8 +91,8 @@ class TestPyosmiumGetChanges(unittest.TestCase):
         content = fd.read()
         try:
             assert_equals('454', content)
-            fd.close()
         finally:
+            fd.close()
             unlink(fname)
 
     def test_init_from_seq_file(self):
@@ -100,12 +100,13 @@ class TestPyosmiumGetChanges(unittest.TestCase):
             fd.write('453'.encode('utf-8'))
             fname = fd.name
 
+        assert_equals(0, self.main('-f', fname))
+        fd = open(fname, 'r')
+        content = fd.read()
         try:
-            assert_equals(0, self.main('-f', fname))
-            fd = open(fname, 'r')
-            content = fd.read()
             assert_equals('454', content)
         finally:
+            fd.close()
             unlink(fname)
 
     def test_init_date_with_cookie(self):
