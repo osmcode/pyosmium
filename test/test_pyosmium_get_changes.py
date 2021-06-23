@@ -17,6 +17,11 @@ except:
     from io import StringIO
 
 try:
+    import http.cookiejar as cookiejarlib
+except ImportError:
+    import cookielib as cookiejarlib
+
+try:
     from urllib.error import URLError
 except ImportError:
     from urllib2 import URLError
@@ -44,8 +49,8 @@ class TestPyosmiumGetChanges(unittest.TestCase):
                                            "../../tools/pyosmium-get-changes"))
         self.url_mock = MagicMock()
         self.urls = dict()
-        self.url_mock.side_effect = lambda url : self.urls[url.get_full_url()]
-        self.script['rserv'].urlrequest.urlopen = self.url_mock
+        self.url_mock.side_effect = lambda url,data=None,timeout=None : self.urls[url.get_full_url()]
+        self.script['rserv'].urlrequest.OpenerDirector.open = self.url_mock
 
     def url(self, url, result):
         self.urls[url] = BytesIO(dedent(result).encode())
@@ -95,8 +100,34 @@ class TestPyosmiumGetChanges(unittest.TestCase):
             fd.write('453'.encode('utf-8'))
             fname = fd.name
 
-        assert_equals(0, self.main('-f', fname))
-        fd = open(fname, 'r')
-        content = fd.read()
-        assert_equals('454', content)
+        try:
+            assert_equals(0, self.main('-f', fname))
+            fd = open(fname, 'r')
+            content = fd.read()
+            assert_equals('454', content)
+        finally:
+            unlink(fname)
 
+    def test_init_date_with_cookie(self):
+        self.url('https://planet.osm.org/replication/minute//state.txt',
+                 """\
+                    sequenceNumber=100
+                    timestamp=2017-08-26T11\:04\:02Z
+                 """)
+        self.url('https://planet.osm.org/replication/minute//000/000/000.state.txt',
+                 """\
+                    sequenceNumber=0
+                    timestamp=2016-08-26T11\:04\:02Z
+                 """)
+
+        with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.cookie', delete=False) as fd:
+            fname = fd.name
+        cookie_jar = cookiejarlib.MozillaCookieJar(fname)
+        cookie_jar.save()
+
+        try:
+            assert_equals(0, self.main('--cookie', fname, '-D', '2015-12-24T08:08:08Z'))
+            assert_equals(1, len(self.stdout))
+            assert_equals('1', self.stdout[0])
+        finally:
+            unlink(fname)
