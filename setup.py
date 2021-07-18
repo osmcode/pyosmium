@@ -154,6 +154,7 @@ setup(
     package_dir = {'' : 'src'},
     package_data = { 'osmium' : [ '*.dll' ] },
     python_requires = ">=3.4",
+    install_requires = ['requests'],
     cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,
 )
