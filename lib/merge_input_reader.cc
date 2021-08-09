@@ -80,6 +80,13 @@ public:
             // For normal data files we sort with the largest version of each
             // object first and then only copy this last version of any object
             // to the output.
+            // Caution: When change files have been
+            // created from extracts it is possible that they contain objects
+            // with the same type, id, version, and timestamp. In that case we
+            // still want to get the last object available. So we have to make
+            // sure it appears first in the objects vector before doing the
+            // stable sort.
+            std::reverse(objects.ptr_begin(), objects.ptr_end());
             objects.sort(osmium::object_order_type_id_reverse_version());
 
             auto output_it = boost::make_function_output_iterator(
