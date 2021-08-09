@@ -4,6 +4,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.2.0] - 2021-08-09
+
+### Fixed
+
+- merge change files correctly so that latest applied object comes first
+
+### Changed
+
+- switch to requests library for downloading files (thanks @jocelynj)
+- update to libosmium 2.17.0
+- update to pybind11 2.7.1
+
 ## [3.1.3] - 2021-02-05
 
 ### Fixed
