@@ -21,7 +21,7 @@ We provide binary wheels for Linux and Windows 64 for all actively
 maintained Python versions.
 
 For other versions, a source wheel is provided. Make sure to install all
-external dependencies first. On Deian/Ubuntu-like systems, the following
+external dependencies first. On Debian/Ubuntu-like systems, the following
 command installs all required packages:
 
     sudo apt-get install build-essential cmake libboost-dev \
@@ -42,6 +42,7 @@ pyosmium has the following dependencies:
  * [libz](https://www.zlib.net/)
  * [libbz2](https://www.sourceware.org/bzip2/)
  * [Boost](https://www.boost.org/) variant and iterator >= 1.41
+ * [Python Requests](https://docs.python-requests.org/en/master/)
  * Python setuptools
  * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
 
