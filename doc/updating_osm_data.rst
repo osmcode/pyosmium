@@ -84,7 +84,7 @@ Updating larger amounts of data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When used without any parameters, pyosmium downloads at a maximum about
-1GB of changes. That corresponds to about 3 days of planet-wide changes.
+100MB of changes. That corresponds to about 6 hours of planet-wide changes.
 You can increase the amount using the additional `--size` parameter::
 
   pyosmium-up-to-date --size=10000 planet.osm.pbf
