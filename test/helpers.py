@@ -8,21 +8,16 @@ from textwrap import dedent
 import osmium
 from datetime import datetime
 from nose.tools import *
+from datetime import timezone
 
-if sys.version_info[0] == 3:
-    from datetime import timezone
-
-    def mkdate(*args):
-        return datetime(*args, tzinfo=timezone.utc)
-else:
-    def mkdate(*args):
-        return datetime(*args)
+def mkdate(*args):
+    return datetime(*args, tzinfo=timezone.utc)
 
 
 def load_script(filename):
     """ Load an executable script into its own private environment.
     """
-    src = os.path.normpath(filename)
+    src = str(filename)
     globvars = dict()
     if sys.version_info[0] >= 3:
         exec(compile(open(src, "rb").read(), src, 'exec'), globvars)

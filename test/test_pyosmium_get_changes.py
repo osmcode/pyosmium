@@ -5,7 +5,7 @@ from helpers import load_script
 from nose.tools import *
 import unittest
 from io import BytesIO
-from os import path as osp
+from pathlib import Path
 from textwrap import dedent
 import sys
 import tempfile
@@ -48,8 +48,7 @@ class RequestsResponses(BytesIO):
 class TestPyosmiumGetChanges(unittest.TestCase):
 
     def setUp(self):
-        self.script = load_script(osp.join(osp.realpath(__file__),
-                                           "../../tools/pyosmium-get-changes"))
+        self.script = load_script((Path(__file__) / ".." / ".." / "tools"/ "pyosmium-get-changes").resolve())
         self.url_mock = MagicMock()
         self.urls = dict()
         self.url_mock.side_effect = lambda url,data=None,timeout=None : self.urls[url.get_full_url()]
