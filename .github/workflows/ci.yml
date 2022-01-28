@@ -303,6 +303,12 @@ jobs:
             fail-fast: false
             matrix:
                 python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
+                include:
+                    - python-version: "3.10"
+                      test-args: "-k 'not test_amenity_list'" #no binary wheel for shapely available
+
+        env:
+            PYTEST_ADDOPTS: ${{ matrix.test-args }}
 
         steps:
             - uses: actions/checkout@v2
