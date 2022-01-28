@@ -10,11 +10,7 @@ from textwrap import dedent
 import sys
 import tempfile
 from os import unlink
-
-try:
-    from cStringIO import StringIO
-except:
-    from io import StringIO
+from io import StringIO
 
 from requests import Session
 
@@ -28,10 +24,7 @@ try:
 except ImportError:
     from urllib2 import URLError
 
-try:
-    from unittest.mock import MagicMock, DEFAULT
-except ImportError:
-    from mock import MagicMock, DEFAULT
+from unittest.mock import MagicMock, DEFAULT
 
 class Capturing(list):
     def __enter__(self):

@@ -4,10 +4,9 @@ runs:
     using: "composite"
     steps:
         - name: Install test requirements
-          run: pip install nose shapely
+          run: pip install pytest nose shapely
           shell: bash
 
         - name: Run tests
-          run: python run_tests.py
+          run: pytest test
           shell: bash
-          working-directory: test

@@ -8,13 +8,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-
-            - name: Install package dependencies
-              run: |
-                  git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
-                  git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
-                  git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
-              shell: bash
+            - uses: ./.github/actions/install-dependencies
 
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
@@ -96,6 +90,7 @@ jobs:
         needs: build-default
 
         strategy:
+            fail-fast: false
             matrix:
                 python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
 
@@ -121,19 +116,36 @@ jobs:
             - uses: ./.github/actions/run-tests
 
 
-    build-ubuntu-1804:
-        runs-on: ubuntu-18.04
+    build-ubuntu:
+        runs-on: ${{ matrix.platform }}
 
         strategy:
             matrix:
-                compiler: [gcc, clang]
+                compiler: [gcc-old, clang-old, gcc, clang, macos]
                 include:
-                    - compiler: gcc
+                    - compiler: gcc-old
                       cc: gcc-7
                       cxx: g++-7
-                    - compiler: clang
+                      platform: ubuntu-18.04
+                      python: 3.5
+                    - compiler: clang-old
                       cc: clang-6.0
                       cxx: clang++-6.0
+                      platform: ubuntu-18.04
+                      python: 3.5
+                    - compiler: gcc
+                      cc: gcc-10
+                      cxx: g++-10
+                      platform: ubuntu-20.04
+                      python: 3.9
+                    - compiler: clang
+                      cc: clang-11
+                      cxx: clang++-11
+                      platform: ubuntu-20.04
+                      python: 3.9
+                    - compiler: macos
+                      platform: macos-latest
+                      python: 3.9
 
         env:
             CC: ${{ matrix.cc }}
@@ -141,89 +153,39 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
+            - uses: ./.github/actions/install-dependencies
 
             - uses: actions/setup-python@v2
               with:
-                  python-version: 3.5
+                  python-version: "${{ matrix.python }}"
 
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
-
-            - name: Install clang package
-              run: sudo apt-get install -y -qq clang-6.0
-              if: ${{ matrix.compiler == 'clang' }}
-
-            - uses: ./.github/actions/install-dependencies
-
-            - name: Build package
-              run: python setup.py build
-              shell: bash
-
-            - name: Run tests
-              run: python run_tests.py
-              shell: bash
-              working-directory: test
-
-    build-ubuntu-2004:
-        runs-on: ubuntu-20.04
-
-        strategy:
-            matrix:
-                compiler: [gcc, clang]
-                include:
-                    - compiler: gcc
-                      cc: gcc-10
-                      cxx: g++-10
-                    - compiler: clang
-                      cc: clang-11
-                      cxx: clang++-11
-
-        steps:
-            - uses: actions/checkout@v2
-
-            - uses: actions/setup-python@v2
-              with:
-                  python-version: "3.9"
-
-            - name: Install packages
-              run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
-
-            - uses: ./.github/actions/install-dependencies
-
-            - name: Build package
-              run: python setup.py build
-              shell: bash
-
-            - name: Run tests
-              run: python run_tests.py
-              shell: bash
-              working-directory: test
-
-    build-macos:
-        runs-on: macos-latest
-
-        steps:
-            - uses: actions/checkout@v2
-
-            - uses: actions/setup-python@v2
-              with:
-                  python-version: 3
+              if: ${{ matrix.compiler != 'macos' }}
 
             - name: Install packages
               run: brew install boost geos lz4
               shell: bash
+              if: ${{ matrix.compiler == 'macos' }}
 
-            - uses: ./.github/actions/install-dependencies
+            - name: Install clang package
+              run: sudo apt-get install -y -qq clang-6.0
+              if: ${{ matrix.cc == 'clang-6.0' }}
+
+            - name: Install prerequisites
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install pytest nose shapely setuptools requests
+              shell: bash
 
             - name: Build package
               run: python setup.py build
               shell: bash
 
-            # Doesn't work Python 3.10.
-            #- name: Run tests
-            #  run: python run_tests.py
-            #  shell: bash
-            #  working-directory: test
+            - name: Run tests
+              run: pytest test
+              shell: bash
+
 
     build-windows:
         runs-on: windows-2022
@@ -233,13 +195,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-
-            - name: Install package dependencies
-              run: |
-                  git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
-                  git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
-                  git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
-              shell: bash
+            - uses: ./.github/actions/install-dependencies
 
             - uses: actions/cache@v2
               with:
@@ -344,6 +300,7 @@ jobs:
         needs: build-windows
 
         strategy:
+            fail-fast: false
             matrix:
                 python-version: ["3.5", "3.6", "3.7", "3.8", "3.9"]
 
