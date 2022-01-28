@@ -14,10 +14,11 @@ class SimpleHandler: public BaseHandler
 public:
     virtual ~SimpleHandler() = default;
 
-    void apply_file(const std::string &filename, bool locations = false,
+    void apply_file(pybind11::object filename, bool locations = false,
                     const std::string &idx = "flex_mem")
     {
-        apply_object(osmium::io::File(filename), locations, idx);
+        std::string path = pybind11::str(((pybind11::object) filename.attr("__str__"))());
+        apply_object(osmium::io::File(path), locations, idx);
     }
 
     void apply_buffer(pybind11::buffer const &buf, std::string const &format,
