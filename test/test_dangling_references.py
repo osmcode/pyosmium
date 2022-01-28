@@ -1,9 +1,9 @@
 # vim: set fileencoding=utf-8 :
 from nose.tools import *
 import unittest
-from sys import version_info as python_version
+from pathlib import Path
 
-from helpers import create_osm_file
+TEST_DIR = (Path(__file__) / '..').resolve()
 
 import osmium as o
 
@@ -26,12 +26,8 @@ class DanglingReferenceBase(object):
     def test_keep_reference(self):
         h = o.make_simple_handler(node=self.node, way=self.way,
                                   relation=self.relation, area=self.area)
-        if python_version < (3,0):
-            with self.assertRaisesRegexp(RuntimeError, "callback keeps reference"):
-                h.apply_file('example-test.pbf')
-        else:
-            with self.assertRaisesRegex(RuntimeError, "callback keeps reference"):
-                h.apply_file('example-test.pbf')
+        with self.assertRaisesRegex(RuntimeError, "callback keeps reference"):
+              h.apply_file(TEST_DIR / 'example-test.pbf')
         assert_greater(len(self.refkeeper), 0)
         while len(self.refkeeper) > 0:
             self.refkeeper.pop()
@@ -144,7 +140,7 @@ class NotADanglingReferenceBase(object):
         h = o.make_simple_handler(node=self.node, way=self.way,
                                   relation=self.relation, area=self.area)
         # Does not rise a dangling reference excpetion
-        h.apply_file('example-test.pbf')
+        h.apply_file(TEST_DIR / 'example-test.pbf')
         assert_greater(len(self.refkeeper), 0)
         #self.refkeeper.clear()
         while len(self.refkeeper) > 0:

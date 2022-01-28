@@ -6,14 +6,13 @@ import unittest
 import sys
 from helpers import load_script
 from os import path as osp
+from io import StringIO
+from pathlib import Path
 
-TEST_FILE='example-test.pbf'
-TEST_DIFF='example-test.osc'
+TEST_DIR = (Path(__file__) / '..').resolve()
+TEST_FILE = TEST_DIR / 'example-test.pbf'
+TEST_DIFF = TEST_DIR / 'example-test.osc'
 
-try:
-    from StringIO import StringIO
-except:
-    from io import StringIO
 
 class Capturing(list):
     def __enter__(self):
@@ -26,8 +25,7 @@ class Capturing(list):
         sys.stdout = self._stdout
 
 def load_example(name):
-    return load_script(osp.join(osp.realpath(__file__),
-                                "..", "..", "examples", name + ".py"))
+    return load_script((TEST_DIR / '..' / "examples" / (name + ".py")).resolve())
 
 def test_amenity_list():
     script = load_example("amenity_list")

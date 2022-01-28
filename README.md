@@ -75,13 +75,12 @@ They are mostly ports of the examples in Libosmium and osmium-contrib.
 There is a small test suite in the test directory. This provides regression
 test for the python bindings, it is not meant to be a test suite for Libosmium.
 
-You'll need the Python `nose` module. On Debian/Ubuntu install the package
-`python-nose`. For Python2 `mock` is required as well (package `python-mock`).
+You'll need the Python `nose` and `pytest` module. On Debian/Ubuntu install the package
+`python3-nose` and `python3-pytest`.
 
 The suite can be run with:
 
-    cd test
-    python run_tests.py
+    pytest test
 
 
 ## Documentation
@@ -117,4 +116,3 @@ Pyosmium is available under the BSD 2-Clause License. See LICENSE.TXT.
 ## Authors
 
 Sarah Hoffmann (lonvia@denofr.de)
-
