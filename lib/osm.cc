@@ -207,11 +207,11 @@ PYBIND11_MODULE(_osm, m) {
         "an immutable sequence of :py:class:`osmium.osm.NodeRef`. This class "
         "is normally not used directly, use one of its subclasses instead.")
         .def("__len__", &osmium::NodeRefList::size)
-        .def("__getitem__", [](osmium::NodeRefList const &list, ssize_t idx)
+        .def("__getitem__", [](osmium::NodeRefList const &list, Py_ssize_t idx)
              {
                 auto sz = list.size();
                 osmium::NodeRefList::size_type iout =
-                    (idx >= 0 ? idx : (ssize_t) sz + idx);
+                    (idx >= 0 ? idx : (Py_ssize_t) sz + idx);
 
                 if (iout >= sz || iout < 0) {
                     throw py::index_error("Bad index.");
