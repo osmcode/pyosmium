@@ -126,7 +126,7 @@ def write_end_sequence(fname, seqid):
 
 def get_arg_parser(from_main=False):
     def h(s):
-        return re.sub("\s\s+" , " ", s)
+        return re.sub(r'\s\s+' , " ", s)
 
     parser = ArgumentParser(description=__doc__,
                             usage=None if from_main else 'pyosmium-get-changes [options]',

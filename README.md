@@ -75,8 +75,8 @@ They are mostly ports of the examples in Libosmium and osmium-contrib.
 There is a small test suite in the test directory. This provides regression
 test for the python bindings, it is not meant to be a test suite for Libosmium.
 
-You'll need the Python `nose` and `pytest` module. On Debian/Ubuntu install the package
-`python3-nose` and `python3-pytest`.
+You'll need the Python `pytest` module. On Debian/Ubuntu install the package
+`python3-pytest`.
 
 The suite can be run with:
 

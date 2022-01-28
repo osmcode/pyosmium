@@ -1,53 +1,49 @@
 # vim: set fileencoding=utf-8 :
-from nose.tools import *
-import unittest
-import os
-import sys
-from datetime import datetime
+import pytest
 
 from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase
 
 import osmium as o
 
-class TestTagEmptyTagListLength(HandlerTestBase, unittest.TestCase):
+class TestTagEmptyTagListLength(HandlerTestBase):
     data = "n234 x1 y2"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
-            assert_equals(0, len(n.tags))
-            assert_false(n.tags)
+            assert 0 == len(n.tags)
+            assert not n.tags
 
-class TestTagEmptyTagListContains(HandlerTestBase, unittest.TestCase):
+class TestTagEmptyTagListContains(HandlerTestBase):
     data = "n234 x1 y2"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
-            assert_not_in("a", n.tags)
+            assert "a" not in n.tags
 
-class TestTagEmptyTagListGet(HandlerTestBase, unittest.TestCase):
+class TestTagEmptyTagListGet(HandlerTestBase):
     data = "n234 x1 y2"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
-            assert_equals(None, n.tags.get("foo"))
-            assert_equals(None, n.tags.get("foo", None))
-            assert_equals("fs", n.tags.get("foo", "fs"))
+            assert None == n.tags.get("foo")
+            assert None == n.tags.get("foo", None)
+            assert "fs" == n.tags.get("foo", "fs")
 
-class TestTagEmptyTagListIndexOp(HandlerTestBase, unittest.TestCase):
+class TestTagEmptyTagListIndexOp(HandlerTestBase):
     data = "n234 x1 y2"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
-            with assert_raises(KeyError):
+            with pytest.raises(KeyError):
                 n.tags["foo"]
-            with assert_raises(KeyError):
+            with pytest.raises(KeyError):
                 n.tags[None]
 
-class TestTagListLen(HandlerTestBase, unittest.TestCase):
+class TestTagListLen(HandlerTestBase):
     data = u"""\
            n1 x0 y0 Ta=a
            n2 Tkeyñ=value
@@ -58,58 +54,58 @@ class TestTagListLen(HandlerTestBase, unittest.TestCase):
         expected_len = { 1 : 1, 2 : 1, 3 : 3}
 
         def node(self, n):
-            assert_true(n.tags)
-            assert_equals(self.expected_len[n.id], len(n.tags))
-            assert_true(check_repr(n.tags))
+            assert n.tags
+            assert self.expected_len[n.id], len(n.tags)
+            assert check_repr(n.tags)
 
-class TestTagContains(HandlerTestBase, unittest.TestCase):
+class TestTagContains(HandlerTestBase):
     data = "n234 Tabba=x,2=vvv,xx=abba"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
-            assert_in("abba", n.tags)
-            assert_in("2", n.tags)
-            assert_in("xx", n.tags)
-            assert_not_in("x", n.tags)
-            assert_not_in(None, n.tags)
-            assert_not_in("", n.tags)
-            assert_true(check_repr(n.tags))
+            assert "abba" in n.tags
+            assert "2" in n.tags
+            assert "xx" in n.tags
+            assert "x" not in n.tags
+            assert None not in n.tags
+            assert "" not in n.tags
+            assert check_repr(n.tags)
 
-class TestTagIndexOp(HandlerTestBase, unittest.TestCase):
+class TestTagIndexOp(HandlerTestBase):
     data = "n234 Tabba=x,2=vvv,xx=abba"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
-            eq_("x", n.tags["abba"])
-            eq_("vvv", n.tags["2"])
-            eq_("abba", n.tags["xx"])
+            assert "x" == n.tags["abba"]
+            assert "vvv" == n.tags["2"]
+            assert "abba" == n.tags["xx"]
             for k in ("x", "addad", "..", None):
-                with assert_raises(KeyError):
+                with pytest.raises(KeyError):
                     n.tags[k]
 
-class TestTagGet(HandlerTestBase, unittest.TestCase):
+class TestTagGet(HandlerTestBase):
     data = "n234 Tabba=x,2=vvv,xx=abba"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
-            eq_("x", n.tags.get("abba"))
-            eq_("vvv", n.tags.get("2", None))
-            eq_("abba", n.tags.get("xx", "ff"))
-            eq_("43 fg", n.tags.get("_", "43 fg"))
-            assert_is_none(n.tags.get("gerger4"))
-            assert_is_none(n.tags.get("ffleo", None))
+            assert "x" == n.tags.get("abba")
+            assert "vvv" == n.tags.get("2", None)
+            assert "abba" == n.tags.get("xx", "ff")
+            assert "43 fg" == n.tags.get("_", "43 fg")
+            assert n.tags.get("gerger4") is None
+            assert n.tags.get("ffleo", None) is None
 
-class TestTagToDict(HandlerTestBase, unittest.TestCase):
+class TestTagToDict(HandlerTestBase):
     data = "n234 Tabba=x,2=vvv,xx=abba"
 
     class Handler(o.SimpleHandler):
 
         def node(self, n):
             d = dict(n.tags)
-            eq_(len(d), 3)
-            eq_(d['abba'], 'x')
-            eq_(d['2'], 'vvv')
-            eq_(d['xx'], 'abba')
+            assert len(d) == 3
+            assert d['abba'] == 'x'
+            assert d['2'] == 'vvv'
+            assert d['xx'] == 'abba'

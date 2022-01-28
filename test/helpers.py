@@ -7,7 +7,6 @@ import sys
 from textwrap import dedent
 import osmium
 from datetime import datetime
-from nose.tools import *
 from datetime import timezone
 
 def mkdate(*args):
@@ -201,7 +200,7 @@ class ExecutedHandler(osmium.SimpleHandler):
         self.has_run = False
 
     def check_result(self):
-        assert_true(self.has_run)
+        assert self.has_run
 
 
 class HandlerFunction(osmium.SimpleHandler):

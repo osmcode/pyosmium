@@ -331,7 +331,6 @@ class ReplicationServer:
     def get_diff_block(self, seq):
         """ Downloads the diff with the given sequence number and returns
             it as a byte sequence. Throws a :code:`urllib.error.HTTPError`
-            (or :code:`urllib2.HTTPError` in python2)
             if the file cannot be downloaded.
         """
         resp = self.open_url(self.make_request(self.get_diff_url(seq)))

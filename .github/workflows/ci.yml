@@ -92,7 +92,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+                python-version: [3.5, 3.6, 3.7, 3.8, 3.9, "3.10"]
 
         steps:
             - uses: actions/checkout@v2
@@ -137,15 +137,15 @@ jobs:
                       cc: gcc-10
                       cxx: g++-10
                       platform: ubuntu-20.04
-                      python: 3.9
+                      python: "3.10"
                     - compiler: clang
                       cc: clang-11
                       cxx: clang++-11
                       platform: ubuntu-20.04
-                      python: 3.9
+                      python: "3.10"
                     - compiler: macos
                       platform: macos-latest
-                      python: 3.9
+                      python: "3.10"
 
         env:
             CC: ${{ matrix.cc }}
@@ -175,7 +175,7 @@ jobs:
             - name: Install prerequisites
               run: |
                   python -m pip install --upgrade pip
-                  pip install pytest nose shapely setuptools requests
+                  pip install pytest shapely setuptools requests
               shell: bash
 
             - name: Build package
@@ -302,7 +302,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.5", "3.6", "3.7", "3.8", "3.9"]
+                python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
 
         steps:
             - uses: actions/checkout@v2

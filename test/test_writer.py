@@ -1,9 +1,7 @@
-from nose.tools import *
-import unittest
 import tempfile
 import os
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import OrderedDict
 import logging
 import sys
@@ -12,14 +10,8 @@ import osmium as o
 
 log = logging.getLogger(__name__)
 
-if sys.version_info[0] == 3:
-    from datetime import timezone
-
-    def mkdate(*args):
-        return datetime(*args, tzinfo=timezone.utc)
-else:
-    def mkdate(*args):
-        return datetime(*args)
+def mkdate(*args):
+    return datetime(*args, tzinfo=timezone.utc)
 
 @contextmanager
 def WriteExpect(expected):
@@ -32,7 +24,7 @@ def WriteExpect(expected):
 
     with open(fname, 'r') as fd:
         line = fd.readline().strip()
-    assert_equals(line, expected)
+    assert line == expected
     os.remove(fname)
 
 class O(object):
@@ -40,7 +32,7 @@ class O(object):
         for k,v in params.items():
             setattr(self, k, v)
 
-class TestWriteSimpleAttributes(unittest.TestCase):
+class TestWriteSimpleAttributes:
 
     test_data_simple_attr = (
       (O(id=None), '0 v0 dV c0 t i0 u T'),
@@ -77,7 +69,7 @@ class TestWriteSimpleAttributes(unittest.TestCase):
             with WriteExpect('r' + out + ' M') as w:
                 w.add_relation(rel)
 
-class TestWriteTags(unittest.TestCase):
+class TestWriteTags:
 
     test_data_tags = (
      (None, 'T'),
@@ -105,7 +97,7 @@ class TestWriteTags(unittest.TestCase):
                 w.add_relation(O(tags=tags))
 
 
-class TestWriteNode(unittest.TestCase):
+class TestWriteNode:
 
     def test_location_tuple(self):
         with WriteExpect('n0 v0 dV c0 t i0 u T x1.1234561 y0.1234561') as w:
@@ -119,7 +111,7 @@ class TestWriteNode(unittest.TestCase):
         with WriteExpect('n0 v0 dV c0 t i0 u T x y') as w:
             w.add_node(O(location=None))
 
-class TestWriteWay(unittest.TestCase):
+class TestWriteWay:
 
     def test_node_list(self):
         with WriteExpect('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
@@ -129,7 +121,7 @@ class TestWriteWay(unittest.TestCase):
         with WriteExpect('w0 v0 dV c0 t i0 u T N') as w:
             w.add_way(O(nodes=None))
 
-class TestWriteRelation(unittest.TestCase):
+class TestWriteRelation:
 
     def test_relation_members(self):
         with WriteExpect('r0 v0 dV c0 t i0 u T Mn34@foo,r200@,w1111@x') as w:
@@ -141,6 +133,3 @@ class TestWriteRelation(unittest.TestCase):
     def test_relation_members_None(self):
         with WriteExpect('r0 v0 dV c0 t i0 u T M') as w:
             w.add_relation(O(members=None))
-
-if __name__ == '__main__':
-    unittest.main()

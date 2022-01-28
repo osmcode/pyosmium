@@ -1,12 +1,12 @@
-from nose.tools import *
-import unittest
 import os
+
+import pytest
 
 from helpers import create_osm_file, osmobj
 
 import osmium as o
 
-class TestReaderFromFile(unittest.TestCase):
+class TestReaderFromFile:
 
     def _run_file(self, fn):
         try:
@@ -41,26 +41,21 @@ class TestReaderFromFile(unittest.TestCase):
         fn = create_osm_file([osmobj('N', id=1, timestamp='x')])
         try:
             rd = o.io.Reader(fn)
-            with assert_raises(ValueError):
+            with pytest.raises(ValueError):
                 o.apply(rd, o.SimpleHandler())
                 rd.close()
         finally:
             os.remove(fn)
 
 
-class TestFileHeader(unittest.TestCase):
-
-    def test_file_header(self):
-        fn = create_osm_file([osmobj('N', id=1)])
-        try:
-            rd = o.io.Reader(fn)
-            h = rd.header()
-            assert_false(h.has_multiple_object_versions)
-            assert_true(h.box().valid())
-            assert_equals(h.box().size(), 64800.0)
-            rd.close()
-        finally:
-            os.remove(fn)
-
-if __name__ == '__main__':
-    unittest.main()
+def test_file_header():
+    fn = create_osm_file([osmobj('N', id=1)])
+    try:
+        rd = o.io.Reader(fn)
+        h = rd.header()
+        assert not h.has_multiple_object_versions
+        assert h.box().valid()
+        assert h.box().size() == 64800.0
+        rd.close()
+    finally:
+        os.remove(fn)

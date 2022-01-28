@@ -1,5 +1,3 @@
-from nose.tools import *
-import unittest
 import os
 import threading
 
@@ -20,7 +18,7 @@ def import_data(function_complete):
 
 
 def test_threaded_processing():
-    """ Process a file in a different thread nad make sure that processing
+    """ Process a file in a different thread and make sure that processing
         completes.
     """
 
@@ -29,6 +27,6 @@ def test_threaded_processing():
     t.start()
     function_complete.wait(timeout=2)
 
-    assert_true(function_complete.is_set());
+    assert function_complete.is_set()
 
 
