@@ -6,9 +6,98 @@ jobs:
     build-default:
         runs-on: ubuntu-20.04
 
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Install package dependencies
+              run: |
+                  git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
+                  git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
+                  git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
+              shell: bash
+
+            - name: Install packages
+              run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
+
+            - name: Set up Python 3.5
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.5
+
+            - name: Build package 3.5
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+
+            - name: Set up Python 3.6
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.6
+
+            - name: Build package 3.6
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+
+            - name: Set up Python 3.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.7
+
+            - name: Build package 3.7
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+
+            - name: Set up Python 3.8
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.8
+
+            - name: Build package 3.8
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+
+            - name: Set up Python 3.9
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Build package 3.9
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+
+            - name: Set up Python 3.10
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "3.10"
+
+            - name: Build package 3.10
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  name: pyosmium-linux-x64-dist
+                  path: dist
+
+    test-default:
+        runs-on: ubuntu-20.04
+        needs: build-default
+
         strategy:
             matrix:
-                python-version: [3.6, 3.7, 3.8]
+                python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
 
         steps:
             - uses: actions/checkout@v2
@@ -18,19 +107,18 @@ jobs:
               with:
                   python-version: ${{ matrix.python-version }}
 
-            - name: Install packages
-              run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
+            - uses: actions/download-artifact@v2
+              with:
+                  name: pyosmium-linux-x64-dist
 
-            - uses: ./.github/actions/install-dependencies
-
-            - name: Build package
-              run: python setup.py build
+            - name: Install osmium
+              run: |
+                pip install osmium*${PYVER/./}*.whl
               shell: bash
+              env:
+                PYVER: ${{ matrix.python-version }}
 
-            - name: Run tests
-              run: python run_tests.py
-              shell: bash
-              working-directory: test
+            - uses: ./.github/actions/run-tests
 
 
     build-ubuntu-1804:
@@ -39,6 +127,17 @@ jobs:
         strategy:
             matrix:
                 compiler: [gcc, clang]
+                include:
+                    - compiler: gcc
+                      cc: gcc-7
+                      cxx: g++-7
+                    - compiler: clang
+                      cc: clang-6.0
+                      cxx: clang++-6.0
+
+        env:
+            CC: ${{ matrix.cc }}
+            CXX: ${{ matrix.cxx }}
 
         steps:
             - uses: actions/checkout@v2
@@ -59,18 +158,6 @@ jobs:
             - name: Build package
               run: python setup.py build
               shell: bash
-              env:
-                CC: gcc-7
-                CXX: g++-7
-              if: ${{ matrix.compiler == 'gcc' }}
-
-            - name: Build package
-              run: python setup.py build
-              shell: bash
-              env:
-                CC: clang-6.0
-                CXX: clang++-6.0
-              if: ${{ matrix.compiler == 'clang' }}
 
             - name: Run tests
               run: python run_tests.py
@@ -83,13 +170,20 @@ jobs:
         strategy:
             matrix:
                 compiler: [gcc, clang]
+                include:
+                    - compiler: gcc
+                      cc: gcc-10
+                      cxx: g++-10
+                    - compiler: clang
+                      cc: clang-11
+                      cxx: clang++-11
 
         steps:
             - uses: actions/checkout@v2
 
             - uses: actions/setup-python@v2
               with:
-                  python-version: 3.9
+                  python-version: "3.9"
 
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
@@ -99,18 +193,6 @@ jobs:
             - name: Build package
               run: python setup.py build
               shell: bash
-              env:
-                CC: gcc-10
-                CXX: g++-10
-              if: ${{ matrix.compiler == 'gcc' }}
-
-            - name: Build package
-              run: python setup.py build
-              shell: bash
-              env:
-                CC: clang-10
-                CXX: clang++-10
-              if: ${{ matrix.compiler == 'clang' }}
 
             - name: Run tests
               run: python run_tests.py
@@ -137,9 +219,151 @@ jobs:
               run: python setup.py build
               shell: bash
 
-            - name: Run tests
-              run: python run_tests.py
+            # Doesn't work Python 3.10.
+            #- name: Run tests
+            #  run: python run_tests.py
+            #  shell: bash
+            #  working-directory: test
+
+    build-windows:
+        runs-on: windows-2022
+
+        env:
+            VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Install package dependencies
+              run: |
+                  git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
+                  git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
+                  git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
               shell: bash
-              working-directory: test
 
+            - uses: actions/cache@v2
+              with:
+                  path: |
+                    C:/vcpkg_binary_cache
+                  key: vcpkg-binary-cache-windows-2022
 
+            - name: Prepare cache
+              run: if [ ! -d C:/vcpkg_binary_cache ]; then mkdir C:/vcpkg_binary_cache; fi
+              shell: bash
+
+            - name: Install packages
+              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
+              shell: bash
+
+            - name: Set up Python 3.5
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.5
+
+            - name: Build package 3.5
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: Set up Python 3.6
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.6
+
+            - name: Build package 3.6
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: Set up Python 3.7
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.7
+
+            - name: Build package 3.7
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: Set up Python 3.8
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.8
+
+            - name: Build package 3.8
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: Set up Python 3.9
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Build package 3.9
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: Set up Python 3.10
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "3.10"
+
+            - name: Build package 3.10
+              run: |
+                pip install build wheel
+                python -m build -w
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: 'Upload Artifact'
+              uses: actions/upload-artifact@v2
+              with:
+                  name: pyosmium-win64-dist
+                  path: dist
+
+    test-windows:
+        runs-on: windows-2022
+        needs: build-windows
+
+        strategy:
+            matrix:
+                python-version: ["3.5", "3.6", "3.7", "3.8", "3.9"]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - uses: actions/download-artifact@v2
+              with:
+                  name: pyosmium-win64-dist
+
+            - name: Install osmium
+              run: |
+                pip install osmium*${PYVER/./}*.whl
+              shell: bash
+              env:
+                PYVER: ${{ matrix.python-version }}
+
+            - uses: ./.github/actions/run-tests

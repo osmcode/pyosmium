@@ -1,0 +1,13 @@
+name: "Run tests"
+
+runs:
+    using: "composite"
+    steps:
+        - name: Install test requirements
+          run: pip install nose shapely
+          shell: bash
+
+        - name: Run tests
+          run: python run_tests.py
+          shell: bash
+          working-directory: test
