@@ -7,4 +7,3 @@ include lib/*.cc
 include doc/*.rst
 include examples/*py
 include test/*py
-include contrib/*.dll
