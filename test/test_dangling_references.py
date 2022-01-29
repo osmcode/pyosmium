@@ -17,8 +17,6 @@ class DanglingReferenceBase:
         that was handed into the callback. We expect that the handler
         bails out with a runtime error in such a case.
     """
-
-
     node = None
     way = None
     relation = None

@@ -5,63 +5,71 @@
 # Copyright (C) 2022 Sarah Hoffmann.
 import pytest
 
-from helpers import create_osm_file, osmobj, HandlerTestBase
-
 import osmium as o
 
-class TestLength(HandlerTestBase):
+def test_waynode_length(simple_handler):
     data = """\
            w593
            w4 Nn1,n2,n-34
            w8 Nn12,n12,n12,n0
            """
 
-    class Handler(o.SimpleHandler):
-        expected_length = { 593 : 0, 4 : 3, 8 : 4 }
+    lens = {}
+    def way(w):
+        lens[w.id] = len(w.nodes)
 
-        def way(self, w):
-            assert self.expected_length[w.id] == len(w.nodes)
+    simple_handler(data, way=way)
 
-class TestNodeIds(HandlerTestBase):
-    data = """w4 Nn1,n1,n34359737784,n-34,n0"""
+    assert lens == { 593 : 0, 4 : 3, 8 : 4 }
 
-    class Handler(o.SimpleHandler):
 
-        def way(self, w):
-            assert 1 == w.nodes[0].ref
-            assert 1 == w.nodes[1].ref
-            assert 34359737784 == w.nodes[2].ref
-            assert -34 == w.nodes[3].ref
-            assert 0 == w.nodes[4].ref
-            assert 0 == w.nodes[-1].ref
+def test_node_ids(simple_handler):
+    refs = []
+    def way(w):
+        refs.extend(n.ref for n in w.nodes)
+        assert w.nodes[-2].ref == -34
+        with pytest.raises(IndexError):
+            w.nodes[5]
+        with pytest.raises(IndexError):
+            w.nodes[-6]
 
-class TestMissingRef(HandlerTestBase):
+    simple_handler("w4 Nn1,n1,n34359737784,n-34,n0", way=way)
+
+    assert refs == [1, 1, 34359737784, -34, 0]
+
+
+def test_missing_location_without_location_handler(simple_handler):
     data = """\
            n1 x0.5 y10.0
            w4 Nn1
            """
 
-    class Handler(o.SimpleHandler):
+    refs = []
+    def way(w):
+        refs.extend(n.ref for n in w.nodes)
+        assert not w.nodes[0].location.valid()
+        with pytest.raises(o.InvalidLocationError):
+            w.nodes[0].location.lat
+        with pytest.raises(o.InvalidLocationError):
+            w.nodes[0].location.lon
 
-        def way(self, w):
-            assert 1 == w.nodes[0].ref
-            assert not w.nodes[0].location.valid()
-            with pytest.raises(o.InvalidLocationError):
-                w.nodes[0].location.lat
-            with pytest.raises(o.InvalidLocationError):
-                w.nodes[0].location.lon
+    simple_handler(data, way=way)
 
-class TestValidRefs(HandlerTestBase):
+    assert refs == [1]
+
+
+def test_valid_locations(simple_handler):
     data = """\
            n1 x0.5 y10.0
            w4 Nn1
            """
-    apply_locations = True
 
-    class Handler(o.SimpleHandler):
+    locations = []
+    def way(w):
+        assert all(n.location.valid() for n in w.nodes)
+        locations.extend((int(10 * n.location.lon), int(10 * n.location.lat))
+                         for n in w.nodes)
 
-        def way(self, w):
-            assert 1 == w.nodes[0].ref
-            assert w.nodes[0].location.valid()
-            assert w.nodes[0].location.lat == pytest.approx(10.0)
-            assert w.nodes[0].location.lon == pytest.approx(0.5)
+    simple_handler(data, way=way, locations=True)
+
+    assert locations == [(5, 100)]

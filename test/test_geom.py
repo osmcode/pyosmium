@@ -7,127 +7,121 @@ import json
 
 import pytest
 
-from helpers import create_osm_file, osmobj, HandlerTestBase, HandlerFunction
 import osmium as o
 import osmium.geom
 
 wkbfab = o.geom.WKBFactory()
 
-class NodeGeomCollector(object):
+@pytest.fixture
+def node_geom(test_data):
 
-    def __init__(self, fab):
-        self.fab = fab
-        self.geoms = []
+    def _run(factory, data='n1 x-23.3 y28.0'):
+        geoms = []
+        def _mk_point(node):
+            geoms.append(factory.create_point(node))
+        handler = o.make_simple_handler(node=_mk_point)
+        handler.apply_file(test_data(data))
 
-    def __call__(self, n):
-        self.geoms.append(self.fab.create_point(n))
+        assert len(geoms) == 1
+        return geoms[0]
 
-    def run(self):
-        data = [osmobj('N', id=1, lat=28.0, lon=-23.3)]
-        HandlerFunction(node=self).run(data)
+    return _run
 
-        assert 1 == len(self.geoms)
-        return self.geoms[0]
 
-def test_wkb_create_node():
-    c = NodeGeomCollector(o.geom.WKBFactory())
-    wkb = c.run()
+def test_wkb_create_node(node_geom):
+    wkb = node_geom(o.geom.WKBFactory())
     if wkb.startswith('01'):
         assert wkb.startswith('0101000000')
     else:
         assert wkb.startswith('00')
 
-def test_wkt_create_node():
-    c = NodeGeomCollector(o.geom.WKTFactory())
-    wkt = c.run()
+
+def test_wkt_create_node(node_geom):
+    wkt = node_geom(o.geom.WKTFactory())
     assert wkt.startswith('POINT(')
 
-def test_geojson_create_node():
-    c = NodeGeomCollector(o.geom.GeoJSONFactory())
-    geom = c.run()
+
+def test_geojson_create_node(node_geom):
+    geom = node_geom(o.geom.GeoJSONFactory())
     geom = json.loads(geom)
     assert geom['type'], 'Point'
 
 
-class WayGeomCollector(object):
+@pytest.fixture
+def way_geom(test_data):
 
-    def __init__(self, fab):
-        self.fab = fab
-        self.geoms = []
+    def _run(factory):
+        opl = test_data(['n1 x0 y0', 'n2 x1 y0', 'n3 x0 y1', 'w1 Nn1,n2,n3'])
+        geoms = []
+        def _mk_way(w):
+            geoms.append(factory.create_linestring(w))
+            geoms.append(factory.create_linestring(w,
+                                          direction=o.geom.direction.BACKWARD))
+            geoms.append(factory.create_linestring(w,
+                                          use_nodes=o.geom.use_nodes.ALL))
 
-    def __call__(self, w):
-        self.geoms.append(self.fab.create_linestring(w))
-        self.geoms.append(self.fab.create_linestring(w,
-                                           direction=o.geom.direction.BACKWARD))
-        self.geoms.append(self.fab.create_linestring(w,
-                                           use_nodes=o.geom.use_nodes.ALL))
+        handler = o.make_simple_handler(way=_mk_way)
+        handler.apply_file(opl, locations=True)
 
-    def run(self):
-        data = [osmobj('N', id=1, lat=0, lon=0),
-                osmobj('N', id=2, lat=0, lon=1),
-                osmobj('N', id=3, lat=1, lon=0),
-                osmobj('W', id=1, nodes = [1,2,3])]
-        HandlerFunction(way=self).run(data, apply_locations=True)
+        assert len(geoms) == 3
+        return geoms
 
-        assert 3 == len(self.geoms)
-        return self.geoms
+    return _run
 
-def test_wkb_create_way():
-    c = WayGeomCollector(o.geom.WKBFactory())
-    for wkb in c.run():
+
+def test_wkb_create_way(way_geom):
+    wkbs = way_geom(o.geom.WKBFactory())
+
+    for wkb in wkbs:
         if wkb.startswith('01'):
             assert wkb.startswith('0102000000030'), "wkb: " + wkb
         else:
             assert wkb.startswith('00')
 
-def test_wkt_create_way():
-    c = WayGeomCollector(o.geom.WKTFactory())
-    for wkt in c.run():
-        assert wkt.startswith('LINESTRING(')
+def test_wkt_create_way(way_geom):
+    wkts = way_geom(o.geom.WKTFactory())
 
-def test_geojson_create_way():
-    c = WayGeomCollector(o.geom.GeoJSONFactory())
-    for geom in c.run():
-        geom = json.loads(geom)
-        assert geom['type'] == 'LineString'
+    assert all(wkt.startswith('LINESTRING(') for wkt in wkts)
+
+def test_geojson_create_way(way_geom):
+    geoms = way_geom(o.geom.GeoJSONFactory())
+
+    assert all(json.loads(geom)['type'] == 'LineString' for geom in geoms)
 
 
-class PolyGeomCollector(object):
+@pytest.fixture
+def area_geom(test_data):
 
-    def __init__(self, fab):
-        self.fab = fab
-        self.geoms = []
+    def _run(factory):
+        opl = test_data(['n1 x0 y0', 'n2 x1 y0', 'n3 x0 y1', 'w23 Nn1,n2,n3,n1 Tarea=yes'])
+        geoms = []
+        def _mk_area(a):
+            geoms.append(factory.create_multipolygon(a))
 
-    def __call__(self, n):
-        self.geoms.append(self.fab.create_multipolygon(n))
+        handler = o.make_simple_handler(area=_mk_area)
+        handler.apply_file(opl, locations=True)
 
-    def run(self):
-        data = [osmobj('N', id=1, lat=0, lon=0),
-                osmobj('N', id=2, lat=0, lon=1),
-                osmobj('N', id=3, lat=1, lon=0),
-                osmobj('W', id=23,
-                       nodes = [1,2,3,1], tags = { "area" : "yes" })]
-        HandlerFunction(area=self).run(data, apply_locations=True)
+        assert len(geoms) == 1
+        return geoms[0]
 
-        assert 1 == len(self.geoms)
-        return self.geoms[0]
+    return _run
 
-def test_wkb_create_poly():
-    c = PolyGeomCollector(o.geom.WKBFactory())
-    wkb = c.run()
+
+def test_wkb_create_poly(area_geom):
+    wkb = area_geom(o.geom.WKBFactory())
     if wkb.startswith('01'):
         assert wkb.startswith('010600000001'), "wkb: " + wkb
     else:
         assert wkb.startswith('00')
 
-def test_wkt_create_poly():
-    c = PolyGeomCollector(o.geom.WKTFactory())
-    wkt = c.run()
+
+def test_wkt_create_poly(area_geom):
+    wkt = area_geom(o.geom.WKTFactory())
     assert wkt.startswith('MULTIPOLYGON(')
 
-def test_geojson_create_poly():
-    c = PolyGeomCollector(o.geom.GeoJSONFactory())
-    geom = c.run()
+
+def test_geojson_create_poly(area_geom):
+    geom = area_geom(o.geom.GeoJSONFactory())
     geom = json.loads(geom)
     assert geom['type'] == 'MultiPolygon'
 
@@ -137,26 +131,28 @@ def test_lonlat_to_mercator():
     assert c.x == pytest.approx(378486.2686971)
     assert c.y == pytest.approx(-814839.8325696)
 
+
 def test_mercator_lonlat():
     c = o.geom.mercator_to_lonlat(o.geom.Coordinates(0.03,10.2))
     assert c.x == pytest.approx(0.00000026, rel=1e-1)
     assert c.y == pytest.approx(0.00009162, rel=1e-1)
+
 
 def test_coordinate_from_location():
     c = o.geom.Coordinates(o.osm.Location(10.0, -3.0))
     assert c.x == pytest.approx(10.0)
     assert c.y == pytest.approx(-3.0)
 
+
 def test_haversine():
-    data = [osmobj('N', id=1, lat=0, lon=0),
-                osmobj('N', id=2, lat=0, lon=1),
-                osmobj('N', id=3, lat=1, lon=0),
-                osmobj('W', id=1, nodes = [1,2,3])]
+    data = ['n1 x0 y0', 'n2 x1 y0', 'n3 x0 y1', 'w1 Nn1,n2,n3']
 
     results = []
     def call_haversine(w):
         results.append(o.geom.haversine_distance(w.nodes))
-    HandlerFunction(way=call_haversine).run(data, apply_locations=True)
+
+    handler = o.make_simple_handler(way=call_haversine)
+    handler.apply_buffer('\n'.join(data).encode('utf-8'), 'opl', locations=True)
 
     assert 1 == len(results)
     assert 268520 == pytest.approx(results[0])

@@ -1,6 +1,6 @@
 from osmium._osmium import SimpleHandler
 
-def make_simple_handler(node=None, way=None, relation=None, area=None):
+def make_simple_handler(node=None, way=None, relation=None, area=None, changeset=None):
     """ Convenience function that creates a `SimpleHandler` from a set of
         callback functions. Each of the parameters takes an optional callable
         that must expect a single positional parameter with the object being
@@ -17,5 +17,7 @@ def make_simple_handler(node=None, way=None, relation=None, area=None):
         __HandlerWithCallbacks.relation = staticmethod(relation)
     if area is not None:
         __HandlerWithCallbacks.area = staticmethod(area)
+    if changeset is not None:
+        __HandlerWithCallbacks.changeset = staticmethod(changeset)
 
     return __HandlerWithCallbacks()

@@ -5,111 +5,121 @@
 # Copyright (C) 2022 Sarah Hoffmann.
 import pytest
 
-from helpers import create_osm_file, osmobj, check_repr, HandlerTestBase
+from helpers import check_repr
 
 import osmium as o
 
-class TestTagEmptyTagListLength(HandlerTestBase):
-    data = "n234 x1 y2"
+@pytest.fixture
+def tag_handler(simple_handler):
 
-    class Handler(o.SimpleHandler):
+    def _handle(data, tests):
+        tags = {None: None} # marker that handler hasn't run yet
+        def node(n):
+            if None in tags:
+                del tags[None]
+            tags.update(n.tags)
+            tests(n)
+            assert check_repr(n.tags)
 
-        def node(self, n):
-            assert 0 == len(n.tags)
-            assert not n.tags
+        simple_handler(data, node=node)
 
-class TestTagEmptyTagListContains(HandlerTestBase):
-    data = "n234 x1 y2"
+        return tags
 
-    class Handler(o.SimpleHandler):
+    return _handle
 
-        def node(self, n):
-            assert "a" not in n.tags
 
-class TestTagEmptyTagListGet(HandlerTestBase):
-    data = "n234 x1 y2"
+def test_empty_taglist_length(tag_handler):
+    def tests(n):
+        assert 0 == len(n.tags)
+        assert not n.tags
 
-    class Handler(o.SimpleHandler):
+    tags = tag_handler("n234 x1 y2", tests)
+    assert tags == {}
 
-        def node(self, n):
-            assert None == n.tags.get("foo")
-            assert None == n.tags.get("foo", None)
-            assert "fs" == n.tags.get("foo", "fs")
 
-class TestTagEmptyTagListIndexOp(HandlerTestBase):
-    data = "n234 x1 y2"
+def test_empty_taglist_contains(tag_handler):
+    def tests(n):
+        assert "a" not in n.tags
 
-    class Handler(o.SimpleHandler):
+    tags = tag_handler("n234 x1 y2", tests)
+    assert tags == {}
 
-        def node(self, n):
-            with pytest.raises(KeyError):
-                n.tags["foo"]
-            with pytest.raises(KeyError):
-                n.tags[None]
 
-class TestTagListLen(HandlerTestBase):
+def test_empty_taglist_get(tag_handler):
+    def tests(n):
+        assert None == n.tags.get("foo")
+        assert None == n.tags.get("foo", None)
+        assert "fs" == n.tags.get("foo", "fs")
+
+    tags = tag_handler("n234 x1 y2", tests)
+    assert tags == {}
+
+
+def test_empty_taglist_indexop(tag_handler):
+    def tests(n):
+        with pytest.raises(KeyError):
+            n.tags["foo"]
+        with pytest.raises(KeyError):
+            n.tags[None]
+
+    tags = tag_handler("n234 x1 y2", tests)
+    assert tags == {}
+
+
+def test_taglist_length(simple_handler):
     data = u"""\
            n1 x0 y0 Ta=a
            n2 Tkeyñ=value
            n3 Tfoo=1ß,bar=2,foobar=33
            """
-    class Handler(o.SimpleHandler):
 
-        expected_len = { 1 : 1, 2 : 1, 3 : 3}
+    lens = {}
+    def node(n):
+        lens[n.id] = len(n.tags)
+        assert n.tags
 
-        def node(self, n):
-            assert n.tags
-            assert self.expected_len[n.id], len(n.tags)
-            assert check_repr(n.tags)
+    simple_handler(data, node=node)
 
-class TestTagContains(HandlerTestBase):
-    data = "n234 Tabba=x,2=vvv,xx=abba"
+    lens = {1 : 1, 2 : 1, 3 : 3}
 
-    class Handler(o.SimpleHandler):
 
-        def node(self, n):
-            assert "abba" in n.tags
-            assert "2" in n.tags
-            assert "xx" in n.tags
-            assert "x" not in n.tags
-            assert None not in n.tags
-            assert "" not in n.tags
-            assert check_repr(n.tags)
+def test_taglist_contains(tag_handler):
+    def tests(n):
+        assert "abba" in n.tags
+        assert "2" in n.tags
+        assert "xx" in n.tags
+        assert "x" not in n.tags
+        assert None not in n.tags
+        assert "" not in n.tags
 
-class TestTagIndexOp(HandlerTestBase):
-    data = "n234 Tabba=x,2=vvv,xx=abba"
+    tags = tag_handler("n234 Tabba=x,2=vvv,xx=abba", tests)
 
-    class Handler(o.SimpleHandler):
+    assert tags == {'abba': 'x', '2': 'vvv', 'xx': 'abba'}
 
-        def node(self, n):
-            assert "x" == n.tags["abba"]
-            assert "vvv" == n.tags["2"]
-            assert "abba" == n.tags["xx"]
-            for k in ("x", "addad", "..", None):
-                with pytest.raises(KeyError):
-                    n.tags[k]
 
-class TestTagGet(HandlerTestBase):
-    data = "n234 Tabba=x,2=vvv,xx=abba"
+def test_taglist_indexop(tag_handler):
+    def tests(n):
+        assert "x" == n.tags["abba"]
+        assert "vvv" == n.tags["2"]
+        assert "abba" == n.tags["xx"]
+        for k in ("x", "addad", "..", None):
+            with pytest.raises(KeyError):
+                n.tags[k]
 
-    class Handler(o.SimpleHandler):
+    tags = tag_handler("n234 Tabba=x,2=vvv,xx=abba", tests)
 
-        def node(self, n):
-            assert "x" == n.tags.get("abba")
-            assert "vvv" == n.tags.get("2", None)
-            assert "abba" == n.tags.get("xx", "ff")
-            assert "43 fg" == n.tags.get("_", "43 fg")
-            assert n.tags.get("gerger4") is None
-            assert n.tags.get("ffleo", None) is None
+    assert tags == {'abba': 'x', '2': 'vvv', 'xx': 'abba'}
 
-class TestTagToDict(HandlerTestBase):
-    data = "n234 Tabba=x,2=vvv,xx=abba"
 
-    class Handler(o.SimpleHandler):
+def test_taglist_indexop(tag_handler):
+    def tests(n):
+        assert "x" == n.tags.get("abba")
+        assert "vvv" == n.tags.get("2", None)
+        assert "abba" == n.tags.get("xx", "ff")
+        assert "43 fg" == n.tags.get("_", "43 fg")
+        assert n.tags.get("gerger4") is None
+        assert n.tags.get("ffleo", None) is None
 
-        def node(self, n):
-            d = dict(n.tags)
-            assert len(d) == 3
-            assert d['abba'] == 'x'
-            assert d['2'] == 'vvv'
-            assert d['xx'] == 'abba'
+    tags = tag_handler("n234 Tabba=x,2=vvv,xx=abba", tests)
+
+    assert tags == {'abba': 'x', '2': 'vvv', 'xx': 'abba'}

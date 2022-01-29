@@ -4,17 +4,13 @@
 #
 # Copyright (C) 2022 Sarah Hoffmann.
 from io import BytesIO
-import os
 from textwrap import dedent
+from urllib.error import URLError
 
 import pytest
 
-from helpers import mkdate, osmobj, create_osm_file, CountingHandler
+from helpers import mkdate, CountingHandler
 
-try:
-    from urllib.error import URLError
-except ImportError:
-    from urllib2 import URLError
 
 try:
     from unittest.mock import MagicMock, patch
@@ -25,8 +21,6 @@ import osmium as o
 import osmium.replication.server as rserv
 import osmium.replication.utils as rutil
 import osmium.replication
-import tempfile
-import datetime
 
 class RequestsResponses(BytesIO):
 
@@ -337,27 +331,28 @@ def test_apply_reader_with_location(mock):
 
     assert h.counts == [1, 1, 0, 0]
 
-def test_get_newest_change_from_file():
-    data = [osmobj('N', id=1, version=1, changeset=63965061, uid=8369524,
-                   timestamp='2018-10-29T03:56:07Z', user='x')]
-    fn = create_osm_file(data)
+
+def test_get_newest_change_from_file(tmp_path):
+    fn = tmp_path / 'change.opl'
+    fn.write_text('n6365 v1 c63965061 t2018-10-29T03:56:07Z i8369524 ux x1 y7')
+
+    val = osmium.replication.newest_change_from_file(str(fn))
+    assert val == mkdate(2018, 10, 29, 3, 56, 7)
 
 
-    try:
-        val = osmium.replication.newest_change_from_file(fn)
-        assert val == mkdate(2018, 10, 29, 3, 56, 7)
-    finally:
-        os.remove(fn)
+def test_get_replication_header_empty(tmp_path):
+    fn = tmp_path / 'test.opl'
+    fn.write_text('n6365 v1 c63965061 t2018-10-29T03:56:07Z i8369524 ux x1 y7')
 
-def test_get_replication_header_empty():
-    data = [osmobj('N', id=1, version=1, changeset=63965061, uid=8369524,
-                   timestamp='2018-10-29T03:56:07Z', user='x')]
-    fn = create_osm_file(data)
+    val = rutil.get_replication_header(str(fn))
+    assert val.url is None
+    assert val.sequence is None
+    assert val.timestamp is None
 
-    try:
-        val = rutil.get_replication_header(fn)
-        assert val.url is None
-        assert val.sequence is None
-        assert val.timestamp is None
-    finally:
-        os.remove(fn)
+
+def test_get_replication_header_full(test_data_dir):
+    val = rutil.get_replication_header(str(test_data_dir / 'example-test.pbf'))
+
+    assert val.url == 'http://download.geofabrik.de/europe/andorra-updates'
+    assert val.sequence == 2167
+    assert val.timestamp == mkdate(2019, 2, 23, 21, 15, 2)

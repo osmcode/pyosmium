@@ -8,37 +8,18 @@
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
-import sys
-import tempfile
-from os import unlink
-from io import StringIO
+from urllib.error import URLError
+from unittest.mock import MagicMock, DEFAULT
 
 import pytest
 from requests import Session
 
-from helpers import load_script
 
 try:
     import http.cookiejar as cookiejarlib
 except ImportError:
     import cookielib as cookiejarlib
 
-try:
-    from urllib.error import URLError
-except ImportError:
-    from urllib2 import URLError
-
-from unittest.mock import MagicMock, DEFAULT
-
-class Capturing(list):
-    def __enter__(self):
-        self._stdout = sys.stdout
-        sys.stdout = self._stringio = StringIO()
-        return self
-    def __exit__(self, *args):
-        self.extend(self._stringio.getvalue().splitlines())
-        del self._stringio    # free up some memory
-        sys.stdout = self._stdout
 
 class RequestsResponses(BytesIO):
 
@@ -49,13 +30,20 @@ class RequestsResponses(BytesIO):
     def iter_lines(self):
        return self.readlines()
 
+
 class TestPyosmiumGetChanges:
 
     @pytest.fixture(autouse=True)
-    def setUp(self):
-        self.script = load_script((Path(__file__) / ".." / ".." / "tools"/ "pyosmium-get-changes").resolve())
-        self.url_mock = MagicMock()
+    def setUp(self, monkeypatch):
+        self.script = dict()
+
+        filename = (Path(__file__) / ".." / ".." / "tools"/ "pyosmium-get-changes").resolve()
+        with filename.open("rb") as f:
+            exec(compile(f.read(), str(filename), 'exec'), self.script)
+
         self.urls = dict()
+
+        self.url_mock = MagicMock()
         self.url_mock.side_effect = lambda url,data=None,timeout=None : self.urls[url.get_full_url()]
         self.script['rserv'].urlrequest.OpenerDirector.open = self.url_mock
 
@@ -63,21 +51,22 @@ class TestPyosmiumGetChanges:
         self.urlreq_mock.side_effect = lambda url,**kw : self.urls[url]
         self.script['rserv'].requests.Session.get = self.urlreq_mock
 
+
     def url(self, url, result):
         self.urls[url] = RequestsResponses(dedent(result).encode())
 
     def main(self, *args):
-        with Capturing() as output:
-            ret = self.script['main'](args)
-            self.stdout = output
-        return ret
+        return self.script['main'](args)
 
-    def test_init_id(self):
+    def test_init_id(self, capsys):
         assert 0 == self.main('-I', '453')
-        assert 1 == len(self.stdout)
-        assert '454' == self.stdout[0]
 
-    def test_init_date(self):
+        output = capsys.readouterr().out.strip()
+
+        assert output == '454'
+
+
+    def test_init_date(self, capsys):
         self.url('https://planet.osm.org/replication/minute//state.txt',
                  """\
                     sequenceNumber=100
@@ -89,38 +78,28 @@ class TestPyosmiumGetChanges:
                     timestamp=2016-08-26T11\\:04\\:02Z
                  """)
         assert 0 == self.main('-D', '2015-12-24T08:08:08Z')
-        assert 1 == len(self.stdout)
-        assert '1' == self.stdout[0]
 
-    def test_init_to_file(self):
-        fd = tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.seq', delete=False)
-        fname = fd.name
-        fd.close()
+        output = capsys.readouterr().out.strip()
 
-        assert 0 == self.main('-I', '453', '-f', fd.name)
-        fd = open(fname, 'r')
-        content = fd.read()
-        try:
-            assert '454' == content
-        finally:
-            fd.close()
-            unlink(fname)
+        assert output == '1'
 
-    def test_init_from_seq_file(self):
-        with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.seq', delete=False) as fd:
-            fd.write('453'.encode('utf-8'))
-            fname = fd.name
 
-        assert 0 == self.main('-f', fname)
-        fd = open(fname, 'r')
-        content = fd.read()
-        try:
-            assert '454' == content
-        finally:
-            fd.close()
-            unlink(fname)
+    def test_init_to_file(self, tmp_path):
+        fname = tmp_path / 'db.seq'
 
-    def test_init_date_with_cookie(self):
+        assert 0 == self.main('-I', '453', '-f', str(fname))
+        assert fname.read_text() == '454'
+
+
+    def test_init_from_seq_file(self, tmp_path):
+        fname = tmp_path / 'db.seq'
+        fname.write_text('453')
+
+        assert 0 == self.main('-f', str(fname))
+        assert fname.read_text() == '454'
+
+
+    def test_init_date_with_cookie(self, capsys, tmp_path):
         self.url('https://planet.osm.org/replication/minute//state.txt',
                  """\
                     sequenceNumber=100
@@ -132,14 +111,12 @@ class TestPyosmiumGetChanges:
                     timestamp=2016-08-26T11\\:04\\:02Z
                  """)
 
-        with tempfile.NamedTemporaryFile(dir=tempfile.gettempdir(), suffix='.cookie', delete=False) as fd:
-            fname = fd.name
-        cookie_jar = cookiejarlib.MozillaCookieJar(fname)
+        fname = tmp_path / 'my.cookie'
+        cookie_jar = cookiejarlib.MozillaCookieJar(str(fname))
         cookie_jar.save()
 
-        try:
-            assert 0 == self.main('--cookie', fname, '-D', '2015-12-24T08:08:08Z')
-            assert 1 == len(self.stdout)
-            assert '1' == self.stdout[0]
-        finally:
-            unlink(fname)
+        assert 0 == self.main('--cookie', str(fname), '-D', '2015-12-24T08:08:08Z')
+
+        output = capsys.readouterr().out.strip()
+
+        assert output == '1'
