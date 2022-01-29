@@ -1,4 +1,8 @@
-# vim: set fileencoding=utf-8 :
+# SPDX-License-Identifier: BSD
+#
+# This file is part of Pyosmium.
+#
+# Copyright (C) 2022 Sarah Hoffmann.
 from helpers import create_osm_file, osmobj, HandlerTestBase, check_repr
 
 import osmium as o

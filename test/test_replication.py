@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: BSD
+#
+# This file is part of Pyosmium.
+#
+# Copyright (C) 2022 Sarah Hoffmann.
 from io import BytesIO
 import os
 from textwrap import dedent
