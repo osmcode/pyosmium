@@ -8,7 +8,6 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - uses: ./.github/actions/install-dependencies
 
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
@@ -203,9 +202,6 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - uses: ./.github/actions/install-dependencies
-              with:
-                  version: release
 
             - uses: actions/cache@v2
               with:
@@ -229,7 +225,7 @@ jobs:
             - name: Build package 3.5
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -242,7 +238,7 @@ jobs:
             - name: Build package 3.6
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -255,7 +251,7 @@ jobs:
             - name: Build package 3.7
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -268,7 +264,7 @@ jobs:
             - name: Build package 3.8
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -281,7 +277,7 @@ jobs:
             - name: Build package 3.9
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -294,7 +290,7 @@ jobs:
             - name: Build package 3.10
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake

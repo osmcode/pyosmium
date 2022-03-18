@@ -19,7 +19,7 @@ runs:
 
         - name: Install package dependencies (release)
           run: |
-              set +x
+              export PATH=$PATH:/c/msys64/usr/bin
               OSMIUM_VER=`grep libosmium_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
               PROTOZERO_VER=`grep protozero_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
               PYBIND_VER=`grep pybind11_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`

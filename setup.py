@@ -3,6 +3,9 @@ import re
 import sys
 import platform
 import subprocess
+import urllib.request
+import tarfile
+from pathlib import Path
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -26,8 +29,21 @@ class Pyosmium_sdist(orig_sdist):
         for name, tar_src in self.contrib:
             tarball = tar_src.format(versions[name + '_version'])
             print("Downloading and adding {} sources from {}".format(name, tarball))
-            subprocess.call('wget -O - -q {} | tar xz -C {} --one-top-level=contrib/{} --strip-components=1'.format(
-                   tarball, base_dir, name), shell=True)
+            base = Path("-".join((name, versions[name + '_version'])))
+            dest = Path(base_dir) / "contrib" / name
+            with urllib.request.urlopen(tarball) as reader:
+                with tarfile.open(fileobj=reader, mode='r|gz') as tf:
+                    for member in tf:
+                        fname = Path(member.name)
+                        if not fname.is_absolute():
+                            fname = fname.relative_to(base)
+                            if member.isdir():
+                                (dest / fname).mkdir(parents=True, exist_ok=True)
+                            elif member.isfile():
+                                with tf.extractfile(member) as memberfile:
+                                    with (dest / fname).open('wb') as of:
+                                        of.write(memberfile.read())
+
 
 
 def get_versions():
