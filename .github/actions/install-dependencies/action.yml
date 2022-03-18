@@ -1,12 +1,30 @@
 name: 'Install pyosmium dependencies'
 
+inputs:
+  version:
+    description: "Which version to install (release or develop)"
+    required: true
+
 runs:
     using: "composite"
 
     steps:
-        - name: Install package dependencies
+        - name: Install package dependencies (develop)
           run: |
               git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
               git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
-              git clone --quiet --depth 1 https://github.com/pybind/pybind11.git contrib/pybind11
+              git clone --quiet https://github.com/pybind/pybind11.git contrib/pybind11
           shell: bash
+          if: ${{ inputs.version == 'develop' }}
+
+        - name: Install package dependencies (release)
+          run: |
+              set +x
+              OSMIUM_VER=`grep libosmium_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
+              PROTOZERO_VER=`grep protozero_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
+              PYBIND_VER=`grep pybind11_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
+              wget -O - https://github.com/osmcode/libosmium/archive/v$OSMIUM_VER.tar.gz | tar xz --one-top-level=contrib/libosmium --strip-components=1
+              wget -O - https://github.com/mapbox/protozero/archive/v$PROTOZERO_VER.tar.gz | tar xz --one-top-level=contrib/protozero --strip-components=1
+              wget -O - https://github.com/pybind/pybind11/archive/v$PYBIND_VER.tar.gz | tar xz --one-top-level=contrib/pybind11 --strip-components=1
+          shell: bash
+          if: ${{ inputs.version == 'release' }}

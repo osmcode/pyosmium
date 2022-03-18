@@ -21,7 +21,7 @@ jobs:
             - name: Build package 3.5
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
 
             - name: Set up Python 3.6
@@ -32,7 +32,7 @@ jobs:
             - name: Build package 3.6
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
 
             - name: Set up Python 3.7
@@ -43,7 +43,7 @@ jobs:
             - name: Build package 3.7
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
 
             - name: Set up Python 3.8
@@ -54,7 +54,7 @@ jobs:
             - name: Build package 3.8
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
 
             - name: Set up Python 3.9
@@ -65,7 +65,7 @@ jobs:
             - name: Build package 3.9
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
 
             - name: Set up Python 3.10
@@ -76,7 +76,7 @@ jobs:
             - name: Build package 3.10
               run: |
                 pip install build wheel
-                python -m build -w
+                python -m build
               shell: bash
 
             - name: Upload Artifact
@@ -128,24 +128,29 @@ jobs:
                       cxx: g++-7
                       platform: ubuntu-18.04
                       python: 3.5
+                      deps: release
                     - compiler: clang-old
                       cc: clang-6.0
                       cxx: clang++-6.0
                       platform: ubuntu-18.04
                       python: 3.5
+                      deps: release
                     - compiler: gcc
                       cc: gcc-10
                       cxx: g++-10
                       platform: ubuntu-20.04
                       python: "3.10"
+                      deps: develop
                     - compiler: clang
                       cc: clang-11
                       cxx: clang++-11
                       platform: ubuntu-20.04
                       python: "3.10"
+                      deps: develop
                     - compiler: macos
                       platform: macos-latest
                       python: "3.10"
+                      deps: develop
 
         env:
             CC: ${{ matrix.cc }}
@@ -153,7 +158,10 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
+
             - uses: ./.github/actions/install-dependencies
+              with:
+                  version: ${{ matrix.deps }}
 
             - uses: actions/setup-python@v2
               with:
@@ -196,6 +204,8 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - uses: ./.github/actions/install-dependencies
+              with:
+                  version: release
 
             - uses: actions/cache@v2
               with:
