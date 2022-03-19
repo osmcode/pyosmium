@@ -5,11 +5,10 @@ library, a library for working with OpenStreetMap data in a fast and flexible
 manner.
 
 [![Github Actions Build Status](https://github.com/osmcode/pyosmium/workflows/CI/badge.svg)](https://github.com/osmcode/pyosmium/actions?query=workflow%3ACI)
-[![Appeveyor Build status](https://ci.appveyor.com/api/projects/status/ch3gwxucycytako4/branch/master?svg=true)](https://ci.appveyor.com/project/lonvia/pyosmium/branch/master)
 
 ## Installation
 
-Pyosmium works with Python >= 3.4. Pypy is known to not work.
+Pyosmium works with Python >= 3.5. Pypy is known to not work.
 
 ### Using Pip
 
