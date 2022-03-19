@@ -54,13 +54,16 @@ set custom locations with `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
 
 To use a custom boost installation, set `BOOST_PREFIX`.
 
-To compile the bindings, run
+To compile the bindings during development, you can use
+[build](https://pypa-build.readthedocs.io/en/stable/).
+On Debian/Ubuntu-like systems, install `python3-build`, then
+run:
 
-    python setup.py build
+    python3 -m build -w
 
 To compile and install the bindings, run
 
-    python setup.py install [--user]
+    pip install [--user] .
 
 
 ## Examples
