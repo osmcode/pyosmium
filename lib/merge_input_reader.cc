@@ -107,11 +107,15 @@ public:
 
     size_t add_buffer(py::buffer const &buf, std::string const &format)
     {
-        Py_buffer pybuf;
-        PyObject_GetBuffer(buf.ptr(), &pybuf, PyBUF_C_CONTIGUOUS);
+        auto *view = new Py_buffer();
+        if (PyObject_GetBuffer(buf.ptr(), view, PyBUF_C_CONTIGUOUS | PyBUF_FORMAT) != 0) {
+            delete view;
+            throw pybind11::error_already_set();
+        }
+        pybind11::buffer_info info(view);
 
-        return internal_add(osmium::io::File(reinterpret_cast<char const *>(pybuf.buf),
-                                             (size_t) pybuf.len,
+        return internal_add(osmium::io::File(reinterpret_cast<char const *>(info.ptr),
+                                             static_cast<size_t>(info.size),
                                              format.c_str()));
     }
 

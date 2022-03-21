@@ -25,11 +25,15 @@ public:
                       bool locations = false,
                       const std::string &idx = "flex_mem")
     {
-        Py_buffer pybuf;
-        PyObject_GetBuffer(buf.ptr(), &pybuf, PyBUF_C_CONTIGUOUS);
+        auto *view = new Py_buffer();
+        if (PyObject_GetBuffer(buf.ptr(), view, PyBUF_C_CONTIGUOUS | PyBUF_FORMAT) != 0) {
+            delete view;
+            throw pybind11::error_already_set();
+        }
+        pybind11::buffer_info info(view);
 
-        apply_object(osmium::io::File(reinterpret_cast<const char *>(pybuf.buf),
-                                      (size_t) pybuf.len, format.c_str()),
+        apply_object(osmium::io::File(reinterpret_cast<const char *>(info.ptr),
+                                      static_cast<size_t>(info.size), format.c_str()),
                      locations, idx);
     }
 
