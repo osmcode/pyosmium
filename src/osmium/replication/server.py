@@ -35,11 +35,11 @@ class ReplicationServer:
         self.diff_type = diff_type
         self.session = None
 
-    def close():
+    def close(self):
         """ Close any open connection to the replication server.
         """
-        if self.session:
-            session.close()
+        if self.session is not None:
+            self.session.close()
             self.session = None
 
     def __enter__(self):

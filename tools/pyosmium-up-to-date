@@ -70,84 +70,84 @@ def update_from_osm_server(ts, options):
 
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
-    svr = rserv.ReplicationServer(url, "osc.gz")
-    if options.cookie is not None:
-        # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
-        cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
-        cookie_jar.load(options.cookie)
-        opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
-        svr.open_url = opener.open
+    with rserv.ReplicationServer(url, "osc.gz") as svr:
+        if options.cookie is not None:
+            # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
+            cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
+            cookie_jar.load(options.cookie)
+            opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
+            svr.open_url = opener.open
 
-    log.info("Using replication service at %s", url)
+        log.info("Using replication service at %s", url)
 
-    current = svr.get_state_info()
-    if current is None:
-        log.error("Cannot download state information. Is the replication URL correct?")
-        return 3
-    log.debug("Server is at sequence %d (%s).", current.sequence, current.timestamp)
-
-    if seq is None:
-        log.info("Using timestamp %s as starting point." % ts)
-        startseq = svr.timestamp_to_sequence(ts)
-        if startseq is None:
-            log.error("No starting point found for time %s on server %s"
-                      % (str(ts), url))
+        current = svr.get_state_info()
+        if current is None:
+            log.error("Cannot download state information. Is the replication URL correct?")
             return 3
-    else:
-        if seq >= current.sequence:
-            log.info("File is already up to date.")
-            return 0
+        log.debug("Server is at sequence %d (%s).", current.sequence, current.timestamp)
 
-        log.debug("Using given sequence ID %d" % seq)
-        startseq = seq + 1
-        ts = svr.get_state_info(seq=startseq)
-        if ts is None:
-            log.error("Cannot download state information for ID %d. Is the URL correct?" % seq)
-            return 3
-        ts = ts.timestamp
+        if seq is None:
+            log.info("Using timestamp %s as starting point." % ts)
+            startseq = svr.timestamp_to_sequence(ts)
+            if startseq is None:
+                log.error("No starting point found for time %s on server %s"
+                          % (str(ts), url))
+                return 3
+        else:
+            if seq >= current.sequence:
+                log.info("File is already up to date.")
+                return 0
 
-    if not options.force_update:
-        cmpdate = dt.datetime.utcnow() - dt.timedelta(days=90)
-        cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
-        if ts < cmpdate:
-            log.error(
-              """The OSM file is more than 3 months old. You should download a
-                 more recent file instead of updating. If you really want to
-                 update the file, use --force-update-of-old-planet.""")
-            return 3
+            log.debug("Using given sequence ID %d" % seq)
+            startseq = seq + 1
+            ts = svr.get_state_info(seq=startseq)
+            if ts is None:
+                log.error("Cannot download state information for ID %d. Is the URL correct?" % seq)
+                return 3
+            ts = ts.timestamp
 
-    log.info("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
+        if not options.force_update:
+            cmpdate = dt.datetime.utcnow() - dt.timedelta(days=90)
+            cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
+            if ts < cmpdate:
+                log.error(
+                  """The OSM file is more than 3 months old. You should download a
+                     more recent file instead of updating. If you really want to
+                     update the file, use --force-update-of-old-planet.""")
+                return 3
 
-    outfile = options.outfile
-    infile = options.infile
+        log.info("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
 
-    if outfile is None:
-        fdir, fname = os.path.split(infile)
-        if options.tmpdir is not None:
-            fdir = options.tmpdir
-        ofname = mktemp(suffix='-' + fname, dir=fdir)
-    else:
-        ofname = outfile
-
-    try:
-        extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
-        outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
-                                         max_size=options.outsize*1024,
-                                         extra_headers=extra_headers,
-                                         outformat=options.outformat)
-
-        if outseqs is None:
-            log.info("No new updates found.")
-            return 3
+        outfile = options.outfile
+        infile = options.infile
 
         if outfile is None:
-            os.rename(ofname, infile)
-    finally:
-        if outfile is None:
-            try:
-                os.remove(ofname)
-            except FileNotFoundError:
-                pass
+            fdir, fname = os.path.split(infile)
+            if options.tmpdir is not None:
+                fdir = options.tmpdir
+            ofname = mktemp(suffix='-' + fname, dir=fdir)
+        else:
+            ofname = outfile
+
+        try:
+            extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
+            outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
+                                             max_size=options.outsize*1024,
+                                             extra_headers=extra_headers,
+                                             outformat=options.outformat)
+
+            if outseqs is None:
+                log.info("No new updates found.")
+                return 3
+
+            if outfile is None:
+                os.rename(ofname, infile)
+        finally:
+            if outfile is None:
+                try:
+                    os.remove(ofname)
+                except FileNotFoundError:
+                    pass
 
     log.info("Downloaded until %d. Server has data available until %d." % outseqs)
 

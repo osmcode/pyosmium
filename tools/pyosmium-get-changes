@@ -215,32 +215,32 @@ def main(args):
 
     socket.setdefaulttimeout(options.socket_timeout)
 
-    svr = rserv.ReplicationServer(url)
-    if options.cookie is not None:
-        # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
-        cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
-        cookie_jar.load(options.cookie)
-        opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
-        svr.open_url = opener.open
+    with rserv.ReplicationServer(url) as svr:
+        if options.cookie is not None:
+            # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
+            cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
+            cookie_jar.load(options.cookie)
+            opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
+            svr.open_url = opener.open
 
-    startseq = options.start.get_sequence(svr)
-    if startseq is None:
-        log.error("Cannot read state file from server. Is the URL correct?")
-        return 1
+        startseq = options.start.get_sequence(svr)
+        if startseq is None:
+            log.error("Cannot read state file from server. Is the URL correct?")
+            return 1
 
-    if options.outfile is None:
-        write_end_sequence(options.seq_file, startseq)
-        return 0
+        if options.outfile is None:
+            write_end_sequence(options.seq_file, startseq)
+            return 0
 
-    log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
-    if options.outformat is not None:
-        outhandler = WriteHandler(options.outfile, 4096*1024, options.outformat)
-    else:
-        outhandler = WriteHandler(options.outfile)
+        log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
+        if options.outformat is not None:
+            outhandler = WriteHandler(options.outfile, 4096*1024, options.outformat)
+        else:
+            outhandler = WriteHandler(options.outfile)
 
-    endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
-                             simplify=options.simplify)
-    outhandler.close()
+        endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
+                                 simplify=options.simplify)
+        outhandler.close()
 
     # save cookies
     if options.cookie:
