@@ -59,16 +59,17 @@ class ReplicationServer:
 
             This method has no support for cookies or any special authentication
             methods. If you need these, you have to provide your own custom URL
-            opener. The method has to return an object which supports the
-            `read()` and `readline()` methods to access the content. Example::
+            opener. Overwrite open_url() with a method that receives an
+            urllib.Request object and returns a ByteIO-like object or a
+            requests.Response.
 
-                def my_open_url(self, url):
-                    opener = urlrequest.build_opener()
-                    opener.addheaders = [('X-Fancy-Header', 'important_content')]
-                    return opener.open(url)
+            Example::
+
+                opener = urlrequest.build_opener()
+                opener.addheaders = [('X-Fancy-Header', 'important_content')]
 
                 svr = ReplicationServer()
-                svr.open_url = my_open_url
+                svr.open_url = opener.open
         """
         headers = dict()
         for h in url.header_items():
