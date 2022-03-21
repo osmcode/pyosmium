@@ -8,6 +8,7 @@ from textwrap import dedent
 from urllib.error import URLError
 
 import pytest
+import requests.exceptions
 
 from helpers import mkdate, CountingHandler
 
@@ -199,8 +200,10 @@ class TestReplication:
         assert res is None
 
 
-    def test_get_state_server_timeout(self):
-        self.url_exception = URLError(reason='Mock')
+    @pytest.mark.parametrize("error", [URLError(reason='Mock'),
+                                       requests.exceptions.ConnectTimeout])
+    def test_get_state_server_timeout(self, error):
+        self.url_exception = error
 
         svr = self.mk_replication_server("https://test.io")
         assert svr.get_state_info() is None
