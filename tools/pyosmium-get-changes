@@ -38,10 +38,7 @@ try:
     import http.cookiejar as cookiejarlib
 except ImportError:
     import cookielib as cookiejarlib
-try:
-    import urllib.request as urlrequest
-except ImportError:
-    import urllib2 as urlrequest
+import urllib.request as urlrequest
 
 import re
 import sys

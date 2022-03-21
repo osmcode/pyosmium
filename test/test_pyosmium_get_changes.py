@@ -8,12 +8,9 @@
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
-from urllib.error import URLError
-from unittest.mock import MagicMock, DEFAULT
 
 import pytest
-from requests import Session
-
+import osmium.replication.server
 
 try:
     import http.cookiejar as cookiejarlib
@@ -43,20 +40,27 @@ class TestPyosmiumGetChanges:
 
         self.urls = dict()
 
-        self.url_mock = MagicMock()
-        self.url_mock.side_effect = lambda url,data=None,timeout=None : self.urls[url.get_full_url()]
-        self.script['rserv'].urlrequest.OpenerDirector.open = self.url_mock
 
-        self.urlreq_mock = MagicMock()
-        self.urlreq_mock.side_effect = lambda url,**kw : self.urls[url]
-        self.script['rserv'].requests.Session.get = self.urlreq_mock
+    @pytest.fixture
+    def mock_requests(self, monkeypatch):
+        def mock_get(session, url, **kwargs):
+            return RequestsResponses(self.urls[url])
+        monkeypatch.setattr(osmium.replication.server.requests.Session, "get", mock_get)
+
+
+    @pytest.fixture
+    def mock_urllib(self, monkeypatch):
+        def mock_get(_, url, **kwargs):
+            return BytesIO(self.urls[url.get_full_url()])
+        monkeypatch.setattr(self.script['urlrequest'].OpenerDirector, "open", mock_get)
 
 
     def url(self, url, result):
-        self.urls[url] = RequestsResponses(dedent(result).encode())
+        self.urls[url] = dedent(result).encode()
 
     def main(self, *args):
         return self.script['main'](args)
+
 
     def test_init_id(self, capsys):
         assert 0 == self.main('-I', '453')
@@ -66,7 +70,7 @@ class TestPyosmiumGetChanges:
         assert output == '454'
 
 
-    def test_init_date(self, capsys):
+    def test_init_date(self, capsys, mock_requests):
         self.url('https://planet.osm.org/replication/minute//state.txt',
                  """\
                     sequenceNumber=100
@@ -99,7 +103,7 @@ class TestPyosmiumGetChanges:
         assert fname.read_text() == '454'
 
 
-    def test_init_date_with_cookie(self, capsys, tmp_path):
+    def test_init_date_with_cookie(self, capsys, tmp_path, mock_urllib):
         self.url('https://planet.osm.org/replication/minute//state.txt',
                  """\
                     sequenceNumber=100
