@@ -4,6 +4,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.0] - 2022-03-22
+
+### Added
+
+- `add_box()` for osmium.osm.Header for setting the bbox in a OSM file
+- SimpleWriter now can receive a customized header in its constructor
+- SimpleWriter now accepts a list of RelationMember in then member parameter
+  of `add_relation()`
+- more tests for replication server and osm base types
+
+### Fixed
+
+- AttributeError when using pyosmium-get-changes with cookies (thanks @wiktorn)
+- avoid memory leak in `apply_buffer()` functions in
+  SimpleHandler and MergeInputReader
+- maek sure close() is called for requests.Session and requests.Response
+- documentation for `open_url()` now reflects its new behaviour
+- build issue with raw ssize_t on Windows since Python 3.10
+
+### Changed
+
+- ReplicationServer is now a context manager
+- allow any string-like object for `apply_file()`
+- switch tests from nose to pytest
+- use Python libraries instead of wget for downloading contrib packages
+- update to libosmium 2.18.0 (requires now C++14)
+- update to pybind11 2.9.1
+
+
 ## [3.2.0] - 2021-08-09
 
 ### Fixed
