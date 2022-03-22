@@ -40,7 +40,7 @@ class O:
             setattr(self, k, v)
 
 
-@pytest.fixture(params=[
+@pytest.mark.parametrize('osmobj, out_attr', [
       (O(id=None), '0 v0 dV c0 t i0 u T'),
       (O(visible=None), '0 v0 dV c0 t i0 u T'),
       (O(version=None), '0 v0 dV c0 t i0 u T'),
@@ -59,23 +59,21 @@ class O:
       (O(timestamp=mkdate(2009, 4, 14, 20, 58, 35)), '0 v0 dV c0 t2009-04-14T20:58:35Z i0 u T'),
       (O(timestamp='1970-01-01T00:00:01Z'), '0 v0 dV c0 t1970-01-01T00:00:01Z i0 u T')
     ])
-def attr_sample(request):
-    return request.param
+class TestWriteAttributes:
+    def test_node_simple_attr(self, test_writer, osmobj, out_attr):
+        with test_writer('n' + out_attr + ' x y') as w:
+            w.add_node(osmobj)
 
-def test_node_simple_attr(test_writer, attr_sample):
-    with test_writer('n' + attr_sample[1] + ' x y') as w:
-        w.add_node(attr_sample[0])
+    def test_way_simple_attr(self, test_writer, osmobj, out_attr):
+        with test_writer('w' + out_attr + ' N') as w:
+            w.add_way(osmobj)
 
-def test_way_simple_attr(test_writer, attr_sample):
-    with test_writer('w' + attr_sample[1] + ' N') as w:
-        w.add_way(attr_sample[0])
-
-def test_relation_simple_attr(test_writer, attr_sample):
-    with test_writer('r' + attr_sample[1] + ' M') as w:
-        w.add_relation(attr_sample[0])
+    def test_relation_simple_attr(self, test_writer, osmobj, out_attr):
+        with test_writer('r' + out_attr + ' M') as w:
+            w.add_relation(osmobj)
 
 
-@pytest.fixture(params = [
+@pytest.mark.parametrize('tags,out', [
      (None, 'T'),
      ([], 'T'),
      ({}, 'T'),
@@ -84,33 +82,26 @@ def test_relation_simple_attr(test_writer, attr_sample):
      ({'test' : 'drive'}, 'Ttest=drive'),
      (OrderedDict((('a', 'b'), ('c', '3'))), 'Ta=b,c=3'),
     ])
-def tags_sample(request):
-    return request.param
+class TestWriteTags:
+    def test_node_tags(self, test_writer, tags, out):
+        with test_writer('n0 v0 dV c0 t i0 u ' + out + ' x y') as w:
+            w.add_node(O(tags=tags))
 
-def test_node_tags(test_writer, tags_sample):
-    with test_writer('n0 v0 dV c0 t i0 u ' + tags_sample[1] + ' x y') as w:
-        w.add_node(O(tags=tags_sample[0]))
+    def test_way_tags(self, test_writer, tags, out):
+        with test_writer('w0 v0 dV c0 t i0 u ' + out + ' N') as w:
+            w.add_way(O(tags=tags))
 
-def test_way_tags(test_writer, tags_sample):
-    with test_writer('w0 v0 dV c0 t i0 u ' + tags_sample[1] + ' N') as w:
-        w.add_way(O(tags=tags_sample[0]))
-
-def test_relation_tags(test_writer, tags_sample):
-    with test_writer('r0 v0 dV c0 t i0 u ' + tags_sample[1] + ' M') as w:
-        w.add_relation(O(tags=tags_sample[0]))
+    def test_relation_tags(self, test_writer, tags, out):
+        with test_writer('r0 v0 dV c0 t i0 u ' + out + ' M') as w:
+            w.add_relation(O(tags=tags))
 
 
-def test_location_tuple(test_writer):
-    with test_writer('n0 v0 dV c0 t i0 u T x1.1234561 y0.1234561') as w:
-        w.add_node(O(location=(1.1234561, 0.1234561)))
-
-def test_location_rounding(test_writer):
-    with test_writer('n0 v0 dV c0 t i0 u T x30.46 y50.37') as w:
-        w.add_node(O(location=(30.46, 50.37)))
-
-def test_location_none(test_writer):
-    with test_writer('n0 v0 dV c0 t i0 u T x y') as w:
-        w.add_node(O(location=None))
+@pytest.mark.parametrize("location,out", [((1.1234561, 0.1234561), 'x1.1234561 y0.1234561'),
+                                          ((30.46, 50.37), 'x30.46 y50.37'),
+                                          (None, 'x y')])
+def test_location(test_writer, location, out):
+    with test_writer('n0 v0 dV c0 t i0 u T ' + out) as w:
+        w.add_node(O(location=location))
 
 
 def test_node_list(test_writer):
@@ -132,3 +123,70 @@ def test_relation_members(test_writer):
 def test_relation_members_None(test_writer):
     with test_writer('r0 v0 dV c0 t i0 u T M') as w:
         w.add_relation(O(members=None))
+
+
+def test_node_object(test_writer, simple_handler):
+    node_opl = 'n235 v1 dV c0 t i0 u Telephant=yes x98.7 y-3.45'
+
+    with test_writer(node_opl) as w:
+        simple_handler(node_opl, node=lambda o: w.add_node(o))
+
+
+def test_location_object(test_writer, simple_handler):
+    node_opl = 'n235 v1 dV c0 t i0 u Telephant=yes x98.7 y-3.45'
+
+    with test_writer('n0 v0 dV c0 t i0 u T x98.7 y-3.45') as w:
+        simple_handler(node_opl, node=lambda o: w.add_node(O(location=o.location)))
+
+
+def test_tag_object(test_writer, simple_handler):
+    node_opl = 'n235 v1 dV c0 t i0 u Telephant=yes x98.7 y-3.45'
+
+    with test_writer('n0 v0 dV c0 t i0 u Telephant=yes x y') as w:
+        simple_handler(node_opl, node=lambda o: w.add_node(O(tags=o.tags)))
+
+
+def test_way_object(test_writer, simple_handler):
+    way_opl = 'w45 v14 dV c0 t i0 u Thighway=top Nn23,n56,n34,n23'
+
+    with test_writer(way_opl) as w:
+        simple_handler(way_opl, way=lambda o: w.add_way(o))
+
+
+def test_nodelist_object(test_writer, simple_handler):
+    way_opl = 'w45 v14 dV c0 t i0 u Thighway=top Nn23,n56,n34,n23'
+
+    with test_writer('w0 v0 dV c0 t i0 u T Nn23,n56,n34,n23') as w:
+        simple_handler(way_opl, way=lambda o: w.add_way(O(nodes=o.nodes)))
+
+
+def test_noderef_object(test_writer, simple_handler):
+    way_opl = 'w45 v14 dV c0 t i0 u Thighway=top Nn23,n56,n34,n23'
+
+    with test_writer('w0 v0 dV c0 t i0 u T Nn56,n34') as w:
+        simple_handler(way_opl,
+                       way=lambda o: w.add_way(O(nodes=[n for n in o.nodes if n.ref != 23])))
+
+
+def test_relation_object(test_writer, simple_handler):
+    rel_opl = 'r2 v0 dV c0 t i0 u Ttype=multipolygon Mw1@,w2@,w3@inner'
+
+    with test_writer(rel_opl) as w:
+        simple_handler(rel_opl, relation=lambda o: w.add_relation(o))
+
+
+def test_memberlist_object(test_writer, simple_handler):
+    rel_opl = 'r2 v0 dV c0 t i0 u Ttype=multipolygon Mw1@,w2@,w3@inner'
+
+    with test_writer('r0 v0 dV c0 t i0 u T Mw1@,w2@,w3@inner') as w:
+        simple_handler(rel_opl,
+                       relation=lambda o: w.add_relation(O(members=o.members)))
+
+
+def test_member_object(test_writer, simple_handler):
+    rel_opl = 'r2 v0 dV c0 t i0 u Ttype=multipolygon Mw1@,w2@,w3@inner'
+
+    with test_writer('r0 v0 dV c0 t i0 u T Mw1@,w2@') as w:
+        simple_handler(rel_opl,
+                       relation=lambda o: w.add_relation(O(members=[m for m in o.members
+                                                                    if m.role != 'inner'])))

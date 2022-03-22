@@ -217,11 +217,16 @@ private:
         osmium::builder::RelationMemberListBuilder rml_builder(buffer, builder);
 
         for (auto m: it) {
-            auto member = m.cast<py::tuple>();
-            auto type = member[0].cast<std::string>();
-            auto id = member[1].cast<osmium::object_id_type>();
-            auto role = member[2].cast<std::string>();
-            rml_builder.add_member(osmium::char_to_item_type(type[0]), id, role.c_str());
+            if (py::isinstance<osmium::RelationMember>(m)) {
+                auto &member = m.cast<osmium::RelationMember &>();
+                rml_builder.add_member(member.type(), member.ref(), member.role());
+            } else {
+                auto member = m.cast<py::tuple>();
+                auto type = member[0].cast<std::string>();
+                auto id = member[1].cast<osmium::object_id_type>();
+                auto role = member[2].cast<std::string>();
+                rml_builder.add_member(osmium::char_to_item_type(type[0]), id, role.c_str());
+            }
         }
     }
 
