@@ -8,8 +8,8 @@ pyosmium_major = '3.2'
 pyosmium_release = '3.2.0'
 
 # libosmium version shipped with the Pip release
-libosmium_version = '2.17.3'
+libosmium_version = '2.18.0'
 # protozero version shipped with the Pip release
 protozero_version = '1.7.1'
 # pybind11 version shipped with the Pip release
-pybind11_version = '2.9.0'
+pybind11_version = '2.9.1'
