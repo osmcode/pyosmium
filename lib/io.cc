@@ -43,6 +43,11 @@ PYBIND11_MODULE(io, m)
                  &osmium::io::Header::set,
              py::arg("key"), py::arg("value"),
              "Set the value of header option 'key'.")
+        .def("add_box", &osmium::io::Header::add_box,
+             py::arg("box"),
+             py::return_value_policy::reference_internal,
+             "Add the given bounding box to the list of bounding boxes in the "
+             " header.")
     ;
 
     py::class_<osmium::io::Reader>(m, "Reader",

@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
 
 #include <osmium/osm.hpp>
 #include <osmium/osm/entity_bits.hpp>
@@ -53,6 +54,7 @@ PYBIND11_MODULE(_osm, m) {
          "necessarily have to be valid.")
         .def(py::init<>())
         .def(py::init<double, double>())
+        .def(py::self == py::self)
         .def_property_readonly("x", &osmium::Location::x,
              "(read-only) X coordinate (longitude) as a fixed-point integer.")
         .def_property_readonly("y", &osmium::Location::y,

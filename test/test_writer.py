@@ -190,3 +190,27 @@ def test_member_object(test_writer, simple_handler):
         simple_handler(rel_opl,
                        relation=lambda o: w.add_relation(O(members=[m for m in o.members
                                                                     if m.role != 'inner'])))
+
+
+def test_set_custom_header(tmp_path):
+    fn = str(tmp_path / 'test.xml')
+    h = o.io.Header()
+    h.set('generator', 'foo')
+    h.add_box(o.osm.Box(0.1, -4, 10, 45))
+
+    writer = o.SimpleWriter(fn, 4000, h)
+
+    try:
+        writer.add_node({})
+    finally:
+        writer.close()
+
+    rd = o.io.Reader(fn)
+    try:
+        h = rd.header()
+        assert h.get('generator') == 'foo'
+        assert h.box().valid()
+        assert h.box().bottom_left == o.osm.Location(0.1, -4)
+        assert h.box().top_right == o.osm.Location(10, 45)
+    finally:
+        rd.close()

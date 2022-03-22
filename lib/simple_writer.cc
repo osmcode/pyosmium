@@ -3,6 +3,7 @@
 #include <osmium/osm.hpp>
 #include <osmium/io/any_output.hpp>
 #include <osmium/io/writer.hpp>
+#include <osmium/io/header.hpp>
 #include <osmium/memory/buffer.hpp>
 #include <osmium/builder/osm_object_builder.hpp>
 
@@ -17,8 +18,8 @@ class SimpleWriter
     enum { BUFFER_WRAP = 4096 };
 
 public:
-    SimpleWriter(const char* filename, size_t bufsz=4096*1024)
-    : writer(filename),
+    SimpleWriter(const char* filename, size_t bufsz=4096*1024, osmium::io::Header header=osmium::io::Header())
+    : writer(filename, header),
       buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
              osmium::memory::Buffer::auto_grow::yes),
       buffer_size(buffer.capacity()) // same rounding to BUFFER_WRAP
@@ -274,6 +275,7 @@ void init_simple_writer(pybind11::module &m)
         "parameter allows changing the default buffer size of 4MB. Larger buffers "
         "are normally better but you should be aware that there are normally multiple "
         "buffers in use during the write process.")
+        .def(py::init<const char*, unsigned long, osmium::io::Header>())
         .def(py::init<const char*, unsigned long>())
         .def(py::init<const char*>())
         .def("add_node", &SimpleWriter::add_node, py::arg("node"),
