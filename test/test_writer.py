@@ -214,3 +214,35 @@ def test_set_custom_header(tmp_path):
         assert h.box().top_right == o.osm.Location(10, 45)
     finally:
         rd.close()
+
+
+def test_add_node_after_close(tmp_path, simple_handler):
+    node_opl = "n235 v1 dV c0 t i0 u Telephant=yes x98.7 y-3.45"
+
+    filename = tmp_path / (str(uuid.uuid4()) + '.opl')
+    writer = o.SimpleWriter(str(filename), 1024*1024)
+    writer.close()
+
+    with pytest.raises(RuntimeError, match='closed'):
+        simple_handler(node_opl, node=lambda o: writer.add_node(o))
+
+
+def test_add_way_after_close(tmp_path, simple_handler):
+    node_opl = "w1 Nn1"
+
+    filename = tmp_path / (str(uuid.uuid4()) + '.opl')
+    writer = o.SimpleWriter(str(filename), 1024*1024)
+    writer.close()
+
+    with pytest.raises(RuntimeError, match='closed'):
+        simple_handler(node_opl, way=lambda o: writer.add_way(o))
+
+def test_add_relation_after_close(tmp_path, simple_handler):
+    node_opl = "r54 Mn1@,w3@foo"
+
+    filename = tmp_path / (str(uuid.uuid4()) + '.opl')
+    writer = o.SimpleWriter(str(filename), 1024*1024)
+    writer.close()
+
+    with pytest.raises(RuntimeError, match='closed'):
+        simple_handler(node_opl, relation=lambda o: writer.add_relation(o))

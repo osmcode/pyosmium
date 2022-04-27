@@ -36,6 +36,10 @@ public:
 
     void add_node(py::object o)
     {
+        if (!buffer) {
+            throw std::runtime_error{"Writer already closed."};
+        }
+
         if (py::isinstance<osmium::Node>(o)) {
             buffer.add_item(o.cast<osmium::Node &>());
         } else {
@@ -57,6 +61,10 @@ public:
 
     void add_way(py::object o)
     {
+        if (!buffer) {
+            throw std::runtime_error{"Writer already closed."};
+        }
+
         if (py::isinstance<osmium::Way>(o)) {
             buffer.add_item(o.cast<osmium::Way &>());
         } else {
@@ -76,6 +84,10 @@ public:
 
     void add_relation(py::object o)
     {
+        if (!buffer) {
+            throw std::runtime_error{"Writer already closed."};
+        }
+
         if (py::isinstance<osmium::Relation>(o)) {
             buffer.add_item(o.cast<osmium::Relation &>());
         } else {
