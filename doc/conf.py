@@ -13,6 +13,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import glob
 import sys
 import sysconfig
 import os
@@ -21,9 +22,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
-build_dir = "../build/lib.%s-%d.%d" % (
-                    sysconfig.get_platform(),
-                    sys.version_info[0], sys.version_info[1])
+build_dir = glob.glob("../build/lib.%s-*" % (sysconfig.get_platform()))[0]
 
 # insert after the current directory
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), build_dir)))
