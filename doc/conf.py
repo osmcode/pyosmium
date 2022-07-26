@@ -20,24 +20,25 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-build_dir = "../build/lib.%s-%d.%d" % (
-                    sysconfig.get_platform(),
-                    sys.version_info[0], sys.version_info[1])
+# old style distutils libraries
+build_dir = "../build/lib.%s-%d.%d" % (sysconfig.get_platform(),
+                                       sys.version_info[0], sys.version_info[1])
+if not os.path.exists(build_dir):
+    # new style distutils libraries
+    build_dir = "../build/lib.%s-%s" % (sysconfig.get_platform(),
+                                        sys.implementation.cache_tag)
+    if not os.path.exists(build_dir):
+        print("""
+            Compiled version of pyosmium not found, please build pyosmium for Python {}.{}
+            before building the documentation.
+            """.format(*sys.version_info))
+        raise RuntimeError("Cannot find pyosmium")
 
 # insert after the current directory
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), build_dir)))
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), '../tools')))
 
-try:
-    from osmium.version import pyosmium_major, pyosmium_release
-except ImportError:
-    print("""
-        Compiled version of pyosmium not found, please build pyosmium
-        for Python %d.%d.
-        Expected build directory: %s """
-        % (sys.version_info[0], sys.version_info[1], build_dir))
-    raise
+from osmium.version import pyosmium_major, pyosmium_release
 
 # -- General configuration ------------------------------------------------
 
