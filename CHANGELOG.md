@@ -4,6 +4,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.4.0] - 2022-07-27
+
+### Fixed
+
+- finding the build directory when newer versions of setuptools are used
+
+### Changed
+
+- improve error message when writing to a writer that is already closed
+- update to pybind 2.10.0
+- drop support for Python 3.5
+
+
 ## [3.3.0] - 2022-03-22
 
 ### Added
