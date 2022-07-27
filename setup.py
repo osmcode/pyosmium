@@ -131,8 +131,8 @@ class CMakeBuild(build_ext):
 
 versions = get_versions()
 
-if sys.version_info < (3,5):
-    raise RuntimeError("Python 3.5 or larger required.")
+if sys.version_info < (3,6):
+    raise RuntimeError("Python 3.6 or larger required.")
 
 with open('README.rst', 'r') as descfile:
     long_description = descfile.read()
@@ -155,7 +155,6 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -167,7 +166,7 @@ setup(
     ext_modules=[CMakeExtension('cmake_example')],
     packages = ['osmium', 'osmium/osm', 'osmium/replication'],
     package_dir = {'' : 'src'},
-    python_requires = ">=3.5",
+    python_requires = ">=3.6",
     install_requires = ['requests'],
     cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,

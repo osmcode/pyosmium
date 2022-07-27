@@ -12,17 +12,6 @@ jobs:
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
 
-            - name: Set up Python 3.5
-              uses: actions/setup-python@v2
-              with:
-                  python-version: 3.5
-
-            - name: Build package 3.5
-              run: |
-                pip install build wheel
-                python -m build
-              shell: bash
-
             - name: Set up Python 3.6
               uses: actions/setup-python@v2
               with:
@@ -91,7 +80,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.5, 3.6, 3.7, 3.8, 3.9, "3.10"]
+                python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
 
         steps:
             - uses: actions/checkout@v2
@@ -126,13 +115,13 @@ jobs:
                       cc: gcc-7
                       cxx: g++-7
                       platform: ubuntu-18.04
-                      python: 3.5
+                      python: 3.6
                       deps: release
                     - compiler: clang-old
                       cc: clang-6.0
                       cxx: clang++-6.0
                       platform: ubuntu-18.04
-                      python: 3.5
+                      python: 3.6
                       deps: release
                     - compiler: gcc
                       cc: gcc-10
@@ -217,19 +206,6 @@ jobs:
               run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
               shell: bash
 
-            - name: Set up Python 3.5
-              uses: actions/setup-python@v2
-              with:
-                  python-version: 3.5
-
-            - name: Build package 3.5
-              run: |
-                pip install build wheel
-                python -m build
-              shell: bash
-              env:
-                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
-
             - name: Set up Python 3.6
               uses: actions/setup-python@v2
               with:
@@ -308,10 +284,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
-                include:
-                    - python-version: "3.10"
-                      test-args: "-k 'not test_amenity_list'" #no binary wheel for shapely available
+                python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
 
         env:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}

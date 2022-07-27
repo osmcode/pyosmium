@@ -8,7 +8,7 @@ manner.
 
 ## Installation
 
-Pyosmium works with Python >= 3.5. Pypy is known to not work.
+Pyosmium works with Python >= 3.6. Pypy is known to not work.
 
 ### Using Pip
 
