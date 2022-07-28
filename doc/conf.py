@@ -28,11 +28,17 @@ if not os.path.exists(build_dir):
     build_dir = "../build/lib.%s-%s" % (sysconfig.get_platform(),
                                         sys.implementation.cache_tag)
     if not os.path.exists(build_dir):
-        print("""
-            Compiled version of pyosmium not found, please build pyosmium for Python {}.{}
-            before building the documentation.
-            """.format(*sys.version_info))
-        raise RuntimeError("Cannot find pyosmium")
+        # pybuild
+        build_dir = "../.pybuild/cpython3_%s.%s_pyosmium/build" % (
+            sys.version_info[0], sys.version_info[1]
+        )
+
+        if not os.path.exists(build_dir):
+            print("""
+                Compiled version of pyosmium not found, please build pyosmium for Python {}.{}
+                before building the documentation.
+                """.format(*sys.version_info))
+            raise RuntimeError("Cannot find pyosmium")
 
 # insert after the current directory
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), build_dir)))
