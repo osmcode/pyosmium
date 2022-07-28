@@ -4,6 +4,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.4.1] - 2022-07-28
+
+### Fixed
+
+- allow building docs from built sources in PYTHONPATH again
+
+
 ## [3.4.0] - 2022-07-27
 
 ### Fixed
