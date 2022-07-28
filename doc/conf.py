@@ -33,18 +33,20 @@ if not os.path.exists(build_dir):
             sys.version_info[0], sys.version_info[1]
         )
 
-        if not os.path.exists(build_dir):
-            print("""
-                Compiled version of pyosmium not found, please build pyosmium for Python {}.{}
-                before building the documentation.
-                """.format(*sys.version_info))
-            raise RuntimeError("Cannot find pyosmium")
+if os.path.exists(build_dir):
+    sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), build_dir)))
 
 # insert after the current directory
-sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), build_dir)))
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.abspath('.'), '../tools')))
 
-from osmium.version import pyosmium_major, pyosmium_release
+try:
+    from osmium.version import pyosmium_major, pyosmium_release
+except ImportError:
+    print("""
+        Compiled version of pyosmium not found, please build pyosmium for Python {}.{}
+        before building the documentation.
+        """.format(*sys.version_info))
+    raise RuntimeError("Cannot find pyosmium")
 
 # -- General configuration ------------------------------------------------
 
