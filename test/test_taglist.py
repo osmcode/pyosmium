@@ -5,8 +5,6 @@
 # Copyright (C) 2022 Sarah Hoffmann.
 import pytest
 
-from helpers import check_repr
-
 import osmium as o
 
 @pytest.fixture
@@ -19,7 +17,6 @@ def tag_handler(simple_handler):
                 del tags[None]
             tags.update(n.tags)
             tests(n)
-            assert check_repr(n.tags)
 
         simple_handler(data, node=node)
 
@@ -32,6 +29,8 @@ def test_empty_taglist_length(tag_handler):
     def tests(n):
         assert 0 == len(n.tags)
         assert not n.tags
+        assert str(n.tags) == '{}'
+        assert repr(n.tags) == 'osmium.osm.TagList({})'
 
     tags = tag_handler("n234 x1 y2", tests)
     assert tags == {}
@@ -91,6 +90,8 @@ def test_taglist_contains(tag_handler):
         assert "x" not in n.tags
         assert None not in n.tags
         assert "" not in n.tags
+        assert str(n.tags) == '{abba=x,2=vvv,xx=abba}'
+        assert repr(n.tags) == "osmium.osm.TagList({'abba': 'x', '2': 'vvv', 'xx': 'abba'})"
 
     tags = tag_handler("n234 Tabba=x,2=vvv,xx=abba", tests)
 

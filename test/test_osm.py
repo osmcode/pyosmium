@@ -3,10 +3,11 @@
 # This file is part of Pyosmium.
 #
 # Copyright (C) 2022 Sarah Hoffmann.
+import re
 from itertools import count
 import pytest
 
-from helpers import check_repr, mkdate
+from helpers import mkdate
 
 import osmium as o
 
@@ -62,7 +63,9 @@ def area_importer(request, tmp_path, to_opl):
 def test_invalid_location():
     loc = o.osm.Location()
     assert not loc.valid()
-    assert check_repr(loc)
+    assert str(loc) == 'invalid'
+    assert repr(loc) == 'osmium.osm.Location()'
+
     with pytest.raises(o.InvalidLocationError):
         lat = loc.lat
     with pytest.raises(o.InvalidLocationError):
@@ -73,12 +76,13 @@ def test_invalid_location():
 
 
 def test_valid_location():
-    loc = o.osm.Location(1,10)
-    assert loc.lon == pytest.approx(1)
+    loc = o.osm.Location(-1, 10)
+    assert loc.lon == pytest.approx(-1)
     assert loc.lat == pytest.approx(10)
-    assert loc.x == 10000000
+    assert loc.x == -10000000
     assert loc.y == 100000000
-    assert check_repr(loc)
+    assert re.fullmatch('-1.0*/10.0*', str(loc))
+    assert repr(loc) == 'osmium.osm.Location(x=-10000000, y=100000000)'
 
 
 def test_node_attributes(test_importer):
@@ -92,7 +96,8 @@ def test_node_attributes(test_importer):
         assert n.timestamp == mkdate(2014, 1, 31, 6, 23, 35)
         assert n.user == u'änonymous'
         assert n.positive_id() == 1
-        assert check_repr(n)
+        assert str(n) == 'n1: location=invalid tags={}'
+        assert repr(n) == "osmium.osm.Node(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user='änonymous', tags=osmium.osm.TagList({}), location=osmium.osm.Location())"
 
     assert 1 == test_importer('n1 v5 c58674 t2014-01-31T06:23:35Z i42 uänonymous',
                               node=node)
@@ -125,8 +130,12 @@ def test_way_attributes(test_importer):
         assert not o.is_closed()
         assert not o.ends_have_same_id()
         assert not o.ends_have_same_location()
-        assert check_repr(o)
-        assert check_repr(o.nodes)
+
+        assert str(o) == 'w1: nodes=[1@0.0000000/0.0000000,2,3@1.0000000/1.0000000] tags={}'
+        assert repr(o) == "osmium.osm.Way(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user='anonymous', tags=osmium.osm.TagList({}), nodes=osmium.osm.WayNodeList([osmium.osm.NodeRef(ref=1, location=osmium.osm.Location(x=0, y=0)), osmium.osm.NodeRef(ref=2, location=osmium.osm.Location()), osmium.osm.NodeRef(ref=3, location=osmium.osm.Location(x=10000000, y=10000000))]))"
+
+        assert str(o.nodes) == '[1@0.0000000/0.0000000,2,3@1.0000000/1.0000000]'
+        assert repr(o.nodes) == "osmium.osm.WayNodeList([osmium.osm.NodeRef(ref=1, location=osmium.osm.Location(x=0, y=0)), osmium.osm.NodeRef(ref=2, location=osmium.osm.Location()), osmium.osm.NodeRef(ref=3, location=osmium.osm.Location(x=10000000, y=10000000))])"
 
     assert 1 == test_importer(['n1 x0 y0', 'n3 x1 y1',
                                'w1 v5 c58674 t2014-01-31T06:23:35Z i42 uanonymous Nn1,n2,n3'],
@@ -145,8 +154,12 @@ def test_relation_attributes(test_importer):
         assert o.timestamp == mkdate(2014, 1, 31, 6, 23, 35)
         assert o.user == ' anonymous'
         assert o.positive_id() == 1
-        assert check_repr(o)
-        assert check_repr(o.members)
+
+        assert str(o) == 'r1: members=[w1], tags={}'
+        assert repr(o) == "osmium.osm.Relation(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user=' anonymous', tags=osmium.osm.TagList({}), members=osmium.osm.RelationMemberList([osmium.osm.RelationMember(ref=1, type='w', role='')]))"
+
+        assert str(o.members) == '[w1]'
+        assert repr(o.members) == "osmium.osm.RelationMemberList([osmium.osm.RelationMember(ref=1, type='w', role='')])"
 
     assert 1 == test_importer('r1 v5 c58674 t2014-01-31T06:23:35Z i42 u%20%anonymous Mw1@',
                               relation=relation)
@@ -230,7 +243,8 @@ def test_changest_attributes(area_importer):
         assert 515288620 == c.bounds.top_right.y
         assert -1465242 == c.bounds.bottom_left.x
         assert 515288506 == c.bounds.bottom_left.y
-        assert check_repr(c)
+        assert str(c) == 'c34: closed_at=2005-04-09 20:54:39+00:00, bounds=(-0.1465242/51.5288506 -0.1464925/51.5288620), tags={}'
+        assert repr(c) == "osmium.osm.Changeset(id=34, uid=1, created_at=datetime.datetime(2005, 4, 9, 19, 54, 13, tzinfo=datetime.timezone.utc), closed_at=datetime.datetime(2005, 4, 9, 20, 54, 39, tzinfo=datetime.timezone.utc), open=False, num_changes=2, bounds=osmium.osm.Box(bottom_left=osmium.osm.Location(x=-1465242, y=515288506), top_right=osmium.osm.Location(x=-1464925, y=515288620)), user='Steve', tags=osmium.osm.TagList({}))"
 
     assert 1 == area_importer('c34 k2 s2005-04-09T19:54:13Z e2005-04-09T20:54:39Z '
                                'd34 i1 uSteve x-0.1465242 y51.5288506 X-0.1464925 Y51.5288620',

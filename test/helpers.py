@@ -7,9 +7,6 @@ import osmium
 def mkdate(*args):
     return datetime(*args, tzinfo=timezone.utc)
 
-def check_repr(o):
-    return not str(o).startswith('<') and not repr(o).startswith('<')
-
 class CountingHandler(osmium.SimpleHandler):
 
     def __init__(self):

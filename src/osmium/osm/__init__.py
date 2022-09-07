@@ -26,9 +26,9 @@ Node.replace = create_mutable_node
 Way.replace = create_mutable_way
 Relation.replace = create_mutable_relation
 
-def _make_repr(attr_list):
+def _make_repr(*attr_list):
     fmt_string = 'osmium.osm.{0}('\
-                 + ', '.join(['{0}={{1.{0}!r}}'.format(x) for x in attr_list])\
+                 + ', '.join([f'{x}={{1.{x}!r}}' for x in attr_list])\
                  + ')'
 
     return lambda o: fmt_string.format(o.__class__.__name__, o)
@@ -43,55 +43,56 @@ def _list_elipse(obj):
         objects = objects[:47] + '...'
     return objects
 
-Location.__repr__ = lambda l: 'osmium.osm.Location(x={0.x!r}, y={0.y!r})'.format(l) \
-                               if l.valid() else 'osmium.osm.Location()'
-Location.__str__ = lambda l: '{:f}/{:f}'.format(l.lon_without_check(),
-                                                l.lat_without_check()) \
-                             if l.valid() else 'invalid'
+setattr(Location, '__repr__',
+        lambda l: f'osmium.osm.Location(x={l.x!r}, y={l.y!r})'
+                      if l.valid() else 'osmium.osm.Location()')
+setattr(Location, '__str__',
+        lambda l: f'{l.lon_without_check():.7f}/{l.lat_without_check():.7f}'
+                      if l.valid() else 'invalid')
 
-Box.__repr__ = _make_repr(['bottom_left', 'top_right'])
-Box.__str__ = lambda b: '({0.bottom_left!s} {0.top_right!s})'.format(b)
+setattr(Box, '__repr__', _make_repr('bottom_left', 'top_right'))
+setattr(Box, '__str__', lambda b: f'({b.bottom_left!s} {b.top_right!s})')
 
-Tag.__repr__ = _make_repr(['k', 'v'])
-Tag.__str__ = lambda t: '{0.k}={0.v}'.format(t)
+setattr(Tag, '__repr__', _make_repr('k', 'v'))
+setattr(Tag, '__str__', lambda t: f'{t.k}={t.v}')
 
-TagList.__repr__ = lambda t: "osmium.osm.TagList({%s})" \
-                              % ', '.join(["%r: %r" % (i.k, i.v) for i in t])
-TagList.__str__ = lambda t: '{' + _list_elipse(t) + '}'
+setattr(TagList, '__repr__', lambda t: "osmium.osm.TagList({%s})"
+                                       % ', '.join([f"{i.k!r}: {i.v!r}" for i in t]))
+setattr(TagList, '__str__', lambda t: f'{{{_list_elipse(t)}}}')
 
-NodeRef.__repr__ = _make_repr(['ref', 'location'])
-NodeRef.__str__ = lambda n: '{0.ref:d}@{0.location!s}'.format(n) \
-                            if n.location.valid() else str(n.ref)
+setattr(NodeRef, '__repr__', _make_repr('ref', 'location'))
+setattr(NodeRef, '__str__', lambda n: f'{n.ref:d}@{n.location!s}'
+                                     if n.location.valid() else str(n.ref))
 
-NodeRefList.__repr__ = _list_repr
-NodeRefList.__str__ = lambda o: '[' + _list_elipse(o) + ']'
+setattr(NodeRefList, '__repr__', _list_repr)
+setattr(NodeRefList, '__str__', lambda o: f'[{_list_elipse(o)}]')
 
-RelationMember.__repr__ = _make_repr(['ref', 'type', 'role'])
-RelationMember.__str__ = lambda r: ('{0.type}{0.ref:d}@{0.role}' \
-                                   if r.role else '{0.type}{0.ref:d}').format(r)
+setattr(RelationMember, '__repr__', _make_repr('ref', 'type', 'role'))
+setattr(RelationMember, '__str__', lambda r: f'{r.type}{r.ref:d}@{r.role}' \
+                                             if r.role else f'{r.type}{r.ref:d}')
 
-RelationMemberList.__repr__ = _list_repr
-RelationMemberList.__str__ = lambda o: '[' + _list_elipse(o) + ']'
+setattr(RelationMemberList, '__repr__', _list_repr)
+setattr(RelationMemberList, '__str__', lambda o: f'[{_list_elipse(o)}]')
 
-OSMObject.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
-                                 'uid', 'timestamp', 'user', 'tags'])
+setattr(OSMObject, '__repr__', _make_repr('id', 'deleted', 'visible', 'version',
+                                          'changeset', 'uid', 'timestamp', 'user',
+                                          'tags'))
 
-Node.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
-                            'uid', 'timestamp', 'user', 'tags', 'location'])
-Node.__str__ = lambda n: 'n{0.id:d}: location={0.location!s} tags={0.tags!s}'\
-                         .format(n)
+setattr(Node, '__repr__', _make_repr('id', 'deleted', 'visible', 'version',
+                                     'changeset', 'uid', 'timestamp', 'user',
+                                     'tags', 'location'))
+setattr(Node, '__str__', lambda n: f'n{n.id:d}: location={n.location!s} tags={n.tags!s}')
 
-Way.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
-                           'uid', 'timestamp', 'user', 'tags', 'nodes'])
-Way.__str__ = lambda o: 'w{0.id:d}: nodes={0.nodes!s} tags={0.tags!s}' \
-                         .format(o)
+setattr(Way, '__repr__', _make_repr('id', 'deleted', 'visible', 'version', 'changeset',
+                                   'uid', 'timestamp', 'user', 'tags', 'nodes'))
+setattr(Way, '__str__', lambda o: f'w{o.id:d}: nodes={o.nodes!s} tags={o.tags!s}')
 
-Relation.__repr__ = _make_repr(['id', 'deleted', 'visible', 'version', 'changeset',
-                                'uid', 'timestamp', 'user', 'tags', 'members'])
-Relation.__str__ = lambda o: 'r{0.id:d}: members={0.members!s}, tags={0.tags!s}' \
-                             .format(o)
+setattr(Relation, '__repr__', _make_repr('id', 'deleted', 'visible', 'version',
+                                         'changeset', 'uid', 'timestamp', 'user',
+                                         'tags', 'members'))
+setattr(Relation, '__str__', lambda o: f'r{o.id:d}: members={o.members!s}, tags={o.tags!s}')
 
-Changeset.__repr__ = _make_repr(['id', 'uid', 'created_at', 'closed_at', 'open',
-                                 'num_changes', 'bounds', 'user', 'tags'])
-Changeset.__str__ = lambda o: 'c{0.id:d}: closed_at={0.closed_at!s}, bounds={0.bounds!s}, tags={0.tags!s}' \
-                              .format(o)
+setattr(Changeset, '__repr__', _make_repr('id', 'uid', 'created_at', 'closed_at',
+                                          'open', 'num_changes', 'bounds', 'user',
+                                          'tags'))
+setattr(Changeset, '__str__', lambda o: f'c{o.id:d}: closed_at={o.closed_at!s}, bounds={o.bounds!s}, tags={o.tags!s}')
