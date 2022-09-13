@@ -1,43 +1,24 @@
-import osmium.osm.mutable
+from typing import Any, Callable, Sequence
+
+from osmium.osm.mutable import create_mutable_node, create_mutable_way, create_mutable_relation
 from ._osm import *
 
-def create_mutable_node(node, **args):
-    """ Create a mutable node replacing the properties given in the
-        named parameters. Note that this function only creates a shallow
-        copy which is still bound to the scope of the original object.
-    """
-    return osmium.osm.mutable.Node(base=node, **args)
+setattr(Node, 'replace', create_mutable_node)
+setattr(Way, 'replace', create_mutable_way)
+setattr(Relation, 'replace', create_mutable_relation)
 
-def create_mutable_way(way, **args):
-    """ Create a mutable way replacing the properties given in the
-        named parameters. Note that this function only creates a shallow
-        copy which is still bound to the scope of the original object.
-    """
-    return osmium.osm.mutable.Way(base=way, **args)
-
-def create_mutable_relation(rel, **args):
-    """ Create a mutable relation replacing the properties given in the
-        named parameters. Note that this function only creates a shallow
-        copy which is still bound to the scope of the original object.
-    """
-    return osmium.osm.mutable.Relation(base=rel, **args)
-
-Node.replace = create_mutable_node
-Way.replace = create_mutable_way
-Relation.replace = create_mutable_relation
-
-def _make_repr(*attr_list):
+def _make_repr(*attrs: str) -> Callable[[object], str]:
     fmt_string = 'osmium.osm.{0}('\
-                 + ', '.join([f'{x}={{1.{x}!r}}' for x in attr_list])\
+                 + ', '.join([f'{x}={{1.{x}!r}}' for x in attrs])\
                  + ')'
 
     return lambda o: fmt_string.format(o.__class__.__name__, o)
 
-def _list_repr(obj):
+def _list_repr(obj: Sequence[Any]) -> str:
     return 'osmium.osm.{}([{}])'.format(obj.__class__.__name__,
                                         ', '.join(map(repr, obj)))
 
-def _list_elipse(obj):
+def _list_elipse(obj: Sequence[Any]) -> str:
     objects = ','.join(map(str, obj))
     if len(objects) > 50:
         objects = objects[:47] + '...'
