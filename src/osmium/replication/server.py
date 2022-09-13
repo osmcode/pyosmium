@@ -1,6 +1,6 @@
 """ Helper functions to communicate with replication servers.
 """
-
+from typing import NamedTuple, Optional, Any, Iterator, cast, Mapping, Tuple
 import requests
 import urllib.request as urlrequest
 from urllib.error import URLError
@@ -9,7 +9,7 @@ from collections import namedtuple
 from contextlib import contextmanager
 from math import ceil
 
-from osmium import MergeInputReader
+from osmium import MergeInputReader, BaseHandler
 from osmium import io as oio
 from osmium import version
 
@@ -18,8 +18,14 @@ import logging
 LOG = logging.getLogger('pyosmium')
 LOG.addHandler(logging.NullHandler())
 
-OsmosisState = namedtuple('OsmosisState', ['sequence', 'timestamp'])
-DownloadResult = namedtuple('DownloadResult', ['id', 'reader', 'newest'])
+class OsmosisState(NamedTuple):
+    sequence: int
+    timestamp: dt.datetime
+
+class DownloadResult(NamedTuple):
+    id: int
+    reader: MergeInputReader
+    newest: int
 
 class ReplicationServer:
     """ Represents a connection to a  server that publishes replication data.
@@ -30,37 +36,37 @@ class ReplicationServer:
         internally keeps a connection to the server making downloads faster.
     """
 
-    def __init__(self, url, diff_type='osc.gz'):
+    def __init__(self, url: str, diff_type: str = 'osc.gz') -> None:
         self.baseurl = url
         self.diff_type = diff_type
-        self.session = None
+        self.session: Optional[requests.Session] = None
 
-    def close(self):
+    def close(self) -> None:
         """ Close any open connection to the replication server.
         """
         if self.session is not None:
             self.session.close()
             self.session = None
 
-    def __enter__(self):
+    def __enter__(self) -> 'ReplicationServer':
         self.session = requests.Session()
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         self.close()
 
-    def make_request(self, url):
+    def make_request(self, url: str) -> urlrequest.Request:
         headers = {"User-Agent" : "pyosmium/{}".format(version.pyosmium_release)}
         return urlrequest.Request(url, headers=headers)
 
-    def open_url(self, url):
+    def open_url(self, url: urlrequest.Request) -> Any:
         """ Download a resource from the given URL and return a byte sequence
             of the content.
 
             This method has no support for cookies or any special authentication
             methods. If you need these, you have to provide your own custom URL
             opener. Overwrite open_url() with a method that receives an
-            urllib.Request object and returns a ByteIO-like object or a
+            urlrequest.Request object and returns a ByteIO-like object or a
             requests.Response.
 
             Example::
@@ -79,14 +85,14 @@ class ReplicationServer:
             return self.session.get(url.get_full_url(), headers=headers, stream=True)
 
         @contextmanager
-        def _get_url_with_session():
+        def _get_url_with_session() -> Iterator[requests.Response]:
             with requests.Session() as session:
                 request = session.get(url.get_full_url(), headers=headers, stream=True)
                 yield request
 
         return _get_url_with_session()
 
-    def collect_diffs(self, start_id, max_size=1024):
+    def collect_diffs(self, start_id: int, max_size: int = 1024) -> Optional[DownloadResult]:
         """ Create a MergeInputReader and download diffs starting with sequence
             id `start_id` into it. `max_size`
             restricts the number of diffs that are downloaded. The download
@@ -131,7 +137,9 @@ class ReplicationServer:
 
         return DownloadResult(current_id - 1, rd, newest.sequence)
 
-    def apply_diffs(self, handler, start_id, max_size=1024, idx="", simplify=True):
+    def apply_diffs(self, handler: BaseHandler, start_id: int,
+                    max_size: int = 1024, idx: str = "",
+                    simplify: bool = True) -> Optional[int]:
         """ Download diffs starting with sequence id `start_id`, merge them
             together and then apply them to handler `handler`. `max_size`
             restricts the number of diffs that are downloaded. The download
@@ -165,9 +173,11 @@ class ReplicationServer:
 
         return diffs.id
 
-    def apply_diffs_to_file(self, infile, outfile, start_id, max_size=1024,
-                            set_replication_header=True, extra_headers=None,
-                            outformat=None):
+    def apply_diffs_to_file(self, infile: str, outfile: str,
+                            start_id: int, max_size: int = 1024,
+                            set_replication_header: bool = True,
+                            extra_headers: Optional[Mapping[str, str]] = None,
+                            outformat: Optional[str] = None) -> Optional[Tuple[int, int]]:
         """ Download diffs starting with sequence id `start_id`, merge them
             with the data from the OSM file named `infile` and write the result
             into a file with the name `outfile`. The output file must not yet
@@ -230,7 +240,8 @@ class ReplicationServer:
         return (diffs.id, diffs.newest)
 
 
-    def timestamp_to_sequence(self, timestamp, balanced_search=False):
+    def timestamp_to_sequence(self, timestamp: dt.datetime,
+                              balanced_search: bool = False) -> Optional[int]:
         """ Get the sequence number of the replication file that contains the
             given timestamp. The search algorithm is optimised for replication
             servers that publish updates in regular intervals. For servers
@@ -312,7 +323,7 @@ class ReplicationServer:
                 return lower.sequence
 
 
-    def get_state_info(self, seq=None, retries=2):
+    def get_state_info(self, seq: Optional[int] = None, retries: int = 2) -> Optional[OsmosisState]:
         """ Downloads and returns the state information for the given
             sequence. If the download is successful, a namedtuple with
             `sequence` and `timestamp` is returned, otherwise the function
@@ -359,7 +370,7 @@ class ReplicationServer:
 
         return None
 
-    def get_diff_block(self, seq):
+    def get_diff_block(self, seq: int) -> str:
         """ Downloads the diff with the given sequence number and returns
             it as a byte sequence. Throws a :code:`urllib.error.HTTPError`
             if the file cannot be downloaded.
@@ -367,13 +378,13 @@ class ReplicationServer:
         with self.open_url(self.make_request(self.get_diff_url(seq))) as resp:
             if hasattr(resp, 'content'):
                 # generated by requests
-                return resp.content
+                return cast(str, resp.content)
 
             # generated by urllib.request
-            return resp.read()
+            return cast(str, resp.read())
 
 
-    def get_state_url(self, seq):
+    def get_state_url(self, seq: Optional[int]) -> str:
         """ Returns the URL of the state.txt files for a given sequence id.
 
             If seq is `None` the URL for the latest state info is returned,
@@ -387,7 +398,7 @@ class ReplicationServer:
                (self.baseurl, seq / 1000000, (seq % 1000000) / 1000, seq % 1000)
 
 
-    def get_diff_url(self, seq):
+    def get_diff_url(self, seq: int) -> str:
         """ Returns the URL to the diff file for the given sequence id.
         """
         return '%s/%03i/%03i/%03i.%s' % \

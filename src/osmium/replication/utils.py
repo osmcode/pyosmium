@@ -1,5 +1,5 @@
 """ Helper functions for change file handling. """
-
+from typing import NamedTuple, Optional
 import logging
 import datetime as dt
 from collections import namedtuple
@@ -8,10 +8,13 @@ from osmium.osm import NOTHING
 
 LOG = logging.getLogger('pyosmium')
 
-ReplicationHeader = namedtuple('ReplicationHeader',
-                               ['url', 'sequence', 'timestamp'])
+class ReplicationHeader(NamedTuple):
+    url: Optional[str]
+    sequence: Optional[int]
+    timestamp: Optional[dt.datetime]
 
-def get_replication_header(fname):
+
+def get_replication_header(fname: str) -> ReplicationHeader:
     """ Scans the given file for an Osmosis replication header. It returns
         a namedtuple with `url`, `sequence` and `timestamp`. Each or all fields
         may be None, if the piece of information is not avilable. If any of
@@ -24,20 +27,21 @@ def get_replication_header(fname):
     r = oreader(fname, NOTHING)
     h = r.header()
 
-    ts = h.get("osmosis_replication_timestamp")
-    url = h.get("osmosis_replication_base_url")
+    tsstr = h.get("osmosis_replication_timestamp")
+    url: Optional[str] = h.get("osmosis_replication_base_url")
 
-    if url or ts:
+    if url or tsstr:
         LOG.debug("Replication information found in OSM file header.")
 
     if url:
         LOG.debug("Replication URL: %s", url)
         # the sequence ID is only considered valid, if an URL is given
-        seq = h.get("osmosis_replication_sequence_number")
-        if seq:
-            LOG.debug("Replication sequence: %s", seq)
+        seqstr = h.get("osmosis_replication_sequence_number")
+        seq: Optional[int]
+        if seqstr:
+            LOG.debug("Replication sequence: %s", seqstr)
             try:
-                seq = int(seq)
+                seq = int(seqstr)
                 if seq < 0:
                     LOG.warning("Sequence id '%d' in OSM file header is negative. Ignored.", seq)
                     seq = None
@@ -50,10 +54,10 @@ def get_replication_header(fname):
         url = None
         seq = None
 
-    if ts:
-        LOG.debug("Replication timestamp: %s", ts)
+    if tsstr:
+        LOG.debug("Replication timestamp: %s", tsstr)
         try:
-            ts = dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ")
+            ts = dt.datetime.strptime(tsstr, "%Y-%m-%dT%H:%M:%SZ")
             ts = ts.replace(tzinfo=dt.timezone.utc)
 
         except ValueError:
