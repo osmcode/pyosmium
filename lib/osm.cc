@@ -102,7 +102,8 @@ PYBIND11_MODULE(_osm, m) {
              py::return_value_policy::reference_internal,
              "Extend the box to include the given location. If the location "
              "is invalid the box remains unchanged. If the box is invalid, it "
-             "will contain only the location after the operation.")
+             "will contain only the location after the operation. "
+             "Returns a reference to itself.")
         .def("extend",
              (osmium::Box& (osmium::Box::*)(osmium::Box const &))
                  &osmium::Box::extend,
@@ -110,7 +111,8 @@ PYBIND11_MODULE(_osm, m) {
              py::return_value_policy::reference_internal,
              "Extend the box to include the given box. If the box to be added "
              "is invalid the input box remains unchanged. If the input box is invalid, it "
-             "will become equal to the box that was added.")
+             "will become equal to the box that was added. "
+             "Returns a reference to itself.")
         .def("valid", &osmium::Box::valid,
              "Check if the box coordinates are defined and with the usual bounds.")
         .def("size", &osmium::Box::size,
