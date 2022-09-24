@@ -56,7 +56,7 @@ class ReplicationServer:
         self.close()
 
     def make_request(self, url: str) -> urlrequest.Request:
-        headers = {"User-Agent" : "pyosmium/{}".format(version.pyosmium_release)}
+        headers = {"User-Agent" : f"pyosmium/{version.pyosmium_release}"}
         return urlrequest.Request(url, headers=headers)
 
     def open_url(self, url: urlrequest.Request) -> Any:
