@@ -246,3 +246,75 @@ def test_add_relation_after_close(tmp_path, simple_handler):
 
     with pytest.raises(RuntimeError, match='closed'):
         simple_handler(node_opl, relation=lambda o: writer.add_relation(o))
+
+
+@pytest.mark.parametrize("final_item", (True, False))
+def test_catch_errors_in_add_node(tmp_path, final_item):
+    test_file = tmp_path / 'test.opl'
+
+    writer = o.SimpleWriter(str(test_file), 4000)
+
+    try:
+        writer.add_node(o.osm.mutable.Node(id=123))
+        with pytest.raises(TypeError):
+            writer.add_node(o.osm.mutable.Node(id=124, tags=34))
+        if not final_item:
+            writer.add_node(o.osm.mutable.Node(id=125))
+    finally:
+        writer.close()
+
+    output = test_file.read_text()
+
+    expected = 'n123 v0 dV c0 t i0 u T x y\n'
+    if not final_item:
+        expected += 'n125 v0 dV c0 t i0 u T x y\n'
+
+    assert output == expected
+
+
+@pytest.mark.parametrize("final_item", (True, False))
+def test_catch_errors_in_add_way(tmp_path, final_item):
+    test_file = tmp_path / 'test.opl'
+
+    writer = o.SimpleWriter(str(test_file), 4000)
+
+    try:
+        writer.add_way(o.osm.mutable.Way(id=123, nodes=[1, 2, 3]))
+        with pytest.raises(TypeError):
+            writer.add_way(o.osm.mutable.Way(id=124, nodes=34))
+        if not final_item:
+            writer.add_way(o.osm.mutable.Way(id=125, nodes=[11, 12]))
+    finally:
+        writer.close()
+
+    output = test_file.read_text()
+
+    expected = 'w123 v0 dV c0 t i0 u T Nn1,n2,n3\n'
+    if not final_item:
+        expected += 'w125 v0 dV c0 t i0 u T Nn11,n12\n'
+
+    assert output == expected
+
+
+@pytest.mark.parametrize("final_item", (True, False))
+def test_catch_errors_in_add_relation(tmp_path, final_item):
+    test_file = tmp_path / 'test.opl'
+
+    writer = o.SimpleWriter(str(test_file), 4000)
+
+    try:
+        writer.add_relation(o.osm.mutable.Relation(id=123))
+        with pytest.raises(TypeError):
+            writer.add_relation(o.osm.mutable.Relation(id=124, members=34))
+        if not final_item:
+            writer.add_relation(o.osm.mutable.Relation(id=125))
+    finally:
+        writer.close()
+
+    output = test_file.read_text()
+
+    expected = 'r123 v0 dV c0 t i0 u T M\n'
+    if not final_item:
+        expected += 'r125 v0 dV c0 t i0 u T M\n'
+
+    assert output == expected
