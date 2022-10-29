@@ -67,7 +67,7 @@ class TestPyosmiumGetChanges:
 
         output = capsys.readouterr().out.strip()
 
-        assert output == '454'
+        assert output == '453'
 
 
     def test_init_date(self, capsys, mock_requests):
@@ -85,14 +85,14 @@ class TestPyosmiumGetChanges:
 
         output = capsys.readouterr().out.strip()
 
-        assert output == '1'
+        assert output == '-1'
 
 
     def test_init_to_file(self, tmp_path):
         fname = tmp_path / 'db.seq'
 
         assert 0 == self.main('-I', '453', '-f', str(fname))
-        assert fname.read_text() == '454'
+        assert fname.read_text() == '453'
 
 
     def test_init_from_seq_file(self, tmp_path):
@@ -100,7 +100,7 @@ class TestPyosmiumGetChanges:
         fname.write_text('453')
 
         assert 0 == self.main('-f', str(fname))
-        assert fname.read_text() == '454'
+        assert fname.read_text() == '453'
 
 
     def test_init_date_with_cookie(self, capsys, tmp_path, mock_urllib):
@@ -123,4 +123,4 @@ class TestPyosmiumGetChanges:
 
         output = capsys.readouterr().out.strip()
 
-        assert output == '1'
+        assert output == '-1'

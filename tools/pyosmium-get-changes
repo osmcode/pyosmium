@@ -62,18 +62,16 @@ class ReplicationStart(object):
             return self.seq_id + 1
 
         log.debug("Looking up sequence ID for timestamp %s" % self.date)
-        seq = svr.timestamp_to_sequence(self.date)
-
-        return seq + 1 if seq is not None else None
+        return svr.timestamp_to_sequence(self.date)
 
     @staticmethod
     def from_id(idstr):
         try:
-            seq_id=int(idstr)
+            seq_id = int(idstr)
         except ValueError:
             raise ArgumentTypeError("Sequence id '%s' is not a number" % idstr)
 
-        if seq_id < 0:
+        if seq_id < -1:
             raise ArgumentTypeError("Sequence id '%s' is negative" % idstr)
 
         return ReplicationStart(seq_id=seq_id)
@@ -229,7 +227,7 @@ def main(args):
             return 1
 
         if options.outfile is None:
-            write_end_sequence(options.seq_file, startseq)
+            write_end_sequence(options.seq_file, startseq - 1)
             return 0
 
         log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
