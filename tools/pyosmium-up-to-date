@@ -35,6 +35,7 @@ import re
 import sys
 import traceback
 import logging
+import http.cookiejar
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
@@ -45,15 +46,6 @@ from osmium.version import pyosmium_release
 from textwrap import dedent as msgfmt
 from tempfile import mktemp
 import os.path
-
-try:
-    import http.cookiejar as cookiejarlib
-except ImportError:
-    import cookielib as cookiejarlib
-try:
-    import urllib.request as urlrequest
-except ImportError:
-    import urllib2 as urlrequest
 
 log = logging.getLogger()
 
@@ -72,14 +64,12 @@ def update_from_custom_server(url, seq, ts, options):
     extra_request_params = dict(stream=True,
                                 timeout=options.socket_timeout or None)
 
-    with rserv.ReplicationServer(url, "osc.gz", extra_request_params=extra_request_params) as svr:
-        if options.cookie is not None:
-            # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
-            cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
-            cookie_jar.load(options.cookie)
-            opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
-            svr.open_url = opener.open
+    if options.cookie is not None:
+        cookie_jar = http.cookiejar.MozillaCookieJar(options.cookie)
+        cookie_jar.load(options.cookie)
+        extra_request_params['cookies'] = cookie_jar
 
+    with rserv.ReplicationServer(url, "osc.gz", extra_request_params=extra_request_params) as svr:
         log.info("Using replication service at %s", url)
 
         current = svr.get_state_info()

@@ -27,17 +27,14 @@ cookies to the server and will save received cookies to the jar file.
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import datetime as dt
+import http.cookiejar as cookiejarlib
+
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
 from osmium.version import pyosmium_release
 from osmium import SimpleHandler, WriteHandler
 
-try:
-    import http.cookiejar as cookiejarlib
-except ImportError:
-    import cookielib as cookiejarlib
-import urllib.request as urlrequest
 
 import re
 import sys
@@ -213,14 +210,12 @@ def main(args):
     extra_request_params = dict(stream=True,
                                 timeout=options.socket_timeout or None)
 
-    with rserv.ReplicationServer(url, extra_request_params=extra_request_params) as svr:
-        if options.cookie is not None:
-            # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
-            cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
-            cookie_jar.load(options.cookie)
-            opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
-            svr.open_url = opener.open
+    if options.cookie is not None:
+        cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
+        cookie_jar.load(options.cookie)
+        extra_request_params['cookies'] = cookie_jar
 
+    with rserv.ReplicationServer(url, extra_request_params=extra_request_params) as svr:
         startseq = options.start.get_sequence(svr)
         if startseq is None:
             log.error("Cannot read state file from server. Is the URL correct?")
