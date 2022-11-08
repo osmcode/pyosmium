@@ -245,6 +245,7 @@ def main(args):
         cookie_jar.save(options.cookie)
 
     if endseq is None:
+        log.error("Error while downloading diffs.")
         return 3
 
     if options.outfile != '-' or options.seq_file is not None:
