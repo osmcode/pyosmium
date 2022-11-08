@@ -35,7 +35,6 @@ import re
 import sys
 import traceback
 import logging
-import socket
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
@@ -70,7 +69,10 @@ def update_from_osm_server(ts, options):
 
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
-    with rserv.ReplicationServer(url, "osc.gz") as svr:
+    extra_request_params = dict(stream=True,
+                                timeout=options.socket_timeout or None)
+
+    with rserv.ReplicationServer(url, "osc.gz", extra_request_params=extra_request_params) as svr:
         if options.cookie is not None:
             # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
             cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
@@ -243,8 +245,6 @@ if __name__ == '__main__':
 
     options = get_arg_parser(from_main=True).parse_args()
     log.setLevel(max(3 - options.loglevel, 0) * 10)
-
-    socket.setdefaulttimeout(options.socket_timeout)
 
     try:
         url, seq, ts = compute_start_point(options)

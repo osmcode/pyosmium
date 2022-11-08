@@ -36,9 +36,14 @@ class ReplicationServer:
         internally keeps a connection to the server making downloads faster.
     """
 
-    def __init__(self, url: str, diff_type: str = 'osc.gz') -> None:
+    def __init__(self, url: str, diff_type: str = 'osc.gz',
+                 extra_request_params: Optional[Mapping[str, Any]] = None) -> None:
         self.baseurl = url
         self.diff_type = diff_type
+        if extra_request_params is None:
+            self.extra_request_params = dict(timeout=60, stream=True)
+        else:
+            self.extra_request_params = extra_request_params
         self.session: Optional[requests.Session] = None
 
     def close(self) -> None:
@@ -77,17 +82,19 @@ class ReplicationServer:
                 svr = ReplicationServer()
                 svr.open_url = opener.open
         """
-        headers = dict()
-        for h in url.header_items():
-            headers[h[0]] = h[1]
+        if 'headers' in self.extra_request_params:
+            get_params = self.extra_request_params
+        else:
+            get_params = dict(self.extra_request_params)
+            get_params['headers'] = {k: v for k,v in url.header_items()}
 
         if self.session is not None:
-            return self.session.get(url.get_full_url(), headers=headers, stream=True)
+            return self.session.get(url.get_full_url(), **get_params)
 
         @contextmanager
         def _get_url_with_session() -> Iterator[requests.Response]:
             with requests.Session() as session:
-                request = session.get(url.get_full_url(), headers=headers, stream=True)
+                request = session.get(url.get_full_url(), **get_params)
                 yield request
 
         return _get_url_with_session()
