@@ -61,16 +61,15 @@ def update_from_osm_server(ts, options):
 
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
-    extra_request_params = dict(stream=True,
-                                timeout=options.socket_timeout or None)
-
-    if options.cookie is not None:
-        cookie_jar = http.cookiejar.MozillaCookieJar(options.cookie)
-        cookie_jar.load(options.cookie)
-        extra_request_params['cookies'] = cookie_jar
-
-    with rserv.ReplicationServer(url, "osc.gz", extra_request_params=extra_request_params) as svr:
+    with rserv.ReplicationServer(url, "osc.gz") as svr:
         log.info("Using replication service at %s", url)
+
+        svr.set_request_parameter('timeout', options.socket_timeout or None)
+
+        if options.cookie is not None:
+            cookie_jar = http.cookiejar.MozillaCookieJar(options.cookie)
+            cookie_jar.load(options.cookie)
+            svr.set_request_parameter('cookies', cookie_jar)
 
         current = svr.get_state_info()
         if current is None:

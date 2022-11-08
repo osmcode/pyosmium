@@ -27,7 +27,7 @@ cookies to the server and will save received cookies to the jar file.
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import datetime as dt
-import http.cookiejar as cookiejarlib
+import http.cookiejar
 
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
@@ -207,15 +207,14 @@ def main(args):
             or 'https://planet.osm.org/replication/minute/'
     logging.info("Using replication server at %s" % url)
 
-    extra_request_params = dict(stream=True,
-                                timeout=options.socket_timeout or None)
+    with rserv.ReplicationServer(url) as svr:
+        svr.set_request_parameter('timeout', options.socket_timeout or None)
 
-    if options.cookie is not None:
-        cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
-        cookie_jar.load(options.cookie)
-        extra_request_params['cookies'] = cookie_jar
+        if options.cookie is not None:
+            cookie_jar = http.cookiejar.MozillaCookieJar(options.cookie)
+            cookie_jar.load(options.cookie)
+            svr.set_request_parameter('cookies', cookie_jar)
 
-    with rserv.ReplicationServer(url, extra_request_params=extra_request_params) as svr:
         startseq = options.start.get_sequence(svr)
         if startseq is None:
             log.error("Cannot read state file from server. Is the URL correct?")

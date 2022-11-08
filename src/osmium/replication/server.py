@@ -37,25 +37,14 @@ class ReplicationServer:
         replication service serves something other than osc.gz files, set
         the `diff_type` to the given file suffix.
 
-        `extra_parameters` may be used to define additional parameters to be
-        handed to the `requests.get()` method when downloading files. This
-        may be used to set custom headers, timeouts and similar parameters.
-        See the `requests documentation <https://requests.readthedocs.io/en/latest/api/?highlight=get#requests.request>`_
-        for possible parameters. The default is to set a timeout of 60 sec
-        and enable streaming download.
-
         ReplicationServer may be used as a context manager. In this case, it
         internally keeps a connection to the server making downloads faster.
     """
 
-    def __init__(self, url: str, diff_type: str = 'osc.gz',
-                 extra_request_params: Optional[Mapping[str, Any]] = None) -> None:
+    def __init__(self, url: str, diff_type: str = 'osc.gz') -> None:
         self.baseurl = url
         self.diff_type = diff_type
-        if extra_request_params is None:
-            self.extra_request_params = dict(timeout=60, stream=True)
-        else:
-            self.extra_request_params = extra_request_params
+        self.extra_request_params: Mapping[str, Any] = dict(timeout=60, stream=True)
         self.session: Optional[requests.Session] = None
 
     def close(self) -> None:
@@ -71,6 +60,16 @@ class ReplicationServer:
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         self.close()
+
+    def set_request_parameter(self, key: str, value: Any) -> None:
+        """ Set a parameter which will be handed to the requests library
+            when calling `requests.get()`. This
+            may be used to set custom headers, timeouts and similar parameters.
+            See the `requests documentation <https://requests.readthedocs.io/en/latest/api/?highlight=get#requests.request>`_
+            for possible parameters. Per default, a timeout of 60 sec is set
+            and streaming download enabled.
+        """
+        self.extra_request_params[key] = value
 
     def make_request(self, url: str) -> urlrequest.Request:
         headers = {"User-Agent" : f"pyosmium/{version.pyosmium_release}"}
