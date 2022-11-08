@@ -32,6 +32,18 @@ class ReplicationServer:
         Replication change files allow to keep local OSM data up-to-date without
         downloading the full dataset again.
 
+        `url` contains the base URL of the replication service. This is the
+        directory that contains the state file with the current state. If the
+        replication service serves something other than osc.gz files, set
+        the `diff_type` to the given file suffix.
+
+        `extra_parameters` may be used to define additional parameters to be
+        handed to the `requests.get()` method when downloading files. This
+        may be used to set custom headers, timeouts and similar parameters.
+        See the `requests documentation <https://requests.readthedocs.io/en/latest/api/?highlight=get#requests.request>`_
+        for possible parameters. The default is to set a timeout of 60 sec
+        and enable streaming download.
+
         ReplicationServer may be used as a context manager. In this case, it
         internally keeps a connection to the server making downloads faster.
     """
@@ -67,20 +79,6 @@ class ReplicationServer:
     def open_url(self, url: urlrequest.Request) -> Any:
         """ Download a resource from the given URL and return a byte sequence
             of the content.
-
-            This method has no support for cookies or any special authentication
-            methods. If you need these, you have to provide your own custom URL
-            opener. Overwrite open_url() with a method that receives an
-            urlrequest.Request object and returns a ByteIO-like object or a
-            requests.Response.
-
-            Example::
-
-                opener = urlrequest.build_opener()
-                opener.addheaders = [('X-Fancy-Header', 'important_content')]
-
-                svr = ReplicationServer()
-                svr.open_url = opener.open
         """
         if 'headers' in self.extra_request_params:
             get_params = self.extra_request_params
