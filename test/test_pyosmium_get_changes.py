@@ -48,13 +48,6 @@ class TestPyosmiumGetChanges:
         monkeypatch.setattr(osmium.replication.server.requests.Session, "get", mock_get)
 
 
-    @pytest.fixture
-    def mock_urllib(self, monkeypatch):
-        def mock_get(_, url, **kwargs):
-            return BytesIO(self.urls[url.get_full_url()])
-        monkeypatch.setattr(self.script['urlrequest'].OpenerDirector, "open", mock_get)
-
-
     def url(self, url, result):
         self.urls[url] = dedent(result).encode()
 
@@ -103,7 +96,7 @@ class TestPyosmiumGetChanges:
         assert fname.read_text() == '453'
 
 
-    def test_init_date_with_cookie(self, capsys, tmp_path, mock_urllib):
+    def test_init_date_with_cookie(self, capsys, tmp_path, mock_requests):
         self.url('https://planet.osm.org/replication/minute//state.txt',
                  """\
                     sequenceNumber=100
