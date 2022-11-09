@@ -32,6 +32,11 @@ class ReplicationServer:
         Replication change files allow to keep local OSM data up-to-date without
         downloading the full dataset again.
 
+        `url` contains the base URL of the replication service. This is the
+        directory that contains the state file with the current state. If the
+        replication service serves something other than osc.gz files, set
+        the `diff_type` to the given file suffix.
+
         ReplicationServer may be used as a context manager. In this case, it
         internally keeps a connection to the server making downloads faster.
     """
@@ -39,6 +44,7 @@ class ReplicationServer:
     def __init__(self, url: str, diff_type: str = 'osc.gz') -> None:
         self.baseurl = url
         self.diff_type = diff_type
+        self.extra_request_params: Mapping[str, Any] = dict(timeout=60, stream=True)
         self.session: Optional[requests.Session] = None
 
     def close(self) -> None:
@@ -55,6 +61,16 @@ class ReplicationServer:
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         self.close()
 
+    def set_request_parameter(self, key: str, value: Any) -> None:
+        """ Set a parameter which will be handed to the requests library
+            when calling `requests.get()`. This
+            may be used to set custom headers, timeouts and similar parameters.
+            See the `requests documentation <https://requests.readthedocs.io/en/latest/api/?highlight=get#requests.request>`_
+            for possible parameters. Per default, a timeout of 60 sec is set
+            and streaming download enabled.
+        """
+        self.extra_request_params[key] = value
+
     def make_request(self, url: str) -> urlrequest.Request:
         headers = {"User-Agent" : f"pyosmium/{version.pyosmium_release}"}
         return urlrequest.Request(url, headers=headers)
@@ -62,32 +78,20 @@ class ReplicationServer:
     def open_url(self, url: urlrequest.Request) -> Any:
         """ Download a resource from the given URL and return a byte sequence
             of the content.
-
-            This method has no support for cookies or any special authentication
-            methods. If you need these, you have to provide your own custom URL
-            opener. Overwrite open_url() with a method that receives an
-            urlrequest.Request object and returns a ByteIO-like object or a
-            requests.Response.
-
-            Example::
-
-                opener = urlrequest.build_opener()
-                opener.addheaders = [('X-Fancy-Header', 'important_content')]
-
-                svr = ReplicationServer()
-                svr.open_url = opener.open
         """
-        headers = dict()
-        for h in url.header_items():
-            headers[h[0]] = h[1]
+        if 'headers' in self.extra_request_params:
+            get_params = self.extra_request_params
+        else:
+            get_params = dict(self.extra_request_params)
+            get_params['headers'] = {k: v for k,v in url.header_items()}
 
         if self.session is not None:
-            return self.session.get(url.get_full_url(), headers=headers, stream=True)
+            return self.session.get(url.get_full_url(), **get_params)
 
         @contextmanager
         def _get_url_with_session() -> Iterator[requests.Response]:
             with requests.Session() as session:
-                request = session.get(url.get_full_url(), headers=headers, stream=True)
+                request = session.get(url.get_full_url(), **get_params)
                 yield request
 
         return _get_url_with_session()

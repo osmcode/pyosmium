@@ -27,18 +27,14 @@ cookies to the server and will save received cookies to the jar file.
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import datetime as dt
-import socket
+import http.cookiejar
+
 from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
 from osmium.version import pyosmium_release
 from osmium import SimpleHandler, WriteHandler
 
-try:
-    import http.cookiejar as cookiejarlib
-except ImportError:
-    import cookielib as cookiejarlib
-import urllib.request as urlrequest
 
 import re
 import sys
@@ -211,15 +207,13 @@ def main(args):
             or 'https://planet.osm.org/replication/minute/'
     logging.info("Using replication server at %s" % url)
 
-    socket.setdefaulttimeout(options.socket_timeout)
-
     with rserv.ReplicationServer(url) as svr:
+        svr.set_request_parameter('timeout', options.socket_timeout or None)
+
         if options.cookie is not None:
-            # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
-            cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
+            cookie_jar = http.cookiejar.MozillaCookieJar(options.cookie)
             cookie_jar.load(options.cookie)
-            opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
-            svr.open_url = opener.open
+            svr.set_request_parameter('cookies', cookie_jar)
 
         startseq = options.start.get_sequence(svr)
         if startseq is None:
@@ -245,6 +239,7 @@ def main(args):
         cookie_jar.save(options.cookie)
 
     if endseq is None:
+        log.error("Error while downloading diffs.")
         return 3
 
     if options.outfile != '-' or options.seq_file is not None:

@@ -35,7 +35,7 @@ import re
 import sys
 import traceback
 import logging
-import socket
+import http.cookiejar
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
@@ -46,15 +46,6 @@ from osmium.version import pyosmium_release
 from textwrap import dedent as msgfmt
 from tempfile import mktemp
 import os.path
-
-try:
-    import http.cookiejar as cookiejarlib
-except ImportError:
-    import cookielib as cookiejarlib
-try:
-    import urllib.request as urlrequest
-except ImportError:
-    import urllib2 as urlrequest
 
 log = logging.getLogger()
 
@@ -71,14 +62,14 @@ def update_from_osm_server(ts, options):
 def update_from_custom_server(url, seq, ts, options):
     """Update from a custom URL, simply using the diff sequence as is."""
     with rserv.ReplicationServer(url, "osc.gz") as svr:
-        if options.cookie is not None:
-            # According to the documentation, the cookie jar loads the file only if FileCookieJar.load is called.
-            cookie_jar = cookiejarlib.MozillaCookieJar(options.cookie)
-            cookie_jar.load(options.cookie)
-            opener = urlrequest.build_opener(urlrequest.HTTPCookieProcessor(cookie_jar))
-            svr.open_url = opener.open
-
         log.info("Using replication service at %s", url)
+
+        svr.set_request_parameter('timeout', options.socket_timeout or None)
+
+        if options.cookie is not None:
+            cookie_jar = http.cookiejar.MozillaCookieJar(options.cookie)
+            cookie_jar.load(options.cookie)
+            svr.set_request_parameter('cookies', cookie_jar)
 
         current = svr.get_state_info()
         if current is None:
@@ -243,8 +234,6 @@ if __name__ == '__main__':
 
     options = get_arg_parser(from_main=True).parse_args()
     log.setLevel(max(3 - options.loglevel, 0) * 10)
-
-    socket.setdefaulttimeout(options.socket_timeout)
 
     try:
         url, seq, ts = compute_start_point(options)
