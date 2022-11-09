@@ -135,14 +135,14 @@ jobs:
                       python: 3.6
                       deps: release
                     - compiler: gcc
-                      cc: gcc-10
-                      cxx: g++-10
+                      cc: gcc-11
+                      cxx: g++-11
                       platform: ubuntu-22.04
                       python: "3.11"
                       deps: develop
                     - compiler: clang
-                      cc: clang-11
-                      cxx: clang++-11
+                      cc: clang-14
+                      cxx: clang++-14
                       platform: ubuntu-22.04
                       python: "3.11"
                       deps: develop
