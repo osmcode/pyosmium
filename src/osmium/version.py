@@ -3,9 +3,9 @@ Version information.
 """
 
 # the major version
-pyosmium_major = '3.4'
+pyosmium_major = '3.5'
 # current release (Pip version)
-pyosmium_release = '3.4.1'
+pyosmium_release = '3.5.0'
 
 # libosmium version shipped with the Pip release
 libosmium_version = '2.18.0'

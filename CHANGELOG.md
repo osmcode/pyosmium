@@ -4,6 +4,32 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.5.0] - 2022-11-09
+
+### Added
+
+- type annotations for the public interface
+- new `ReplicationServer.set_request_parameter()` function to specify additional
+  parameters to give to `requests.get()`
+
+### Fixed
+
+- writer now rolls back data buffer after exceptions (fixes #212)
+- off-by-one error in computation of change ID from a start date
+- socket timeout in pyosmium-get-changes/pyosmium-up-to-date was ignored
+  falling back to waiting forever on requests
+
+### Changed
+
+- use format strings instead of `format()` where possible
+- pyosmium-get-changes now prints an error message when there is a HTTP error
+  during download
+- overwriting `ReplicationServer.open_url()` is no longer recommended,
+  use new `ReplicationServer.set_request_parameter()` function instead
+- cookies for pyosmium-get-changes/pyosmium-up-to-date are now set via
+  request parameters, removing the last use-case where urllib was used
+- update bundled pybind11 to 2.10.1
+
 ## [3.4.1] - 2022-07-28
 
 ### Fixed
