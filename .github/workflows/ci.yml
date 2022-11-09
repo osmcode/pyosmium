@@ -7,13 +7,13 @@ jobs:
         runs-on: ubuntu-20.04
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
 
             - name: Set up Python 3.6
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.6
 
@@ -24,7 +24,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.7
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.7
 
@@ -35,7 +35,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.8
 
@@ -46,7 +46,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.9
 
@@ -57,7 +57,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: "3.10"
 
@@ -67,8 +67,19 @@ jobs:
                 python -m build
               shell: bash
 
+            - name: Set up Python 3.11
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.11"
+
+            - name: Build package 3.11
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
             - name: Upload Artifact
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: pyosmium-linux-x64-dist
                   path: dist
@@ -80,17 +91,17 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
+                python-version: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11"]
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: ${{ matrix.python-version }}
 
-            - uses: actions/download-artifact@v2
+            - uses: actions/download-artifact@v3
               with:
                   name: pyosmium-linux-x64-dist
 
@@ -124,20 +135,20 @@ jobs:
                       python: 3.6
                       deps: release
                     - compiler: gcc
-                      cc: gcc-10
-                      cxx: g++-10
-                      platform: ubuntu-20.04
-                      python: "3.10"
+                      cc: gcc-11
+                      cxx: g++-11
+                      platform: ubuntu-22.04
+                      python: "3.11"
                       deps: develop
                     - compiler: clang
-                      cc: clang-11
-                      cxx: clang++-11
-                      platform: ubuntu-20.04
-                      python: "3.10"
+                      cc: clang-14
+                      cxx: clang++-14
+                      platform: ubuntu-22.04
+                      python: "3.11"
                       deps: develop
                     - compiler: macos
                       platform: macos-latest
-                      python: "3.10"
+                      python: "3.11"
                       deps: develop
 
         env:
@@ -145,13 +156,13 @@ jobs:
             CXX: ${{ matrix.cxx }}
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - uses: ./.github/actions/install-dependencies
               with:
                   version: ${{ matrix.deps }}
 
-            - uses: actions/setup-python@v2
+            - uses: actions/setup-python@v4
               with:
                   python-version: "${{ matrix.python }}"
 
@@ -190,9 +201,9 @@ jobs:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
-            - uses: actions/cache@v2
+            - uses: actions/cache@v3
               with:
                   path: |
                     C:/vcpkg_binary_cache
@@ -207,7 +218,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.6
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.6
 
@@ -220,7 +231,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.7
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.7
 
@@ -233,7 +244,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.8
 
@@ -246,7 +257,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: 3.9
 
@@ -259,7 +270,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: "3.10"
 
@@ -271,8 +282,21 @@ jobs:
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+            - name: Set up Python 3.11
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.11"
+
+            - name: Build package 3.11
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
             - name: 'Upload Artifact'
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: pyosmium-win64-dist
                   path: dist
@@ -284,20 +308,20 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+                python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
 
         env:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
 
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: ${{ matrix.python-version }}
 
-            - uses: actions/download-artifact@v2
+            - uses: actions/download-artifact@v3
               with:
                   name: pyosmium-win64-dist
 
