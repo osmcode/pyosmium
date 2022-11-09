@@ -67,6 +67,17 @@ jobs:
                 python -m build
               shell: bash
 
+            - name: Set up Python 3.11
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "3.11"
+
+            - name: Build package 3.11
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
             - name: Upload Artifact
               uses: actions/upload-artifact@v2
               with:
@@ -80,7 +91,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
+                python-version: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11"]
 
         steps:
             - uses: actions/checkout@v2
@@ -126,18 +137,18 @@ jobs:
                     - compiler: gcc
                       cc: gcc-10
                       cxx: g++-10
-                      platform: ubuntu-20.04
-                      python: "3.10"
+                      platform: ubuntu-22.04
+                      python: "3.11"
                       deps: develop
                     - compiler: clang
                       cc: clang-11
                       cxx: clang++-11
-                      platform: ubuntu-20.04
-                      python: "3.10"
+                      platform: ubuntu-22.04
+                      python: "3.11"
                       deps: develop
                     - compiler: macos
                       platform: macos-latest
-                      python: "3.10"
+                      python: "3.11"
                       deps: develop
 
         env:
@@ -271,6 +282,19 @@ jobs:
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+            - name: Set up Python 3.11
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "3.11"
+
+            - name: Build package 3.11
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
             - name: 'Upload Artifact'
               uses: actions/upload-artifact@v2
               with:
@@ -284,7 +308,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+                python-version: ["3.6", "3.7", "3.8", "3.9", "3.10". "3.11"]
 
         env:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
