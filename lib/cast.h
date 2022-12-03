@@ -1,9 +1,11 @@
 #ifndef PYOSMIUM_CAST_H
 #define PYOSMIUM_CAST_H
 
-#include <pybind11/pybind11.h>
 #include <datetime.h>
 #include <chrono>
+
+#include <pybind11/pybind11.h>
+#include <osmium/osm.hpp>
 
 namespace pybind11 { namespace detail {
     template <> struct type_caster<osmium::Timestamp> {
