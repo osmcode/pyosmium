@@ -67,15 +67,15 @@ class COSMChangeset {
 
 class CNodeRefList {
     public:
-        CNodeRefList(osmium::NodeRefList const &list) : m_obj(list) {}
+        CNodeRefList(osmium::NodeRefList const *list) : m_obj(list) {}
 
-        osmium::NodeRefList const &get() const {
+        osmium::NodeRefList const *get() const {
             return m_obj;
         }
 
         pybind11::object get_item(Py_ssize_t idx) const
          {
-            auto sz = m_obj.size();
+            auto sz = m_obj->size();
 
             osmium::NodeRefList::size_type iout =
                 (idx >= 0 ? idx : (Py_ssize_t) sz + idx);
@@ -84,7 +84,7 @@ class CNodeRefList {
                 throw pybind11::index_error("Bad index.");
             }
 
-            auto const &node = m_obj[iout];
+            auto const &node = (*m_obj)[iout];
 
             static auto node_ref_t = pybind11::module_::import("osmium.osm.types").attr("NodeRef");
 
@@ -92,7 +92,7 @@ class CNodeRefList {
          }
 
     private:
-        osmium::NodeRefList const &m_obj;
+        osmium::NodeRefList const *m_obj;
 };
 
 #endif //PYOSMIUM_OSM_WRAPPER_HPP

@@ -37,6 +37,35 @@ private:
 };
 
 
+class RelationMemberListIterator
+{
+public:
+    RelationMemberListIterator(osmium::RelationMemberList const &t)
+    : m_it(t.cbegin()), m_cend(t.cend()), m_size(t.size())
+    {}
+
+    py::object next()
+    {
+        if (m_it == m_cend)
+            throw py::stop_iteration();
+
+        static auto memb = py::module_::import("osmium.osm.types").attr("RelationMember");
+        auto value = memb(m_it->ref(), item_type_to_char(m_it->type()), m_it->role());
+        ++m_it;
+
+        return value;
+    }
+
+    int size() const { return m_size; }
+
+private:
+    osmium::RelationMemberList::const_iterator m_it;
+    osmium::RelationMemberList::const_iterator const m_cend;
+    int const m_size;
+};
+
+
+
 PYBIND11_MODULE(_osm, m) {
     py::enum_<osmium::osm_entity_bits::type>(m, "osm_entity_bits")
         .value("NOTHING", osmium::osm_entity_bits::nothing)
@@ -132,6 +161,13 @@ PYBIND11_MODULE(_osm, m) {
     ;
 
 
+    py::class_<RelationMemberListIterator>(m, "RelationMemberListIterator")
+        .def("__iter__", [](RelationMemberListIterator &it) -> RelationMemberListIterator& { return it; })
+        .def("__next__", &RelationMemberListIterator::next)
+        .def("__len__", &RelationMemberListIterator::size)
+    ;
+
+
     py::class_<COSMObject>(m, "COSMObject")
         .def("id", [](COSMObject const &o) { return o.get_object()->id(); })
         .def("deleted", [](COSMObject const &o) { return o.get_object()->deleted(); })
@@ -160,11 +196,14 @@ PYBIND11_MODULE(_osm, m) {
         .def("is_closed", [](COSMWay const &o) { return o.get()->is_closed(); })
         .def("ends_have_same_id", [](COSMWay const &o) { return o.get()->ends_have_same_id(); })
         .def("ends_have_same_location", [](COSMWay const &o) { return o.get()->ends_have_same_location(); })
-        .def("nodes", [](COSMWay const &o) { return CNodeRefList(o.get()->nodes()); })
+        .def("nodes", [](COSMWay const &o) { return CNodeRefList(&(o.get()->nodes())); })
     ;
 
 
-    py::class_<COSMRelation, COSMObject>(m, "COSMRelation");
+    py::class_<COSMRelation, COSMObject>(m, "COSMRelation")
+        .def("members_size", [](COSMRelation const &o) { return o.get()->members().size(); })
+        .def("members_iter", [](COSMRelation const &o) { return RelationMemberListIterator(o.get()->members()); })
+    ;
 
     py::class_<COSMArea, COSMObject>(m, "COSMArea")
         .def("from_way", [](COSMArea const &o) { return o.get()->from_way(); })
@@ -194,7 +233,7 @@ PYBIND11_MODULE(_osm, m) {
 
 
     py::class_<CNodeRefList>(m, "CNodeRefList")
-        .def("size", [](CNodeRefList const &o) { return o.get().size(); })
+        .def("size", [](CNodeRefList const &o) { return o.get()->size(); })
         .def("get", &CNodeRefList::get_item)
     ;
 

@@ -139,6 +139,18 @@ class Relation(_OSMObject):
     def __init__(self, crelation: cosm.COSMRelation):
         self._data = crelation
         self.tags = TagList(self._data)
+        self.members = RelationMemberList(self._data)
+
+
+    def __str__(self):
+        if self._data.is_valid():
+            return f"r{self.id:d}: members={self.members!s}, tags={self.tags!s}"
+
+        return f"<invalid>"
+
+    __repr__ = _make_repr('Relation', 'id', 'deleted', 'visible', 'version',
+                                      'changeset', 'uid', 'timestamp', 'user',
+                                      'tags', 'members')
 
 
 class Area(_OSMObject):
@@ -276,6 +288,55 @@ class TagList:
     def __repr__(self):
         tagstr = ', '.join([f"{i.k!r}: {i.v!r}" for i in self])
         return f"osmium.osm.TagList({{{tagstr}}})"
+
+
+class RelationMember:
+
+    def __init__(self, ref, mtype, role):
+        self.ref = ref
+        self.type = mtype
+        self.role = role
+
+
+    def __str__(self):
+        if self.role:
+            return f"{self.type}{self.ref:d}@{self.role}"
+
+        return f"{self.type}{self.ref:d}"
+
+
+    def __repr__(self):
+        return f"osmium.osm.RelationMember(ref={self.ref!r}, type={self.type!r}, role={self.role!r})"
+
+
+class RelationMemberList:
+
+    def __init__(self, parent):
+        self._data = parent
+
+
+    def __len__(self):
+        return self._data.members_size()
+
+
+    def __iter__(self):
+        return self._data.members_iter()
+
+
+    def __str__(self):
+        if not self._data.is_valid():
+            return '[<invalid>]'
+
+        return f'[{_list_elipse(self)}]'
+
+
+    def __repr__(self):
+        if not self._data.is_valid():
+            return f"osmium.osm.{self.__class__.__name__}(<invalid>)"
+
+        return 'osmium.osm.{}([{}])'.format(self.__class__.__name__,
+                                        ', '.join(map(repr, self)))
+
 
 
 class NodeRef:
