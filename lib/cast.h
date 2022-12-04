@@ -62,4 +62,36 @@ namespace pybind11 { namespace detail {
     };
 }} // namespace pybind11::detail
 
+namespace pyosmium {
+
+template <typename T>
+T const *try_cast(pybind11::object o) {
+    if (!pybind11::hasattr(o, "_data")) {
+        return nullptr;
+    }
+
+    auto inner = o.attr("_data");
+
+    if (pybind11::isinstance<T>(inner)) {
+        return inner.cast<T const *>();
+    }
+
+    return nullptr;
+}
+
+template <typename T>
+T const &cast(pybind11::object o) {
+    return o.attr("_data").cast<T const &>();
+}
+
+template <typename T>
+T const &cast_list(pybind11::object o) {
+    return o.attr("_list").cast<T const &>();
+}
+
+
+
+
+}
+
 #endif // PYOSMIUM_CAST_H
