@@ -5,9 +5,14 @@ from osmium.osm.types import (Node as Node,
                               Way as Way,
                               Relation as Relation,
                               Area as Area,
-                              Changeset as Changeset)
+                              Changeset as Changeset,
+                              Tag as Tag,
+                              TagList as TagList,
+                              NodeRef as NodeRef,
+                              WayNodeList as WayNodeList)
 
-from osmium.osm._osm import (Location as Location)
+from osmium.osm._osm import (Location as Location,
+                             Box as Box)
 
 setattr(Location, '__repr__',
         lambda l: f'osmium.osm.Location(x={l.x!r}, y={l.y!r})'
@@ -15,4 +20,7 @@ setattr(Location, '__repr__',
 setattr(Location, '__str__',
         lambda l: f'{l.lon_without_check():.7f}/{l.lat_without_check():.7f}'
                       if l.valid() else 'invalid')
+
+setattr(Box, '__repr__', lambda b: f"osmium.osm.Box(bottom_left={b.bottom_left!r}, top_right={b.top_right!r})")
+setattr(Box, '__str__', lambda b: f'({b.bottom_left!s} {b.top_right!s})')
 

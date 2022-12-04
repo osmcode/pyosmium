@@ -59,6 +59,8 @@ class COSMChangeset {
 
         void invalidate() { m_obj = nullptr; }
 
+        bool is_valid() const { return m_obj; }
+
     private:
         osmium::Changeset const *m_obj;
 };

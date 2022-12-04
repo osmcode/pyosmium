@@ -50,6 +50,51 @@ PYBIND11_MODULE(_osm, m) {
         .export_values()
     ;
 
+
+    py::class_<osmium::Box>(m, "Box",
+        "A bounding box around a geographic area. It is defined by an "
+        ":py:class:`osmium.osm.Location` for the bottem-left corner and an "
+        "``osmium.osm.Location`` for the top-right corner. Those locations may "
+        " be invalid in which case the box is considered invalid, too.")
+        .def(py::init<double, double, double, double>())
+        .def(py::init<osmium::Location, osmium::Location>())
+        .def_property_readonly("bottom_left",
+                               (osmium::Location& (osmium::Box::*)())
+                                   &osmium::Box::bottom_left,
+                               py::return_value_policy::reference_internal,
+             "(read-only) Bottom-left corner of the bounding box.")
+        .def_property_readonly("top_right",
+                               (osmium::Location& (osmium::Box::*)())
+                                   &osmium::Box::top_right,
+                               py::return_value_policy::reference_internal,
+             "(read-only) Top-right corner of the bounding box.")
+        .def("extend",
+             (osmium::Box& (osmium::Box::*)(osmium::Location const&))
+                 &osmium::Box::extend,
+             py::arg("location"),
+             py::return_value_policy::reference_internal,
+             "Extend the box to include the given location. If the location "
+             "is invalid the box remains unchanged. If the box is invalid, it "
+             "will contain only the location after the operation. "
+             "Returns a reference to itself.")
+        .def("extend",
+             (osmium::Box& (osmium::Box::*)(osmium::Box const &))
+                 &osmium::Box::extend,
+             py::arg("box"),
+             py::return_value_policy::reference_internal,
+             "Extend the box to include the given box. If the box to be added "
+             "is invalid the input box remains unchanged. If the input box is invalid, it "
+             "will become equal to the box that was added. "
+             "Returns a reference to itself.")
+        .def("valid", &osmium::Box::valid,
+             "Check if the box coordinates are defined and with the usual bounds.")
+        .def("size", &osmium::Box::size,
+             "Return the size in square degrees.")
+        .def("contains", &osmium::Box::contains, py::arg("location"),
+             "Check if the given location is inside the box.")\
+    ;
+
+
     py::class_<osmium::Location>(m, "Location",
         "A geographic coordinate in WGS84 projection. A location doesn't "
          "necessarily have to be valid.")
@@ -137,12 +182,14 @@ PYBIND11_MODULE(_osm, m) {
         .def("num_changes", [](COSMChangeset const &o) { return o.get()->num_changes(); })
         .def("user", [](COSMChangeset const &o) { return o.get()->user(); })
         .def("user_is_anonymous", [](COSMChangeset const &o) { return o.get()->user_is_anonymous(); })
+        .def("bounds", [](COSMChangeset const &o) { return o.get()->bounds(); })
         .def("tags_size", [](COSMChangeset const &o) { return o.get()->tags().size(); })
         .def("tags_get_value_by_key", [](COSMChangeset const &o, char const *key, char const *def)
             { return o.get()->tags().get_value_by_key(key, def); })
         .def("tags_has_key", [](COSMChangeset const &o, char const *key)
             { return o.get()->tags().has_key(key); })
-
+        .def("tags_iter", [](COSMChangeset const &o) { return TagListIterator(o.get()->tags()); })
+        .def("is_valid", &COSMChangeset::is_valid)
     ;
 
 

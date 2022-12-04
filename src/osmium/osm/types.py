@@ -168,6 +168,7 @@ class Changeset(_OSMObject):
 
     def __init__(self, carea: cosm.COSMChangeset):
         self._data = carea
+        self._bounds = None
         self.tags = TagList(self._data)
 
 
@@ -206,8 +207,25 @@ class Changeset(_OSMObject):
         return self._data.user()
 
 
+    @property
+    def bounds(self):
+        if self._bounds is None:
+            self._bounds = self._data.bounds()
+
+        return self._bounds
+
+
     def user_is_anonymous(self):
         return self._data.user_is_anonymous()
+
+
+    def __str__(self):
+        return f'c{self.id:d}: closed_at={self.closed_at!s}, bounds={self.bounds!s}, tags={self.tags!s}'
+
+
+    __repr__ =  _make_repr('Changeset', 'id', 'uid', 'created_at', 'closed_at',
+                                        'open', 'num_changes', 'bounds', 'user',
+                                        'tags')
 
 
 class Tag(NamedTuple):
