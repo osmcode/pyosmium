@@ -69,6 +69,19 @@ private:
     }
 };
 
+template <typename T>
+class ObjectGuard {
+    public:
+        ObjectGuard(pybind11::object ward) : m_ward(ward) {}
+
+        ~ObjectGuard() {
+            m_ward.attr("_data").cast<T *>()->invalidate();
+        }
+
+    private:
+        pybind11::object m_ward;
+};
+
 class PySimpleHandler : public SimpleHandler
 {
 public:
@@ -98,8 +111,8 @@ public:
         auto func = callback("node");
         if (func) {
             auto obj = m_type_module.attr("Node")(COSMNode{n});
+            ObjectGuard<COSMNode> guard(obj);
             func(obj);
-            obj.attr("_data").cast<COSMNode *>()->invalidate();
         }
     }
 
@@ -109,8 +122,8 @@ public:
         auto func = callback("way");
         if (func) {
             auto obj = m_type_module.attr("Way")(COSMWay{w});
+            ObjectGuard<COSMWay> guard(obj);
             func(obj);
-            obj.attr("_data").cast<COSMWay *>()->invalidate();
         }
     }
 
@@ -120,8 +133,8 @@ public:
         auto func = callback("relation");
         if (func) {
             auto obj = m_type_module.attr("Relation")(COSMRelation{r});
+            ObjectGuard<COSMRelation> guard(obj);
             func(obj);
-            obj.attr("_data").cast<COSMRelation *>()->invalidate();
         }
     }
 
@@ -131,8 +144,8 @@ public:
         auto func = callback("changeset");
         if (func) {
             auto obj = m_type_module.attr("Changeset")(COSMChangeset{c});
+            ObjectGuard<COSMChangeset> guard(obj);
             func(obj);
-            obj.attr("_data").cast<COSMChangeset *>()->invalidate();
         }
     }
 
@@ -142,8 +155,8 @@ public:
         auto func = callback("area");
         if (func) {
             auto obj = m_type_module.attr("Area")(COSMArea{a});
+            ObjectGuard<COSMArea> guard(obj);
             func(obj);
-            obj.attr("_data").cast<COSMArea *>()->invalidate();
         }
     }
 

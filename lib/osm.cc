@@ -9,6 +9,33 @@
 
 namespace py = pybind11;
 
+class TagListIterator
+{
+public:
+    TagListIterator(osmium::TagList const &t)
+    : m_it(t.cbegin()), m_cend(t.cend()), m_size(t.size())
+    {}
+
+    py::object next()
+    {
+        if (m_it == m_cend)
+            throw py::stop_iteration();
+
+        static auto tag = py::module_::import("osmium.osm.types").attr("Tag");
+        auto value = tag(m_it->key(), m_it->value());
+        ++m_it;
+
+        return value;
+    }
+
+    int size() const { return m_size; }
+
+private:
+    osmium::TagList::const_iterator m_it;
+    osmium::TagList::const_iterator const m_cend;
+    int const m_size;
+};
+
 
 PYBIND11_MODULE(_osm, m) {
     py::enum_<osmium::osm_entity_bits::type>(m, "osm_entity_bits")
@@ -53,6 +80,13 @@ PYBIND11_MODULE(_osm, m) {
     ;
 
 
+    py::class_<TagListIterator>(m, "TagListIterator")
+        .def("__iter__", [](TagListIterator &it) -> TagListIterator& { return it; })
+        .def("__next__", &TagListIterator::next)
+        .def("__len__", &TagListIterator::size)
+    ;
+
+
     py::class_<COSMObject>(m, "COSMObject")
         .def("id", [] (COSMObject const &o) { return o.get_object()->id(); })
         .def("deleted", [] (COSMObject const &o) { return o.get_object()->deleted(); })
@@ -64,6 +98,13 @@ PYBIND11_MODULE(_osm, m) {
         .def("user", [] (COSMObject const &o) { return o.get_object()->user(); })
         .def("positive_id", [] (COSMObject const &o) { return o.get_object()->positive_id(); })
         .def("user_is_anonymous", [] (COSMObject const &o) { return o.get_object()->user_is_anonymous(); })
+        .def("tags_size", [] (COSMObject const &o) { return o.get_object()->tags().size(); })
+        .def("tags_get_value_by_key", [] (COSMObject const &o, char const *key, char const *def)
+            { return o.get_object()->tags().get_value_by_key(key, def); })
+        .def("tags_has_key", [] (COSMObject const &o, char const *key)
+            { return o.get_object()->tags().has_key(key); })
+        .def("tags_iter", [] (COSMObject const &o) { return TagListIterator(o.get_object()->tags()); })
+        .def("is_valid", &COSMObject::is_valid)
     ;
 
     py::class_<COSMNode, COSMObject>(m, "COSMNode")
@@ -95,6 +136,11 @@ PYBIND11_MODULE(_osm, m) {
         .def("num_changes", [] (COSMChangeset const &o) { return o.get()->num_changes(); })
         .def("user", [] (COSMChangeset const &o) { return o.get()->user(); })
         .def("user_is_anonymous", [] (COSMChangeset const &o) { return o.get()->user_is_anonymous(); })
+        .def("tags_size", [] (COSMChangeset const &o) { return o.get()->tags().size(); })
+        .def("tags_get_value_by_key", [] (COSMChangeset const &o, char const *key, char const *def)
+            { return o.get()->tags().get_value_by_key(key, def); })
+        .def("tags_has_key", [] (COSMChangeset const &o, char const *key)
+            { return o.get()->tags().has_key(key); })
 
     ;
 

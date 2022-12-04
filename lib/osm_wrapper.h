@@ -13,6 +13,8 @@ class COSMObject {
             return obj;
         }
 
+        bool is_valid() const { return object_ptr(); }
+
     protected:
         virtual osmium::OSMObject const *object_ptr() const = 0;
 };
