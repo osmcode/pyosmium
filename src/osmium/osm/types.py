@@ -2,6 +2,7 @@ from typing import Sequence, Any, NamedTuple, Callable
 import collections.abc
 
 import osmium.osm._osm as cosm
+import osmium.osm.mutable
 
 def _make_repr(name, *attrs: str) -> Callable[[object], str]:
     fmt_string = f'osmium.osm.{name}('\
@@ -79,6 +80,9 @@ class Node(_OSMObject):
         self._location = None
         self.tags = TagList(self._data)
 
+    def replace(self, **kwargs):
+        return osmium.osm.mutable.Node(self, **kwargs)
+
     @property
     def location(self):
         if self._location is None:
@@ -102,6 +106,9 @@ class Way(_OSMObject):
         self._data = cway
         self.tags = TagList(self._data)
         self._nodes = None
+
+    def replace(self, **kwargs):
+        return osmium.osm.mutable.Way(self, **kwargs)
 
 
     @property
@@ -139,6 +146,8 @@ class Relation(_OSMObject):
         self.tags = TagList(self._data)
         self.members = RelationMemberList(self._data)
 
+    def replace(self, **kwargs):
+        return osmium.osm.mutable.Relation(self, **kwargs)
 
     def __str__(self):
         if self._data.is_valid():
@@ -248,6 +257,9 @@ class Changeset(_OSMObject):
 class Tag(NamedTuple):
     k: str
     v: str
+
+    def __str__(self):
+        return f"{self.k}={self.v}"
 
 
 class TagList:

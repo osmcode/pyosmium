@@ -1,3 +1,4 @@
+#define PYBIND11_DETAILED_ERROR_MESSAGES
 #include <pybind11/pybind11.h>
 
 #include <osmium/osm.hpp>
@@ -8,6 +9,8 @@
 #include <osmium/builder/osm_object_builder.hpp>
 
 #include "cast.h"
+#include "osm_base_objects.h"
+#include "osm_helper.h"
 
 namespace py = pybind11;
 
@@ -28,18 +31,6 @@ public:
     virtual ~SimpleWriter()
     { close(); }
 
-    void add_osmium_object(const osmium::OSMObject& o)
-    {
-        if (!buffer) {
-            throw std::runtime_error{"Writer already closed."};
-        }
-
-        buffer.rollback();
-
-        buffer.add_item(o);
-        flush_buffer();
-    }
-
     void add_node(py::object o)
     {
         if (!buffer) {
@@ -48,8 +39,9 @@ public:
 
         buffer.rollback();
 
-        if (py::isinstance<osmium::Node>(o)) {
-            buffer.add_item(o.cast<osmium::Node &>());
+        auto const *inode = pyosmium::try_cast<COSMNode>(o);
+        if (inode) {
+            buffer.add_item(*inode->get());
         } else {
             osmium::builder::NodeBuilder builder(buffer);
 
@@ -61,7 +53,7 @@ public:
             set_common_attributes(o, builder);
 
             if (hasattr(o, "tags"))
-                set_taglist(o.attr("tags"), builder);
+                set_taglist<COSMNode>(o.attr("tags"), builder);
         }
 
         flush_buffer();
@@ -75,8 +67,9 @@ public:
 
         buffer.rollback();
 
-        if (py::isinstance<osmium::Way>(o)) {
-            buffer.add_item(o.cast<osmium::Way &>());
+        auto const *iobj = pyosmium::try_cast<COSMWay>(o);
+        if (iobj) {
+            buffer.add_item(*iobj->get());
         } else {
             osmium::builder::WayBuilder builder(buffer);
 
@@ -86,7 +79,7 @@ public:
                 set_nodelist(o.attr("nodes"), &builder);
 
             if (hasattr(o, "tags"))
-                set_taglist(o.attr("tags"), builder);
+                set_taglist<COSMWay>(o.attr("tags"), builder);
         }
 
         flush_buffer();
@@ -100,8 +93,9 @@ public:
 
         buffer.rollback();
 
-        if (py::isinstance<osmium::Relation>(o)) {
-            buffer.add_item(o.cast<osmium::Relation &>());
+        auto const *iobj = pyosmium::try_cast<COSMRelation>(o);
+        if (iobj) {
+            buffer.add_item(*iobj->get());
         } else {
             osmium::builder::RelationBuilder builder(buffer);
 
@@ -111,7 +105,7 @@ public:
                 set_memberlist(o.attr("members"), &builder);
 
             if (hasattr(o, "tags"))
-                set_taglist(o.attr("tags"), builder);
+                set_taglist<COSMRelation>(o.attr("tags"), builder);
         }
 
         flush_buffer();
@@ -154,12 +148,13 @@ private:
         }
     }
 
-    template <typename T>
+    template <typename Base, typename T>
     void set_taglist(py::object o, T& obuilder)
     {
         // original taglist
-        if (py::isinstance<osmium::TagList>(o)) {
-            auto &otl = o.cast<osmium::TagList&>();
+        auto const &iobj = pyosmium::try_cast<Base>(o);
+        if (iobj) {
+            auto &otl = iobj->get()->tags();
             if (otl.size() > 0)
                 obuilder.add_item(otl);
             return;
@@ -200,8 +195,9 @@ private:
     void set_nodelist(py::object o, osmium::builder::WayBuilder *builder)
     {
         // original nodelist
-        if (py::isinstance<osmium::NodeRefList>(o)) {
-            auto &onl = o.cast<osmium::NodeRefList &>();
+        auto const &iobj = pyosmium::try_cast_list<CWayNodeList>(o);
+        if (iobj) {
+            auto &onl = *iobj->get();
             if (onl.size() > 0)
                 builder->add_item(onl);
             return;
@@ -216,8 +212,8 @@ private:
         osmium::builder::WayNodeListBuilder wnl_builder(buffer, builder);
 
         for (auto ref : it) {
-            if (py::isinstance<osmium::NodeRef>(ref))
-                wnl_builder.add_node_ref(ref.cast<osmium::NodeRef>());
+            if (py::hasattr(ref, "ref"))
+                wnl_builder.add_node_ref(ref.attr("ref").cast<osmium::object_id_type>());
             else
                 wnl_builder.add_node_ref(ref.cast<osmium::object_id_type>());
         }
@@ -226,8 +222,9 @@ private:
     void set_memberlist(py::object o, osmium::builder::RelationBuilder *builder)
     {
         // original memberlist
-        if (py::isinstance<osmium::RelationMemberList>(o)) {
-            auto &oml = o.cast<osmium::RelationMemberList &>();
+        auto const &iobj = pyosmium::try_cast<COSMRelation>(o);
+        if (iobj) {
+            auto &oml = iobj->get()->members();
             if (oml.size() > 0)
                 builder->add_item(oml);
             return;
@@ -242,14 +239,16 @@ private:
         osmium::builder::RelationMemberListBuilder rml_builder(buffer, builder);
 
         for (auto m: it) {
-            if (py::isinstance<osmium::RelationMember>(m)) {
-                auto &member = m.cast<osmium::RelationMember &>();
-                rml_builder.add_member(member.type(), member.ref(), member.role());
-            } else {
+            if (py::isinstance<py::tuple>(m)) {
                 auto member = m.cast<py::tuple>();
                 auto type = member[0].cast<std::string>();
                 auto id = member[1].cast<osmium::object_id_type>();
                 auto role = member[2].cast<std::string>();
+                rml_builder.add_member(osmium::char_to_item_type(type[0]), id, role.c_str());
+            } else {
+                auto type = m.attr("type").cast<std::string>();
+                auto id = m.attr("ref").cast<osmium::object_id_type>();
+                auto role = m.attr("role").cast<std::string>();
                 rml_builder.add_member(osmium::char_to_item_type(type[0]), id, role.c_str());
             }
         }

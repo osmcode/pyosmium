@@ -1,5 +1,5 @@
 
-#from osmium.osm.mutable import create_mutable_node, create_mutable_way, create_mutable_relation
+from osmium.osm.mutable import create_mutable_node, create_mutable_way, create_mutable_relation
 
 from osmium.osm.types import (Node as Node,
                               Way as Way,
