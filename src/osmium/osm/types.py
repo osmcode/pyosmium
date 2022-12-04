@@ -3,8 +3,6 @@ import collections.abc
 
 import osmium.osm._osm as cosm
 
-UNDEFINED_COORDINATE = cosm.get_undefined_coordinate()
-
 def _make_repr(name, *attrs: str) -> Callable[[object], str]:
     fmt_string = f'osmium.osm.{name}('\
                  + ', '.join([f'{x}={{0.{x}!r}}' for x in attrs])\
@@ -119,7 +117,7 @@ class Way(_OSMObject):
 
 
     def ends_have_same_id(self):
-        return self._data.ends_have_same_id()
+        return self._data.is_closed()
 
 
     def ends_have_same_location(self):
@@ -174,6 +172,13 @@ class Area(_OSMObject):
 
     def num_rings(self):
         return self._data.num_rings()
+
+
+    def outer_rings(self):
+        return map(lambda ring: OuterRing(self._data, ring), self._data.outer_rings())
+
+    def inner_rings(self, oring):
+        return map(lambda ring: InnerRing(self._data, ring), self._data.inner_rings(oring._get_list()))
 
 
 class Changeset(_OSMObject):
@@ -391,6 +396,14 @@ class NodeRefList(collections.abc.Sequence):
 
         raise RuntimeError("Access to removed object")
 
+    def is_closed(self):
+        return self._get_list().is_closed()
+
+    def ends_have_same_id(self):
+        return self._get_list().is_closed()
+
+    def ends_have_same_location(self):
+        return self._get_list().ends_have_same_location()
 
     def __len__(self):
         return self._get_list().size()
@@ -416,4 +429,12 @@ class NodeRefList(collections.abc.Sequence):
 
 
 class WayNodeList(NodeRefList):
+    pass
+
+
+class OuterRing(NodeRefList):
+    pass
+
+
+class InnerRing(NodeRefList):
     pass

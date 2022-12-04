@@ -114,6 +114,18 @@ PYBIND11_MODULE(_osm, m) {
     ;
 
 
+    py::class_<OuterRingIterator>(m, "OuterRingIterator")
+        .def("__iter__", [](OuterRingIterator &it) -> OuterRingIterator& { return it; })
+        .def("__next__", &OuterRingIterator::next)
+    ;
+
+
+    py::class_<InnerRingIterator>(m, "InnerRingIterator")
+        .def("__iter__", [](InnerRingIterator &it) -> InnerRingIterator& { return it; })
+        .def("__next__", &InnerRingIterator::next)
+    ;
+
+
     py::class_<COSMObject>(m, "COSMObject")
         .def("id", [](COSMObject const &o) { return o.get_object()->id(); })
         .def("deleted", [](COSMObject const &o) { return o.get_object()->deleted(); })
@@ -140,9 +152,8 @@ PYBIND11_MODULE(_osm, m) {
 
     py::class_<COSMWay, COSMObject>(m, "COSMWay")
         .def("is_closed", [](COSMWay const &o) { return o.get()->is_closed(); })
-        .def("ends_have_same_id", [](COSMWay const &o) { return o.get()->ends_have_same_id(); })
         .def("ends_have_same_location", [](COSMWay const &o) { return o.get()->ends_have_same_location(); })
-        .def("nodes", [](COSMWay const &o) { return CNodeRefList(&(o.get()->nodes())); })
+        .def("nodes", [](COSMWay const &o) { return CWayNodeList(&(o.get()->nodes())); })
     ;
 
 
@@ -156,6 +167,9 @@ PYBIND11_MODULE(_osm, m) {
         .def("orig_id", [](COSMArea const &o) { return o.get()->orig_id(); })
         .def("is_multipolygon", [](COSMArea const &o) { return o.get()->is_multipolygon(); })
         .def("num_rings", [](COSMArea const &o) { return o.get()->num_rings(); })
+        .def("outer_rings", [](COSMArea const &o) { return OuterRingIterator(o.get()->outer_rings()); })
+        .def("inner_rings", [](COSMArea const &o, COuterRing const &ring)
+            { return InnerRingIterator(o.get()->inner_rings(*ring.get())); })
     ;
 
     py::class_<COSMChangeset>(m, "COSMChangeset")
@@ -178,10 +192,26 @@ PYBIND11_MODULE(_osm, m) {
     ;
 
 
-    py::class_<CNodeRefList>(m, "CNodeRefList")
-        .def("size", [](CNodeRefList const &o) { return o.get()->size(); })
-        .def("get", &CNodeRefList::get_item)
+    py::class_<CWayNodeList>(m, "CWayNodeList")
+        .def("size", [](CWayNodeList const &o) { return o.get()->size(); })
+        .def("get", &CWayNodeList::get_item)
+        .def("is_closed", [](CWayNodeList const &o) { return o.get()->is_closed(); })
+        .def("ends_have_same_location", [](CWayNodeList const &o) { return o.get()->ends_have_same_location(); })
     ;
 
-    m.def("get_undefined_coordinate", []() { return static_cast<int32_t>(osmium::Location::undefined_coordinate); });
+
+    py::class_<COuterRing>(m, "COuterRing")
+        .def("size", [](COuterRing const &o) { return o.get()->size(); })
+        .def("get", &COuterRing::get_item)
+        .def("is_closed", [](COuterRing const &o) { return o.get()->is_closed(); })
+        .def("ends_have_same_location", [](COuterRing const &o) { return o.get()->ends_have_same_location(); })
+    ;
+
+
+    py::class_<CInnerRing>(m, "CInnerRing")
+        .def("size", [](CInnerRing const &o) { return o.get()->size(); })
+        .def("get", &CInnerRing::get_item)
+        .def("is_closed", [](CInnerRing const &o) { return o.get()->is_closed(); })
+        .def("ends_have_same_location", [](CInnerRing const &o) { return o.get()->ends_have_same_location(); })
+    ;
 }

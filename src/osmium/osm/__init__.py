@@ -12,7 +12,15 @@ from osmium.osm.types import (Node as Node,
                               WayNodeList as WayNodeList)
 
 from osmium.osm._osm import (Location as Location,
-                             Box as Box)
+                             Box as Box,
+                             NOTHING as NOTHING,
+                             NODE as NODE,
+                             WAY as WAY,
+                             RELATION as RELATION,
+                             AREA as AREA,
+                             OBJECT as OBJECT,
+                             CHANGESET as CHANGESET,
+                             ALL as ALL)
 
 setattr(Location, '__repr__',
         lambda l: f'osmium.osm.Location(x={l.x!r}, y={l.y!r})'

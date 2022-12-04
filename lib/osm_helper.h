@@ -1,11 +1,14 @@
 #ifndef PYOSMIUM_OSM_HELPER_HPP
 #define PYOSMIUM_OSM_HELPER_HPP
 
+template <typename T>
 class CNodeRefList {
-public:
-    CNodeRefList(osmium::NodeRefList const *list) : m_obj(list) {}
+    using ImplClass = T const;
 
-    osmium::NodeRefList const *get() const {
+public:
+    CNodeRefList(ImplClass *list) : m_obj(list) {}
+
+    ImplClass *get() const {
         return m_obj;
     }
 
@@ -28,9 +31,12 @@ public:
      }
 
 private:
-    osmium::NodeRefList const *m_obj;
+    ImplClass *m_obj;
 };
 
+using CWayNodeList = CNodeRefList<osmium::WayNodeList>;
+using COuterRing = CNodeRefList<osmium::OuterRing>;
+using CInnerRing = CNodeRefList<osmium::InnerRing>;
 
 template <typename T, typename C>
 class GenericIterator
@@ -87,5 +93,33 @@ public:
         return memb(m_it->ref(), item_type_to_char(m_it->type()), m_it->role());
     }
 };
+
+
+template <typename T>
+class RingIterator {
+    using IteratorType = osmium::memory::ItemIteratorRange<T const>;
+public:
+    RingIterator(IteratorType t)
+    : m_it(t.cbegin()), m_cend(t.cend())
+    {}
+
+    CNodeRefList<T> next()
+    {
+        if (m_it == m_cend)
+            throw pybind11::stop_iteration();
+
+        auto value = CNodeRefList<T>(&(*m_it));
+        ++m_it;
+
+        return value;
+    }
+
+private:
+    typename IteratorType::const_iterator m_it;
+    typename IteratorType::const_iterator const m_cend;
+};
+
+using OuterRingIterator = RingIterator<osmium::OuterRing>;
+using InnerRingIterator = RingIterator<osmium::InnerRing>;
 
 #endif //PYOSMIUM_OSM_HELPER_HPP
