@@ -5,64 +5,10 @@
 #include <osmium/osm/entity_bits.hpp>
 
 #include "cast.h"
-#include "osm_wrapper.h"
+#include "osm_base_objects.h"
+#include "osm_helper.h"
 
 namespace py = pybind11;
-
-class TagListIterator
-{
-public:
-    TagListIterator(osmium::TagList const &t)
-    : m_it(t.cbegin()), m_cend(t.cend()), m_size(t.size())
-    {}
-
-    py::object next()
-    {
-        if (m_it == m_cend)
-            throw py::stop_iteration();
-
-        static auto tag = py::module_::import("osmium.osm.types").attr("Tag");
-        auto value = tag(m_it->key(), m_it->value());
-        ++m_it;
-
-        return value;
-    }
-
-    int size() const { return m_size; }
-
-private:
-    osmium::TagList::const_iterator m_it;
-    osmium::TagList::const_iterator const m_cend;
-    int const m_size;
-};
-
-
-class RelationMemberListIterator
-{
-public:
-    RelationMemberListIterator(osmium::RelationMemberList const &t)
-    : m_it(t.cbegin()), m_cend(t.cend()), m_size(t.size())
-    {}
-
-    py::object next()
-    {
-        if (m_it == m_cend)
-            throw py::stop_iteration();
-
-        static auto memb = py::module_::import("osmium.osm.types").attr("RelationMember");
-        auto value = memb(m_it->ref(), item_type_to_char(m_it->type()), m_it->role());
-        ++m_it;
-
-        return value;
-    }
-
-    int size() const { return m_size; }
-
-private:
-    osmium::RelationMemberList::const_iterator m_it;
-    osmium::RelationMemberList::const_iterator const m_cend;
-    int const m_size;
-};
 
 
 

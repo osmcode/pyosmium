@@ -8,7 +8,7 @@
 #include <osmium/visitor.hpp>
 
 #include "base_handler.h"
-#include "osm_wrapper.h"
+#include "osm_base_objects.h"
 
 class SimpleHandler: public BaseHandler
 {
