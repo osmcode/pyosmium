@@ -1,4 +1,5 @@
 from typing import Sequence, Any, NamedTuple, Callable
+import collections.abc
 
 import osmium.osm._osm as cosm
 
@@ -102,7 +103,15 @@ class Way(_OSMObject):
     def __init__(self, cway: cosm.COSMWay):
         self._data = cway
         self.tags = TagList(self._data)
-        self.nodes = NodeRefList(self._data)
+        self._nodes = None
+
+
+    @property
+    def nodes(self):
+        if self._nodes is None:
+            self._nodes = WayNodeList(self._data, self._data.nodes())
+
+        return self._nodes
 
 
     def is_closed(self):
@@ -251,7 +260,81 @@ class TagList:
         return f"osmium.osm.TagList({{{tagstr}}})"
 
 
-class NodeRefList:
+class NodeRef:
 
-    def __init__(self, parent):
+    def __init__(self, location, ref):
+        self.location = location
+        self.ref = ref
+
+
+    @property
+    def x(self):
+        return self.location.x
+
+
+    @property
+    def y(self):
+        return self.location.y
+
+
+    @property
+    def lat(self):
+        return self.location.lat
+
+
+    @property
+    def lon(self):
+        return self.location.lon
+
+
+    def __str__(self):
+        if self.location.valid():
+            return f"{self.ref:d}@{self.location!s}"
+
+        return str(self.ref)
+
+
+    def __repr__(self):
+        return f"osmium.osm.NodeRef(ref={self.ref!r}, location={self.location!r})"
+
+
+
+class NodeRefList(collections.abc.Sequence):
+
+    def __init__(self, parent, ref_list):
         self._data = parent
+        self._list = ref_list
+
+
+    def _get_list(self):
+        if self._data.is_valid():
+            return self._list
+
+        raise RuntimeError("Access to removed object")
+
+
+    def __len__(self):
+        return self._get_list().size()
+
+
+    def __getitem__(self, idx):
+        return self._get_list().get(idx)
+
+
+    def __str__(self):
+        if not self._data.is_valid():
+            return '[<invalid>]'
+
+        return f'[{_list_elipse(self)}]'
+
+
+    def __repr__(self):
+        if not self._data.is_valid():
+            return f"osmium.osm.{self.__class__.__name__}(<invalid>)"
+
+        return 'osmium.osm.{}([{}])'.format(self.__class__.__name__,
+                                        ', '.join(map(repr, self)))
+
+
+class WayNodeList(NodeRefList):
+    pass

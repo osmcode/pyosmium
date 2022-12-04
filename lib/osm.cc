@@ -88,60 +88,67 @@ PYBIND11_MODULE(_osm, m) {
 
 
     py::class_<COSMObject>(m, "COSMObject")
-        .def("id", [] (COSMObject const &o) { return o.get_object()->id(); })
-        .def("deleted", [] (COSMObject const &o) { return o.get_object()->deleted(); })
-        .def("visible", [] (COSMObject const &o) { return o.get_object()->visible(); })
-        .def("version", [] (COSMObject const &o) { return o.get_object()->version(); })
-        .def("changeset", [] (COSMObject const &o) { return o.get_object()->changeset(); })
-        .def("uid", [] (COSMObject const &o) { return o.get_object()->uid(); })
-        .def("timestamp", [] (COSMObject const &o) { return o.get_object()->timestamp(); })
-        .def("user", [] (COSMObject const &o) { return o.get_object()->user(); })
-        .def("positive_id", [] (COSMObject const &o) { return o.get_object()->positive_id(); })
-        .def("user_is_anonymous", [] (COSMObject const &o) { return o.get_object()->user_is_anonymous(); })
-        .def("tags_size", [] (COSMObject const &o) { return o.get_object()->tags().size(); })
-        .def("tags_get_value_by_key", [] (COSMObject const &o, char const *key, char const *def)
+        .def("id", [](COSMObject const &o) { return o.get_object()->id(); })
+        .def("deleted", [](COSMObject const &o) { return o.get_object()->deleted(); })
+        .def("visible", [](COSMObject const &o) { return o.get_object()->visible(); })
+        .def("version", [](COSMObject const &o) { return o.get_object()->version(); })
+        .def("changeset", [](COSMObject const &o) { return o.get_object()->changeset(); })
+        .def("uid", [](COSMObject const &o) { return o.get_object()->uid(); })
+        .def("timestamp", [](COSMObject const &o) { return o.get_object()->timestamp(); })
+        .def("user", [](COSMObject const &o) { return o.get_object()->user(); })
+        .def("positive_id", [](COSMObject const &o) { return o.get_object()->positive_id(); })
+        .def("user_is_anonymous", [](COSMObject const &o) { return o.get_object()->user_is_anonymous(); })
+        .def("tags_size", [](COSMObject const &o) { return o.get_object()->tags().size(); })
+        .def("tags_get_value_by_key", [](COSMObject const &o, char const *key, char const *def)
             { return o.get_object()->tags().get_value_by_key(key, def); })
-        .def("tags_has_key", [] (COSMObject const &o, char const *key)
+        .def("tags_has_key", [](COSMObject const &o, char const *key)
             { return o.get_object()->tags().has_key(key); })
-        .def("tags_iter", [] (COSMObject const &o) { return TagListIterator(o.get_object()->tags()); })
+        .def("tags_iter", [](COSMObject const &o) { return TagListIterator(o.get_object()->tags()); })
         .def("is_valid", &COSMObject::is_valid)
     ;
 
     py::class_<COSMNode, COSMObject>(m, "COSMNode")
-        .def("location", [] (COSMNode const &o) { return o.get()->location(); })
+        .def("location", [](COSMNode const &o) { return o.get()->location(); })
     ;
 
     py::class_<COSMWay, COSMObject>(m, "COSMWay")
-        .def("is_closed", [] (COSMWay const &o) { return o.get()->is_closed(); })
-        .def("ends_have_same_id", [] (COSMWay const &o) { return o.get()->ends_have_same_id(); })
-        .def("ends_have_same_location", [] (COSMWay const &o) { return o.get()->ends_have_same_location(); })
+        .def("is_closed", [](COSMWay const &o) { return o.get()->is_closed(); })
+        .def("ends_have_same_id", [](COSMWay const &o) { return o.get()->ends_have_same_id(); })
+        .def("ends_have_same_location", [](COSMWay const &o) { return o.get()->ends_have_same_location(); })
+        .def("nodes", [](COSMWay const &o) { return CNodeRefList(o.get()->nodes()); })
     ;
 
 
     py::class_<COSMRelation, COSMObject>(m, "COSMRelation");
 
     py::class_<COSMArea, COSMObject>(m, "COSMArea")
-        .def("from_way", [] (COSMArea const &o) { return o.get()->from_way(); })
-        .def("orig_id", [] (COSMArea const &o) { return o.get()->orig_id(); })
-        .def("is_multipolygon", [] (COSMArea const &o) { return o.get()->is_multipolygon(); })
-        .def("num_rings", [] (COSMArea const &o) { return o.get()->num_rings(); })
+        .def("from_way", [](COSMArea const &o) { return o.get()->from_way(); })
+        .def("orig_id", [](COSMArea const &o) { return o.get()->orig_id(); })
+        .def("is_multipolygon", [](COSMArea const &o) { return o.get()->is_multipolygon(); })
+        .def("num_rings", [](COSMArea const &o) { return o.get()->num_rings(); })
     ;
 
     py::class_<COSMChangeset>(m, "COSMChangeset")
-        .def("id", [] (COSMChangeset const &o) { return o.get()->id(); })
-        .def("uid", [] (COSMChangeset const &o) { return o.get()->uid(); })
-        .def("created_at", [] (COSMChangeset const &o) { return o.get()->created_at(); })
-        .def("closed_at", [] (COSMChangeset const &o) { return o.get()->closed_at(); })
-        .def("open", [] (COSMChangeset const &o) { return o.get()->open(); })
-        .def("num_changes", [] (COSMChangeset const &o) { return o.get()->num_changes(); })
-        .def("user", [] (COSMChangeset const &o) { return o.get()->user(); })
-        .def("user_is_anonymous", [] (COSMChangeset const &o) { return o.get()->user_is_anonymous(); })
-        .def("tags_size", [] (COSMChangeset const &o) { return o.get()->tags().size(); })
-        .def("tags_get_value_by_key", [] (COSMChangeset const &o, char const *key, char const *def)
+        .def("id", [](COSMChangeset const &o) { return o.get()->id(); })
+        .def("uid", [](COSMChangeset const &o) { return o.get()->uid(); })
+        .def("created_at", [](COSMChangeset const &o) { return o.get()->created_at(); })
+        .def("closed_at", [](COSMChangeset const &o) { return o.get()->closed_at(); })
+        .def("open", [](COSMChangeset const &o) { return o.get()->open(); })
+        .def("num_changes", [](COSMChangeset const &o) { return o.get()->num_changes(); })
+        .def("user", [](COSMChangeset const &o) { return o.get()->user(); })
+        .def("user_is_anonymous", [](COSMChangeset const &o) { return o.get()->user_is_anonymous(); })
+        .def("tags_size", [](COSMChangeset const &o) { return o.get()->tags().size(); })
+        .def("tags_get_value_by_key", [](COSMChangeset const &o, char const *key, char const *def)
             { return o.get()->tags().get_value_by_key(key, def); })
-        .def("tags_has_key", [] (COSMChangeset const &o, char const *key)
+        .def("tags_has_key", [](COSMChangeset const &o, char const *key)
             { return o.get()->tags().has_key(key); })
 
+    ;
+
+
+    py::class_<CNodeRefList>(m, "CNodeRefList")
+        .def("size", [](CNodeRefList const &o) { return o.get().size(); })
+        .def("get", &CNodeRefList::get_item)
     ;
 
     m.def("get_undefined_coordinate", []() { return static_cast<int32_t>(osmium::Location::undefined_coordinate); });
