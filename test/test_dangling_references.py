@@ -23,104 +23,94 @@ class DanglingReferenceBase:
     area = None
     refkeeper = []
 
-    def keep(self, obj):
-        self.refkeeper.append(obj)
+    def keep(self, obj, func):
+        self.refkeeper.append((obj, func))
 
     def test_keep_reference(self):
         h = o.make_simple_handler(node=self.node, way=self.way,
                                   relation=self.relation, area=self.area)
-        with pytest.raises(RuntimeError, match="callback keeps reference"):
-              h.apply_file(TEST_DIR / 'example-test.pbf')
+        h.apply_file(TEST_DIR / 'example-test.osc')
         assert self.refkeeper
-        while len(self.refkeeper) > 0:
-            self.refkeeper.pop()
+
+        for obj, func in self.refkeeper:
+            with pytest.raises(RuntimeError, match="removed object"):
+                func(obj)
 
 
 class TestKeepNodeRef(DanglingReferenceBase):
 
     def node(self, n):
-        self.keep(n)
+        self.keep(n, lambda n: n.id)
 
 class TestKeepWayRef(DanglingReferenceBase):
 
     def way(self, w):
-        self.keep(w)
+        self.keep(w, lambda n: n.id)
 
 class TestKeepRelationRef(DanglingReferenceBase):
 
     def relation(self, r):
-        self.keep(r)
+        self.keep(r, lambda n: n.id)
 
 class TestKeepAreaRef(DanglingReferenceBase):
 
     def area(self, a):
-        self.keep(a)
+        self.keep(a, lambda n: n.id)
 
 class TestKeepNodeTagsRef(DanglingReferenceBase):
 
     def node(self, n):
-        self.keep(n.tags)
+        self.keep(n.tags, lambda t: 'foo' in t)
 
 class TestKeepWayTagsRef(DanglingReferenceBase):
 
     def way(self, w):
-        self.keep(w.tags)
+        self.keep(w.tags, lambda t: 'foo' in t)
 
 class TestKeepRelationTagsRef(DanglingReferenceBase):
 
     def relation(self, r):
-        self.keep(r.tags)
+        self.keep(r.tags, lambda t: 'foo' in t)
 
 class TestKeepAreaTagsRef(DanglingReferenceBase):
 
     def area(self, a):
-        self.keep(a.tags)
+        self.keep(a.tags, lambda t: 'foo' in t)
 
 class TestKeepTagListIterator(DanglingReferenceBase):
 
     def node(self, n):
-        self.keep(n.tags.__iter__())
-
-class TestKeepSingleTag(DanglingReferenceBase):
-
-    def node(self, n):
-        for t in n.tags:
-            self.keep(t)
+        self.keep(n.tags.__iter__(), lambda t: next(t))
 
 class TestKeepOuterRingIterator(DanglingReferenceBase):
 
     def area(self, r):
-        self.keep(r.outer_rings())
+        self.keep(r.outer_rings(), lambda t: next(t))
 
 class TestKeepOuterRing(DanglingReferenceBase):
 
     def area(self, r):
         for ring in r.outer_rings():
-            self.keep(ring)
+            self.keep(ring, lambda t: len(t))
 
 class TestKeepInnerRingIterator(DanglingReferenceBase):
 
     def area(self, r):
         for ring in r.outer_rings():
-            self.keep(r.inner_rings(ring))
+            self.keep(r.inner_rings(ring), lambda t: next(t))
 
 class TestKeepInnerRing(DanglingReferenceBase):
 
     def area(self, r):
         for outer in r.outer_rings():
             for inner in r.inner_rings(outer):
-                self.keep(inner)
+                self.keep(inner, lambda t: len(t))
 
 class TestKeepRelationMemberIterator(DanglingReferenceBase):
 
     def relation(self, r):
-        self.keep(r.members)
+        self.keep(r.members, lambda t: next(t))
 
-class TestKeepRelationMember(DanglingReferenceBase):
-
-    def relation(self, r):
-        for m in r.members:
-            self.keep(m)
 
 
 class NotADanglingReferenceBase:
@@ -135,51 +125,31 @@ class NotADanglingReferenceBase:
     area = None
     refkeeper = []
 
-    def keep(self, obj):
-        self.refkeeper.append(obj)
+    def keep(self, obj, func):
+        self.refkeeper.append((obj, func))
 
     def test_keep_reference(self):
         h = o.make_simple_handler(node=self.node, way=self.way,
                                   relation=self.relation, area=self.area)
-        # Does not rise a dangling reference excpetion
         h.apply_file(TEST_DIR / 'example-test.pbf')
         assert self.refkeeper
-        while len(self.refkeeper) > 0:
-            self.refkeeper.pop()
 
-class TestKeepId(NotADanglingReferenceBase):
-
-    def node(self, n):
-        self.keep(n.id)
-
-class TestKeepChangeset(NotADanglingReferenceBase):
-
-    def node(self, n):
-        self.keep(n.changeset)
-
-class TestKeepUid(NotADanglingReferenceBase):
-
-    def node(self, n):
-        self.keep(n.uid)
-
-class TestKeepUser(NotADanglingReferenceBase):
-
-    def node(self, n):
-        self.keep(n.user)
+        for obj, func in self.refkeeper:
+            func(obj)
 
 class TestKeepLocation(NotADanglingReferenceBase):
 
     def node(self, n):
-        self.keep(n.location)
+        self.keep(n.location, lambda l: l.x)
 
-class TestKeepKey(NotADanglingReferenceBase):
-
-    def node(self, n):
-        for t in n.tags:
-            self.keep(t.k)
-
-class TestKeepValue(NotADanglingReferenceBase):
+class TestKeepNode(NotADanglingReferenceBase):
 
     def node(self, n):
         for t in n.tags:
-            self.keep(t.v)
+            self.keep(t, lambda t: t.k)
+
+class TestKeepMember(NotADanglingReferenceBase):
+
+    def member(self, n):
+        for m in n.members:
+            self.keep(m, lambda m: t.ref)
