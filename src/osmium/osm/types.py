@@ -10,7 +10,7 @@ def _make_repr(name, *attrs: str) -> Callable[[object], str]:
                  + ')'
 
     def _repr(self):
-        if self._data.is_valid():
+        if self._pyosmium_data.is_valid():
             return fmt_string.format(self)
 
     return _repr
@@ -27,58 +27,58 @@ class _OSMObject:
 
     @property
     def id(self):
-        return self._data.id()
+        return self._pyosmium_data.id()
 
 
     @property
     def deleted(self):
-        return self._data.deleted()
+        return self._pyosmium_data.deleted()
 
 
     @property
     def visible(self):
-        return self._data.visible()
+        return self._pyosmium_data.visible()
 
 
     @property
     def version(self):
-        return self._data.version()
+        return self._pyosmium_data.version()
 
 
     @property
     def changeset(self):
-        return self._data.changeset()
+        return self._pyosmium_data.changeset()
 
 
     @property
     def uid(self):
-        return self._data.uid()
+        return self._pyosmium_data.uid()
 
 
     @property
     def timestamp(self):
-        return self._data.timestamp()
+        return self._pyosmium_data.timestamp()
 
 
     @property
     def user(self):
-        return self._data.user()
+        return self._pyosmium_data.user()
 
 
     def positive_id(self):
-        return self._data.positive_id()
+        return self._pyosmium_data.positive_id()
 
 
     def user_is_anonymous(self):
-        return self._data.user_is_anonymous()
+        return self._pyosmium_data.user_is_anonymous()
 
 
 class Node(_OSMObject):
 
     def __init__(self, cnode: cosm.COSMNode):
-        self._data = cnode
+        self._pyosmium_data = cnode
         self._location = None
-        self.tags = TagList(self._data)
+        self.tags = TagList(self._pyosmium_data)
 
     def replace(self, **kwargs):
         return osmium.osm.mutable.Node(self, **kwargs)
@@ -86,7 +86,7 @@ class Node(_OSMObject):
     @property
     def location(self):
         if self._location is None:
-            self._location = self._data.location()
+            self._location = self._pyosmium_data.location()
 
         return self._location
 
@@ -103,8 +103,8 @@ class Node(_OSMObject):
 class Way(_OSMObject):
 
     def __init__(self, cway: cosm.COSMWay):
-        self._data = cway
-        self.tags = TagList(self._data)
+        self._pyosmium_data = cway
+        self.tags = TagList(self._pyosmium_data)
         self._nodes = None
 
     def replace(self, **kwargs):
@@ -114,21 +114,21 @@ class Way(_OSMObject):
     @property
     def nodes(self):
         if self._nodes is None:
-            self._nodes = WayNodeList(self._data, self._data.nodes())
+            self._nodes = WayNodeList(self._pyosmium_data, self._pyosmium_data.nodes())
 
         return self._nodes
 
 
     def is_closed(self):
-        return self._data.is_closed()
+        return self._pyosmium_data.is_closed()
 
 
     def ends_have_same_id(self):
-        return self._data.is_closed()
+        return self._pyosmium_data.is_closed()
 
 
     def ends_have_same_location(self):
-        return self._data.ends_have_same_location()
+        return self._pyosmium_data.ends_have_same_location()
 
 
     def __str__(self):
@@ -142,15 +142,15 @@ class Way(_OSMObject):
 class Relation(_OSMObject):
 
     def __init__(self, crelation: cosm.COSMRelation):
-        self._data = crelation
-        self.tags = TagList(self._data)
-        self.members = RelationMemberList(self._data)
+        self._pyosmium_data = crelation
+        self.tags = TagList(self._pyosmium_data)
+        self.members = RelationMemberList(self._pyosmium_data)
 
     def replace(self, **kwargs):
         return osmium.osm.mutable.Relation(self, **kwargs)
 
     def __str__(self):
-        if self._data.is_valid():
+        if self._pyosmium_data.is_valid():
             return f"r{self.id:d}: members={self.members!s}, tags={self.tags!s}"
 
         return f"<invalid>"
@@ -162,27 +162,27 @@ class Relation(_OSMObject):
 class OuterRingIterator:
 
     def __init__(self, parent):
-        self._data = parent
-        self.iterator = self._data.outer_begin()
+        self._pyosmium_data = parent
+        self.iterator = self._pyosmium_data.outer_begin()
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        return OuterRing(self._data, self._data.outer_next(self.iterator))
+        return OuterRing(self._pyosmium_data, self._pyosmium_data.outer_next(self.iterator))
 
 
 class InnerRingIterator:
 
     def __init__(self, parent, oring):
-        self._data = parent
-        self.iterator = self._data.inner_begin(oring._get_list())
+        self._pyosmium_data = parent
+        self.iterator = self._pyosmium_data.inner_begin(oring._get_list())
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        return InnerRing(self._data, self._data.inner_next(self.iterator))
+        return InnerRing(self._pyosmium_data, self._pyosmium_data.inner_next(self.iterator))
 
 
 
@@ -190,87 +190,87 @@ class InnerRingIterator:
 class Area(_OSMObject):
 
     def __init__(self, carea: cosm.COSMArea):
-        self._data = carea
-        self.tags = TagList(self._data)
+        self._pyosmium_data = carea
+        self.tags = TagList(self._pyosmium_data)
 
 
     def from_way(self):
-        return self._data.from_way()
+        return self._pyosmium_data.from_way()
 
 
     def orig_id(self):
-        return self._data.orig_id()
+        return self._pyosmium_data.orig_id()
 
 
     def is_multipolygon(self):
-        return self._data.is_multipolygon()
+        return self._pyosmium_data.is_multipolygon()
 
 
     def num_rings(self):
-        return self._data.num_rings()
+        return self._pyosmium_data.num_rings()
 
 
     def outer_rings(self):
-        return OuterRingIterator(self._data)
+        return OuterRingIterator(self._pyosmium_data)
 
     def inner_rings(self, oring):
-        return InnerRingIterator(self._data, oring)
-        return map(lambda ring: InnerRing(self._data, ring), self._data.inner_rings(oring._get_list()))
+        return InnerRingIterator(self._pyosmium_data, oring)
+        return map(lambda ring: InnerRing(self._pyosmium_data, ring), self._pyosmium_data.inner_rings(oring._get_list()))
 
 
 class Changeset(_OSMObject):
 
     def __init__(self, carea: cosm.COSMChangeset):
-        self._data = carea
+        self._pyosmium_data = carea
         self._bounds = None
-        self.tags = TagList(self._data)
+        self.tags = TagList(self._pyosmium_data)
 
 
     @property
     def id(self):
-        return self._data.id()
+        return self._pyosmium_data.id()
 
 
     @property
     def uid(self):
-        return self._data.uid()
+        return self._pyosmium_data.uid()
 
 
     @property
     def created_at(self):
-        return self._data.created_at()
+        return self._pyosmium_data.created_at()
 
 
     @property
     def closed_at(self):
-        return self._data.closed_at()
+        return self._pyosmium_data.closed_at()
 
 
     @property
     def open(self):
-        return self._data.open()
+        return self._pyosmium_data.open()
 
 
     @property
     def num_changes(self):
-        return self._data.num_changes()
+        return self._pyosmium_data.num_changes()
 
 
     @property
     def user(self):
-        return self._data.user()
+        return self._pyosmium_data.user()
 
 
     @property
     def bounds(self):
         if self._bounds is None:
-            self._bounds = self._data.bounds()
+            self._bounds = self._pyosmium_data.bounds()
 
         return self._bounds
 
 
     def user_is_anonymous(self):
-        return self._data.user_is_anonymous()
+        return self._pyosmium_data.user_is_anonymous()
 
 
     def __str__(self):
@@ -293,44 +293,44 @@ class Tag(NamedTuple):
 class TagIterator:
 
     def __init__(self, parent):
-        self._data = parent
-        self.iterator = self._data.tags_begin()
+        self._pyosmium_data = parent
+        self.iterator = self._pyosmium_data.tags_begin()
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        return self._data.tags_next(self.iterator)
+        return self._pyosmium_data.tags_next(self.iterator)
 
 
 class MemberIterator:
 
     def __init__(self, parent):
-        self._data = parent
-        self.iterator = self._data.members_begin()
+        self._pyosmium_data = parent
+        self.iterator = self._pyosmium_data.members_begin()
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        return self._data.members_next(self.iterator)
+        return self._pyosmium_data.members_next(self.iterator)
 
 
 class TagList:
 
     def __init__(self, parent):
-        self._data = parent
+        self._pyosmium_data = parent
 
 
     def __len__(self):
-        return self._data.tags_size()
+        return self._pyosmium_data.tags_size()
 
 
     def __getitem__(self, key):
         if key is None:
             raise KeyError("Key 'None' not allowed.")
 
-        val = self._data.tags_get_value_by_key(key, None)
+        val = self._pyosmium_data.tags_get_value_by_key(key, None)
         if val is None:
             raise KeyError("No tag with that key.")
 
@@ -338,18 +338,18 @@ class TagList:
 
 
     def __contains__(self, key):
-        return key is not None and self._data.tags_has_key(key)
+        return key is not None and self._pyosmium_data.tags_has_key(key)
 
 
     def get(self, key, default=None):
         if key is None:
             return default
 
-        return self._data.tags_get_value_by_key(key, default)
+        return self._pyosmium_data.tags_get_value_by_key(key, default)
 
 
     def __iter__(self):
-        return TagIterator(self._data)
+        return TagIterator(self._pyosmium_data)
 
 
     def __str__(self):
@@ -383,26 +383,26 @@ class RelationMember:
 class RelationMemberList:
 
     def __init__(self, parent):
-        self._data = parent
+        self._pyosmium_data = parent
 
 
     def __len__(self):
-        return self._data.members_size()
+        return self._pyosmium_data.members_size()
 
 
     def __iter__(self):
-        return MemberIterator(self._data)
+        return MemberIterator(self._pyosmium_data)
 
 
     def __str__(self):
-        if not self._data.is_valid():
+        if not self._pyosmium_data.is_valid():
             return '[<invalid>]'
 
         return f'[{_list_elipse(self)}]'
 
 
     def __repr__(self):
-        if not self._data.is_valid():
+        if not self._pyosmium_data.is_valid():
             return f"osmium.osm.{self.__class__.__name__}(<invalid>)"
 
         return 'osmium.osm.{}([{}])'.format(self.__class__.__name__,
@@ -452,12 +452,12 @@ class NodeRef:
 class NodeRefList(collections.abc.Sequence):
 
     def __init__(self, parent, ref_list):
-        self._data = parent
+        self._pyosmium_data = parent
         self._list = ref_list
 
 
     def _get_list(self):
-        if self._data.is_valid():
+        if self._pyosmium_data.is_valid():
             return self._list
 
         raise RuntimeError("Access to removed object")
@@ -480,14 +480,14 @@ class NodeRefList(collections.abc.Sequence):
 
 
     def __str__(self):
-        if not self._data.is_valid():
+        if not self._pyosmium_data.is_valid():
             return '[<invalid>]'
 
         return f'[{_list_elipse(self)}]'
 
 
     def __repr__(self):
-        if not self._data.is_valid():
+        if not self._pyosmium_data.is_valid():
             return f"osmium.osm.{self.__class__.__name__}(<invalid>)"
 
         return 'osmium.osm.{}([{}])'.format(self.__class__.__name__,

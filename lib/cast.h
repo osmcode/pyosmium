@@ -66,11 +66,11 @@ namespace pyosmium {
 
 template <typename T>
 T const *try_cast(pybind11::object o) {
-    if (!pybind11::hasattr(o, "_data")) {
+    if (!pybind11::hasattr(o, "_pyosmium_data")) {
         return nullptr;
     }
 
-    auto inner = o.attr("_data");
+    auto inner = o.attr("_pyosmium_data");
 
     if (pybind11::isinstance<T>(inner)) {
         return inner.cast<T const *>();
@@ -81,7 +81,7 @@ T const *try_cast(pybind11::object o) {
 
 template <typename T>
 T const &cast(pybind11::object o) {
-    return o.attr("_data").cast<T const &>();
+    return o.attr("_pyosmium_data").cast<T const &>();
 }
 
 
