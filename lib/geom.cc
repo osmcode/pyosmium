@@ -1,4 +1,3 @@
-#define PYBIND11_DETAILED_ERROR_MESSAGES
 #include <pybind11/pybind11.h>
 
 #include <osmium/geom/mercator_projection.hpp>
@@ -10,7 +9,6 @@
 #include <osmium/geom/geojson.hpp>
 
 #include "cast.h"
-#include "osm_helper.h"
 #include "osm_base_objects.h"
 
 namespace py = pybind11;
