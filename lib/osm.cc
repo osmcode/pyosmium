@@ -10,6 +10,49 @@
 
 namespace py = pybind11;
 
+using TagIterator = osmium::TagList::const_iterator;
+using MemberIterator = osmium::RelationMemberList::const_iterator;
+
+static py::object tag_iterator_next(TagIterator &it, TagIterator const &cend)
+{
+    if (it == cend)
+        throw pybind11::stop_iteration();
+
+    static auto const tag = pybind11::module_::import("osmium.osm.types").attr("Tag");
+    auto const value = tag(it->key(), it->value());
+    ++it;
+
+    return value;
+}
+
+
+static py::object member_iterator_next(MemberIterator &it, MemberIterator const &cend)
+{
+    if (it == cend)
+        throw pybind11::stop_iteration();
+
+    static auto const obj = pybind11::module_::import("osmium.osm.types").attr("RelationMember");
+    auto const value = obj(it->ref(), item_type_to_char(it->type()), it->role());
+    ++it;
+
+    return value;
+}
+
+using OuterRingIterator = osmium::memory::ItemIteratorRange<osmium::OuterRing const>::const_iterator;
+using InnerRingIterator = osmium::memory::ItemIteratorRange<osmium::InnerRing const>::const_iterator;
+
+template <typename T>
+CNodeRefList<T> ring_iterator_next(typename osmium::memory::ItemIteratorRange<T const>::const_iterator &it)
+{
+    if (!it)
+        throw pybind11::stop_iteration();
+
+    auto value = CNodeRefList<T>(&(*it));
+    ++it;
+
+    return value;
+}
+
 
 
 PYBIND11_MODULE(_osm, m) {
@@ -100,30 +143,10 @@ PYBIND11_MODULE(_osm, m) {
     ;
 
 
-    py::class_<TagListIterator>(m, "TagListIterator")
-        .def("__iter__", [](TagListIterator &it) -> TagListIterator& { return it; })
-        .def("__next__", &TagListIterator::next)
-        .def("__len__", &TagListIterator::size)
-    ;
-
-
-    py::class_<RelationMemberListIterator>(m, "RelationMemberListIterator")
-        .def("__iter__", [](RelationMemberListIterator &it) -> RelationMemberListIterator& { return it; })
-        .def("__next__", &RelationMemberListIterator::next)
-        .def("__len__", &RelationMemberListIterator::size)
-    ;
-
-
-    py::class_<OuterRingIterator>(m, "OuterRingIterator")
-        .def("__iter__", [](OuterRingIterator &it) -> OuterRingIterator& { return it; })
-        .def("__next__", &OuterRingIterator::next)
-    ;
-
-
-    py::class_<InnerRingIterator>(m, "InnerRingIterator")
-        .def("__iter__", [](InnerRingIterator &it) -> InnerRingIterator& { return it; })
-        .def("__next__", &InnerRingIterator::next)
-    ;
+    py::class_<TagIterator>(m, "CTagListIterator");
+    py::class_<MemberIterator>(m, "CRelationMemberListIterator");
+    py::class_<OuterRingIterator>(m, "COuterRingIterator");
+    py::class_<InnerRingIterator>(m, "CInnerRingIterator");
 
 
     py::class_<COSMObject>(m, "COSMObject")
@@ -142,7 +165,9 @@ PYBIND11_MODULE(_osm, m) {
             { return o.get_object()->tags().get_value_by_key(key, def); })
         .def("tags_has_key", [](COSMObject const &o, char const *key)
             { return o.get_object()->tags().has_key(key); })
-        .def("tags_iter", [](COSMObject const &o) { return TagListIterator(o.get_object()->tags()); })
+        .def("tags_begin", [](COSMObject const &o) { return o.get_object()->tags().cbegin(); })
+        .def("tags_next", [](COSMObject const &o, TagIterator &it)
+            { return tag_iterator_next(it, o.get_object()->tags().cend()); })
         .def("is_valid", &COSMObject::is_valid)
     ;
 
@@ -159,7 +184,10 @@ PYBIND11_MODULE(_osm, m) {
 
     py::class_<COSMRelation, COSMObject>(m, "COSMRelation")
         .def("members_size", [](COSMRelation const &o) { return o.get()->members().size(); })
-        .def("members_iter", [](COSMRelation const &o) { return RelationMemberListIterator(o.get()->members()); })
+        .def("members_begin", [](COSMRelation const &o) { return o.get()->members().cbegin(); })
+        .def("members_next", [](COSMRelation const &o, MemberIterator &it)
+            { return member_iterator_next(it, o.get()->members().cend()); })
+
     ;
 
     py::class_<COSMArea, COSMObject>(m, "COSMArea")
@@ -167,9 +195,17 @@ PYBIND11_MODULE(_osm, m) {
         .def("orig_id", [](COSMArea const &o) { return o.get()->orig_id(); })
         .def("is_multipolygon", [](COSMArea const &o) { return o.get()->is_multipolygon(); })
         .def("num_rings", [](COSMArea const &o) { return o.get()->num_rings(); })
-        .def("outer_rings", [](COSMArea const &o) { return OuterRingIterator(o.get()->outer_rings()); })
-        .def("inner_rings", [](COSMArea const &o, COuterRing const &ring)
-            { return InnerRingIterator(o.get()->inner_rings(*ring.get())); })
+        .def("outer_begin", [](COSMArea const &o) { return o.get()->outer_rings().cbegin(); })
+        .def("outer_next", [](COSMArea const &o, OuterRingIterator &it) {
+            o.get();
+            return ring_iterator_next<osmium::OuterRing>(it);
+        })
+        .def("inner_begin", [](COSMArea const &o, COuterRing const &ring)
+            { return o.get()->inner_rings(*ring.get()).cbegin(); })
+        .def("inner_next", [](COSMArea const &o, InnerRingIterator &it) {
+            o.get();
+            return ring_iterator_next<osmium::InnerRing>(it);
+        })
     ;
 
     py::class_<COSMChangeset>(m, "COSMChangeset")
@@ -187,7 +223,9 @@ PYBIND11_MODULE(_osm, m) {
             { return o.get()->tags().get_value_by_key(key, def); })
         .def("tags_has_key", [](COSMChangeset const &o, char const *key)
             { return o.get()->tags().has_key(key); })
-        .def("tags_iter", [](COSMChangeset const &o) { return TagListIterator(o.get()->tags()); })
+        .def("tags_begin", [](COSMChangeset const &o) { return o.get()->tags().cbegin(); })
+        .def("tags_next", [](COSMChangeset const &o, TagIterator &it)
+            { return tag_iterator_next(it, o.get()->tags().cend()); })
         .def("is_valid", &COSMChangeset::is_valid)
     ;
 

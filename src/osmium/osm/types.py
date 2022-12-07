@@ -159,6 +159,33 @@ class Relation(_OSMObject):
                                       'changeset', 'uid', 'timestamp', 'user',
                                       'tags', 'members')
 
+class OuterRingIterator:
+
+    def __init__(self, parent):
+        self._data = parent
+        self.iterator = self._data.outer_begin()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return OuterRing(self._data, self._data.outer_next(self.iterator))
+
+
+class InnerRingIterator:
+
+    def __init__(self, parent, oring):
+        self._data = parent
+        self.iterator = self._data.inner_begin(oring._get_list())
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return InnerRing(self._data, self._data.inner_next(self.iterator))
+
+
+
 
 class Area(_OSMObject):
 
@@ -184,9 +211,10 @@ class Area(_OSMObject):
 
 
     def outer_rings(self):
-        return map(lambda ring: OuterRing(self._data, ring), self._data.outer_rings())
+        return OuterRingIterator(self._data)
 
     def inner_rings(self, oring):
+        return InnerRingIterator(self._data, oring)
         return map(lambda ring: InnerRing(self._data, ring), self._data.inner_rings(oring._get_list()))
 
 
@@ -262,6 +290,32 @@ class Tag(NamedTuple):
         return f"{self.k}={self.v}"
 
 
+class TagIterator:
+
+    def __init__(self, parent):
+        self._data = parent
+        self.iterator = self._data.tags_begin()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self._data.tags_next(self.iterator)
+
+
+class MemberIterator:
+
+    def __init__(self, parent):
+        self._data = parent
+        self.iterator = self._data.members_begin()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self._data.members_next(self.iterator)
+
+
 class TagList:
 
     def __init__(self, parent):
@@ -295,7 +349,7 @@ class TagList:
 
 
     def __iter__(self):
-        return self._data.tags_iter()
+        return TagIterator(self._data)
 
 
     def __str__(self):
@@ -337,7 +391,7 @@ class RelationMemberList:
 
 
     def __iter__(self):
-        return self._data.members_iter()
+        return MemberIterator(self._data)
 
 
     def __str__(self):
