@@ -5,24 +5,8 @@
 
 #include <osmium/osm.hpp>
 
-class COSMObject {
-public:
-    osmium::OSMObject const *get_object() const {
-        auto const *obj = object_ptr();
-        if (!obj) {
-            throw std::runtime_error{"Access to removed object"};
-        }
-        return obj;
-    }
-
-    bool is_valid() const { return object_ptr(); }
-
-protected:
-    virtual osmium::OSMObject const *object_ptr() const = 0;
-};
-
 template <typename T>
-class COSMDerivedObject : public COSMObject {
+class COSMDerivedObject {
 public:
     COSMDerivedObject(T *obj) : m_obj(obj) {}
 
@@ -33,10 +17,9 @@ public:
         return m_obj;
     }
 
-    void invalidate() { m_obj = nullptr; }
+    bool is_valid() const { return m_obj; }
 
-protected:
-    osmium::OSMObject const *object_ptr() const override { return m_obj; }
+    void invalidate() { m_obj = nullptr; }
 
 private:
     T *m_obj;

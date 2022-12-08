@@ -67,7 +67,7 @@ static pybind11::object get_node_item(osmium::NodeRefList const *list, Py_ssize_
 }
 
 template <typename T>
-static void make_node_list(py::module_ &m, char const *class_name)
+void make_node_list(py::module_ &m, char const *class_name)
 {
     py::class_<T>(m, class_name)
         .def("size", [](T const *o) { return o->size(); })
@@ -75,6 +75,35 @@ static void make_node_list(py::module_ &m, char const *class_name)
             { return get_node_item(o, idx); })
         .def("is_closed", [](T const *o) { return o->is_closed(); })
         .def("ends_have_same_location", [](T const *o) { return o->ends_have_same_location(); })
+    ;
+}
+
+
+template <typename T>
+py::class_<T> make_osm_object_class(py::module_ &m, char const *class_name)
+{
+    using COSMObject = T;
+
+    return py::class_<COSMObject>(m, class_name)
+        .def("id", [](COSMObject const &o) { return o.get()->id(); })
+        .def("deleted", [](COSMObject const &o) { return o.get()->deleted(); })
+        .def("visible", [](COSMObject const &o) { return o.get()->visible(); })
+        .def("version", [](COSMObject const &o) { return o.get()->version(); })
+        .def("changeset", [](COSMObject const &o) { return o.get()->changeset(); })
+        .def("uid", [](COSMObject const &o) { return o.get()->uid(); })
+        .def("timestamp", [](COSMObject const &o) { return o.get()->timestamp(); })
+        .def("user", [](COSMObject const &o) { return o.get()->user(); })
+        .def("positive_id", [](COSMObject const &o) { return o.get()->positive_id(); })
+        .def("user_is_anonymous", [](COSMObject const &o) { return o.get()->user_is_anonymous(); })
+        .def("tags_size", [](COSMObject const &o) { return o.get()->tags().size(); })
+        .def("tags_get_value_by_key", [](COSMObject const &o, char const *key, char const *def)
+            { return o.get()->tags().get_value_by_key(key, def); })
+        .def("tags_has_key", [](COSMObject const &o, char const *key)
+            { return o.get()->tags().has_key(key); })
+        .def("tags_begin", [](COSMObject const &o) { return o.get()->tags().cbegin(); })
+        .def("tags_next", [](COSMObject const &o, TagIterator &it)
+            { return tag_iterator_next(it, o.get()->tags().cend()); })
+        .def("is_valid", &COSMObject::is_valid)
     ;
 }
 
@@ -173,33 +202,11 @@ PYBIND11_MODULE(_osm, m) {
     py::class_<InnerRingIterator>(m, "CInnerRingIterator");
 
 
-    py::class_<COSMObject>(m, "COSMObject")
-        .def("id", [](COSMObject const &o) { return o.get_object()->id(); })
-        .def("deleted", [](COSMObject const &o) { return o.get_object()->deleted(); })
-        .def("visible", [](COSMObject const &o) { return o.get_object()->visible(); })
-        .def("version", [](COSMObject const &o) { return o.get_object()->version(); })
-        .def("changeset", [](COSMObject const &o) { return o.get_object()->changeset(); })
-        .def("uid", [](COSMObject const &o) { return o.get_object()->uid(); })
-        .def("timestamp", [](COSMObject const &o) { return o.get_object()->timestamp(); })
-        .def("user", [](COSMObject const &o) { return o.get_object()->user(); })
-        .def("positive_id", [](COSMObject const &o) { return o.get_object()->positive_id(); })
-        .def("user_is_anonymous", [](COSMObject const &o) { return o.get_object()->user_is_anonymous(); })
-        .def("tags_size", [](COSMObject const &o) { return o.get_object()->tags().size(); })
-        .def("tags_get_value_by_key", [](COSMObject const &o, char const *key, char const *def)
-            { return o.get_object()->tags().get_value_by_key(key, def); })
-        .def("tags_has_key", [](COSMObject const &o, char const *key)
-            { return o.get_object()->tags().has_key(key); })
-        .def("tags_begin", [](COSMObject const &o) { return o.get_object()->tags().cbegin(); })
-        .def("tags_next", [](COSMObject const &o, TagIterator &it)
-            { return tag_iterator_next(it, o.get_object()->tags().cend()); })
-        .def("is_valid", &COSMObject::is_valid)
-    ;
-
-    py::class_<COSMNode, COSMObject>(m, "COSMNode")
+    make_osm_object_class<COSMNode>(m, "COSMNode")
         .def("location", [](COSMNode const &o) { return o.get()->location(); })
     ;
 
-    py::class_<COSMWay, COSMObject>(m, "COSMWay")
+    make_osm_object_class<COSMWay>(m, "COSMWay")
         .def("is_closed", [](COSMWay const &o) { return o.get()->is_closed(); })
         .def("ends_have_same_location", [](COSMWay const &o) { return o.get()->ends_have_same_location(); })
         .def("nodes", [](COSMWay const &o) { return &o.get()->nodes(); },
@@ -207,7 +214,7 @@ PYBIND11_MODULE(_osm, m) {
     ;
 
 
-    py::class_<COSMRelation, COSMObject>(m, "COSMRelation")
+    make_osm_object_class<COSMRelation>(m, "COSMRelation")
         .def("members_size", [](COSMRelation const &o) { return o.get()->members().size(); })
         .def("members_begin", [](COSMRelation const &o) { return o.get()->members().cbegin(); })
         .def("members_next", [](COSMRelation const &o, MemberIterator &it)
@@ -215,7 +222,7 @@ PYBIND11_MODULE(_osm, m) {
 
     ;
 
-    py::class_<COSMArea, COSMObject>(m, "COSMArea")
+    make_osm_object_class<COSMArea>(m, "COSMArea")
         .def("from_way", [](COSMArea const &o) { return o.get()->from_way(); })
         .def("orig_id", [](COSMArea const &o) { return o.get()->orig_id(); })
         .def("is_multipolygon", [](COSMArea const &o) { return o.get()->is_multipolygon(); })
