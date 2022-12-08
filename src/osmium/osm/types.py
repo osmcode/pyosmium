@@ -15,6 +15,8 @@ def _make_repr(name, *attrs: str) -> Callable[[object], str]:
         if self._pyosmium_data.is_valid():
             return fmt_string.format(self)
 
+        return f'osmium.osm.{name}(<invalid>)'
+
     return _repr
 
 
@@ -25,57 +27,48 @@ def _list_elipse(obj: Sequence[Any]) -> str:
     return objects
 
 
-class _OSMObject:
+class OSMObject:
 
     @property
     def id(self):
         return self._pyosmium_data.id()
 
-
     @property
     def deleted(self):
         return self._pyosmium_data.deleted()
-
 
     @property
     def visible(self):
         return self._pyosmium_data.visible()
 
-
     @property
     def version(self):
         return self._pyosmium_data.version()
-
 
     @property
     def changeset(self):
         return self._pyosmium_data.changeset()
 
-
     @property
     def uid(self):
         return self._pyosmium_data.uid()
-
 
     @property
     def timestamp(self):
         return self._pyosmium_data.timestamp()
 
-
     @property
     def user(self):
         return self._pyosmium_data.user()
 
-
     def positive_id(self):
         return self._pyosmium_data.positive_id()
-
 
     def user_is_anonymous(self):
         return self._pyosmium_data.user_is_anonymous()
 
 
-class Node(_OSMObject):
+class Node(OSMObject):
 
     def __init__(self, cnode: 'cosm.COSMNode'):
         self._pyosmium_data = cnode
@@ -92,9 +85,11 @@ class Node(_OSMObject):
 
         return self._location
 
-
     def __str__(self):
-        return f'n{self.id:d}: location={self.location!s} tags={self.tags!s}'
+        if self._pyosmium_data.is_valid():
+            return f'n{self.id:d}: location={self.location!s} tags={self.tags!s}'
+
+        return '<node invalid>'
 
 
     __repr__ = _make_repr('Node', 'id', 'deleted', 'visible', 'version',
@@ -102,7 +97,7 @@ class Node(_OSMObject):
                           'tags', 'location')
 
 
-class Way(_OSMObject):
+class Way(OSMObject):
 
     def __init__(self, cway: 'cosm.COSMWay'):
         self._pyosmium_data = cway
@@ -112,7 +107,6 @@ class Way(_OSMObject):
     def replace(self, **kwargs):
         return osmium.osm.mutable.Way(self, **kwargs)
 
-
     @property
     def nodes(self):
         if self._nodes is None:
@@ -120,28 +114,26 @@ class Way(_OSMObject):
 
         return self._nodes
 
-
     def is_closed(self):
         return self._pyosmium_data.is_closed()
-
 
     def ends_have_same_id(self):
         return self._pyosmium_data.is_closed()
 
-
     def ends_have_same_location(self):
         return self._pyosmium_data.ends_have_same_location()
 
-
     def __str__(self):
-        return f'w{self.id:d}: nodes={self.nodes!s} tags={self.tags!s}'
+        if self._pyosmium_data.is_valid():
+            return f'w{self.id:d}: nodes={self.nodes!s} tags={self.tags!s}'
 
+        return '<way invalid>'
 
     __repr__ = _make_repr('Way', 'id', 'deleted', 'visible', 'version', 'changeset',
                           'uid', 'timestamp', 'user', 'tags', 'nodes')
 
 
-class Relation(_OSMObject):
+class Relation(OSMObject):
 
     def __init__(self, crelation: 'cosm.COSMRelation'):
         self._pyosmium_data = crelation
@@ -155,11 +147,12 @@ class Relation(_OSMObject):
         if self._pyosmium_data.is_valid():
             return f"r{self.id:d}: members={self.members!s}, tags={self.tags!s}"
 
-        return f"<invalid>"
+        return f"<relation invalid>"
 
     __repr__ = _make_repr('Relation', 'id', 'deleted', 'visible', 'version',
                                       'changeset', 'uid', 'timestamp', 'user',
                                       'tags', 'members')
+
 
 class OuterRingIterator:
 
@@ -187,30 +180,23 @@ class InnerRingIterator:
         return InnerRing(self._pyosmium_data, self._pyosmium_data.inner_next(self.iterator))
 
 
-
-
-class Area(_OSMObject):
+class Area(OSMObject):
 
     def __init__(self, carea: 'cosm.COSMArea'):
         self._pyosmium_data = carea
         self.tags = TagList(self._pyosmium_data)
 
-
     def from_way(self):
         return self._pyosmium_data.from_way()
-
 
     def orig_id(self):
         return self._pyosmium_data.orig_id()
 
-
     def is_multipolygon(self):
         return self._pyosmium_data.is_multipolygon()
 
-
     def num_rings(self):
         return self._pyosmium_data.num_rings()
-
 
     def outer_rings(self):
         return OuterRingIterator(self._pyosmium_data)
@@ -218,49 +204,51 @@ class Area(_OSMObject):
     def inner_rings(self, oring):
         return InnerRingIterator(self._pyosmium_data, oring)
 
+    def __str__(self):
+        if self._pyosmium_data.is_valid():
+            return f"a{self.id:d}: num_rings={self.num_rings()}, tags={self.tags!s}"
 
-class Changeset(_OSMObject):
+        return f"<area invalid>"
+
+    __repr__ = _make_repr('Area', 'id', 'deleted', 'visible', 'version',
+                                  'changeset', 'uid', 'timestamp', 'user',
+                                  'tags')
+
+
+class Changeset(OSMObject):
 
     def __init__(self, carea: 'cosm.COSMChangeset'):
         self._pyosmium_data = carea
         self._bounds = None
         self.tags = TagList(self._pyosmium_data)
 
-
     @property
     def id(self):
         return self._pyosmium_data.id()
-
 
     @property
     def uid(self):
         return self._pyosmium_data.uid()
 
-
     @property
     def created_at(self):
         return self._pyosmium_data.created_at()
-
 
     @property
     def closed_at(self):
         return self._pyosmium_data.closed_at()
 
-
     @property
     def open(self):
         return self._pyosmium_data.open()
-
 
     @property
     def num_changes(self):
         return self._pyosmium_data.num_changes()
 
-
     @property
     def user(self):
         return self._pyosmium_data.user()
-
 
     @property
     def bounds(self):
@@ -269,14 +257,14 @@ class Changeset(_OSMObject):
 
         return self._bounds
 
-
     def user_is_anonymous(self):
         return self._pyosmium_data.user_is_anonymous()
 
-
     def __str__(self):
-        return f'c{self.id:d}: closed_at={self.closed_at!s}, bounds={self.bounds!s}, tags={self.tags!s}'
+        if self._pyosmium_data.is_valid():
+            return f'c{self.id:d}: closed_at={self.closed_at!s}, bounds={self.bounds!s}, tags={self.tags!s}'
 
+        return f"<changeset invalid>"
 
     __repr__ =  _make_repr('Changeset', 'id', 'uid', 'created_at', 'closed_at',
                                         'open', 'num_changes', 'bounds', 'user',
@@ -322,10 +310,8 @@ class TagList:
     def __init__(self, parent):
         self._pyosmium_data = parent
 
-
     def __len__(self):
         return self._pyosmium_data.tags_size()
-
 
     def __getitem__(self, key):
         if key is None:
@@ -337,10 +323,8 @@ class TagList:
 
         return val
 
-
     def __contains__(self, key):
         return key is not None and self._pyosmium_data.tags_has_key(key)
-
 
     def get(self, key, default=None):
         if key is None:
@@ -348,17 +332,21 @@ class TagList:
 
         return self._pyosmium_data.tags_get_value_by_key(key, default)
 
-
     def __iter__(self):
         return TagIterator(self._pyosmium_data)
 
-
     def __str__(self):
-        return f"{{{_list_elipse(self)}}}"
+        if self._pyosmium_data.is_valid():
+            return f"{{{_list_elipse(self)}}}"
 
+        return '<taglist invalid>'
 
     def __repr__(self):
-        tagstr = ', '.join([f"{i.k!r}: {i.v!r}" for i in self])
+        if self._pyosmium_data.is_valid():
+            tagstr = ', '.join([f"{i.k!r}: {i.v!r}" for i in self])
+        else:
+            tagstr = '<invalid>'
+
         return f"osmium.osm.TagList({{{tagstr}}})"
 
 
@@ -369,13 +357,11 @@ class RelationMember:
         self.type = mtype
         self.role = role
 
-
     def __str__(self):
         if self.role:
             return f"{self.type}{self.ref:d}@{self.role}"
 
         return f"{self.type}{self.ref:d}"
-
 
     def __repr__(self):
         return f"osmium.osm.RelationMember(ref={self.ref!r}, type={self.type!r}, role={self.role!r})"
@@ -386,29 +372,25 @@ class RelationMemberList:
     def __init__(self, parent):
         self._pyosmium_data = parent
 
-
     def __len__(self):
         return self._pyosmium_data.members_size()
-
 
     def __iter__(self):
         return MemberIterator(self._pyosmium_data)
 
-
     def __str__(self):
-        if not self._pyosmium_data.is_valid():
-            return '[<invalid>]'
+        if self._pyosmium_data.is_valid():
+            return f'[{_list_elipse(self)}]'
 
-        return f'[{_list_elipse(self)}]'
-
+        return '<member list invalid>'
 
     def __repr__(self):
-        if not self._pyosmium_data.is_valid():
-            return f"osmium.osm.{self.__class__.__name__}(<invalid>)"
+        if self._pyosmium_data.is_valid():
+            members = ', '.join(map(repr, self))
+        else:
+            members = '<invalid>'
 
-        return 'osmium.osm.{}([{}])'.format(self.__class__.__name__,
-                                        ', '.join(map(repr, self)))
-
+        return f'osmium.osm.RelationMemberList([{members}])'
 
 
 class NodeRef:
@@ -417,26 +399,21 @@ class NodeRef:
         self.location = location
         self.ref = ref
 
-
     @property
     def x(self):
         return self.location.x
-
 
     @property
     def y(self):
         return self.location.y
 
-
     @property
     def lat(self):
         return self.location.lat
 
-
     @property
     def lon(self):
         return self.location.lon
-
 
     def __str__(self):
         if self.location.valid():
@@ -444,10 +421,8 @@ class NodeRef:
 
         return str(self.ref)
 
-
     def __repr__(self):
         return f"osmium.osm.NodeRef(ref={self.ref!r}, location={self.location!r})"
-
 
 
 class NodeRefList(collections.abc.Sequence):
@@ -468,7 +443,6 @@ class NodeRefList(collections.abc.Sequence):
     def __len__(self):
         return self._list.size(self._pyosmium_data)
 
-
     def __getitem__(self, idx):
         return self._list.get(self._pyosmium_data, idx)
 
@@ -476,18 +450,18 @@ class NodeRefList(collections.abc.Sequence):
         return (self[i] for i in range(len(self)))
 
     def __str__(self):
-        if not self._pyosmium_data.is_valid():
-            return '[<invalid>]'
+        if self._pyosmium_data.is_valid():
+            return f'[{_list_elipse(self)}]'
 
-        return f'[{_list_elipse(self)}]'
-
+        return '<node list invalid>'
 
     def __repr__(self):
-        if not self._pyosmium_data.is_valid():
-            return f"osmium.osm.{self.__class__.__name__}(<invalid>)"
+        if self._pyosmium_data.is_valid():
+            nodes = ', '.join(map(repr, self))
+        else:
+            nodes = '<invalid>'
 
-        return 'osmium.osm.{}([{}])'.format(self.__class__.__name__,
-                                        ', '.join(map(repr, self)))
+        return 'osmium.osm.{}([{}])'.format(self.__class__.__name__, nodes)
 
 
 class WayNodeList(NodeRefList):

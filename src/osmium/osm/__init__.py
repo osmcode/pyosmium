@@ -1,7 +1,8 @@
 
 from osmium.osm.mutable import create_mutable_node, create_mutable_way, create_mutable_relation
 
-from osmium.osm.types import (Node as Node,
+from osmium.osm.types import (OSMObject as OSMObject,
+                              Node as Node,
                               Way as Way,
                               Relation as Relation,
                               Area as Area,
@@ -9,7 +10,12 @@ from osmium.osm.types import (Node as Node,
                               Tag as Tag,
                               TagList as TagList,
                               NodeRef as NodeRef,
-                              WayNodeList as WayNodeList)
+                              NodeRefList as NodeRefList,
+                              WayNodeList as WayNodeList,
+                              OuterRing as OuterRing,
+                              InnerRing as InnerRing,
+                              RelationMember as RelationMember,
+                              RelationMemberList as RelationMemberList)
 
 from osmium.osm._osm import (Location as Location,
                              Box as Box,

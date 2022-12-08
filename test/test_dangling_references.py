@@ -35,6 +35,9 @@ class DanglingReferenceBase:
         for obj, func in self.refkeeper:
             with pytest.raises(RuntimeError, match="removed object"):
                 func(obj)
+            # str() and repr() must not throw errors
+            str(obj)
+            repr(obj)
 
 
 class TestKeepNodeRef(DanglingReferenceBase):
