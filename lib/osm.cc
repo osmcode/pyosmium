@@ -40,17 +40,43 @@ using OuterRingIterator = osmium::memory::ItemIteratorRange<osmium::OuterRing co
 using InnerRingIterator = osmium::memory::ItemIteratorRange<osmium::InnerRing const>::const_iterator;
 
 template <typename T>
-CNodeRefList<T> ring_iterator_next(typename osmium::memory::ItemIteratorRange<T const>::const_iterator &it)
+T const *ring_iterator_next(typename osmium::memory::ItemIteratorRange<T const>::const_iterator &it)
 {
     if (!it)
         throw pybind11::stop_iteration();
 
-    auto value = CNodeRefList<T>(&(*it));
-    ++it;
-
-    return value;
+    return &(*it++);
 }
 
+static pybind11::object get_node_item(osmium::NodeRefList const *list, Py_ssize_t idx)
+{
+    auto sz = list->size();
+
+    osmium::NodeRefList::size_type iout =
+        (idx >= 0 ? idx : (Py_ssize_t) sz + idx);
+
+    if (iout >= sz || iout < 0) {
+        throw pybind11::index_error("Bad index.");
+    }
+
+    auto const &node = (*list)[iout];
+
+    static auto const node_ref_t = pybind11::module_::import("osmium.osm.types").attr("NodeRef");
+
+    return node_ref_t(node.location(), node.ref());
+}
+
+template <typename T>
+static void make_node_list(py::module_ &m, char const *class_name)
+{
+    py::class_<T>(m, class_name)
+        .def("size", [](T const *o) { return o->size(); })
+        .def("get", [](T const *o, Py_ssize_t idx)
+            { return get_node_item(o, idx); })
+        .def("is_closed", [](T const *o) { return o->is_closed(); })
+        .def("ends_have_same_location", [](T const *o) { return o->ends_have_same_location(); })
+    ;
+}
 
 
 PYBIND11_MODULE(_osm, m) {
@@ -176,7 +202,8 @@ PYBIND11_MODULE(_osm, m) {
     py::class_<COSMWay, COSMObject>(m, "COSMWay")
         .def("is_closed", [](COSMWay const &o) { return o.get()->is_closed(); })
         .def("ends_have_same_location", [](COSMWay const &o) { return o.get()->ends_have_same_location(); })
-        .def("nodes", [](COSMWay const &o) { return CWayNodeList(&(o.get()->nodes())); })
+        .def("nodes", [](COSMWay const &o) { return &o.get()->nodes(); },
+             py::return_value_policy::reference)
     ;
 
 
@@ -197,13 +224,15 @@ PYBIND11_MODULE(_osm, m) {
         .def("outer_next", [](COSMArea const &o, OuterRingIterator &it) {
             o.get();
             return ring_iterator_next<osmium::OuterRing>(it);
-        })
-        .def("inner_begin", [](COSMArea const &o, COuterRing const &ring)
-            { return o.get()->inner_rings(*ring.get()).cbegin(); })
+        },
+             py::return_value_policy::reference)
+        .def("inner_begin", [](COSMArea const &o, osmium::OuterRing const &ring)
+            { return o.get()->inner_rings(ring).cbegin(); })
         .def("inner_next", [](COSMArea const &o, InnerRingIterator &it) {
             o.get();
             return ring_iterator_next<osmium::InnerRing>(it);
-        })
+        },
+             py::return_value_policy::reference)
     ;
 
     py::class_<COSMChangeset>(m, "COSMChangeset")
@@ -227,27 +256,7 @@ PYBIND11_MODULE(_osm, m) {
         .def("is_valid", &COSMChangeset::is_valid)
     ;
 
-
-    py::class_<CWayNodeList>(m, "CWayNodeList")
-        .def("size", [](CWayNodeList const &o) { return o.get()->size(); })
-        .def("get", &CWayNodeList::get_item)
-        .def("is_closed", [](CWayNodeList const &o) { return o.get()->is_closed(); })
-        .def("ends_have_same_location", [](CWayNodeList const &o) { return o.get()->ends_have_same_location(); })
-    ;
-
-
-    py::class_<COuterRing>(m, "COuterRing")
-        .def("size", [](COuterRing const &o) { return o.get()->size(); })
-        .def("get", &COuterRing::get_item)
-        .def("is_closed", [](COuterRing const &o) { return o.get()->is_closed(); })
-        .def("ends_have_same_location", [](COuterRing const &o) { return o.get()->ends_have_same_location(); })
-    ;
-
-
-    py::class_<CInnerRing>(m, "CInnerRing")
-        .def("size", [](CInnerRing const &o) { return o.get()->size(); })
-        .def("get", &CInnerRing::get_item)
-        .def("is_closed", [](CInnerRing const &o) { return o.get()->is_closed(); })
-        .def("ends_have_same_location", [](CInnerRing const &o) { return o.get()->ends_have_same_location(); })
-    ;
+    make_node_list<osmium::WayNodeList>(m, "CWayNodeList");
+    make_node_list<osmium::OuterRing>(m, "COuterRing");
+    make_node_list<osmium::InnerRing>(m, "CInnerRing");
 }

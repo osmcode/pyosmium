@@ -193,11 +193,10 @@ private:
     void set_nodelist(py::object o, osmium::builder::WayBuilder *builder)
     {
         // original nodelist
-        auto const &iobj = pyosmium::try_cast_list<CWayNodeList>(o);
-        if (iobj) {
-            auto &onl = *iobj->get();
-            if (onl.size() > 0)
-                builder->add_item(onl);
+        auto const *onl = pyosmium::try_cast_list<osmium::WayNodeList>(o);
+        if (onl) {
+            if (onl->size() > 0)
+                builder->add_item(*onl);
             return;
         }
 

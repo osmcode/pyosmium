@@ -53,7 +53,7 @@ PYBIND11_MODULE(geom, m)
     ;
 
     m.def("haversine_distance",
-          [](py::object o) { return og::haversine::distance(*pyosmium::cast_list<CWayNodeList>(o).get()); },
+          [](py::object o) { return og::haversine::distance(pyosmium::cast_list<osmium::WayNodeList>(o)); },
           py::arg("list"),
         "Compute the distance using the Haversine algorithm which takes the "
         "curvature of earth into account. If a :py:class:`WayNodeList` is given "
@@ -93,7 +93,7 @@ PYBIND11_MODULE(geom, m)
                     return f.create_linestring(*way->get(), un, dir);
                  }
 
-                 return f.create_linestring(*pyosmium::cast_list<CWayNodeList>(o).get(), un, dir);
+                 return f.create_linestring(pyosmium::cast_list<osmium::WayNodeList>(o), un, dir);
              },
              py::arg("list"), py::arg("use_nodes")=og::use_nodes::unique,
              py::arg("direction")=og::direction::forward,
@@ -132,7 +132,7 @@ PYBIND11_MODULE(geom, m)
                     return f.create_linestring(*way->get(), un, dir);
                  }
 
-                 return f.create_linestring(*pyosmium::cast_list<CWayNodeList>(o).get(), un, dir);
+                 return f.create_linestring(pyosmium::cast_list<osmium::WayNodeList>(o), un, dir);
              },
              py::arg("list"), py::arg("use_nodes")=og::use_nodes::unique,
              py::arg("direction")=og::direction::forward,
@@ -171,7 +171,7 @@ PYBIND11_MODULE(geom, m)
                     return f.create_linestring(*way->get(), un, dir);
                  }
 
-                 return f.create_linestring(*pyosmium::cast_list<CWayNodeList>(o).get(), un, dir);
+                 return f.create_linestring(pyosmium::cast_list<osmium::WayNodeList>(o), un, dir);
              },
              py::arg("list"), py::arg("use_nodes")=og::use_nodes::unique,
              py::arg("direction")=og::direction::forward,
