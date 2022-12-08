@@ -77,7 +77,7 @@ class ObjectGuard {
         ObjectGuard(pybind11::object ward) : m_ward(ward) {}
 
         ~ObjectGuard() {
-            m_ward.attr("_pyosmium_data").cast<WardPtr>()->invalidate();
+            m_ward.attr("_pyosmium_data").template cast<WardPtr>()->invalidate();
         }
 
     private:
