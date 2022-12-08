@@ -66,15 +66,18 @@ static pybind11::object get_node_item(osmium::NodeRefList const *list, Py_ssize_
     return node_ref_t(node.location(), node.ref());
 }
 
-template <typename T>
+template <typename T, typename P>
 void make_node_list(py::module_ &m, char const *class_name)
 {
     py::class_<T>(m, class_name)
-        .def("size", [](T const *o) { return o->size(); })
-        .def("get", [](T const *o, Py_ssize_t idx)
-            { return get_node_item(o, idx); })
-        .def("is_closed", [](T const *o) { return o->is_closed(); })
-        .def("ends_have_same_location", [](T const *o) { return o->ends_have_same_location(); })
+        .def("size", [](T const *o, P const &parent)
+            { parent.get(); return o->size(); })
+        .def("get", [](T const *o, P const &parent, Py_ssize_t idx)
+            { parent.get(); return get_node_item(o, idx); })
+        .def("is_closed", [](T const *o, P const &parent)
+            { parent.get(); return o->is_closed(); })
+        .def("ends_have_same_location", [](T const *o, P const &parent)
+            { parent.get(); return o->ends_have_same_location(); })
     ;
 }
 
@@ -263,7 +266,7 @@ PYBIND11_MODULE(_osm, m) {
         .def("is_valid", &COSMChangeset::is_valid)
     ;
 
-    make_node_list<osmium::WayNodeList>(m, "CWayNodeList");
-    make_node_list<osmium::OuterRing>(m, "COuterRing");
-    make_node_list<osmium::InnerRing>(m, "CInnerRing");
+    make_node_list<osmium::WayNodeList, COSMWay>(m, "CWayNodeList");
+    make_node_list<osmium::OuterRing, COSMArea>(m, "COuterRing");
+    make_node_list<osmium::InnerRing, COSMArea>(m, "CInnerRing");
 }

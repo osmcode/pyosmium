@@ -457,29 +457,24 @@ class NodeRefList(collections.abc.Sequence):
         self._pyosmium_data = parent
         self._list = ref_list
 
-
-    def _get_list(self):
-        if self._pyosmium_data.is_valid():
-            return self._list
-
-        raise RuntimeError("Access to removed object")
-
     def is_closed(self):
-        return self._get_list().is_closed()
+        return self._list.is_closed(self._pyosmium_data)
 
     def ends_have_same_id(self):
-        return self._get_list().is_closed()
+        return self._list.is_closed(self._pyosmium_data)
 
     def ends_have_same_location(self):
-        return self._get_list().ends_have_same_location()
+        return self._list.ends_have_same_location(self._pyosmium_data)
 
     def __len__(self):
-        return self._get_list().size()
+        return self._list.size(self._pyosmium_data)
 
 
     def __getitem__(self, idx):
-        return self._get_list().get(idx)
+        return self._list.get(self._pyosmium_data, idx)
 
+    def __iter__(self):
+        return (self[i] for i in range(len(self)))
 
     def __str__(self):
         if not self._pyosmium_data.is_valid():
