@@ -91,19 +91,9 @@ valid if the node locations have been cached by a location handler.
     :members:
     :undoc-members:
 
-Other OSM Entity Attributes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Some of the attributes of the OSM entities are represented with more
-complex classes.
-
-.. autoclass:: osmium.osm.Box
-    :members:
-    :undoc-members:
-
-.. autoclass:: osmium.osm.Location
-    :members:
-    :undoc-members:
+Relation member lists
+^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: osmium.osm.RelationMember
     :members:
@@ -113,6 +103,9 @@ complex classes.
     :members:
     :undoc-members:
 
+Tag lists
+^^^^^^^^^
+
 .. autoclass:: osmium.osm.Tag
     :members:
     :undoc-members:
@@ -121,4 +114,15 @@ complex classes.
     :members:
     :undoc-members:
 
+
+Geometry Attributes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: osmium.osm.Box
+    :members:
+    :undoc-members:
+
+.. autoclass:: osmium.osm.Location
+    :members:
+    :undoc-members:
 

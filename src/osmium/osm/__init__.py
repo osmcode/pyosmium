@@ -19,6 +19,7 @@ from osmium.osm.types import (OSMObject as OSMObject,
 
 from osmium.osm._osm import (Location as Location,
                              Box as Box,
+                             osm_entity_bits as osm_entity_bits,
                              NOTHING as NOTHING,
                              NODE as NODE,
                              WAY as WAY,
