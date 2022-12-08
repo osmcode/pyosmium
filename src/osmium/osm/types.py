@@ -1,8 +1,10 @@
-from typing import Sequence, Any, NamedTuple, Callable
+from typing import Sequence, Any, NamedTuple, Callable, TYPE_CHECKING
 import collections.abc
 
-import osmium.osm._osm as cosm
 import osmium.osm.mutable
+
+if TYPE_CHECKING:
+    import osmium.osm._osm as cosm
 
 def _make_repr(name, *attrs: str) -> Callable[[object], str]:
     fmt_string = f'osmium.osm.{name}('\
@@ -75,7 +77,7 @@ class _OSMObject:
 
 class Node(_OSMObject):
 
-    def __init__(self, cnode: cosm.COSMNode):
+    def __init__(self, cnode: 'cosm.COSMNode'):
         self._pyosmium_data = cnode
         self._location = None
         self.tags = TagList(self._pyosmium_data)
@@ -102,7 +104,7 @@ class Node(_OSMObject):
 
 class Way(_OSMObject):
 
-    def __init__(self, cway: cosm.COSMWay):
+    def __init__(self, cway: 'cosm.COSMWay'):
         self._pyosmium_data = cway
         self.tags = TagList(self._pyosmium_data)
         self._nodes = None
@@ -141,7 +143,7 @@ class Way(_OSMObject):
 
 class Relation(_OSMObject):
 
-    def __init__(self, crelation: cosm.COSMRelation):
+    def __init__(self, crelation: 'cosm.COSMRelation'):
         self._pyosmium_data = crelation
         self.tags = TagList(self._pyosmium_data)
         self.members = RelationMemberList(self._pyosmium_data)
@@ -189,7 +191,7 @@ class InnerRingIterator:
 
 class Area(_OSMObject):
 
-    def __init__(self, carea: cosm.COSMArea):
+    def __init__(self, carea: 'cosm.COSMArea'):
         self._pyosmium_data = carea
         self.tags = TagList(self._pyosmium_data)
 
@@ -220,7 +222,7 @@ class Area(_OSMObject):
 
 class Changeset(_OSMObject):
 
-    def __init__(self, carea: cosm.COSMChangeset):
+    def __init__(self, carea: 'cosm.COSMChangeset'):
         self._pyosmium_data = carea
         self._bounds = None
         self.tags = TagList(self._pyosmium_data)
