@@ -87,7 +87,11 @@ T const &cast(pybind11::object o) {
 
 template <typename T>
 T const *try_cast_list(pybind11::object o) {
-    if (!pybind11::hasattr(o, "_list")) {
+    if (!pybind11::hasattr(o, "_pyosmium_data") || !pybind11::hasattr(o, "_list")) {
+        return nullptr;
+    }
+
+    if (!o.attr("_pyosmium_data").attr("is_valid")().cast<bool>()) {
         return nullptr;
     }
 
@@ -103,6 +107,10 @@ T const *try_cast_list(pybind11::object o) {
 
 template <typename T>
 T const &cast_list(pybind11::object o) {
+    if (!o.attr("_pyosmium_data").attr("is_valid")().cast<bool>()) {
+        throw std::runtime_error{"Access to removed object"};
+    }
+
     return o.attr("_list").cast<T const &>();
 }
 
