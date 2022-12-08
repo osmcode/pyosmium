@@ -178,7 +178,7 @@ class InnerRingIterator:
 
     def __init__(self, parent, oring):
         self._pyosmium_data = parent
-        self.iterator = self._pyosmium_data.inner_begin(oring._get_list())
+        self.iterator = self._pyosmium_data.inner_begin(oring._list)
 
     def __iter__(self):
         return self
@@ -217,7 +217,6 @@ class Area(_OSMObject):
 
     def inner_rings(self, oring):
         return InnerRingIterator(self._pyosmium_data, oring)
-        return map(lambda ring: InnerRing(self._pyosmium_data, ring), self._pyosmium_data.inner_rings(oring._get_list()))
 
 
 class Changeset(_OSMObject):
