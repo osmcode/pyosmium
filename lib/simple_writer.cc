@@ -43,15 +43,14 @@ public:
         } else {
             osmium::builder::NodeBuilder builder(buffer);
 
-            if (hasattr(o, "location")) {
+            auto const location = py::getattr(o, "location", py::none());
+            if (!location.is_none()) {
                 osmium::Node& n = builder.object();
-                n.set_location(get_location(o.attr("location")));
+                n.set_location(get_location(location));
             }
 
             set_common_attributes(o, builder);
-
-            if (hasattr(o, "tags"))
-                set_taglist<COSMNode>(o.attr("tags"), builder);
+            set_taglist<COSMNode>(o, builder);
         }
 
         flush_buffer();
@@ -72,12 +71,8 @@ public:
             osmium::builder::WayBuilder builder(buffer);
 
             set_common_attributes(o, builder);
-
-            if (hasattr(o, "nodes"))
-                set_nodelist(o.attr("nodes"), &builder);
-
-            if (hasattr(o, "tags"))
-                set_taglist<COSMWay>(o.attr("tags"), builder);
+            set_nodelist(o, &builder);
+            set_taglist<COSMWay>(o, builder);
         }
 
         flush_buffer();
@@ -98,12 +93,8 @@ public:
             osmium::builder::RelationBuilder builder(buffer);
 
             set_common_attributes(o, builder);
-
-            if (hasattr(o, "members"))
-                set_memberlist(o.attr("members"), &builder);
-
-            if (hasattr(o, "tags"))
-                set_taglist<COSMRelation>(o.attr("tags"), builder);
+            set_memberlist(o, &builder);
+            set_taglist<COSMRelation>(o, builder);
         }
 
         flush_buffer();
@@ -119,79 +110,99 @@ public:
     }
 
 private:
-    void set_object_attributes(py::object o, osmium::OSMObject& t)
+    void set_object_attributes(py::object const &o, osmium::OSMObject& t)
     {
-        if (hasattr(o, "id"))
-            t.set_id(o.attr("id").cast<osmium::object_id_type>());
-        if (hasattr(o, "visible"))
-            t.set_visible(o.attr("visible").cast<bool>());
-        if (hasattr(o, "version"))
-            t.set_version(o.attr("version").cast<osmium::object_version_type>());
-        if (hasattr(o, "changeset"))
-            t.set_changeset(o.attr("changeset").cast<osmium::changeset_id_type>());
-        if (hasattr(o, "uid"))
-            t.set_uid_from_signed(o.attr("uid").cast<osmium::signed_user_id_type>());
-        if (hasattr(o, "timestamp")) {
-            t.set_timestamp(o.attr("timestamp").cast<osmium::Timestamp>());
+        {
+            auto const id = py::getattr(o, "id", py::none());
+            if (!id.is_none())
+                t.set_id(id.cast<osmium::object_id_type>());
+        }
+        {
+            auto const attr = py::getattr(o, "visible", py::none());
+            if (!attr.is_none())
+                t.set_visible(attr.cast<bool>());
+        }
+        {
+            auto const attr = py::getattr(o, "version", py::none());
+            if (!attr.is_none())
+                t.set_version(attr.cast<osmium::object_version_type>());
+        }
+        {
+            auto const attr = py::getattr(o, "changeset", py::none());
+            if (!attr.is_none())
+                t.set_changeset(attr.cast<osmium::changeset_id_type>());
+        }
+        {
+            auto const attr = py::getattr(o, "uid", py::none());
+            if (!attr.is_none())
+                t.set_uid_from_signed(attr.cast<osmium::signed_user_id_type>());
+        }
+        {
+            auto const attr = py::getattr(o, "timestamp", py::none());
+            if (!attr.is_none())
+                t.set_timestamp(attr.cast<osmium::Timestamp>());
         }
     }
 
     template <typename T>
-    void set_common_attributes(py::object o, T& builder)
+    void set_common_attributes(py::object const &o, T& builder)
     {
         set_object_attributes(o, builder.object());
 
-        if (hasattr(o, "user")) {
-            builder.set_user(o.attr("user").cast<std::string>());
-        }
+        auto const attr = py::getattr(o, "user", py::none());
+        if (!attr.is_none())
+            builder.set_user(attr.cast<std::string>());
     }
 
     template <typename Base, typename T>
-    void set_taglist(py::object o, T& obuilder)
+    void set_taglist(py::object const &container, T& obuilder)
     {
+        auto const o = py::getattr(container, "tags", py::none());
+
+        if (o.is_none()) {
+            return;
+        }
+
         // original taglist
         auto const &iobj = pyosmium::try_cast<Base>(o);
         if (iobj) {
-            auto &otl = iobj->get()->tags();
+            auto const &otl = iobj->get()->tags();
             if (otl.size() > 0)
                 obuilder.add_item(otl);
             return;
         }
 
+        if (py::len(o) == 0)
+            return;
+
         // dict
         if (py::isinstance<py::dict>(o)) {
-            if (py::len(o) == 0)
-                return;
-
             osmium::builder::TagListBuilder builder(buffer, &obuilder);
-            auto dict = o.cast<py::dict>();
-            for (auto k : o) {
-                builder.add_tag(k.cast<std::string>(),
-                                dict[k].cast<std::string>());
+            auto const dict = o.cast<py::dict>();
+            for (auto const &k : dict) {
+                builder.add_tag(k.first.cast<std::string>(),
+                                k.second.cast<std::string>());
             }
             return;
         }
 
         // else must be an iterable
-        auto it = o.cast<py::iterable>();
-
-        if (py::len(o) == 0)
-            return;
-
         osmium::builder::TagListBuilder builder(buffer, &obuilder);
-        for (auto item : it) {
-            if (py::isinstance<osmium::Tag>(item)) {
-                builder.add_tag(item.cast<osmium::Tag &>());
-            } else {
-                auto tag = item.cast<py::tuple>();
-                builder.add_tag(tag[0].cast<std::string>(),
-                                tag[1].cast<std::string>());
-            }
+        for (auto const item : o) {
+            auto const tag = item.cast<py::tuple>();
+            builder.add_tag(tag[0].cast<std::string>(),
+                            tag[1].cast<std::string>());
         }
     }
 
-    void set_nodelist(py::object o, osmium::builder::WayBuilder *builder)
+    void set_nodelist(py::object const &container, osmium::builder::WayBuilder *builder)
     {
+        auto const o = py::getattr(container, "nodes", py::none());
+
+        if (o.is_none()) {
+            return;
+        }
+
         // original nodelist
         auto const *onl = pyosmium::try_cast_list<osmium::WayNodeList>(o);
         if (onl) {
@@ -201,57 +212,60 @@ private:
         }
 
         // accept an iterable of IDs otherwise
-        auto it = o.cast<py::iterable>();
-
         if (py::len(o) == 0)
             return;
 
         osmium::builder::WayNodeListBuilder wnl_builder(buffer, builder);
 
-        for (auto ref : it) {
-            if (py::hasattr(ref, "ref"))
-                wnl_builder.add_node_ref(ref.attr("ref").cast<osmium::object_id_type>());
+        for (auto const ref : o) {
+            auto const attr = py::getattr(ref, "ref", py::none());
+            if (!attr.is_none())
+                wnl_builder.add_node_ref(attr.cast<osmium::object_id_type>());
             else
                 wnl_builder.add_node_ref(ref.cast<osmium::object_id_type>());
         }
     }
 
-    void set_memberlist(py::object o, osmium::builder::RelationBuilder *builder)
+    void set_memberlist(py::object const &container, osmium::builder::RelationBuilder *builder)
     {
+        auto const o = py::getattr(container, "members", py::none());
+
+        if (o.is_none()) {
+            return;
+        }
+
         // original memberlist
         auto const &iobj = pyosmium::try_cast<COSMRelation>(o);
         if (iobj) {
-            auto &oml = iobj->get()->members();
+            auto const &oml = iobj->get()->members();
             if (oml.size() > 0)
                 builder->add_item(oml);
             return;
         }
 
         // accept an iterable of (type, id, role) otherwise
-        auto it = o.cast<py::iterable>();
-
         if (py::len(o) == 0)
             return;
 
         osmium::builder::RelationMemberListBuilder rml_builder(buffer, builder);
 
-        for (auto m: it) {
+        for (auto const m: o) {
             if (py::isinstance<py::tuple>(m)) {
-                auto member = m.cast<py::tuple>();
-                auto type = member[0].cast<std::string>();
-                auto id = member[1].cast<osmium::object_id_type>();
-                auto role = member[2].cast<std::string>();
+                auto const member = m.cast<py::tuple>();
+                auto const type = member[0].cast<std::string>();
+                auto const id = member[1].cast<osmium::object_id_type>();
+                auto const role = member[2].cast<std::string>();
                 rml_builder.add_member(osmium::char_to_item_type(type[0]), id, role.c_str());
             } else {
-                auto type = m.attr("type").cast<std::string>();
-                auto id = m.attr("ref").cast<osmium::object_id_type>();
-                auto role = m.attr("role").cast<std::string>();
+                auto const type = m.attr("type").cast<std::string>();
+                auto const id = m.attr("ref").cast<osmium::object_id_type>();
+                auto const role = m.attr("role").cast<std::string>();
                 rml_builder.add_member(osmium::char_to_item_type(type[0]), id, role.c_str());
             }
         }
     }
 
-    osmium::Location get_location(py::object o)
+    osmium::Location get_location(py::object const &o) const
     {
         if (py::isinstance<osmium::Location>(o)) {
             return o.cast<osmium::Location>();
@@ -259,7 +273,7 @@ private:
 
         // default is a tuple with two doubles
         auto l = o.cast<py::tuple>();
-        return osmium::Location(l[0].cast<double>(), l[1].cast<double>());
+        return osmium::Location{l[0].cast<double>(), l[1].cast<double>()};
     }
 
     void flush_buffer()
@@ -273,9 +287,6 @@ private:
             writer(std::move(new_buffer));
         }
     }
-
-    bool hasattr(py::object o, char const *attr) const
-    { return py::hasattr(o, attr) && !o.attr(attr).is_none(); }
 
     osmium::io::Writer writer;
     osmium::memory::Buffer buffer;

@@ -50,9 +50,9 @@ T const *ring_iterator_next(typename osmium::memory::ItemIteratorRange<T const>:
 
 static pybind11::object get_node_item(osmium::NodeRefList const *list, Py_ssize_t idx)
 {
-    auto sz = list->size();
+    auto const sz = list->size();
 
-    osmium::NodeRefList::size_type iout =
+    osmium::NodeRefList::size_type const iout =
         (idx >= 0 ? idx : (Py_ssize_t) sz + idx);
 
     if (iout >= sz || iout < 0) {

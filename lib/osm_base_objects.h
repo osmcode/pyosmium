@@ -8,7 +8,7 @@
 template <typename T>
 class COSMDerivedObject {
 public:
-    COSMDerivedObject(T *obj) : m_obj(obj) {}
+    explicit COSMDerivedObject(T *obj) : m_obj(obj) {}
 
     T const *get() const {
         if (!m_obj) {
@@ -17,9 +17,9 @@ public:
         return m_obj;
     }
 
-    bool is_valid() const { return m_obj; }
+    bool is_valid() const noexcept { return m_obj; }
 
-    void invalidate() { m_obj = nullptr; }
+    void invalidate() noexcept { m_obj = nullptr; }
 
 private:
     T *m_obj;
