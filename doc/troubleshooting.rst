@@ -20,5 +20,5 @@ source code version of pyosmium. This can be done with pip::
 
     pip install --no-binary :all: osmium
 
-You need to first install the depencies listed in the README.
+You need to first install the dependencies listed in the README.
 
