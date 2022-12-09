@@ -66,11 +66,7 @@ namespace pyosmium {
 
 template <typename T>
 T const *try_cast(pybind11::object o) {
-    if (!pybind11::hasattr(o, "_pyosmium_data")) {
-        return nullptr;
-    }
-
-    auto inner = o.attr("_pyosmium_data");
+    auto const inner = pybind11::getattr(o, "_pyosmium_data", pybind11::none());
 
     if (pybind11::isinstance<T>(inner)) {
         return inner.cast<T const *>();
@@ -78,6 +74,7 @@ T const *try_cast(pybind11::object o) {
 
     return nullptr;
 }
+
 
 template <typename T>
 T const &cast(pybind11::object o) {
@@ -87,15 +84,19 @@ T const &cast(pybind11::object o) {
 
 template <typename T>
 T const *try_cast_list(pybind11::object o) {
-    if (!pybind11::hasattr(o, "_pyosmium_data") || !pybind11::hasattr(o, "_list")) {
+    auto const ward = pybind11::getattr(o, "_pyosmium_data", pybind11::none());
+
+    if (ward.is_none()) {
         return nullptr;
     }
 
-    if (!o.attr("_pyosmium_data").attr("is_valid")().cast<bool>()) {
+    auto const valid_func = pybind11::getattr(ward, "is_valid", pybind11::none());
+
+    if (valid_func.is_none() || !valid_func().cast<bool>()) {
         return nullptr;
     }
 
-    auto inner = o.attr("_list");
+    auto const inner = pybind11::getattr(o, "_list", pybind11::none());
 
     if (pybind11::isinstance<T>(inner)) {
         return inner.cast<T const *>();
@@ -113,9 +114,6 @@ T const &cast_list(pybind11::object o) {
 
     return o.attr("_list").cast<T const &>();
 }
-
-
-
 
 }
 
