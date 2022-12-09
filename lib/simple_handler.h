@@ -8,6 +8,7 @@
 #include <osmium/visitor.hpp>
 
 #include "base_handler.h"
+#include "osm_base_objects.h"
 
 class SimpleHandler: public BaseHandler
 {
@@ -68,6 +69,21 @@ private:
     }
 };
 
+template <typename T>
+class ObjectGuard {
+    using WardPtr = T*;
+
+    public:
+        ObjectGuard(pybind11::object ward) : m_ward(ward) {}
+
+        ~ObjectGuard() {
+            m_ward.attr("_pyosmium_data").template cast<WardPtr>()->invalidate();
+        }
+
+    private:
+        pybind11::object m_ward;
+};
+
 class PySimpleHandler : public SimpleHandler
 {
 public:
@@ -96,12 +112,9 @@ public:
         pybind11::gil_scoped_acquire acquire;
         auto func = callback("node");
         if (func) {
-            auto obj = pybind11::cast(n, pybind11::return_value_policy::reference);
-
+            auto obj = m_type_module.attr("Node")(COSMNode{n});
+            ObjectGuard<COSMNode> guard(obj);
             func(obj);
-
-            if (obj.ref_count() != 1)
-                throw std::runtime_error("Node callback keeps reference to OSM object. This is not allowed.");
         }
     }
 
@@ -110,12 +123,9 @@ public:
         pybind11::gil_scoped_acquire acquire;
         auto func = callback("way");
         if (func) {
-            auto obj = pybind11::cast(w, pybind11::return_value_policy::reference);
-
+            auto obj = m_type_module.attr("Way")(COSMWay{w});
+            ObjectGuard<COSMWay> guard(obj);
             func(obj);
-
-            if (obj.ref_count() != 1)
-                throw std::runtime_error("Way callback keeps reference to OSM object. This is not allowed.");
         }
     }
 
@@ -124,12 +134,9 @@ public:
         pybind11::gil_scoped_acquire acquire;
         auto func = callback("relation");
         if (func) {
-            auto obj = pybind11::cast(r, pybind11::return_value_policy::reference);
-
+            auto obj = m_type_module.attr("Relation")(COSMRelation{r});
+            ObjectGuard<COSMRelation> guard(obj);
             func(obj);
-
-            if (obj.ref_count() != 1)
-                throw std::runtime_error("Relation callback keeps reference to OSM object. This is not allowed.");
         }
     }
 
@@ -138,12 +145,9 @@ public:
         pybind11::gil_scoped_acquire acquire;
         auto func = callback("changeset");
         if (func) {
-            auto obj = pybind11::cast(c, pybind11::return_value_policy::reference);
-
+            auto obj = m_type_module.attr("Changeset")(COSMChangeset{c});
+            ObjectGuard<COSMChangeset> guard(obj);
             func(obj);
-
-            if (obj.ref_count() != 1)
-                throw std::runtime_error("Changeset callback keeps reference to OSM object. This is not allowed.");
         }
     }
 
@@ -152,18 +156,17 @@ public:
         pybind11::gil_scoped_acquire acquire;
         auto func = callback("area");
         if (func) {
-            auto obj = pybind11::cast(a, pybind11::return_value_policy::reference);
-
+            auto obj = m_type_module.attr("Area")(COSMArea{a});
+            ObjectGuard<COSMArea> guard(obj);
             func(obj);
-
-            if (obj.ref_count() != 1)
-                throw std::runtime_error("Area callback keeps reference to OSM object. This is not allowed.");
         }
     }
 
 private:
     pybind11::function callback(char const *name)
     { return pybind11::get_overload(static_cast<SimpleHandler const *>(this), name); }
+
+    pybind11::object m_type_module = pybind11::module_::import("osmium.osm.types");
 };
 
 #endif // PYOSMIUM_SIMPLE_HANDLER_HPP

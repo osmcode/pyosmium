@@ -1,9 +1,11 @@
 #ifndef PYOSMIUM_CAST_H
 #define PYOSMIUM_CAST_H
 
-#include <pybind11/pybind11.h>
 #include <datetime.h>
 #include <chrono>
+
+#include <pybind11/pybind11.h>
+#include <osmium/osm.hpp>
 
 namespace pybind11 { namespace detail {
     template <> struct type_caster<osmium::Timestamp> {
@@ -59,5 +61,62 @@ namespace pybind11 { namespace detail {
         PYBIND11_TYPE_CASTER(type, _("datetime.datetime"));
     };
 }} // namespace pybind11::detail
+
+namespace pyosmium {
+
+template <typename T>
+T const *try_cast(pybind11::object o) {
+    if (!pybind11::hasattr(o, "_pyosmium_data")) {
+        return nullptr;
+    }
+
+    auto inner = o.attr("_pyosmium_data");
+
+    if (pybind11::isinstance<T>(inner)) {
+        return inner.cast<T const *>();
+    }
+
+    return nullptr;
+}
+
+template <typename T>
+T const &cast(pybind11::object o) {
+    return o.attr("_pyosmium_data").cast<T const &>();
+}
+
+
+template <typename T>
+T const *try_cast_list(pybind11::object o) {
+    if (!pybind11::hasattr(o, "_pyosmium_data") || !pybind11::hasattr(o, "_list")) {
+        return nullptr;
+    }
+
+    if (!o.attr("_pyosmium_data").attr("is_valid")().cast<bool>()) {
+        return nullptr;
+    }
+
+    auto inner = o.attr("_list");
+
+    if (pybind11::isinstance<T>(inner)) {
+        return inner.cast<T const *>();
+    }
+
+    return nullptr;
+}
+
+
+template <typename T>
+T const &cast_list(pybind11::object o) {
+    if (!o.attr("_pyosmium_data").attr("is_valid")().cast<bool>()) {
+        throw std::runtime_error{"Illegal access to removed OSM object"};
+    }
+
+    return o.attr("_list").cast<T const &>();
+}
+
+
+
+
+}
 
 #endif // PYOSMIUM_CAST_H

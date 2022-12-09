@@ -1,7 +1,7 @@
 Troubleshooting
 ===============
 
-``RuntimeError: callback keeps reference to OSM object``
+``RuntimeError: Illegal access to removed OSM object``
 --------------------------------------------------------
 
 One of your callbacks tries to store the OSM object outside the scope of
@@ -20,5 +20,5 @@ source code version of pyosmium. This can be done with pip::
 
     pip install --no-binary :all: osmium
 
-You need to first install the depencies listed in the README.
+You need to first install the dependencies listed in the README.
 

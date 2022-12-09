@@ -8,6 +8,9 @@
 #include <osmium/geom/wkt.hpp>
 #include <osmium/geom/geojson.hpp>
 
+#include "cast.h"
+#include "osm_base_objects.h"
+
 namespace py = pybind11;
 namespace og = osmium::geom;
 
@@ -50,7 +53,7 @@ PYBIND11_MODULE(geom, m)
     ;
 
     m.def("haversine_distance",
-          (double (*)(const osmium::WayNodeList&)) &og::haversine::distance,
+          [](py::object o) { return og::haversine::distance(pyosmium::cast_list<osmium::WayNodeList>(o)); },
           py::arg("list"),
         "Compute the distance using the Haversine algorithm which takes the "
         "curvature of earth into account. If a :py:class:`WayNodeList` is given "
@@ -72,35 +75,33 @@ PYBIND11_MODULE(geom, m)
         .def_property_readonly("proj_string", &WKBFactory::proj_string,
              "(read-only) projection string of the output geometry.")
         .def("create_point",
-             (std::string (WKBFactory::*)(const osmium::Location&) const)
-                 &WKBFactory::create_point,
-             py::arg("location"),
-             "Create a point geometry from a :py:class:`osmium.osm.Location`.")
-        .def("create_point",
-             (std::string (WKBFactory::*)(const osmium::Node&))
-                 &WKBFactory::create_point,
-             py::arg("node"),
+             [](WKBFactory &f, py::object o) {
+                 if (py::isinstance<osmium::Location>(o)) {
+                    return f.create_point(o.cast<osmium::Location const &>());
+                 }
+                 if (py::hasattr(o, "location")) {
+                    return f.create_point(o.attr("location").cast<osmium::Location const &>());
+                 }
+                 return f.create_point(*pyosmium::cast<COSMNode>(o).get());
+             },
+             py::arg("pt"),
              "Create a point geometry from a :py:class:`osmium.osm.Node`.")
-        .def("create_point",
-             (std::string (WKBFactory::*)(const osmium::NodeRef&))
-               &WKBFactory::create_point,
-             py::arg("ref"),
-             "Create a point geometry from a :py:class:`osmium.osm.NodeRef`.")
         .def("create_linestring",
-             (std::string (WKBFactory::*)(const osmium::WayNodeList&,
-                                          og::use_nodes, og::direction))
-                 &WKBFactory::create_linestring,
+             [](WKBFactory &f, py::object o, og::use_nodes un, og::direction dir) {
+                 auto const *way = pyosmium::try_cast<COSMWay>(o);
+                 if (way) {
+                    return f.create_linestring(*way->get(), un, dir);
+                 }
+
+                 return f.create_linestring(pyosmium::cast_list<osmium::WayNodeList>(o), un, dir);
+             },
              py::arg("list"), py::arg("use_nodes")=og::use_nodes::unique,
              py::arg("direction")=og::direction::forward,
-             "Create a LineString geometry from a :py:class:`osmium.osm.WayNodeList`.")
-        .def("create_linestring",
-             (std::string (WKBFactory::*)(const osmium::Way&, og::use_nodes,
-                                          og::direction))
-                 &WKBFactory::create_linestring,
-             py::arg("way"), py::arg("use_nodes")=og::use_nodes::unique,
-             py::arg("direction")=og::direction::forward,
              "Create a LineString geometry from a :py:class:`osmium.osm.Way`.")
-        .def("create_multipolygon", &WKBFactory::create_multipolygon,
+        .def("create_multipolygon",
+             [](WKBFactory &f, py::object o) {
+                 return f.create_multipolygon(*pyosmium::cast<COSMArea>(o).get());
+             },
              py::arg("area"),
              "Create a MultiPolygon geometry from a :py:class:`osmium.osm.Area`.")
     ;
@@ -113,35 +114,33 @@ PYBIND11_MODULE(geom, m)
         .def_property_readonly("proj_string", &WKTFactory::proj_string,
              "(read-only) projection string of the output geometry.")
         .def("create_point",
-             (std::string (WKTFactory::*)(const osmium::Location&) const)
-                 &WKTFactory::create_point,
-             py::arg("location"),
-             "Create a point geometry from a :py:class:`osmium.osm.Location`.")
-        .def("create_point",
-             (std::string (WKTFactory::*)(const osmium::Node&))
-                 &WKTFactory::create_point,
-             py::arg("node"),
+             [](WKTFactory &f, py::object o) {
+                 if (py::isinstance<osmium::Location>(o)) {
+                    return f.create_point(o.cast<osmium::Location const &>());
+                 }
+                 if (py::hasattr(o, "location")) {
+                    return f.create_point(o.attr("location").cast<osmium::Location const &>());
+                 }
+                 return f.create_point(*pyosmium::cast<COSMNode>(o).get());
+             },
+             py::arg("pt"),
              "Create a point geometry from a :py:class:`osmium.osm.Node`.")
-        .def("create_point",
-             (std::string (WKTFactory::*)(const osmium::NodeRef&))
-                 &WKTFactory::create_point,
-             py::arg("ref"),
-             "Create a point geometry from a :py:class:`osmium.osm.NodeRef`.")
         .def("create_linestring",
-             (std::string (WKTFactory::*)(const osmium::WayNodeList&,
-                                          og::use_nodes, og::direction))
-                  &WKTFactory::create_linestring,
+             [](WKTFactory &f, py::object o, og::use_nodes un, og::direction dir) {
+                 auto const *way = pyosmium::try_cast<COSMWay>(o);
+                 if (way) {
+                    return f.create_linestring(*way->get(), un, dir);
+                 }
+
+                 return f.create_linestring(pyosmium::cast_list<osmium::WayNodeList>(o), un, dir);
+             },
              py::arg("list"), py::arg("use_nodes")=og::use_nodes::unique,
              py::arg("direction")=og::direction::forward,
-             "Create a LineString geometry from a :py:class:`osmium.osm.WayNodeList`.")
-        .def("create_linestring",
-             (std::string (WKTFactory::*)(const osmium::Way&, og::use_nodes,
-                                          og::direction))
-                  &WKTFactory::create_linestring,
-             py::arg("way"), py::arg("use_nodes")=og::use_nodes::unique,
-             py::arg("direction")=og::direction::forward,
              "Create a LineString geometry from a :py:class:`osmium.osm.Way`.")
-        .def("create_multipolygon", &WKTFactory::create_multipolygon,
+        .def("create_multipolygon",
+             [](WKTFactory &f, py::object o) {
+                 return f.create_multipolygon(*pyosmium::cast<COSMArea>(o).get());
+             },
              py::arg("area"),
              "Create a MultiPolygon geometry from a :py:class:`osmium.osm.Area`.")
     ;
@@ -154,35 +153,33 @@ PYBIND11_MODULE(geom, m)
         .def_property_readonly("proj_string", &GeoJSONFactory::proj_string,
              "(read-only) projection string of the output geometry.")
         .def("create_point",
-             (std::string (GeoJSONFactory::*)(const osmium::Location&) const)
-                 &GeoJSONFactory::create_point,
-             py::arg("location"),
-             "Create a point geometry from a :py:class:`osmium.osm.Location`.")
-        .def("create_point",
-             (std::string (GeoJSONFactory::*)(const osmium::Node&))
-                 &GeoJSONFactory::create_point,
-             py::arg("node"),
+             [](GeoJSONFactory &f, py::object o) {
+                 if (py::isinstance<osmium::Location>(o)) {
+                    return f.create_point(o.cast<osmium::Location const &>());
+                 }
+                 if (py::hasattr(o, "location")) {
+                    return f.create_point(o.attr("location").cast<osmium::Location const &>());
+                 }
+                 return f.create_point(*pyosmium::cast<COSMNode>(o).get());
+             },
+             py::arg("pt"),
              "Create a point geometry from a :py:class:`osmium.osm.Node`.")
-        .def("create_point",
-             (std::string (GeoJSONFactory::*)(const osmium::NodeRef&))
-                 &GeoJSONFactory::create_point,
-             py::arg("ref"),
-             "Create a point geometry from a :py:class:`osmium.osm.NodeRef`.")
         .def("create_linestring",
-             (std::string (GeoJSONFactory::*)(const osmium::WayNodeList&,
-                                              og::use_nodes, og::direction))
-                 &GeoJSONFactory::create_linestring,
+             [](GeoJSONFactory &f, py::object o, og::use_nodes un, og::direction dir) {
+                 auto const *way = pyosmium::try_cast<COSMWay>(o);
+                 if (way) {
+                    return f.create_linestring(*way->get(), un, dir);
+                 }
+
+                 return f.create_linestring(pyosmium::cast_list<osmium::WayNodeList>(o), un, dir);
+             },
              py::arg("list"), py::arg("use_nodes")=og::use_nodes::unique,
              py::arg("direction")=og::direction::forward,
-             "Create a LineString geometry from a :py:class:`osmium.osm.WayNodeList`.")
-        .def("create_linestring",
-             (std::string (GeoJSONFactory::*)(const osmium::Way&, og::use_nodes,
-                                              og::direction))
-                 &GeoJSONFactory::create_linestring,
-             py::arg("way"), py::arg("use_nodes")=og::use_nodes::unique,
-             py::arg("direction")=og::direction::forward,
              "Create a LineString geometry from a :py:class:`osmium.osm.Way`.")
-        .def("create_multipolygon", &GeoJSONFactory::create_multipolygon,
+        .def("create_multipolygon",
+             [](GeoJSONFactory &f, py::object o) {
+                 return f.create_multipolygon(*pyosmium::cast<COSMArea>(o).get());
+             },
              py::arg("area"),
              "Create a MultiPolygon geometry from a :py:class:`osmium.osm.Area`.")
     ;

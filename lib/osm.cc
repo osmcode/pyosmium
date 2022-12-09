@@ -1,39 +1,112 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
 
-#include <osmium/osm.hpp>
 #include <osmium/osm/entity_bits.hpp>
 
 #include "cast.h"
+#include "osm_base_objects.h"
 
 namespace py = pybind11;
 
-class TagIterator
+using TagIterator = osmium::TagList::const_iterator;
+using MemberIterator = osmium::RelationMemberList::const_iterator;
+
+static py::object tag_iterator_next(TagIterator &it, TagIterator const &cend)
 {
-public:
-    TagIterator(osmium::Tag const &t, py::object r)
-    : tag(t), ref(r)
-    {}
+    if (it == cend)
+        throw pybind11::stop_iteration();
 
-    char const *next()
-    {
-        switch (index) {
-            case 0:
-                ++index;
-                return tag.key();
-            case 1:
-                ++index;
-                return tag.value();
-        };
+    static auto const tag = pybind11::module_::import("osmium.osm.types").attr("Tag");
+    auto const value = tag(it->key(), it->value());
+    ++it;
 
-        throw py::stop_iteration();
+    return value;
+}
+
+
+static py::object member_iterator_next(MemberIterator &it, MemberIterator const &cend)
+{
+    if (it == cend)
+        throw pybind11::stop_iteration();
+
+    static auto const obj = pybind11::module_::import("osmium.osm.types").attr("RelationMember");
+    auto const value = obj(it->ref(), item_type_to_char(it->type()), it->role());
+    ++it;
+
+    return value;
+}
+
+using OuterRingIterator = osmium::memory::ItemIteratorRange<osmium::OuterRing const>::const_iterator;
+using InnerRingIterator = osmium::memory::ItemIteratorRange<osmium::InnerRing const>::const_iterator;
+
+template <typename T>
+T const *ring_iterator_next(typename osmium::memory::ItemIteratorRange<T const>::const_iterator &it)
+{
+    if (!it)
+        throw pybind11::stop_iteration();
+
+    return &(*it++);
+}
+
+static pybind11::object get_node_item(osmium::NodeRefList const *list, Py_ssize_t idx)
+{
+    auto sz = list->size();
+
+    osmium::NodeRefList::size_type iout =
+        (idx >= 0 ? idx : (Py_ssize_t) sz + idx);
+
+    if (iout >= sz || iout < 0) {
+        throw pybind11::index_error("Bad index.");
     }
 
-private:
-    osmium::Tag const &tag;
-    py::object ref; // keep a reference
-    size_t index = 0;
-};
+    auto const &node = (*list)[iout];
+
+    static auto const node_ref_t = pybind11::module_::import("osmium.osm.types").attr("NodeRef");
+
+    return node_ref_t(node.location(), node.ref());
+}
+
+template <typename T, typename P>
+void make_node_list(py::module_ &m, char const *class_name)
+{
+    py::class_<T>(m, class_name)
+        .def("size", [](T const *o, P const &parent)
+            { parent.get(); return o->size(); })
+        .def("get", [](T const *o, P const &parent, Py_ssize_t idx)
+            { parent.get(); return get_node_item(o, idx); })
+        .def("is_closed", [](T const *o, P const &parent)
+            { parent.get(); return o->is_closed(); })
+        .def("ends_have_same_location", [](T const *o, P const &parent)
+            { parent.get(); return o->ends_have_same_location(); })
+    ;
+}
+
+
+template <typename COSMObject>
+py::class_<COSMObject> make_osm_object_class(py::module_ &m, char const *class_name)
+{
+    return py::class_<COSMObject>(m, class_name)
+        .def("id", [](COSMObject const &o) { return o.get()->id(); })
+        .def("deleted", [](COSMObject const &o) { return o.get()->deleted(); })
+        .def("visible", [](COSMObject const &o) { return o.get()->visible(); })
+        .def("version", [](COSMObject const &o) { return o.get()->version(); })
+        .def("changeset", [](COSMObject const &o) { return o.get()->changeset(); })
+        .def("uid", [](COSMObject const &o) { return o.get()->uid(); })
+        .def("timestamp", [](COSMObject const &o) { return o.get()->timestamp(); })
+        .def("user", [](COSMObject const &o) { return o.get()->user(); })
+        .def("positive_id", [](COSMObject const &o) { return o.get()->positive_id(); })
+        .def("user_is_anonymous", [](COSMObject const &o) { return o.get()->user_is_anonymous(); })
+        .def("tags_size", [](COSMObject const &o) { return o.get()->tags().size(); })
+        .def("tags_get_value_by_key", [](COSMObject const &o, char const *key, char const *def)
+            { return o.get()->tags().get_value_by_key(key, def); })
+        .def("tags_has_key", [](COSMObject const &o, char const *key)
+            { return o.get()->tags().has_key(key); })
+        .def("tags_begin", [](COSMObject const &o) { return o.get()->tags().cbegin(); })
+        .def("tags_next", [](COSMObject const &o, TagIterator &it)
+            { return tag_iterator_next(it, o.get()->tags().cend()); })
+        .def("is_valid", &COSMObject::is_valid)
+    ;
+}
 
 
 PYBIND11_MODULE(_osm, m) {
@@ -49,34 +122,6 @@ PYBIND11_MODULE(_osm, m) {
         .export_values()
     ;
 
-    py::class_<osmium::Location>(m, "Location",
-        "A geographic coordinate in WGS84 projection. A location doesn't "
-         "necessarily have to be valid.")
-        .def(py::init<>())
-        .def(py::init<double, double>())
-        .def(py::self == py::self)
-        .def_property_readonly("x", &osmium::Location::x,
-             "(read-only) X coordinate (longitude) as a fixed-point integer.")
-        .def_property_readonly("y", &osmium::Location::y,
-             "(read-only) Y coordinate (latitude) as a fixed-point integer.")
-        .def_property_readonly("lon", &osmium::Location::lon,
-             "(read-only) Longitude (x coordinate) as floating point number."
-             "Raises an :py:class:`osmium.InvalidLocationError` when the "
-             "location is invalid.")
-        .def_property_readonly("lat", &osmium::Location::lat,
-             "(read-only) Latitude (y coordinate) as floating point number."
-             "Raises an :py:class:`osmium.InvalidLocationError` when the "
-             "location is invalid.")
-        .def("valid", &osmium::Location::valid,
-             "Check that the location is a valid WGS84 coordinate, i.e. "
-             "that it is within the usual bounds.")
-        .def("lat_without_check", &osmium::Location::lat_without_check,
-             "Return latitude (y coordinate) without checking if the location "
-             "is valid.")
-        .def("lon_without_check", &osmium::Location::lon_without_check,
-             "Return longitude (x coordinate) without checking if the location "
-             "is valid.")
-    ;
 
     py::class_<osmium::Box>(m, "Box",
         "A bounding box around a geographic area. It is defined by an "
@@ -118,292 +163,108 @@ PYBIND11_MODULE(_osm, m) {
         .def("size", &osmium::Box::size,
              "Return the size in square degrees.")
         .def("contains", &osmium::Box::contains, py::arg("location"),
-             "Check if the given location is inside the box.")
+             "Check if the given location is inside the box.")\
     ;
 
-    py::class_<TagIterator>(m, "TagIterator")
-        .def("__iter__", [](TagIterator &it) -> TagIterator& { return it; })
-        .def("__next__", &TagIterator::next)
-        .def("__len__", [](TagIterator const &it) { return 2; })
-    ;
 
-    py::class_<osmium::Tag>(m, "Tag",
-        "A single OSM tag.")
-        .def_property_readonly("k", &osmium::Tag::key,
-             "(read-only) Tag key.")
-        .def_property_readonly("v", &osmium::Tag::value,
-             "(read-only) Tag value.")
-        .def("__iter__", [](py::object s)
-                         { return TagIterator(s.cast<osmium::Tag const &>(), s); })
-    ;
-
-    py::class_<osmium::TagList>(m, "TagList",
-        "A fixed list of tags. The list is exported as an unmutable, "
-        "dictionary-like object where the keys are tag strings and the "
-        "items are :py:class:`osmium.osm.Tag`.")
-        .def("__len__", &osmium::TagList::size)
-        .def("__getitem__", [](osmium::TagList const &obj, const char *key)
-            {
-                if (!key) {
-                    throw py::key_error("Key 'None' not allowed.");
-                }
-
-                const char* v = obj.get_value_by_key(key);
-                if (!v) {
-                    throw py::key_error("No tag with that key.");
-                }
-                return v;
-            })
-        .def("__contains__", [](osmium::TagList const &obj, const char *key)
-                             { return key && obj.has_key(key); })
-        .def("__iter__", [](osmium::TagList const &obj)
-                         { return py::make_iterator(obj.begin(), obj.end()); },
-                         py::keep_alive<0, 1>())
-        .def("get", &osmium::TagList::get_value_by_key,
-             py::arg("key"), py::arg("default"))
-        .def("get", [](osmium::TagList const &obj, const char *key)
-                    { return key ? obj.get_value_by_key(key) : nullptr; })
-    ;
-
-    py::class_<osmium::NodeRef>(m, "NodeRef",
-        "A reference to a OSM node that also caches the nodes location.")
-        .def_property_readonly("x", &osmium::NodeRef::x,
+    py::class_<osmium::Location>(m, "Location",
+        "A geographic coordinate in WGS84 projection. A location doesn't "
+         "necessarily have to be valid.")
+        .def(py::init<>())
+        .def(py::init<double, double>())
+        .def(py::self == py::self)
+        .def_property_readonly("x", &osmium::Location::x,
              "(read-only) X coordinate (longitude) as a fixed-point integer.")
-        .def_property_readonly("y", &osmium::NodeRef::y,
+        .def_property_readonly("y", &osmium::Location::y,
              "(read-only) Y coordinate (latitude) as a fixed-point integer.")
-        .def_property_readonly("lon", &osmium::NodeRef::lon,
-             "(read-only) Longitude (x coordinate) as floating point number.")
-        .def_property_readonly("lat", &osmium::NodeRef::lat,
-             "(read-only) Latitude (y coordinate) as floating point number.")
-        .def_property_readonly("ref", &osmium::NodeRef::ref,
-             "(read-only) Id of the referenced node.")
-        .def_property_readonly("location",
-                               (osmium::Location (osmium::NodeRef::*)() const)
-                                 &osmium::NodeRef::location,
-             "(read-only) Node coordinates as a :py:class:`osmium.osm.Location` object.")
+        .def_property_readonly("lon", &osmium::Location::lon,
+             "(read-only) Longitude (x coordinate) as floating point number."
+             "Raises an :py:class:`osmium.InvalidLocationError` when the "
+             "location is invalid.")
+        .def_property_readonly("lat", &osmium::Location::lat,
+             "(read-only) Latitude (y coordinate) as floating point number."
+             "Raises an :py:class:`osmium.InvalidLocationError` when the "
+             "location is invalid.")
+        .def("valid", &osmium::Location::valid,
+             "Check that the location is a valid WGS84 coordinate, i.e. "
+             "that it is within the usual bounds.")
+        .def("lat_without_check", &osmium::Location::lat_without_check,
+             "Return latitude (y coordinate) without checking if the location "
+             "is valid.")
+        .def("lon_without_check", &osmium::Location::lon_without_check,
+             "Return longitude (x coordinate) without checking if the location "
+             "is valid.")
     ;
 
-    py::class_<osmium::RelationMember>(m, "RelationMember",
-        "Member of a relation.")
-        .def_property_readonly("ref", 
-                               (osmium::object_id_type (osmium::RelationMember::*)() const)
-                                   &osmium::RelationMember::ref,
-             "OSM ID of the object. Only unique within the type.")
-        .def_property_readonly("type", [](osmium::RelationMember& obj)
-                                       { return item_type_to_char(obj.type()); },
-             "Type of object referenced, a node, way or relation.")
-        .def_property_readonly("role", &osmium::RelationMember::role,
-             "The role of the member within the relation, a free-text string. "
-             "If no role is set then the string is empty.")
+
+    py::class_<TagIterator>(m, "CTagListIterator");
+    py::class_<MemberIterator>(m, "CRelationMemberListIterator");
+    py::class_<OuterRingIterator>(m, "COuterRingIterator");
+    py::class_<InnerRingIterator>(m, "CInnerRingIterator");
+
+
+    make_osm_object_class<COSMNode>(m, "COSMNode")
+        .def("location", [](COSMNode const &o) { return o.get()->location(); })
     ;
 
-    py::class_<osmium::RelationMemberList>(m, "RelationMemberList",
-        "An immutable  sequence of relation members "
-        ":py:class:`osmium.osm.RelationMember`.")
-        .def("__len__", &osmium::RelationMemberList::size)
-        .def("__iter__", [](osmium::RelationMemberList const &obj)
-                         { return py::make_iterator(obj.begin(), obj.end()); },
-                         py::keep_alive<0, 1>())
+    make_osm_object_class<COSMWay>(m, "COSMWay")
+        .def("is_closed", [](COSMWay const &o) { return o.get()->is_closed(); })
+        .def("ends_have_same_location", [](COSMWay const &o) { return o.get()->ends_have_same_location(); })
+        .def("nodes", [](COSMWay const &o) { return &o.get()->nodes(); },
+             py::return_value_policy::reference)
     ;
 
-    py::class_<osmium::NodeRefList>(m, "NodeRefList",
-        "A list of node references, implemented as "
-        "an immutable sequence of :py:class:`osmium.osm.NodeRef`. This class "
-        "is normally not used directly, use one of its subclasses instead.")
-        .def("__len__", &osmium::NodeRefList::size)
-        .def("__getitem__", [](osmium::NodeRefList const &list, Py_ssize_t idx)
-             {
-                auto sz = list.size();
-                osmium::NodeRefList::size_type iout =
-                    (idx >= 0 ? idx : (Py_ssize_t) sz + idx);
 
-                if (iout >= sz || iout < 0) {
-                    throw py::index_error("Bad index.");
-                }
+    make_osm_object_class<COSMRelation>(m, "COSMRelation")
+        .def("members_size", [](COSMRelation const &o) { return o.get()->members().size(); })
+        .def("members_begin", [](COSMRelation const &o) { return o.get()->members().cbegin(); })
+        .def("members_next", [](COSMRelation const &o, MemberIterator &it)
+            { return member_iterator_next(it, o.get()->members().cend()); })
 
-                return list[iout];
-             },
-             py::return_value_policy::reference_internal)
-        .def("__iter__", [](osmium::NodeRefList const &obj)
-                         { return py::make_iterator(obj.begin(), obj.end()); },
-                         py::keep_alive<0, 1>())
-        .def("is_closed", &osmium::NodeRefList::is_closed,
-             "True if the start and end node are the same (synonym for "
-             "``ends_have_same_id``).")
-        .def("ends_have_same_id", &osmium::NodeRefList::ends_have_same_id,
-             "True if the start and end node are exactly the same.")
-        .def("ends_have_same_location", &osmium::NodeRefList::ends_have_same_location,
-             "True if the start and end node of the way are at the same location. "
-             "Expects that the coordinates of the way nodes have been loaded "
-             "(see :py:func:`osmium.SimpleHandler.apply_buffer` and "
-             ":py:func:`osmium.SimpleHandler.apply_file`). "
-             "If the locations are not present then the function returns always true.")
     ;
 
-    py::class_<osmium::WayNodeList, osmium::NodeRefList>(m, "WayNodeList",
-        "List of nodes in a way. "
-        "For its members see :py:class:`osmium.osm.NodeRefList`.")
+    make_osm_object_class<COSMArea>(m, "COSMArea")
+        .def("from_way", [](COSMArea const &o) { return o.get()->from_way(); })
+        .def("orig_id", [](COSMArea const &o) { return o.get()->orig_id(); })
+        .def("is_multipolygon", [](COSMArea const &o) { return o.get()->is_multipolygon(); })
+        .def("num_rings", [](COSMArea const &o) { return o.get()->num_rings(); })
+        .def("outer_begin", [](COSMArea const &o) { return o.get()->outer_rings().cbegin(); })
+        .def("outer_next", [](COSMArea const &o, OuterRingIterator &it) {
+            o.get();
+            return ring_iterator_next<osmium::OuterRing>(it);
+        },
+             py::return_value_policy::reference)
+        .def("inner_begin", [](COSMArea const &o, osmium::OuterRing const &ring)
+            { return o.get()->inner_rings(ring).cbegin(); })
+        .def("inner_next", [](COSMArea const &o, InnerRingIterator &it) {
+            o.get();
+            return ring_iterator_next<osmium::InnerRing>(it);
+        },
+             py::return_value_policy::reference)
     ;
 
-    py::class_<osmium::OuterRing, osmium::NodeRefList>(m, "OuterRing",
-        "List of nodes in an outer ring. "
-        "For its members see :py:class:`osmium.osm.NodeRefList`.")
+    py::class_<COSMChangeset>(m, "COSMChangeset")
+        .def("id", [](COSMChangeset const &o) { return o.get()->id(); })
+        .def("uid", [](COSMChangeset const &o) { return o.get()->uid(); })
+        .def("created_at", [](COSMChangeset const &o) { return o.get()->created_at(); })
+        .def("closed_at", [](COSMChangeset const &o) { return o.get()->closed_at(); })
+        .def("open", [](COSMChangeset const &o) { return o.get()->open(); })
+        .def("num_changes", [](COSMChangeset const &o) { return o.get()->num_changes(); })
+        .def("user", [](COSMChangeset const &o) { return o.get()->user(); })
+        .def("user_is_anonymous", [](COSMChangeset const &o) { return o.get()->user_is_anonymous(); })
+        .def("bounds", [](COSMChangeset const &o) { return o.get()->bounds(); })
+        .def("tags_size", [](COSMChangeset const &o) { return o.get()->tags().size(); })
+        .def("tags_get_value_by_key", [](COSMChangeset const &o, char const *key, char const *def)
+            { return o.get()->tags().get_value_by_key(key, def); })
+        .def("tags_has_key", [](COSMChangeset const &o, char const *key)
+            { return o.get()->tags().has_key(key); })
+        .def("tags_begin", [](COSMChangeset const &o) { return o.get()->tags().cbegin(); })
+        .def("tags_next", [](COSMChangeset const &o, TagIterator &it)
+            { return tag_iterator_next(it, o.get()->tags().cend()); })
+        .def("is_valid", &COSMChangeset::is_valid)
     ;
 
-    py::class_<osmium::InnerRing, osmium::NodeRefList>(m, "InnerRing",
-        "List of nodes in an inner ring. "
-        "For its members see :py:class:`osmium.osm.NodeRefList`.")
-    ;
-
-    using InnerRingRange =
-             osmium::memory::ItemIteratorRange<osmium::InnerRing const>;
-    py::class_<InnerRingRange>(m, "InnerRingIterator",
-        "Iterator over inner rings.")
-        .def("__iter__", [](InnerRingRange const &obj)
-                         { return py::make_iterator(obj.begin(), obj.end()); },
-                         py::keep_alive<0, 1>())
-    ;
-
-    py::class_<osmium::OSMObject>(m, "OSMObject",
-        "This is the base class for all OSM entity classes below and contains "
-        "all common attributes.")
-        .def_property_readonly("id", &osmium::OSMObject::id,
-             "(read-only) OSM id of the object.")
-        .def_property_readonly("deleted", &osmium::OSMObject::deleted,
-             "(read-only) True if the object is no longer visible.")
-        .def_property_readonly("visible", &osmium::OSMObject::visible,
-             "(read-only) True if the object is visible.")
-        .def_property_readonly("version", &osmium::OSMObject::version,
-             "(read-only) Version number of the object.")
-        .def_property_readonly("changeset", &osmium::OSMObject::changeset,
-             "(read-only) Id of changeset where this version of the "
-             "object was created.")
-        .def_property_readonly("uid", &osmium::OSMObject::uid,
-             "(read-only) Id of the user that created this version "
-             "of the object. Only this ID uniquely identifies users.")
-        .def_property_readonly("timestamp", &osmium::OSMObject::timestamp,
-             "(read-only) Date when this version has been created, "
-             "returned as a ``datetime.datetime``.")
-        .def_property_readonly("user", &osmium::OSMObject::user,
-             "(read-only) Name of the user that created this version. "
-             "Be aware that user names can change, so that the same "
-             "user ID may appear with different names and vice versa. ")
-        .def_property_readonly("tags", &osmium::OSMObject::tags,
-                               py::return_value_policy::reference_internal,
-             "(read-only) List of tags describing the object. "
-             "See :py:class:`osmium.osm.TagList`.")
-        .def("positive_id", &osmium::OSMObject::positive_id,
-             "Get the absolute value of the id of this object.")
-        .def("user_is_anonymous", &osmium::OSMObject::user_is_anonymous,
-             "Check if the user is anonymous. If true, the uid does not uniquely "
-             "identify a single user but only the group of all anonymous users "
-             "in general.")
-    ;
-
-    py::class_<osmium::Node, osmium::OSMObject>(m, "Node",
-        "Represents a single OSM node. It inherits from OSMObjects and "
-        "adds a single attribute, the location.")
-        .def_property_readonly("location",
-                               (osmium::Location (osmium::Node::*)() const)
-                                   &osmium::Node::location,
-             "The geographic coordinates of the node. "
-             "See :py:class:`osmium.osm.Location`.")
-    ;
-
-    py::class_<osmium::Way, osmium::OSMObject>(m, "Way",
-        "Represents a OSM way. It inherits the attributes from OSMObjects and "
-        "adds an ordered list of nodes that describes the way.")
-        .def_property_readonly("nodes",
-                               (const osmium::WayNodeList& (osmium::Way::*)() const)
-                                   &osmium::Way::nodes,
-                               py::return_value_policy::reference_internal,
-             "(read-only) Ordered list of nodes. "
-             "See :py:class:`osmium.osm.WayNodeList`.")
-        .def("is_closed", &osmium::Way::is_closed,
-             "True if the start and end node are the same (synonym for "
-             "``ends_have_same_id``).")
-        .def("ends_have_same_id", &osmium::Way::ends_have_same_id,
-             "True if the start and end node are exactly the same.")
-        .def("ends_have_same_location", &osmium::Way::ends_have_same_location,
-             "True if the start and end node of the way are at the same location."
-             "Expects that the coordinates of the way nodes have been loaded "
-             "(see :py:func:`osmium.SimpleHandler.apply_buffer` and "
-             ":py:func:`osmium.SimpleHandler.apply_file`). "
-             "If the locations are not present then the function returns always true.")
-    ;
-
-    py::class_<osmium::Relation, osmium::OSMObject>(m, "Relation",
-        "Represents a OSM relation. It inherits the attributes from OSMObjects "
-        "and adds an ordered list of members.")
-        .def_property_readonly("members", 
-                               (const osmium::RelationMemberList& (osmium::Relation::*)() const)
-                                   &osmium::Relation::members,
-                               py::return_value_policy::reference_internal,
-             "(read-only) Ordered list of relation members. "
-             "See :py:class:`osmium.osm.RelationMemberList`.")
-    ;
-
-    py::class_<osmium::Area, osmium::OSMObject>(m, "Area",
-        "Areas are a special kind of meta-object representing a polygon. "
-        "They can either be derived from closed ways or from relations "
-        "that represent multipolygons. They also inherit the attributes "
-        "of OSMObjects and in addition contain polygon geometries. Areas have "
-        "their own unique id space. This is computed as the OSM id times 2 "
-        "and for relations 1 is added,")
-        .def("from_way", &osmium::Area::from_way,
-             "Return true if the area was created from a way, false if it was "
-             "created from a relation of multipolygon type.")
-        .def("orig_id", &osmium::Area::orig_id,
-             "Compute the original OSM id of this object. Note that this is not "
-             "necessarily unique because the object might be a way or relation "
-             "which have an overlapping id space.")
-        .def("is_multipolygon", &osmium::Area::is_multipolygon,
-             "Return true if this area is a true multipolygon, i.e. it consists "
-             "of multiple outer rings.")
-        .def("num_rings", &osmium::Area::num_rings,
-             "Return a tuple with the number of outer rings and inner rings.")
-        .def("outer_rings", [](osmium::Area const &a)
-                            { return py::make_iterator(a.cbegin<osmium::OuterRing>(),
-                                                       a.cend<osmium::OuterRing>()); },
-                            py::keep_alive<0, 1>(),
-             "Return an iterator over all outer rings of the multipolygon.")
-        .def("inner_rings", &osmium::Area::inner_rings,
-                            py::keep_alive<0, 1>(),
-             py::arg("outer_ring"),
-             "Return an iterator over all inner rings of the multipolygon.")
-    ;
-
-    py::class_<osmium::Changeset>(m, "Changeset",
-        "A changeset description.")
-        .def_property_readonly("id", &osmium::Changeset::id,
-             "(read-only) Unique ID of the changeset.")
-        .def_property_readonly("uid", &osmium::Changeset::uid,
-             "(read-only) User ID of the changeset creator.")
-        .def_property_readonly("created_at", &osmium::Changeset::created_at,
-             "(read-only) Timestamp when the changeset was first opened.")
-        .def_property_readonly("closed_at", &osmium::Changeset::closed_at,
-             "(read-only) Timestamp when the changeset was finalized. May be "
-             "None when the changeset is still open.")
-        .def_property_readonly("open", &osmium::Changeset::open,
-             "(read-only) True when the changeset is still open.")
-        .def_property_readonly("num_changes", &osmium::Changeset::num_changes,
-             "(read-only) The total number of objects changed in this Changeset.")
-        .def_property_readonly("bounds",
-                               (osmium::Box const& (osmium::Changeset::*)() const)
-                                   &osmium::Changeset::bounds,
-                               py::return_value_policy::reference_internal,
-             "(read-only) The bounding box of the area that was edited.")
-        .def_property_readonly("user", &osmium::Changeset::user,
-             "(read-only) Name of the user that created the changeset. "
-             "Be aware that user names can change, so that the same "
-             "user ID may appear with different names and vice versa. ")
-        .def_property_readonly("tags", &osmium::Changeset::tags,
-                               py::return_value_policy::reference_internal,
-             "(read-only) List of tags describing the changeset. "
-             "See :py:class:`osmium.osm.TagList`.")
-        .def("user_is_anonymous", &osmium::Changeset::user_is_anonymous,
-             "Check if the user anonymous. If true, the uid does not uniquely "
-             "identify a single user but only the group of all anonymous users "
-             "in general.")
-    ;
+    make_node_list<osmium::WayNodeList, COSMWay>(m, "CWayNodeList");
+    make_node_list<osmium::OuterRing, COSMArea>(m, "COuterRing");
+    make_node_list<osmium::InnerRing, COSMArea>(m, "CInnerRing");
 }

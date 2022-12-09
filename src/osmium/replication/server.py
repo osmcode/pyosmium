@@ -1,6 +1,6 @@
 """ Helper functions to communicate with replication servers.
 """
-from typing import NamedTuple, Optional, Any, Iterator, cast, Mapping, Tuple
+from typing import NamedTuple, Optional, Any, Iterator, cast, Dict, Mapping, Tuple
 import requests
 import urllib.request as urlrequest
 from urllib.error import URLError
@@ -44,7 +44,7 @@ class ReplicationServer:
     def __init__(self, url: str, diff_type: str = 'osc.gz') -> None:
         self.baseurl = url
         self.diff_type = diff_type
-        self.extra_request_params: Mapping[str, Any] = dict(timeout=60, stream=True)
+        self.extra_request_params: dict[str, Any] = dict(timeout=60, stream=True)
         self.session: Optional[requests.Session] = None
 
     def close(self) -> None:

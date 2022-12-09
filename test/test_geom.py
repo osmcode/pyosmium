@@ -156,3 +156,19 @@ def test_haversine():
 
     assert 1 == len(results)
     assert 268520 == pytest.approx(results[0])
+
+
+def test_haversine_invalid_object():
+    data = ['n1 x0 y0', 'n2 x1 y0', 'n3 x0 y1', 'w1 Nn1,n2,n3']
+
+    results = []
+    def call_haversine(w):
+        print('AAAA')
+        results.append(w.nodes)
+    handler = o.make_simple_handler(way=call_haversine)
+    handler.apply_buffer('\n'.join(data).encode('utf-8'), 'opl', locations=True)
+
+    assert results
+
+    with pytest.raises(RuntimeError, match="removed OSM object"):
+        o.geom.haversine_distance(results[0])
