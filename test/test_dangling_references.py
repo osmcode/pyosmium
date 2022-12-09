@@ -33,7 +33,7 @@ class DanglingReferenceBase:
         assert self.refkeeper
 
         for obj, func in self.refkeeper:
-            with pytest.raises(RuntimeError, match="removed object"):
+            with pytest.raises(RuntimeError, match="removed OSM object"):
                 func(obj)
             # str() and repr() must not throw errors
             str(obj)

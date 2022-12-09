@@ -1,7 +1,7 @@
 Troubleshooting
 ===============
 
-``RuntimeError: callback keeps reference to OSM object``
+``RuntimeError: Illegal access to removed OSM object``
 --------------------------------------------------------
 
 One of your callbacks tries to store the OSM object outside the scope of

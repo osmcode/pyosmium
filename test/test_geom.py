@@ -170,5 +170,5 @@ def test_haversine_invalid_object():
 
     assert results
 
-    with pytest.raises(RuntimeError, match="removed object"):
+    with pytest.raises(RuntimeError, match="removed OSM object"):
         o.geom.haversine_distance(results[0])

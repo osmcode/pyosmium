@@ -82,11 +82,9 @@ void make_node_list(py::module_ &m, char const *class_name)
 }
 
 
-template <typename T>
-py::class_<T> make_osm_object_class(py::module_ &m, char const *class_name)
+template <typename COSMObject>
+py::class_<COSMObject> make_osm_object_class(py::module_ &m, char const *class_name)
 {
-    using COSMObject = T;
-
     return py::class_<COSMObject>(m, class_name)
         .def("id", [](COSMObject const &o) { return o.get()->id(); })
         .def("deleted", [](COSMObject const &o) { return o.get()->deleted(); })

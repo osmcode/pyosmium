@@ -108,7 +108,7 @@ T const *try_cast_list(pybind11::object o) {
 template <typename T>
 T const &cast_list(pybind11::object o) {
     if (!o.attr("_pyosmium_data").attr("is_valid")().cast<bool>()) {
-        throw std::runtime_error{"Access to removed object"};
+        throw std::runtime_error{"Illegal access to removed OSM object"};
     }
 
     return o.attr("_list").cast<T const &>();

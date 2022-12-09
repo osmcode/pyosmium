@@ -121,17 +121,19 @@ might want to simply collect all hotels and then print their names::
 
     print(sorted(hotel_names))
 
-If you try to execute this, then python will immediately return with a
-Runtime error::
+If you try to execute this, then Python will raise a Runtime error::
 
-    RuntimeError: Node callback keeps reference to OSM object. This is not allowed.
+    RuntimeError: Illegal access to OSM object
+
+the moment, you try to access to ``tags`` attribute.
 
 The object references that are handed to the handler are only temporary.
 Osmium reads the object from the file, gives them to the handler function
 and then discards them to free the memory. If you keep a reference
 after the handler function returns, it points to invalid memory. Pyosmium
-does not allow that and throws the runtime error above. If you want to keep
-data for later use *the data must be copied out*.
+checks on every access if the memory is still valid and raises the runtime
+error above if you try to access the object outside the callback. If you
+want to keep data for later use *the data must be copied out*.
 
 For the example, with the list of hotels, we only need to keep the name
 of each hotel. So a correct implementation is::
@@ -152,7 +154,7 @@ of each hotel. So a correct implementation is::
     print(sorted(h.hotels))
 
 Not only the object itself is a temporary reference. Also the tags, node and
-member lists must be copied, when they need to be store. As a general rule,
+member lists must be copied when they need to be stored. As a general rule,
 it is good practise to store as little information as possible. In the example
 above, we could have stored the tags of all objects and then done the filtering
 later but that would need much more memory.
