@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - v**
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, windows-2019, macos-11]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/checkout@v3
+        with:
+          repository: pybind/pybind11
+          ref: v2.10
+          path: contrib/pybind11
+
+      - uses: actions/checkout@v3
+        with:
+          repository: mapbox/protozero
+          ref: v1.7.1
+          path: contrib/protozero
+
+      - uses: actions/checkout@v3
+        with:
+          repository: osmcode/libosmium
+          ref: v2.18.0
+          path: contrib/libosmium
+
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.11.3
+        env:
+           CIBW_ARCHS: native
+           CIBW_SKIP: "pp* *musllinux*"
+           CIBW_TEST_REQUIRES: pytest shapely
+           CIBW_TEST_COMMAND: pytest {project}/test
+           CIBW_BUILD_FRONTEND: build
+           CIBW_BEFORE_BUILD_LINUX: yum install -y sparsehash-devel expat-devel boost-devel zlib-devel bzip2-devel lz4-devel
+           CIBW_BEFORE_BUILD_MACOS: brew install boost google-sparsehash
+           CIBW_BEFORE_BUILD_WINDOWS: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
+           CIBW_ENVIRONMENT_WINDOWS: 'CMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"'
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
