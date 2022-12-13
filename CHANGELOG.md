@@ -4,6 +4,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.0rc1] - 2022-12-13
+
+### Changed
+
+- complete internal rewrite of the bindings for OSM data types
+- invalid buffers are now checked on access time, no more reference count
+  checks on leaving the handler callback
+
 ## [3.5.0] - 2022-11-09
 
 ### Added
