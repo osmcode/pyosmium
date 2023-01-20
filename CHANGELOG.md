@@ -4,6 +4,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.0] - 2023-01-20
+
+### Changed
+
+- update to pybind 2.10.3
+- update to libosmium 2.19.0
+- change minimum required version of Cmake to 3.0
+
 ## [3.6.0rc1] - 2022-12-13
 
 ### Changed

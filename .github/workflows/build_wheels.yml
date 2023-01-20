@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: pybind/pybind11
-          ref: v2.10
+          ref: v2.10.3
           path: contrib/pybind11
 
       - uses: actions/checkout@v3
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: osmcode/libosmium
-          ref: v2.18.0
+          ref: v2.19.0
           path: contrib/libosmium
 
 
