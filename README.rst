@@ -24,7 +24,7 @@ development packages for these libraries. On Debian/Ubuntu do::
                        libexpat1-dev zlib1g-dev libbz2-dev
 
 
-Python >= 3.4 is supported.
+Python >= 3.6 is supported. Pypy is known not to work.
 
 Documentation
 =============
