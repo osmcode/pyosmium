@@ -10,7 +10,7 @@ from pathlib import Path
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.sdist import sdist as orig_sdist
-from distutils.version import LooseVersion
+from packaging.version import Version
 
 BASEDIR = os.path.split(os.path.abspath(__file__))[0]
 
@@ -75,8 +75,8 @@ class CMakeBuild(build_ext):
                                ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
-            cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < '3.1.0':
+            cmake_version = Version(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
+            if cmake_version < Version('3.1.0'):
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
 
         for ext in self.extensions:
