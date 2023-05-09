@@ -6,6 +6,7 @@
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 #include <osmium/osm.hpp>
 #include <osmium/io/any_output.hpp>
@@ -58,6 +59,34 @@ public:
 
             set_common_attributes(o, builder);
             set_taglist<COSMNode>(o, builder);
+        }
+
+        flush_buffer();
+    }
+
+    void add_locations(py::array_t<double> locations, Py_ssize_t first_id)
+    {
+        if (!buffer) {
+            throw std::runtime_error{"Writer already closed."};
+        }
+
+        buffer.rollback();
+
+        // Check input array matches expectations
+        py::buffer_info info = locations.request();
+        if (info.ndim != 2 || info.shape[1] != 2){
+            throw std::runtime_error{"Input array must be of {N, 2} dimension"};
+        }
+        Py_ssize_t nbnodes = info.shape[0];
+
+        // Use a proxy to ease access to elements
+        auto r = locations.unchecked<2>();
+        for (Py_ssize_t i = 0; i < nbnodes; ++i) {
+            osmium::builder::NodeBuilder builder(buffer);
+            osmium::Node& n = builder.object();
+            // Only location and ID are supported
+            n.set_location(osmium::Location{r(i, 0), r(i, 1)});
+            n.set_id(first_id + i);
         }
 
         flush_buffer();
@@ -320,6 +349,13 @@ void init_simple_writer(pybind11::module &m)
              "Add a new node to the file. The node may be an ``osmium.osm.Node`` object, "
              "an ``osmium.osm.mutable.Node`` object or any other Python object that "
              "implements the same attributes.")
+        .def("add_locations", &SimpleWriter::add_locations, 
+             py::arg("locations"), py::arg("first_id"),
+             "Massively add a bunch of nodes to the file from given locations. This is an "
+             "efficient way to create the nodes to be referenced later by a way. The "
+             "locations must be a numpy float64 ndarray of {N,2} dimension, N being the "
+             "number of nodes. Nodes IDs are generated consecutively, starting from first_id."
+             "Additional `numpy` Python package is required to call this method.")
         .def("add_way", &SimpleWriter::add_way, py::arg("way"),
              "Add a new way to the file. The way may be an ``osmium.osm.Way`` object, "
              "an ``osmium.osm.mutable.Way`` object or any other Python object that "

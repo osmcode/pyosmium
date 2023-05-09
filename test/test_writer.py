@@ -103,6 +103,17 @@ def test_location(test_writer, location, out):
     with test_writer('n0 v0 dV c0 t i0 u T ' + out) as w:
         w.add_node(O(location=location))
 
+def test_add_locations(test_writer):
+    # numpy was not a dependency of older shapely version used with python 3.6
+    numpy = pytest.importorskip("numpy", reason="numpy is not available")
+    locations = numpy.array([[1.,1.1], [2.,2.2], [3.,3.3], [4.,4.4], [4.,4.4]])
+    expected = """n1000 v0 dV c0 t i0 u T x1 y1.1
+n1001 v0 dV c0 t i0 u T x2 y2.2
+n1002 v0 dV c0 t i0 u T x3 y3.3
+n1003 v0 dV c0 t i0 u T x4 y4.4
+n1004 v0 dV c0 t i0 u T x4 y4.4"""
+    with test_writer(expected) as w:
+        w.add_locations(locations=locations, first_id=1000)
 
 def test_node_list(test_writer):
     with test_writer('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
