@@ -18,6 +18,38 @@ namespace py = pybind11;
 using TagIterator = osmium::TagList::const_iterator;
 using MemberIterator = osmium::RelationMemberList::const_iterator;
 
+#if PYBIND11_VERSION_MINOR >= 11 || PYBIND11_VERSION_MAJOR > 2
+/*
+Work-around false positive added by pybind/pybind11@f701654 change:
+ItemIterator/CollectionIterator ARE copy/move constructible, even if their template
+parameter is not. Indeed, those iterators iterate over low-level memory representation
+of the objects, without relying on their constructors.
+
+For eg.
+// static_assert(std::is_move_constructible<osmium::memory::CollectionIterator<osmium::RelationMember const>>::value);
+// static_assert(!std::is_copy_constructible<osmium::RelationMember>::value);
+
+The work-around relies on officially exposed pybind11::detail::is_copy_constructible/is_copy_constructible: 
+https://github.com/pybind/pybind11/pull/4631
+*/
+namespace pybind11 {
+namespace detail {
+template <typename T>
+struct is_copy_constructible<osmium::memory::CollectionIterator<T>>
+    : std::true_type {};
+template <typename T>
+struct is_move_constructible<osmium::memory::CollectionIterator<T>>
+    : std::true_type {};
+template <typename T>
+struct is_copy_constructible<osmium::memory::ItemIterator<T>>
+    : std::true_type {};
+template <typename T>
+struct is_move_constructible<osmium::memory::ItemIterator<T>>
+    : std::true_type {};
+} // namespace detail
+} // namespace pybind11
+#endif
+
 static py::object tag_iterator_next(TagIterator &it, TagIterator const &cend)
 {
     if (it == cend)
