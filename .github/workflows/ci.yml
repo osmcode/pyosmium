@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
     build-default:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
 
         steps:
             - uses: actions/checkout@v3
@@ -85,7 +85,7 @@ jobs:
                   path: dist
 
     test-default:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
         needs: build-default
 
         strategy:
@@ -123,15 +123,15 @@ jobs:
                 compiler: [gcc-old, clang-old, gcc, clang, macos]
                 include:
                     - compiler: gcc-old
-                      cc: gcc-7
-                      cxx: g++-7
-                      platform: ubuntu-18.04
+                      cc: gcc-9
+                      cxx: g++-9
+                      platform: ubuntu-20.04
                       python: 3.6
                       deps: release
                     - compiler: clang-old
-                      cc: clang-6.0
-                      cxx: clang++-6.0
-                      platform: ubuntu-18.04
+                      cc: clang-10.0
+                      cxx: clang++-10.0
+                      platform: ubuntu-20.04
                       python: 3.6
                       deps: release
                     - compiler: gcc
