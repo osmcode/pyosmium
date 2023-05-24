@@ -6,8 +6,8 @@
 # For a full list of authors see the git log.
 from typing import Optional, Callable, TypeVar
 
-from osmium._osmium import SimpleHandler
-from osmium.osm import Node, Way, Relation, Area, Changeset
+from npyosmium._osmium import SimpleHandler
+from npyosmium.osm import Node, Way, Relation, Area, Changeset
 
 T = TypeVar('T')
 HandlerFunc = Optional[Callable[[T], None]]

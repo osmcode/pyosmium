@@ -8,9 +8,8 @@
 from typing import NamedTuple, Optional
 import logging
 import datetime as dt
-from collections import namedtuple
-from osmium.io import Reader as oreader
-from osmium.osm import NOTHING
+from npyosmium.io import Reader as oreader
+from npyosmium.osm import NOTHING
 
 LOG = logging.getLogger('pyosmium')
 

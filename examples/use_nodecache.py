@@ -1,4 +1,4 @@
-import osmium as o
+import npyosmium as o
 import sys
 
 class WayHandler(o.SimpleHandler):

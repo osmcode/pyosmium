@@ -6,7 +6,7 @@
 import threading
 
 from helpers import CountingHandler
-import osmium as o
+import npyosmium as o
 
 def test_threaded_processing():
     """ Process a file in a different thread and make sure that processing

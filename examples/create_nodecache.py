@@ -1,4 +1,4 @@
-import osmium as o
+import npyosmium as o
 import sys
 
 if len(sys.argv) != 3:

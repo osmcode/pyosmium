@@ -3,14 +3,14 @@
 # This file is part of Pyosmium.
 #
 # Copyright (C) 2022 Sarah Hoffmann.
-""" Tests for the pyosmium-get-changes script.
+""" Tests for the npyosmium-get-changes script.
 """
 from io import BytesIO
 from pathlib import Path
 from textwrap import dedent
 
 import pytest
-import osmium.replication.server
+import npyosmium.replication.server
 
 try:
     import http.cookiejar as cookiejarlib
@@ -34,7 +34,7 @@ class TestPyosmiumGetChanges:
     def setUp(self, monkeypatch):
         self.script = dict()
 
-        filename = (Path(__file__) / ".." / ".." / "tools"/ "pyosmium-get-changes").resolve()
+        filename = (Path(__file__) / ".." / ".." / "tools"/ "npyosmium-get-changes").resolve()
         with filename.open("rb") as f:
             exec(compile(f.read(), str(filename), 'exec'), self.script)
 
@@ -45,7 +45,7 @@ class TestPyosmiumGetChanges:
     def mock_requests(self, monkeypatch):
         def mock_get(session, url, **kwargs):
             return RequestsResponses(self.urls[url])
-        monkeypatch.setattr(osmium.replication.server.requests.Session, "get", mock_get)
+        monkeypatch.setattr(npyosmium.replication.server.requests.Session, "get", mock_get)
 
 
     def url(self, url, result):

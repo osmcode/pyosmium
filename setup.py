@@ -52,7 +52,7 @@ def get_versions():
         The file cannot be directly imported because it is not installed
         yet.
     """
-    version_py = os.path.join(BASEDIR, "src/osmium/version.py")
+    version_py = os.path.join(BASEDIR, "src/npyosmium/version.py")
     v = {}
     with open(version_py) as version_file:
         # Execute the code in version.py.
@@ -131,45 +131,45 @@ class CMakeBuild(build_ext):
 
 versions = get_versions()
 
-if sys.version_info < (3,6):
-    raise RuntimeError("Python 3.6 or larger required.")
+if sys.version_info < (3,7):
+    raise RuntimeError("Python 3.7 or larger required.")
 
 with open('README.rst', 'r') as descfile:
     long_description = descfile.read()
 
 setup(
-    name='osmium',
-    version=versions['pyosmium_release'],
-    description='Python bindings for libosmium, the data processing library for OSM data',
+    name='npyosmium',
+    version=versions['npyosmium_release'],
+    description='Python bindings for libosmium, the data processing library for OSM data, with numpy interface',
     long_description=long_description,
     author='Sarah Hoffmann',
     author_email='lonvia@denofr.de',
-    maintainer='Sarah Hoffmann',
-    maintainer_email='lonvia@denofr.de',
-    download_url='https://github.com/osmcode/pyosmium',
-    url='https://osmcode.org/pyosmium',
+    maintainer='Aurélien Grenotton',
+    maintainer_email='agrenott@gmail.com',
+    download_url='https://github.com/agrenott/npyosmium',
+    url='https://github.com/agrenott/npyosmium',
     keywords=["OSM", "OpenStreetMap", "Osmium"],
     license='BSD',
-    scripts=['tools/pyosmium-get-changes', 'tools/pyosmium-up-to-date'],
+    scripts=['tools/npyosmium-get-changes', 'tools/npyosmium-up-to-date'],
     classifiers = [
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: C++",
         ],
 
     ext_modules=[CMakeExtension('cmake_example')],
-    packages = ['osmium', 'osmium/osm', 'osmium/replication'],
+    packages = ['npyosmium', 'npyosmium/osm', 'npyosmium/replication'],
     package_dir = {'' : 'src'},
-    package_data = { 'osmium': ['py.typed', '*.pyi',
+    package_data = { 'npyosmium': ['py.typed', '*.pyi',
                                 'replication/_replication.pyi',
                                 'osm/_osm.pyi']},
-    python_requires = ">=3.6",
+    python_requires = ">=3.7",
     install_requires = ['requests'],
     cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,

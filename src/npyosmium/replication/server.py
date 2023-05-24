@@ -6,18 +6,17 @@
 # For a full list of authors see the git log.
 """ Helper functions to communicate with replication servers.
 """
-from typing import NamedTuple, Optional, Any, Iterator, cast, Dict, Mapping, Tuple
+from typing import NamedTuple, Optional, Any, Iterator, cast, Mapping, Tuple
 import requests
 import urllib.request as urlrequest
 from urllib.error import URLError
 import datetime as dt
-from collections import namedtuple
 from contextlib import contextmanager
 from math import ceil
 
-from osmium import MergeInputReader, BaseHandler
-from osmium import io as oio
-from osmium import version
+from npyosmium import MergeInputReader, BaseHandler
+from npyosmium import io as oio
+from npyosmium import version
 
 import logging
 
@@ -78,7 +77,7 @@ class ReplicationServer:
         self.extra_request_params[key] = value
 
     def make_request(self, url: str) -> urlrequest.Request:
-        headers = {"User-Agent" : f"pyosmium/{version.pyosmium_release}"}
+        headers = {"User-Agent" : f"npyosmium/{version.npyosmium_release}"}
         return urlrequest.Request(url, headers=headers)
 
     def open_url(self, url: urlrequest.Request) -> Any:

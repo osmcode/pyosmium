@@ -173,7 +173,7 @@ private:
     pybind11::function callback(char const *name)
     { return pybind11::get_overload(static_cast<SimpleHandler const *>(this), name); }
 
-    pybind11::object m_type_module = pybind11::module_::import("osmium.osm.types");
+    pybind11::object m_type_module = pybind11::module_::import("npyosmium.osm.types");
 };
 
 #endif // PYOSMIUM_SIMPLE_HANDLER_HPP

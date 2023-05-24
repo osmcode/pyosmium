@@ -7,33 +7,33 @@ throughout the library.
 Native OSM Objects
 ^^^^^^^^^^^^^^^^^^
 
-Native OSM object classes are lightwight wrappers around the osmium OSM
+Native OSM object classes are lightwight wrappers around the npyosmium OSM
 data classes. They are immutable and generally bound to the lifetime of
 the buffer they are saved in.
 
 There are five classes representing the basic OSM entities.
 
-.. autoclass:: osmium.osm.OSMObject
+.. autoclass:: npyosmium.osm.OSMObject
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Node
+.. autoclass:: npyosmium.osm.Node
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Way
+.. autoclass:: npyosmium.osm.Way
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Relation
+.. autoclass:: npyosmium.osm.Relation
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Area
+.. autoclass:: npyosmium.osm.Area
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Changeset
+.. autoclass:: npyosmium.osm.Changeset
     :members:
     :undoc-members:
 
@@ -42,23 +42,23 @@ There are five classes representing the basic OSM entities.
 Mutable OSM Objects
 ^^^^^^^^^^^^^^^^^^^
 
-The objects in ``osmium.osm.mutable`` are Python versions of the native OSM
+The objects in ``npyosmium.osm.mutable`` are Python versions of the native OSM
 objects that can be modified. You can use these classes as a base class for
 your own objects or to modify objects read from a file.
 
-.. autoclass:: osmium.osm.mutable.OSMObject
+.. autoclass:: npyosmium.osm.mutable.OSMObject
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.mutable.Node
+.. autoclass:: npyosmium.osm.mutable.Node
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.mutable.Way
+.. autoclass:: npyosmium.osm.mutable.Way
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.mutable.Relation
+.. autoclass:: npyosmium.osm.mutable.Relation
     :members:
     :undoc-members:
 
@@ -67,27 +67,27 @@ Node Reference Lists
 ^^^^^^^^^^^^^^^^^^^^
 
 Line geometries in OSM are simply a sequence of nodes. To simplify processing
-osmium returns such node sequences using a special datatype that contains a
+npyosmium returns such node sequences using a special datatype that contains a
 reference to the node id and also the location geometry. The latter is only
 valid if the node locations have been cached by a location handler.
 
-.. autoclass:: osmium.osm.NodeRef
+.. autoclass:: npyosmium.osm.NodeRef
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.NodeRefList
+.. autoclass:: npyosmium.osm.NodeRefList
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.WayNodeList
+.. autoclass:: npyosmium.osm.WayNodeList
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.OuterRing
+.. autoclass:: npyosmium.osm.OuterRing
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.InnerRing
+.. autoclass:: npyosmium.osm.InnerRing
     :members:
     :undoc-members:
 
@@ -95,22 +95,22 @@ valid if the node locations have been cached by a location handler.
 Relation member lists
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: osmium.osm.RelationMember
+.. autoclass:: npyosmium.osm.RelationMember
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.RelationMemberList
+.. autoclass:: npyosmium.osm.RelationMemberList
     :members:
     :undoc-members:
 
 Tag lists
 ^^^^^^^^^
 
-.. autoclass:: osmium.osm.Tag
+.. autoclass:: npyosmium.osm.Tag
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.TagList
+.. autoclass:: npyosmium.osm.TagList
     :members:
     :undoc-members:
 
@@ -118,11 +118,11 @@ Tag lists
 Geometry Attributes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: osmium.osm.Box
+.. autoclass:: npyosmium.osm.Box
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.osm.Location
+.. autoclass:: npyosmium.osm.Location
     :members:
     :undoc-members:
 

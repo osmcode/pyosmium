@@ -5,7 +5,7 @@
 # Copyright (C) 2022 Sarah Hoffmann.
 import pytest
 
-import osmium as o
+import npyosmium as o
 
 @pytest.fixture
 def tag_handler(simple_handler):
@@ -30,7 +30,7 @@ def test_empty_taglist_length(tag_handler):
         assert 0 == len(n.tags)
         assert not n.tags
         assert str(n.tags) == '{}'
-        assert repr(n.tags) == 'osmium.osm.TagList({})'
+        assert repr(n.tags) == 'npyosmium.osm.TagList({})'
 
     tags = tag_handler("n234 x1 y2", tests)
     assert tags == {}
@@ -91,7 +91,7 @@ def test_taglist_contains(tag_handler):
         assert None not in n.tags
         assert "" not in n.tags
         assert str(n.tags) == '{abba=x,2=vvv,xx=abba}'
-        assert repr(n.tags) == "osmium.osm.TagList({'abba': 'x', '2': 'vvv', 'xx': 'abba'})"
+        assert repr(n.tags) == "npyosmium.osm.TagList({'abba': 'x', '2': 'vvv', 'xx': 'abba'})"
 
     tags = tag_handler("n234 Tabba=x,2=vvv,xx=abba", tests)
 

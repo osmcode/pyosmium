@@ -8,7 +8,7 @@ we are interested in and remember the nodes required. Then, in a second
 run all the relevant nodes and ways are written out.
 """
 
-import osmium as o
+import npyosmium as o
 import sys
 
 class WayFilter(o.SimpleHandler):

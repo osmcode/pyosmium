@@ -4,7 +4,7 @@ a string buffer.
 
 Shows how to use input from strings.
 """
-import osmium as o
+import npyosmium as o
 import sys
 try:
     import urllib.request as urlrequest

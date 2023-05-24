@@ -2,10 +2,10 @@
 Extract all objects with an amenity tag from an osm file and list them
 with their name and position.
 
-This example shows how geometries from osmium objects can be imported
+This example shows how geometries from npyosmium objects can be imported
 into shapely using the WKBFactory.
 """
-import osmium as o
+import npyosmium as o
 import sys
 import shapely.wkb as wkblib
 

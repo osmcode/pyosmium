@@ -18,7 +18,7 @@ python libraries that are compiled. If you see a segmentation fault when
 importing pyosmium together with other libraries, try installing the
 source code version of pyosmium. This can be done with pip::
 
-    pip install --no-binary :all: osmium
+    pip install --no-binary :all: npyosmium
 
 You need to first install the dependencies listed in the README.
 

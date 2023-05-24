@@ -1,20 +1,24 @@
+# npyosmium
+
+Fork of [pyosmium](https://github.com/osmcode/pyosmium), including (only one for the time being) efficient numpy interface.
+
 # pyosmium
 
 Provides Python bindings for the [Libosmium](https://github.com/osmcode/libosmium) C++
 library, a library for working with OpenStreetMap data in a fast and flexible
 manner.
 
-[![Github Actions Build Status](https://github.com/osmcode/pyosmium/workflows/CI/badge.svg)](https://github.com/osmcode/pyosmium/actions?query=workflow%3ACI)
+[![Github Actions Build Status](https://github.com/agrenott/npyosmium/workflows/CI/badge.svg)](https://github.com/agrenott/nyosmium/actions?query=workflow%3ACI)
 
 ## Installation
 
-Pyosmium works with Python >= 3.6. Pypy is known to not work.
+npyosmium works with Python >= 3.7. Pypy is known to not work.
 
 ### Using Pip
 
-The recommended way to install pyosmium is via pip:
+The recommended way to install npyosmium is via pip:
 
-    pip install osmium
+    pip install npyosmium
 
 We provide binary wheels for Linux and Windows 64 for all actively
 maintained Python versions.
@@ -31,7 +35,7 @@ command installs all required packages:
 
 #### Prerequisites
 
-pyosmium has the following dependencies:
+npyosmium has the following dependencies:
 
  * [libosmium](https://github.com/osmcode/libosmium) >= 2.16.0
  * [protozero](https://github.com/mapbox/protozero)
@@ -105,7 +109,7 @@ For building the man pages for the tools run:
 ## Bugs and Questions
 
 If you find bugs or have feature requests, please report those in the
-[github issue tracker](https://github.com/osmcode/pyosmium/issues/).
+[github issue tracker](https://github.com/agrenott/npyosmium/issues/).
 
 For general questions about using pyosmium you can use the
 [OSM development mailing list](https://lists.openstreetmap.org/listinfo/dev)
@@ -113,7 +117,7 @@ or ask on [OSM help](https://help.openstreetmap.org/).
 
 ## License
 
-Pyosmium is available under the BSD 2-Clause License. See LICENSE.TXT.
+npyosmium is available under the BSD 2-Clause License. See LICENSE.TXT.
 
 ## Authors
 

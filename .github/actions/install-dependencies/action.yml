@@ -20,9 +20,9 @@ runs:
         - name: Install package dependencies (release)
           run: |
               export PATH=$PATH:/c/msys64/usr/bin
-              OSMIUM_VER=`grep libosmium_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
-              PROTOZERO_VER=`grep protozero_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
-              PYBIND_VER=`grep pybind11_version src/osmium/version.py | sed "s:.*= '::;s:'.*::"`
+              OSMIUM_VER=`grep libosmium_version src/npyosmium/version.py | sed "s:.*= '::;s:'.*::"`
+              PROTOZERO_VER=`grep protozero_version src/npyosmium/version.py | sed "s:.*= '::;s:'.*::"`
+              PYBIND_VER=`grep pybind11_version src/npyosmium/version.py | sed "s:.*= '::;s:'.*::"`
               wget -O - https://github.com/osmcode/libosmium/archive/v$OSMIUM_VER.tar.gz | tar xz --one-top-level=contrib/libosmium --strip-components=1
               wget -O - https://github.com/mapbox/protozero/archive/v$PROTOZERO_VER.tar.gz | tar xz --one-top-level=contrib/protozero --strip-components=1
               wget -O - https://github.com/pybind/pybind11/archive/v$PYBIND_VER.tar.gz | tar xz --one-top-level=contrib/pybind11 --strip-components=1

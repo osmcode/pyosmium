@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2022 Sarah Hoffmann.
 import pytest
-import osmium as o
+import npyosmium as o
 
 def test_list_types():
     ml = o.index.map_types()

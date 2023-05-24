@@ -12,9 +12,9 @@ import requests.exceptions
 
 from helpers import mkdate, CountingHandler
 
-import osmium as o
-import osmium.replication.server as rserv
-import osmium.replication
+import npyosmium as o
+import npyosmium.replication.server as rserv
+import npyosmium.replication
 
 class RequestsResponses(BytesIO):
 
@@ -56,7 +56,7 @@ def test_get_newest_change_from_file(tmp_path):
     fn = tmp_path / 'change.opl'
     fn.write_text('n6365 v1 c63965061 t2018-10-29T03:56:07Z i8369524 ux x1 y7')
 
-    val = osmium.replication.newest_change_from_file(str(fn))
+    val = npyosmium.replication.newest_change_from_file(str(fn))
     assert val == mkdate(2018, 10, 29, 3, 56, 7)
 
 
@@ -73,7 +73,7 @@ class TestReplication:
                     raise self.url_exception
                 assert self.url_requests
                 return RequestsResponses(self.url_requests.pop(0))
-            monkeypatch.setattr(osmium.replication.server.requests.Session, "get", mock_get)
+            monkeypatch.setattr(npyosmium.replication.server.requests.Session, "get", mock_get)
 
             def mk_server(*args, **kwargs):
                 return rserv.ReplicationServer(*args, **kwargs)

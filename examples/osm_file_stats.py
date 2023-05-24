@@ -3,7 +3,7 @@ Simple example that counts the number of objects in an osm file.
 
 Shows how to write a handler for the different types of objects.
 """
-import osmium as o
+import npyosmium as o
 import sys
 
 class FileStatsHandler(o.SimpleHandler):

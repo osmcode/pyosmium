@@ -3,7 +3,7 @@ Compute the total length of highways in an osm file.
 
 Shows how to extract the geometry of a way.
 """
-import osmium as o
+import npyosmium as o
 import sys
 
 class RoadLengthHandler(o.SimpleHandler):

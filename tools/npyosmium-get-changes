@@ -20,7 +20,7 @@ the sequence number will not be printed. You must write it to a file in that
 case.
 
 Some OSM data sources require a cookie to be sent with the HTTP requests.
-pyosmium-get-changes does not fetch the cookie from these services for you.
+npyosmium-get-changes does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
 cookies to the server and will save received cookies to the jar file.
 """
@@ -29,11 +29,11 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeEr
 import datetime as dt
 import http.cookiejar
 
-from osmium.replication import server as rserv
-from osmium.replication import newest_change_from_file
-from osmium.replication.utils import get_replication_header
-from osmium.version import pyosmium_release
-from osmium import SimpleHandler, WriteHandler
+from npyosmium.replication import server as rserv
+from npyosmium.replication import newest_change_from_file
+from npyosmium.replication.utils import get_replication_header
+from npyosmium.version import npyosmium_release
+from npyosmium import SimpleHandler, WriteHandler
 
 
 import re
@@ -120,7 +120,7 @@ def get_arg_parser(from_main=False):
         return re.sub(r'\s\s+' , " ", s)
 
     parser = ArgumentParser(description=__doc__,
-                            usage=None if from_main else 'pyosmium-get-changes [options]',
+                            usage=None if from_main else 'npyosmium-get-changes [options]',
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='count', default=0,
                         help='Increase verbosity (can be used multiple times)')
@@ -159,7 +159,7 @@ def get_arg_parser(from_main=False):
                         help='Do not deduplicate diffs.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
-    parser.add_argument('--version', action='version', version='pyosmium ' + pyosmium_release)
+    parser.add_argument('--version', action='version', version='npyosmium ' + npyosmium_release)
 
     return parser
 

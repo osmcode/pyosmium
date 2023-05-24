@@ -10,7 +10,7 @@ import pytest
 
 TEST_DIR = (Path(__file__) / '..').resolve()
 
-import osmium as o
+import npyosmium as o
 
 class DanglingReferenceBase:
     """ Base class for tests that try to keep a reference to the object

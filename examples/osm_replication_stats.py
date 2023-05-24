@@ -4,10 +4,10 @@ starting from a given timestamp for a maximum of n hours.
 
 Shows how to detect the different kind of modifications.
 """
-import osmium as o
+import npyosmium as o
 import sys
 import datetime as dt
-import osmium.replication.server as rserv
+import npyosmium.replication.server as rserv
 
 class Stats(object):
 

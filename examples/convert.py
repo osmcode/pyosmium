@@ -4,7 +4,7 @@ Converts a file from one format to another.
 This example shows how to write objects to a file.
 """
 
-import osmium as o
+import npyosmium as o
 
 import sys
 

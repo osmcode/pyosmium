@@ -12,17 +12,6 @@ jobs:
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
 
-            - name: Set up Python 3.6
-              uses: actions/setup-python@v4
-              with:
-                  python-version: 3.6
-
-            - name: Build package 3.6
-              run: |
-                pip install build wheel
-                python -m build
-              shell: bash
-
             - name: Set up Python 3.7
               uses: actions/setup-python@v4
               with:
@@ -81,7 +70,7 @@ jobs:
             - name: Upload Artifact
               uses: actions/upload-artifact@v3
               with:
-                  name: pyosmium-linux-x64-dist
+                  name: npyosmium-linux-x64-dist
                   path: dist
 
     test-default:
@@ -91,7 +80,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11"]
+                python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
 
         steps:
             - uses: actions/checkout@v3
@@ -103,11 +92,11 @@ jobs:
 
             - uses: actions/download-artifact@v3
               with:
-                  name: pyosmium-linux-x64-dist
+                  name: npyosmium-linux-x64-dist
 
-            - name: Install osmium
+            - name: Install npyosmium
               run: |
-                pip install osmium*${PYVER/./}*.whl
+                pip install npyosmium*${PYVER/./}*.whl
               shell: bash
               env:
                 PYVER: ${{ matrix.python-version }}
@@ -126,13 +115,13 @@ jobs:
                       cc: gcc-9
                       cxx: g++-9
                       platform: ubuntu-20.04
-                      python: 3.6
+                      python: 3.7
                       deps: release
                     - compiler: clang-old
-                      cc: clang-10.0
-                      cxx: clang++-10.0
+                      cc: clang-10
+                      cxx: clang++-10
                       platform: ubuntu-20.04
-                      python: 3.6
+                      python: 3.7
                       deps: release
                     - compiler: gcc
                       cc: gcc-11
@@ -217,19 +206,6 @@ jobs:
               run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
               shell: bash
 
-            - name: Set up Python 3.6
-              uses: actions/setup-python@v4
-              with:
-                  python-version: 3.6
-
-            - name: Build package 3.6
-              run: |
-                pip install build wheel
-                python -m build
-              shell: bash
-              env:
-                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
-
             - name: Set up Python 3.7
               uses: actions/setup-python@v4
               with:
@@ -298,7 +274,7 @@ jobs:
             - name: 'Upload Artifact'
               uses: actions/upload-artifact@v3
               with:
-                  name: pyosmium-win64-dist
+                  name: npyosmium-win64-dist
                   path: dist
 
     test-windows:
@@ -308,7 +284,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
+                python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
         env:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
@@ -323,11 +299,11 @@ jobs:
 
             - uses: actions/download-artifact@v3
               with:
-                  name: pyosmium-win64-dist
+                  name: npyosmium-win64-dist
 
-            - name: Install osmium
+            - name: Install npyosmium
               run: |
-                pip install osmium*${PYVER/./}*.whl
+                pip install npyosmium*${PYVER/./}*.whl
               shell: bash
               env:
                 PYVER: ${{ matrix.python-version }}

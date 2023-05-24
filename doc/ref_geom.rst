@@ -7,15 +7,15 @@ Note: remember to apply a location handler before in order to use these geometry
 Geometry Factories
 ^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: osmium.geom.WKBFactory
+.. autoclass:: npyosmium.geom.WKBFactory
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.geom.WKTFactory
+.. autoclass:: npyosmium.geom.WKTFactory
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.geom.GeoJSONFactory
+.. autoclass:: npyosmium.geom.GeoJSONFactory
     :members:
     :undoc-members:
 
@@ -23,4 +23,4 @@ Geometry Factories
 Other Functions
 ^^^^^^^^^^^^^^^
 
-.. autofunction:: osmium.geom.haversine_distance
+.. autofunction:: npyosmium.geom.haversine_distance

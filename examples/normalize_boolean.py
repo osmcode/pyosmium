@@ -3,7 +3,7 @@ This example shows how to filter and modify tags and write the results back.
 It changes all tag values 'yes/no' to '1/0'.
 """
 
-import osmium as o
+import npyosmium as o
 import sys
 
 class BoolNormalizer(o.SimpleHandler):
@@ -19,8 +19,8 @@ class BoolNormalizer(o.SimpleHandler):
 
         # new tags should be kept in a list so that the order is preserved
         newtags = []
-        # pyosmium is much faster writing an original osmium object than
-        # a osmium.mutable.*. Therefore, keep track if the tags list was
+        # npyosmium is much faster writing an original osmium object than
+        # a npyosmium.mutable.*. Therefore, keep track if the tags list was
         # actually changed.
         modified = False
         for t in o.tags:

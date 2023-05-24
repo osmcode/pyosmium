@@ -7,8 +7,8 @@ import json
 
 import pytest
 
-import osmium as o
-import osmium.geom
+import npyosmium as o
+import npyosmium.geom
 
 wkbfab = o.geom.WKBFactory()
 

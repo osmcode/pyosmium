@@ -2,12 +2,12 @@
 """
 from datetime import datetime, timezone
 
-import osmium
+import npyosmium
 
 def mkdate(*args):
     return datetime(*args, tzinfo=timezone.utc)
 
-class CountingHandler(osmium.SimpleHandler):
+class CountingHandler(npyosmium.SimpleHandler):
 
     def __init__(self):
         super(CountingHandler, self).__init__()

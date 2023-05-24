@@ -8,7 +8,7 @@ apply updates.
 Replication Server Class
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: osmium.replication.server.ReplicationServer
+.. autoclass:: npyosmium.replication.server.ReplicationServer
     :members:
     :undoc-members:
 

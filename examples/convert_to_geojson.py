@@ -6,7 +6,7 @@ This demonstrates how to use the GeoJSON factory.
 import sys
 import json
 
-import osmium as o
+import npyosmium as o
 
 geojsonfab = o.geom.GeoJSONFactory()
 

@@ -8,24 +8,24 @@ from typing import Optional, Union, Any, Mapping, Sequence, Tuple, TYPE_CHECKING
 from datetime import datetime
 
 if TYPE_CHECKING:
-    import osmium.osm
+    import npyosmium.osm
 
-    OSMObjectLike = Union['OSMObject', osmium.osm.OSMObject]
-    NodeLike = Union[Node, osmium.osm.Node]
-    WayLike = Union[Way, osmium.osm.Way]
-    RelationLike = Union[Relation, osmium.osm.Relation]
+    OSMObjectLike = Union['OSMObject', npyosmium.osm.OSMObject[Any]]
+    NodeLike = Union["Node", npyosmium.osm.Node]
+    WayLike = Union["Way", npyosmium.osm.Way]
+    RelationLike = Union["Relation", npyosmium.osm.Relation]
 
-    TagSequence = Union[osmium.osm.TagList, Mapping[str, str], Sequence[Tuple[str, str]]]
-    LocationLike = Union[osmium.osm.Location, Tuple[float, float]]
-    NodeSequence = Union[osmium.osm.NodeRefList, Sequence[Union[osmium.osm.NodeRef, int]]]
-    MemberSequence = Union[osmium.osm.RelationMemberList,
-                       Sequence[Union[osmium.osm.RelationMember, Tuple[str, int, str]]]]
+    TagSequence = Union[npyosmium.osm.TagList, Mapping[str, str], Sequence[Tuple[str, str]]]
+    LocationLike = Union[npyosmium.osm.Location, Tuple[float, float]]
+    NodeSequence = Union[npyosmium.osm.NodeRefList, Sequence[Union[npyosmium.osm.NodeRef, int]]]
+    MemberSequence = Union[npyosmium.osm.RelationMemberList,
+                       Sequence[Union[npyosmium.osm.RelationMember, Tuple[str, int, str]]]]
 
 class OSMObject:
-    """Mutable version of ``osmium.osm.OSMObject``. It exposes the following
+    """Mutable version of ``npyosmium.osm.OSMObject``. It exposes the following
        attributes ``id``, ``version``, ``visible``, ``changeset``, ``timestamp``,
        ``uid`` and ``tags``. Timestamps may be strings or datetime objects.
-       Tags can be an osmium.osm.TagList, a dict-like object
+       Tags can be an npyosmium.osm.TagList, a dict-like object
        or a list of tuples, where each tuple contains a (key value) string pair.
 
        If the ``base`` parameter is given in the constructor, then the object
@@ -58,9 +58,9 @@ class OSMObject:
 
 
 class Node(OSMObject):
-    """The mutable version of ``osmium.osm.Node``. It inherits all attributes
-       from osmium.osm.mutable.OSMObject and adds a `location` attribute. This
-       may either be an `osmium.osm.Location` or a tuple of lon/lat coordinates.
+    """The mutable version of ``npyosmium.osm.Node``. It inherits all attributes
+       from npyosmium.osm.mutable.OSMObject and adds a `location` attribute. This
+       may either be an `npyosmium.osm.Location` or a tuple of lon/lat coordinates.
     """
 
     def __init__(self, base: Optional['NodeLike'] = None,
@@ -74,10 +74,10 @@ class Node(OSMObject):
 
 
 class Way(OSMObject):
-    """The mutable version of ``osmium.osm.Way``. It inherits all attributes
-       from osmium.osm.mutable.OSMObject and adds a `nodes` attribute. This may
-       either be and ``osmium.osm.NodeList`` or a list consisting of
-       ``osmium.osm.NodeRef`` or simple node ids.
+    """The mutable version of ``npyosmium.osm.Way``. It inherits all attributes
+       from npyosmium.osm.mutable.OSMObject and adds a `nodes` attribute. This may
+       either be and ``npyosmium.osm.NodeList`` or a list consisting of
+       ``npyosmium.osm.NodeRef`` or simple node ids.
     """
 
     def __init__(self, base: Optional['WayLike'] = None,
@@ -89,10 +89,10 @@ class Way(OSMObject):
             self.nodes = nodes if nodes is not None else base.nodes
 
 class Relation(OSMObject):
-    """The mutable version of ``osmium.osm.Relation``. It inherits all attributes
-       from osmium.osm.mutable.OSMObject and adds a `members` attribute. This
-       may either be an ``osmium.osm.RelationMemberList`` or a list consisting
-       of ``osmium.osm.RelationMember`` or tuples of (type, id, role). The
+    """The mutable version of ``npyosmium.osm.Relation``. It inherits all attributes
+       from npyosmium.osm.mutable.OSMObject and adds a `members` attribute. This
+       may either be an ``npyosmium.osm.RelationMemberList`` or a list consisting
+       of ``npyosmium.osm.RelationMember`` or tuples of (type, id, role). The
        member type should be a single character 'n', 'w' or 'r'.
     """
 

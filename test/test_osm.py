@@ -9,7 +9,7 @@ import pytest
 
 from helpers import mkdate
 
-import osmium as o
+import npyosmium as o
 
 def apply_simple(handler, data, locations, tmp_path):
     handler.apply_buffer(data.encode('utf-8'), 'opl', locations=locations)
@@ -64,7 +64,7 @@ def test_invalid_location():
     loc = o.osm.Location()
     assert not loc.valid()
     assert str(loc) == 'invalid'
-    assert repr(loc) == 'osmium.osm.Location()'
+    assert repr(loc) == 'npyosmium.osm.Location()'
 
     with pytest.raises(o.InvalidLocationError):
         lat = loc.lat
@@ -82,7 +82,7 @@ def test_valid_location():
     assert loc.x == -10000000
     assert loc.y == 100000000
     assert re.fullmatch('-1.0*/10.0*', str(loc))
-    assert repr(loc) == 'osmium.osm.Location(x=-10000000, y=100000000)'
+    assert repr(loc) == 'npyosmium.osm.Location(x=-10000000, y=100000000)'
 
 
 def test_node_attributes(test_importer):
@@ -97,7 +97,7 @@ def test_node_attributes(test_importer):
         assert n.user == u'änonymous'
         assert n.positive_id() == 1
         assert str(n) == 'n1: location=invalid tags={}'
-        assert repr(n) == "osmium.osm.Node(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user='änonymous', tags=osmium.osm.TagList({}), location=osmium.osm.Location())"
+        assert repr(n) == "npyosmium.osm.Node(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user='änonymous', tags=npyosmium.osm.TagList({}), location=npyosmium.osm.Location())"
 
     assert 1 == test_importer('n1 v5 c58674 t2014-01-31T06:23:35Z i42 uänonymous',
                               node=node)
@@ -132,10 +132,10 @@ def test_way_attributes(test_importer):
         assert not o.ends_have_same_location()
 
         assert str(o) == 'w1: nodes=[1@0.0000000/0.0000000,2,3@1.0000000/1.0000000] tags={}'
-        assert repr(o) == "osmium.osm.Way(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user='anonymous', tags=osmium.osm.TagList({}), nodes=osmium.osm.WayNodeList([osmium.osm.NodeRef(ref=1, location=osmium.osm.Location(x=0, y=0)), osmium.osm.NodeRef(ref=2, location=osmium.osm.Location()), osmium.osm.NodeRef(ref=3, location=osmium.osm.Location(x=10000000, y=10000000))]))"
+        assert repr(o) == "npyosmium.osm.Way(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user='anonymous', tags=npyosmium.osm.TagList({}), nodes=npyosmium.osm.WayNodeList([npyosmium.osm.NodeRef(ref=1, location=npyosmium.osm.Location(x=0, y=0)), npyosmium.osm.NodeRef(ref=2, location=npyosmium.osm.Location()), npyosmium.osm.NodeRef(ref=3, location=npyosmium.osm.Location(x=10000000, y=10000000))]))"
 
         assert str(o.nodes) == '[1@0.0000000/0.0000000,2,3@1.0000000/1.0000000]'
-        assert repr(o.nodes) == "osmium.osm.WayNodeList([osmium.osm.NodeRef(ref=1, location=osmium.osm.Location(x=0, y=0)), osmium.osm.NodeRef(ref=2, location=osmium.osm.Location()), osmium.osm.NodeRef(ref=3, location=osmium.osm.Location(x=10000000, y=10000000))])"
+        assert repr(o.nodes) == "npyosmium.osm.WayNodeList([npyosmium.osm.NodeRef(ref=1, location=npyosmium.osm.Location(x=0, y=0)), npyosmium.osm.NodeRef(ref=2, location=npyosmium.osm.Location()), npyosmium.osm.NodeRef(ref=3, location=npyosmium.osm.Location(x=10000000, y=10000000))])"
 
     assert 1 == test_importer(['n1 x0 y0', 'n3 x1 y1',
                                'w1 v5 c58674 t2014-01-31T06:23:35Z i42 uanonymous Nn1,n2,n3'],
@@ -156,10 +156,10 @@ def test_relation_attributes(test_importer):
         assert o.positive_id() == 1
 
         assert str(o) == 'r1: members=[w1], tags={}'
-        assert repr(o) == "osmium.osm.Relation(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user=' anonymous', tags=osmium.osm.TagList({}), members=osmium.osm.RelationMemberList([osmium.osm.RelationMember(ref=1, type='w', role='')]))"
+        assert repr(o) == "npyosmium.osm.Relation(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user=' anonymous', tags=npyosmium.osm.TagList({}), members=npyosmium.osm.RelationMemberList([npyosmium.osm.RelationMember(ref=1, type='w', role='')]))"
 
         assert str(o.members) == '[w1]'
-        assert repr(o.members) == "osmium.osm.RelationMemberList([osmium.osm.RelationMember(ref=1, type='w', role='')])"
+        assert repr(o.members) == "npyosmium.osm.RelationMemberList([npyosmium.osm.RelationMember(ref=1, type='w', role='')])"
 
     assert 1 == test_importer('r1 v5 c58674 t2014-01-31T06:23:35Z i42 u%20%anonymous Mw1@',
                               relation=relation)
@@ -244,7 +244,7 @@ def test_changest_attributes(area_importer):
         assert -1465242 == c.bounds.bottom_left.x
         assert 515288506 == c.bounds.bottom_left.y
         assert str(c) == 'c34: closed_at=2005-04-09 20:54:39+00:00, bounds=(-0.1465242/51.5288506 -0.1464925/51.5288620), tags={}'
-        assert repr(c) == "osmium.osm.Changeset(id=34, uid=1, created_at=datetime.datetime(2005, 4, 9, 19, 54, 13, tzinfo=datetime.timezone.utc), closed_at=datetime.datetime(2005, 4, 9, 20, 54, 39, tzinfo=datetime.timezone.utc), open=False, num_changes=2, bounds=osmium.osm.Box(bottom_left=osmium.osm.Location(x=-1465242, y=515288506), top_right=osmium.osm.Location(x=-1464925, y=515288620)), user='Steve', tags=osmium.osm.TagList({}))"
+        assert repr(c) == "npyosmium.osm.Changeset(id=34, uid=1, created_at=datetime.datetime(2005, 4, 9, 19, 54, 13, tzinfo=datetime.timezone.utc), closed_at=datetime.datetime(2005, 4, 9, 20, 54, 39, tzinfo=datetime.timezone.utc), open=False, num_changes=2, bounds=npyosmium.osm.Box(bottom_left=npyosmium.osm.Location(x=-1465242, y=515288506), top_right=npyosmium.osm.Location(x=-1464925, y=515288620)), user='Steve', tags=npyosmium.osm.TagList({}))"
 
     assert 1 == area_importer('c34 k2 s2005-04-09T19:54:13Z e2005-04-09T20:54:39Z '
                                'd34 i1 uSteve x-0.1465242 y51.5288506 X-0.1464925 Y51.5288620',

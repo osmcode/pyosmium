@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(pyosmium VERSION 3.6.0)
+project(npyosmium VERSION 3.6.0)
 
 option(WITH_LZ4 "Build with lz4 support for PBF files" ON)
 
@@ -64,7 +64,7 @@ set(PYOSMIUM_MODULES geom index io)
 
 foreach(PYMOD geom index io)
     pybind11_add_module(${PYMOD} lib/${PYMOD}.cc)
-    set_module_output(${PYMOD} osmium)
+    set_module_output(${PYMOD} npyosmium)
     target_link_libraries(${PYMOD} PRIVATE ${OSMIUM_LIBRARIES})
     if(APPLE)
         set_target_properties(${PYMOD} PROPERTIES CXX_VISIBILITY_PRESET "default")
@@ -72,15 +72,15 @@ foreach(PYMOD geom index io)
 endforeach()
 
 pybind11_add_module(_osm lib/osm.cc)
-set_module_output(_osm osmium/osm)
+set_module_output(_osm npyosmium/osm)
 pybind11_add_module(_osmium
                     lib/osmium.cc
                     lib/merge_input_reader.cc
                     lib/simple_writer.cc
                     lib/write_handler.cc)
-set_module_output(_osmium osmium)
+set_module_output(_osmium npyosmium)
 pybind11_add_module(_replication lib/replication.cc)
-set_module_output(_replication osmium/replication)
+set_module_output(_replication npyosmium/replication)
 
 target_link_libraries(_osmium PRIVATE ${OSMIUM_LIBRARIES})
 target_link_libraries(_replication PRIVATE ${OSMIUM_LIBRARIES})

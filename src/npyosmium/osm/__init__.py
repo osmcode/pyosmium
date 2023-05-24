@@ -5,9 +5,9 @@
 # Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 
-from osmium.osm.mutable import create_mutable_node, create_mutable_way, create_mutable_relation
+from npyosmium.osm.mutable import create_mutable_node, create_mutable_way, create_mutable_relation
 
-from osmium.osm.types import (OSMObject as OSMObject,
+from npyosmium.osm.types import (OSMObject as OSMObject,
                               Node as Node,
                               Way as Way,
                               Relation as Relation,
@@ -23,7 +23,7 @@ from osmium.osm.types import (OSMObject as OSMObject,
                               RelationMember as RelationMember,
                               RelationMemberList as RelationMemberList)
 
-from osmium.osm._osm import (Location as Location,
+from npyosmium.osm._osm import (Location as Location,
                              Box as Box,
                              osm_entity_bits as osm_entity_bits,
                              NOTHING as NOTHING,
@@ -36,12 +36,12 @@ from osmium.osm._osm import (Location as Location,
                              ALL as ALL)
 
 setattr(Location, '__repr__',
-        lambda l: f'osmium.osm.Location(x={l.x!r}, y={l.y!r})'
-                      if l.valid() else 'osmium.osm.Location()')
+        lambda l: f'npyosmium.osm.Location(x={l.x!r}, y={l.y!r})'
+                      if l.valid() else 'npyosmium.osm.Location()')
 setattr(Location, '__str__',
         lambda l: f'{l.lon_without_check():.7f}/{l.lat_without_check():.7f}'
                       if l.valid() else 'invalid')
 
-setattr(Box, '__repr__', lambda b: f"osmium.osm.Box(bottom_left={b.bottom_left!r}, top_right={b.top_right!r})")
+setattr(Box, '__repr__', lambda b: f"npyosmium.osm.Box(bottom_left={b.bottom_left!r}, top_right={b.top_right!r})")
 setattr(Box, '__str__', lambda b: f'({b.bottom_left!s} {b.top_right!s})')
 

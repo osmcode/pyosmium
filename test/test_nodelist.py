@@ -5,7 +5,7 @@
 # Copyright (C) 2022 Sarah Hoffmann.
 import pytest
 
-import osmium as o
+import npyosmium as o
 
 def test_waynode_length(simple_handler):
     data = """\

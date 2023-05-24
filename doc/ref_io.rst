@@ -3,10 +3,10 @@
 
 This module exposes the generic file reader.
 
-.. autoclass:: osmium.io.Reader
+.. autoclass:: npyosmium.io.Reader
     :members:
     :undoc-members:
 
-.. autoclass:: osmium.io.Header
+.. autoclass:: npyosmium.io.Header
     :members:
     :undoc-members:

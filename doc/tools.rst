@@ -1,7 +1,7 @@
-Pyosmium Tools
-==============
+npyosmium Tools
+===============
 
-Pyosmium comes with a couple of scripts for handling change files:
+npyosmium comes with a couple of scripts for handling change files:
 
 .. toctree::
     :maxdepth: 1

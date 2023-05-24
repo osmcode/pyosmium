@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2022 Sarah Hoffmann.
 
-import osmium as o
+import npyosmium as o
 
 def test_member_list_length(simple_handler):
     data = """\

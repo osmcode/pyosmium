@@ -7,16 +7,16 @@
 from typing import Sequence, Any, NamedTuple, Callable, Optional, Iterator, Iterable, TYPE_CHECKING, TypeVar, Generic, Tuple
 import datetime as dt
 
-import osmium.osm.mutable
+import npyosmium.osm.mutable
 
 
 if TYPE_CHECKING:
-    import osmium.osm._osm as cosm
+    import npyosmium.osm._osm as cosm
 
 T_obj = TypeVar('T_obj', 'cosm.COSMNode', 'cosm.COSMWay', 'cosm.COSMRelation', 'cosm.COSMArea')
 
 def _make_repr(name: str, *attrs: str) -> Callable[[Any], str]:
-    fmt_string = f'osmium.osm.{name}('\
+    fmt_string = f'npyosmium.osm.{name}('\
                  + ', '.join([f'{x}={{0.{x}!r}}' for x in attrs])\
                  + ')'
 
@@ -24,7 +24,7 @@ def _make_repr(name: str, *attrs: str) -> Callable[[Any], str]:
         if self._pyosmium_data.is_valid():
             return fmt_string.format(self)
 
-        return f'osmium.osm.{name}(<invalid>)'
+        return f'npyosmium.osm.{name}(<invalid>)'
 
     return _repr
 
@@ -66,7 +66,7 @@ class TagIterator:
 class TagList(Iterable[Tag]):
     """ A fixed list of tags. The list is exported as an unmutable,
         dictionary-like object where the keys are tag strings and the
-        items are :py:class:`osmium.osm.Tag`.
+        items are :py:class:`npyosmium.osm.Tag`.
     """
 
     def __init__(self, parent: 'cosm.TagContainerProtocol') -> None:
@@ -112,14 +112,14 @@ class TagList(Iterable[Tag]):
         else:
             tagstr = '<invalid>'
 
-        return f"osmium.osm.TagList({{{tagstr}}})"
+        return f"npyosmium.osm.TagList({{{tagstr}}})"
 
 
 class NodeRef:
     """ A reference to a OSM node that also caches the nodes location.
     """
 
-    def __init__(self, location: 'osmium.osm.Location', ref: int) -> None:
+    def __init__(self, location: 'npyosmium.osm.Location', ref: int) -> None:
         self.location = location
         self.ref = ref
 
@@ -154,12 +154,12 @@ class NodeRef:
         return str(self.ref)
 
     def __repr__(self) -> str:
-        return f"osmium.osm.NodeRef(ref={self.ref!r}, location={self.location!r})"
+        return f"npyosmium.osm.NodeRef(ref={self.ref!r}, location={self.location!r})"
 
 
 class NodeRefList:
     """ A list of node references, implemented as
-        an immutable sequence of :py:class:`osmium.osm.NodeRef`. This class
+        an immutable sequence of :py:class:`npyosmium.osm.NodeRef`. This class
         is normally not used directly, use one of its subclasses instead.
     """
 
@@ -181,8 +181,8 @@ class NodeRefList:
     def ends_have_same_location(self) -> bool:
         """ True if the start and end node of the way are at the same location. "
             Expects that the coordinates of the way nodes have been loaded
-            (see :py:func:`osmium.SimpleHandler.apply_buffer` and
-            :py:func:`osmium.SimpleHandler.apply_file`).
+            (see :py:func:`npyosmium.SimpleHandler.apply_buffer` and
+            :py:func:`npyosmium.SimpleHandler.apply_file`).
             If the locations are not present then the function returns always true.
         """
         return self._list.ends_have_same_location(self._pyosmium_data)
@@ -208,23 +208,23 @@ class NodeRefList:
         else:
             nodes = '<invalid>'
 
-        return 'osmium.osm.{}([{}])'.format(self.__class__.__name__, nodes)
+        return 'npyosmium.osm.{}([{}])'.format(self.__class__.__name__, nodes)
 
 
 class WayNodeList(NodeRefList):
     """ List of nodes in a way.
-        For its members see :py:class:`osmium.osm.NodeRefList`.
+        For its members see :py:class:`npyosmium.osm.NodeRefList`.
     """
 
 
 class OuterRing(NodeRefList):
     """List of nodes in an outer ring.
-       For its members see :py:class:`osmium.osm.NodeRefList`.
+       For its members see :py:class:`npyosmium.osm.NodeRefList`.
     """
 
 class InnerRing(NodeRefList):
     """ List of nodes in an inner ring. "
-        For its members see :py:class:`osmium.osm.NodeRefList`.
+        For its members see :py:class:`npyosmium.osm.NodeRefList`.
     """
 
 class RelationMember:
@@ -251,7 +251,7 @@ class RelationMember:
         return f"{self.type}{self.ref:d}"
 
     def __repr__(self) -> str:
-        return f"osmium.osm.RelationMember(ref={self.ref!r}, type={self.type!r}, role={self.role!r})"
+        return f"npyosmium.osm.RelationMember(ref={self.ref!r}, type={self.type!r}, role={self.role!r})"
 
 
 class MemberIterator:
@@ -271,7 +271,7 @@ class MemberIterator:
 
 class RelationMemberList:
     """ An immutable  sequence of relation members
-        ":py:class:`osmium.osm.RelationMember`.
+        ":py:class:`npyosmium.osm.RelationMember`.
     """
 
     def __init__(self, parent: 'cosm.COSMRelation') -> None:
@@ -295,7 +295,7 @@ class RelationMemberList:
         else:
             members = '<invalid>'
 
-        return f'osmium.osm.RelationMemberList([{members}])'
+        return f'npyosmium.osm.RelationMemberList([{members}])'
 
 
 class OSMObject(Generic[T_obj]):
@@ -304,7 +304,7 @@ class OSMObject(Generic[T_obj]):
     """
     _pyosmium_data: T_obj
     tags: TagList
-    "(read-only) List of tags describing the object. See :py:class:`osmium.osm.TagList`."
+    "(read-only) List of tags describing the object. See :py:class:`npyosmium.osm.TagList`."
 
     @property
     def id(self) -> int:
@@ -378,10 +378,10 @@ class Node(OSMObject['cosm.COSMNode']):
 
     def __init__(self, cnode: 'cosm.COSMNode'):
         self._pyosmium_data = cnode
-        self._location: Optional['osmium.osm.Location'] = None
+        self._location: Optional['npyosmium.osm.Location'] = None
         self.tags = TagList(self._pyosmium_data)
 
-    def replace(self, **kwargs: Any) -> 'osmium.osm.mutable.Node':
+    def replace(self, **kwargs: Any) -> 'npyosmium.osm.mutable.Node':
         """ Create a mutable node replacing the properties given in the
             named parameters. The properties may be any of the properties
             of OSMObject or Node.
@@ -391,12 +391,12 @@ class Node(OSMObject['cosm.COSMNode']):
             To create a full copy use:
             ``node.replace(tags=dict(node.tags))``
         """
-        return osmium.osm.mutable.Node(self, **kwargs)
+        return npyosmium.osm.mutable.Node(self, **kwargs)
 
     @property
-    def location(self) -> 'osmium.osm.Location':
+    def location(self) -> 'npyosmium.osm.Location':
         """ The geographic coordinates of the node.
-            See :py:class:`osmium.osm.Location`.
+            See :py:class:`npyosmium.osm.Location`.
         """
         if self._location is None:
             self._location = self._pyosmium_data.location()
@@ -425,7 +425,7 @@ class Way(OSMObject['cosm.COSMWay']):
         self.tags = TagList(self._pyosmium_data)
         self._nodes: Optional[WayNodeList] = None
 
-    def replace(self, **kwargs: Any) -> 'osmium.osm.mutable.Way':
+    def replace(self, **kwargs: Any) -> 'npyosmium.osm.mutable.Way':
         """ Create a mutable way replacing the properties given in the
             named parameters. The properties may be any of the properties
             of OSMObject or Way.
@@ -435,12 +435,12 @@ class Way(OSMObject['cosm.COSMWay']):
             To create a full copy use:
             ``way.replace(tags=dict(way.tags), nodes=list(way.nodes))``
         """
-        return osmium.osm.mutable.Way(self, **kwargs)
+        return npyosmium.osm.mutable.Way(self, **kwargs)
 
     @property
     def nodes(self) -> WayNodeList:
         """ (read-only) Ordered list of nodes.
-            See :py:class:`osmium.osm.WayNodeList`.
+            See :py:class:`npyosmium.osm.WayNodeList`.
         """
         if self._nodes is None:
             self._nodes = WayNodeList(self._pyosmium_data, self._pyosmium_data.nodes())
@@ -461,8 +461,8 @@ class Way(OSMObject['cosm.COSMWay']):
     def ends_have_same_location(self) -> bool:
         """ True if the start and end node of the way are at the same location.
             Expects that the coordinates of the way nodes have been loaded
-            (see :py:func:`osmium.SimpleHandler.apply_buffer` and
-            :py:func:`osmium.SimpleHandler.apply_file`).
+            (see :py:func:`npyosmium.SimpleHandler.apply_buffer` and
+            :py:func:`npyosmium.SimpleHandler.apply_file`).
             If the locations are not present then the function returns always true.
         """
         return self._pyosmium_data.ends_have_same_location()
@@ -483,7 +483,7 @@ class Relation(OSMObject['cosm.COSMRelation']):
     """
     members: RelationMemberList
     """(read-only) Ordered list of relation members.
-       See :py:class:`osmium.osm.RelationMemberList`.
+       See :py:class:`npyosmium.osm.RelationMemberList`.
     """
 
     def __init__(self, crelation: 'cosm.COSMRelation'):
@@ -491,7 +491,7 @@ class Relation(OSMObject['cosm.COSMRelation']):
         self.tags = TagList(self._pyosmium_data)
         self.members = RelationMemberList(self._pyosmium_data)
 
-    def replace(self, **kwargs: Any) -> 'osmium.osm.mutable.Relation':
+    def replace(self, **kwargs: Any) -> 'npyosmium.osm.mutable.Relation':
         """ Create a mutable relation replacing the properties given in the
             named parameters. The properties may be any of the properties
             of OSMObject or Relation.
@@ -501,7 +501,7 @@ class Relation(OSMObject['cosm.COSMRelation']):
             To create a full copy use:
             ``rel.replace(tags=dict(rel.tags), members=list(rel.members))``
         """
-        return osmium.osm.mutable.Relation(self, **kwargs)
+        return npyosmium.osm.mutable.Relation(self, **kwargs)
 
     def __str__(self) -> str:
         if self._pyosmium_data.is_valid():
@@ -608,7 +608,7 @@ class Changeset:
     """ A changeset description.
     """
     _pyosmium_data: 'cosm.COSMChangeset'
-    _bounds: Optional['osmium.osm.Box']
+    _bounds: Optional['npyosmium.osm.Box']
     tags: TagList
 
     def __init__(self, carea: 'cosm.COSMChangeset') -> None:
@@ -662,7 +662,7 @@ class Changeset:
         return self._pyosmium_data.user()
 
     @property
-    def bounds(self) -> 'osmium.osm.Box':
+    def bounds(self) -> 'npyosmium.osm.Box':
         """ (read-only) The bounding box of the area that was edited.
         """
         if self._bounds is None:

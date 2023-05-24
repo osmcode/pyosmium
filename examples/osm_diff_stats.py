@@ -4,7 +4,7 @@ Simple example that counts the number of changes in an osm diff file.
 Shows how to detect the different kind of modifications and how to
 use the handler generator function instead of a handler class.
 """
-import osmium as o
+import npyosmium as o
 import sys
 
 class Stats(object):

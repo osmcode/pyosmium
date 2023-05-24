@@ -1,8 +1,8 @@
-``osmium`` - Processing OSM files
----------------------------------
+``npyosmium`` - Processing OSM files
+------------------------------------
 
 Osmium processes files by reading data from a file and applying them
-to a processing chain. Pyosmium offers a simplified wrapper to this
+to a processing chain. npyosmium offers a simplified wrapper to this
 interface with the ``SimpleHandler`` class from which an OSM file processor
 can easily be derived.
 
@@ -16,7 +16,7 @@ An input handler provides the base class for writing custom
 data processors. They take input data, usually from a file, and forward
 it to handler functions.
 
-.. autoclass:: osmium.SimpleHandler
+.. autoclass:: npyosmium.SimpleHandler
     :members:
     :undoc-members:
 
@@ -24,7 +24,7 @@ SimpleWriter
 ^^^^^^^^^^^^
 
 The writer class can be used to create an OSM file. The writer is able to
-handle native ``osmium.osm`` objects as well as any Python object that
+handle native ``npyosmium.osm`` objects as well as any Python object that
 exposes the same attributes. It is not necessary to implement the full
 list of attributes as any missing attributes will be replaced with a
 sensible default value when writing. See :ref:`mutable-objects`
@@ -37,13 +37,13 @@ for a detailed discussion of the data formats understood for each attribute.
    possible. This is not only true for the OSM data types like Node, Way and
    Relation but also for tag lists, node lists and member lists.
 
-.. autoclass:: osmium.SimpleWriter
+.. autoclass:: npyosmium.SimpleWriter
     :members:
     :undoc-members:
 
 Low-level Functions and Classes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autofunction:: osmium.apply
+.. autofunction:: npyosmium.apply
 
-.. autofunction:: osmium.make_simple_handler
+.. autofunction:: npyosmium.make_simple_handler

@@ -12,7 +12,7 @@ take into account that processing the files requires additional memory
 The starting time is automatically determined from the data in the file.
 For PBF files, it is also possible to read and write the replication
 information from the osmosis headers. That means that after the first update,
-subsequent calls to pyosmium-up-to-date will continue the updates from the same
+subsequent calls to npyosmium-up-to-date will continue the updates from the same
 server exactly where they have left of.
 
 This program can update normal OSM data files as well as OSM history files.
@@ -26,7 +26,7 @@ could not be resolved). Any other error results in a return code larger than 1.
 The output file is guaranteed to be unmodified in that case.
 
 Some OSM data sources require a cookie to be sent with the HTTP requests. 
-Pyosmium-up-to-date does not fetch the cookie from these services for you.
+npyosmium-up-to-date does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
 cookies to the server and will save received cookies to the jar file.
 """
@@ -39,10 +39,10 @@ import http.cookiejar
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import datetime as dt
-from osmium.replication import server as rserv
-from osmium.replication.utils import get_replication_header
-from osmium.replication import newest_change_from_file
-from osmium.version import pyosmium_release
+from npyosmium.replication import server as rserv
+from npyosmium.replication.utils import get_replication_header
+from npyosmium.replication import newest_change_from_file
+from npyosmium.version import npyosmium_release
 from textwrap import dedent as msgfmt
 from tempfile import mktemp
 import os.path
@@ -121,7 +121,7 @@ def update_from_custom_server(url, seq, ts, options):
             ofname = outfile
 
         try:
-            extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
+            extra_headers = { 'generator' : 'npyosmium-up-to-date/' + npyosmium_release }
             outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
                                              max_size=options.outsize*1024,
                                              extra_headers=extra_headers,
@@ -185,7 +185,7 @@ def get_arg_parser(from_main=False):
         return re.sub("\s\s+" , " ", s)
 
     parser = ArgumentParser(description=__doc__,
-                            usage=None if from_main else 'pyosmium-up-to-date [options] <osm file>',
+                            usage=None if from_main else 'npyosmium-up-to-date [options] <osm file>',
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='count', default=0,
                         help='Increase verbosity (can be used multiple times)')
@@ -220,7 +220,7 @@ def get_arg_parser(from_main=False):
                               received cookies will be written to.""")
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
-    parser.add_argument('--version', action='version', version='pyosmium ' + pyosmium_release)
+    parser.add_argument('--version', action='version', version='npyosmium ' + npyosmium_release)
 
     return parser
 

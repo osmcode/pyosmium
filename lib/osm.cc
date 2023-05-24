@@ -55,7 +55,7 @@ static py::object tag_iterator_next(TagIterator &it, TagIterator const &cend)
     if (it == cend)
         throw pybind11::stop_iteration();
 
-    static auto const tag = pybind11::module_::import("osmium.osm.types").attr("Tag");
+    static auto const tag = pybind11::module_::import("npyosmium.osm.types").attr("Tag");
     auto const value = tag(it->key(), it->value());
     ++it;
 
@@ -68,7 +68,7 @@ static py::object member_iterator_next(MemberIterator &it, MemberIterator const 
     if (it == cend)
         throw pybind11::stop_iteration();
 
-    static auto const obj = pybind11::module_::import("osmium.osm.types").attr("RelationMember");
+    static auto const obj = pybind11::module_::import("npyosmium.osm.types").attr("RelationMember");
     auto const value = obj(it->ref(), item_type_to_char(it->type()), it->role());
     ++it;
 
@@ -100,7 +100,7 @@ static pybind11::object get_node_item(osmium::NodeRefList const *list, Py_ssize_
 
     auto const &node = (*list)[iout];
 
-    static auto const node_ref_t = pybind11::module_::import("osmium.osm.types").attr("NodeRef");
+    static auto const node_ref_t = pybind11::module_::import("npyosmium.osm.types").attr("NodeRef");
 
     return node_ref_t(node.location(), node.ref());
 }

@@ -9,7 +9,7 @@ import uuid
 
 import pytest
 
-import osmium as o
+import npyosmium as o
 
 from helpers import mkdate
 

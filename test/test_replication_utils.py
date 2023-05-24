@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2022 Sarah Hoffmann.
 
-import osmium.replication.utils as rutil
+import npyosmium.replication.utils as rutil
 
 from helpers import mkdate
 

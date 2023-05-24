@@ -1,10 +1,10 @@
 """
 Search for pubs in an osm file and list their names.
 """
-import osmium
+import npyosmium
 import sys
 
-class NamesHandler(osmium.SimpleHandler):
+class NamesHandler(npyosmium.SimpleHandler):
 
     def output_pubs(self, tags):
         if tags.get('amenity') == 'pub' and 'name' in tags:

@@ -14,10 +14,10 @@ data and whether or not the cache should be permanent. See the Osmium manual
 for a detailed explaination. The compiled in types can be listed with the
 ``map_types`` function, new stores can be created with ``create_map``.
 
-.. autofunction:: osmium.index.map_types
+.. autofunction:: npyosmium.index.map_types
 
-.. autofunction:: osmium.index.create_map
+.. autofunction:: npyosmium.index.create_map
 
-.. autoclass:: osmium.index.LocationTable
+.. autoclass:: npyosmium.index.LocationTable
     :members:
     :undoc-members:

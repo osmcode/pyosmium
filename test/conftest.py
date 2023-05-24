@@ -24,7 +24,7 @@ if (SRC_DIR / BUILD_DIR).exists():
 
 import pytest
 
-import osmium as o
+import npyosmium as o
 
 @pytest.fixture
 def test_data_dir():
