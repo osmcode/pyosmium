@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(npyosmium VERSION 3.6.0)
+project(npyosmium VERSION 3.6.1)
 
 option(WITH_LZ4 "Build with lz4 support for PBF files" ON)
 
