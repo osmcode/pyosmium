@@ -29,7 +29,7 @@ if not os.path.exists(build_dir):
                                         sys.implementation.cache_tag)
     if not os.path.exists(build_dir):
         # pybuild
-        build_dir = "../.pybuild/cpython3_%s.%s_pyosmium/build" % (
+        build_dir = "../.pybuild/cpython3_%s.%s_npyosmium/build" % (
             sys.version_info[0], sys.version_info[1]
         )
 
@@ -43,10 +43,10 @@ try:
     from npyosmium.version import npyosmium_major, npyosmium_release
 except ImportError:
     print("""
-        Compiled version of pyosmium not found, please build pyosmium for Python {}.{}
+        Compiled version of npyosmium not found, please build npyosmium for Python {}.{}
         before building the documentation.
         """.format(*sys.version_info))
-    raise RuntimeError("Cannot find pyosmium")
+    raise RuntimeError("Cannot find npyosmium")
 
 # -- General configuration ------------------------------------------------
 
@@ -75,7 +75,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Pyosmium'
+project = 'npyosmium'
 copyright = '2015-2020, Sarah Hoffmann'
 
 # The version info for the project you're documenting, acts as replacement for
