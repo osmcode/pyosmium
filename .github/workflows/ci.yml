@@ -123,20 +123,20 @@ jobs:
                 compiler: [gcc-old, clang-old, gcc, clang, macos]
                 include:
                     - compiler: gcc-old
-                      cc: gcc-7
-                      cxx: g++-7
-                      platform: ubuntu-18.04
+                      cc: gcc-10
+                      cxx: g++-10
+                      platform: ubuntu-20.04
                       python: 3.6
                       deps: release
                     - compiler: clang-old
-                      cc: clang-6.0
-                      cxx: clang++-6.0
-                      platform: ubuntu-18.04
+                      cc: clang-10
+                      cxx: clang++-10
+                      platform: ubuntu-20.04
                       python: 3.6
                       deps: release
                     - compiler: gcc
-                      cc: gcc-11
-                      cxx: g++-11
+                      cc: gcc-12
+                      cxx: g++-12
                       platform: ubuntu-22.04
                       python: "3.11"
                       deps: develop
