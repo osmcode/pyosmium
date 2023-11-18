@@ -165,10 +165,10 @@ def test_get_state_server_timeout(httpserver):
 
     httpserver.expect_request("/state.txt").respond_with_handler(sleeping)
 
-    svr = rserv.ReplicationServer(httpserver.url_for(''))
-    svr.set_request_parameter('timeout', 1)
+    with rserv.ReplicationServer(httpserver.url_for('')) as svr:
+        svr.set_request_parameter('timeout', 1)
 
-    res = svr.get_state_info()
+        res = svr.get_state_info()
 
     assert res is None
 
@@ -183,12 +183,11 @@ def test_apply_diffs_count(httpserver):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer(httpserver.url_for(''), "opl")
 
-    h = CountingHandler()
-    assert 100 == svr.apply_diffs(h, 100, 10000)
-
-    assert h.counts == [1, 1, 1, 0]
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        h = CountingHandler()
+        assert 100 == svr.apply_diffs(h, 100, 10000)
+        assert h.counts == [1, 1, 1, 0]
 
 
 def test_apply_diffs_without_simplify(httpserver):
@@ -202,11 +201,11 @@ def test_apply_diffs_without_simplify(httpserver):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer(httpserver.url_for(''), "opl")
 
-    h = CountingHandler()
-    assert 100 == svr.apply_diffs(h, 100, 10000, simplify=False)
-    assert [2, 1, 1, 0] == h.counts
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        h = CountingHandler()
+        assert 100 == svr.apply_diffs(h, 100, 10000, simplify=False)
+        assert [2, 1, 1, 0] == h.counts
 
 
 def test_apply_diffs_with_simplify(httpserver):
@@ -220,11 +219,11 @@ def test_apply_diffs_with_simplify(httpserver):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer(httpserver.url_for(''), "opl")
 
-    h = CountingHandler()
-    assert 100 == svr.apply_diffs(h, 100, 10000, simplify=True)
-    assert [1, 1, 1, 0] == h.counts
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        h = CountingHandler()
+        assert 100 == svr.apply_diffs(h, 100, 10000, simplify=True)
+        assert [1, 1, 1, 0] == h.counts
 
 
 def test_apply_with_location(httpserver):
@@ -236,7 +235,6 @@ def test_apply_with_location(httpserver):
         n1 x10.0 y23.0
         w1 Nn1,n2
     """))
-    svr = rserv.ReplicationServer(httpserver.url_for(''), "opl")
 
     class Handler(CountingHandler):
         def way(self, w):
@@ -249,9 +247,9 @@ def test_apply_with_location(httpserver):
             assert not w.nodes[1].location.valid()
 
     h = Handler()
-    assert 100 == svr.apply_diffs(h, 100, 10000, idx="flex_mem")
-
-    assert h.counts == [1, 1, 0, 0]
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        assert 100 == svr.apply_diffs(h, 100, 10000, idx="flex_mem")
+        assert h.counts == [1, 1, 0, 0]
 
 
 def test_apply_reader_without_simplify(httpserver):
@@ -265,13 +263,12 @@ def test_apply_reader_without_simplify(httpserver):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer(httpserver.url_for(''), "opl")
 
-    h = CountingHandler()
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        h = CountingHandler()
+        diffs = svr.collect_diffs(100, 100000)
 
-    diffs = svr.collect_diffs(100, 100000)
     assert diffs is not None
-
     diffs.reader.apply(h, simplify=False)
     assert [2, 1, 1, 0] == h.counts
 
@@ -287,12 +284,12 @@ def test_apply_reader_with_simplify(httpserver):
         w1
         r1
     """))
-    svr = rserv.ReplicationServer(httpserver.url_for(''), "opl")
 
-    h = CountingHandler()
-    diffs = svr.collect_diffs(100, 100000)
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        h = CountingHandler()
+        diffs = svr.collect_diffs(100, 100000)
+
     assert diffs is not None
-
     diffs.reader.apply(h, simplify=True)
     assert [1, 1, 1, 0] == h.counts
 
@@ -306,7 +303,6 @@ def test_apply_reader_with_location(httpserver):
         n1 x10.0 y23.0
         w1 Nn1,n2
     """))
-    svr = rserv.ReplicationServer(httpserver.url_for(''), "opl")
 
     class Handler(CountingHandler):
         def way(self, w):
@@ -318,10 +314,10 @@ def test_apply_reader_with_location(httpserver):
             assert 2 == w.nodes[1].ref
             assert not w.nodes[1].location.valid()
 
-    h = Handler()
-    diffs = svr.collect_diffs(100, 100000)
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        h = Handler()
+        diffs = svr.collect_diffs(100, 100000)
+
     assert diffs is not None
-
     diffs.reader.apply(h, idx="flex_mem")
-
     assert h.counts == [1, 1, 0, 0]
