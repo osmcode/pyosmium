@@ -4,7 +4,7 @@ runs:
     using: "composite"
     steps:
         - name: Install test requirements
-          run: pip install pytest shapely
+          run: pip install pytest pytest-httpserver shapely
           shell: bash
 
         - name: Run tests
