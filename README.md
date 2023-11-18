@@ -74,13 +74,15 @@ They are mostly ports of the examples in Libosmium and osmium-contrib.
 
 ## Testing
 
-There is a small test suite in the test directory. This provides regression
+There is a small test suite in the test directory. This provides unit
 test for the python bindings, it is not meant to be a test suite for Libosmium.
 
-You'll need the Python `pytest` module. On Debian/Ubuntu install the package
-`python3-pytest`.
+Testing requires `pytest` and `pytest-httpserver`. On Debian/Ubuntu install
+the dependencies with:
 
-The suite can be run with:
+    sudo apt-get install python3-pytest python3-pytest-httpserver
+
+The test suite can be run with:
 
     pytest test
 

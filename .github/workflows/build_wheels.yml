@@ -40,7 +40,7 @@ jobs:
         env:
            CIBW_ARCHS: native
            CIBW_SKIP: "pp* *musllinux*"
-           CIBW_TEST_REQUIRES: pytest shapely
+           CIBW_TEST_REQUIRES: pytest pytest-httpserver shapely
            CIBW_TEST_COMMAND: pytest {project}/test
            CIBW_BUILD_FRONTEND: build
            CIBW_BEFORE_BUILD_LINUX: yum install -y sparsehash-devel expat-devel boost-devel zlib-devel bzip2-devel lz4-devel
