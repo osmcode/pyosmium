@@ -3,6 +3,7 @@
 # This file is part of Pyosmium.
 #
 # Copyright (C) 2023 Sarah Hoffmann.
+import logging
 import time
 from textwrap import dedent
 
@@ -116,6 +117,35 @@ def test_get_state_timestamp_cut(httpserver):
         txnMaxQueried=1219304113
         sequenceNumber=2594669
         timestamp=2017-08-26T11\\:04\\:02Z""")
+
+    res = rserv.ReplicationServer(httpserver.url_for('')).get_state_info()
+
+    assert res is not None
+    assert res.timestamp == mkdate(2017, 8, 26, 11, 4, 2)
+    assert res.sequence == 2594669
+
+
+def test_get_state_permanent_error(httpserver, caplog):
+    httpserver.expect_request('/state.txt').respond_with_data('stuff', status=404)
+
+    with caplog.at_level(logging.DEBUG):
+        res = rserv.ReplicationServer(httpserver.url_for('')).get_state_info()
+
+    assert res is None
+    assert "Loading state info failed" in caplog.text
+
+
+def test_get_state_transient_error(httpserver):
+    httpserver.expect_ordered_request('/state.txt').respond_with_data('stuff', status=500)
+    httpserver.expect_ordered_request('/state.txt').respond_with_data('stuff', status=500)
+    httpserver.expect_ordered_request('/state.txt').respond_with_data("""\
+        #Sat Aug 26 11:04:04 UTC 2017
+        txnMaxQueried=1219304113
+        sequenceNumber=2594669
+        timestamp=2017-08-26T11\\:04\\:02Z
+        txnReadyList=
+        txnMax=1219304113
+        txnActiveList=1219303583,1219304054,1219304104""")
 
     res = rserv.ReplicationServer(httpserver.url_for('')).get_state_info()
 
@@ -321,3 +351,92 @@ def test_apply_reader_with_location(httpserver):
     assert diffs is not None
     diffs.reader.apply(h, idx="flex_mem")
     assert h.counts == [1, 1, 0, 0]
+
+
+def test_apply_diffs_permanent_error(httpserver, caplog):
+    httpserver.expect_ordered_request('/state.txt').respond_with_data("""\
+        sequenceNumber=100
+        timestamp=2017-08-26T11\\:04\\:02Z
+    """)
+    httpserver.expect_ordered_request('/000/000/100.opl')\
+              .respond_with_data('not a file', status=404)
+
+    with caplog.at_level(logging.ERROR):
+        with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+            h = CountingHandler()
+            assert None == svr.apply_diffs(h, 100, 10000)
+            assert h.counts == [0, 0, 0, 0]
+
+    assert 'Error during diff download' in caplog.text
+
+
+def test_apply_diffs_permanent_error_later_diff(httpserver, caplog):
+    httpserver.expect_ordered_request('/state.txt').respond_with_data("""\
+        sequenceNumber=101
+        timestamp=2017-08-26T11\\:04\\:02Z
+    """)
+    httpserver.expect_ordered_request('/000/000/100.opl').respond_with_data(dedent("""\
+        n1 x10.0 y23.0
+        w1 Nn1,n2
+    """))
+    httpserver.expect_ordered_request('/000/000/101.opl')\
+              .respond_with_data('not a file', status=404)
+
+    with caplog.at_level(logging.ERROR):
+        with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+            h = CountingHandler()
+            assert 100 == svr.apply_diffs(h, 100, 10000)
+            assert h.counts == [1, 1, 0, 0]
+
+    assert 'Error during diff download' in caplog.text
+
+
+def test_apply_diffs_transient_error(httpserver, caplog):
+    httpserver.expect_ordered_request('/state.txt').respond_with_data("""\
+        sequenceNumber=101
+        timestamp=2017-08-26T11\\:04\\:02Z
+    """)
+    httpserver.expect_ordered_request('/000/000/100.opl').respond_with_data(dedent("""\
+        n1 x10.0 y23.0
+        w1 Nn1,n2
+    """))
+    httpserver.expect_ordered_request('/000/000/101.opl')\
+              .respond_with_data('not a file', status=503)
+    httpserver.expect_ordered_request('/000/000/101.opl').respond_with_data(dedent("""\
+        n2 x10.0 y23.0
+    """))
+
+    with caplog.at_level(logging.ERROR):
+        with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+            h = CountingHandler()
+            assert 101 == svr.apply_diffs(h, 100, 10000)
+            assert h.counts == [2, 1, 0, 0]
+
+    assert 'Error during diff download' not in caplog.text
+
+
+
+
+def test_apply_diffs_transient_error_permanent(httpserver, caplog):
+    httpserver.expect_ordered_request('/state.txt').respond_with_data("""\
+        sequenceNumber=101
+        timestamp=2017-08-26T11\\:04\\:02Z
+    """)
+    httpserver.expect_ordered_request('/000/000/100.opl').respond_with_data(dedent("""\
+        n1 x10.0 y23.0
+        w1 Nn1,n2
+    """))
+    for _ in range(4):
+        httpserver.expect_ordered_request('/000/000/101.opl')\
+                  .respond_with_data('not a file', status=503)
+    httpserver.expect_ordered_request('/000/000/101.opl').respond_with_data(dedent("""\
+        n2 x10.0 y23.0
+    """))
+
+    with caplog.at_level(logging.ERROR):
+        with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+            h = CountingHandler()
+            assert 100 == svr.apply_diffs(h, 100, 10000)
+            assert h.counts == [1, 1, 0, 0]
+
+    assert 'Error during diff download' in caplog.text
