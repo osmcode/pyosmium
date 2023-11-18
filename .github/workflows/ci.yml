@@ -78,6 +78,17 @@ jobs:
                 python -m build
               shell: bash
 
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.12"
+
+            - name: Build package 3.12
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
             - name: Upload Artifact
               uses: actions/upload-artifact@v3
               with:
@@ -91,7 +102,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11"]
+                python-version: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
 
         steps:
             - uses: actions/checkout@v3

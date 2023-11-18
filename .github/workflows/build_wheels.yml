@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: pybind/pybind11
-          ref: v2.10.3
+          ref: v2.11.1
           path: contrib/pybind11
 
       - uses: actions/checkout@v3
@@ -31,16 +31,17 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: osmcode/libosmium
-          ref: v2.19.0
+          ref: v2.20.0
           path: contrib/libosmium
 
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.11.3
+        uses: pypa/cibuildwheel@v2.16.2
         env:
            CIBW_ARCHS: native
            CIBW_SKIP: "pp* *musllinux*"
            CIBW_TEST_REQUIRES: pytest pytest-httpserver shapely
+           CIBW_TEST_REQUIRES_LINUX: urllib3<2.0 pytest pytest-httpserver shapely
            CIBW_TEST_COMMAND: pytest {project}/test
            CIBW_BUILD_FRONTEND: build
            CIBW_BEFORE_BUILD_LINUX: yum install -y sparsehash-devel expat-devel boost-devel zlib-devel bzip2-devel lz4-devel
