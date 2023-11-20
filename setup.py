@@ -171,6 +171,9 @@ setup(
                                 'osm/_osm.pyi']},
     python_requires = ">=3.6",
     install_requires = ['requests'],
+    extras_require = {
+        'tests': ['pytest', 'pytest-httpserver', 'werkzeug'],
+    },
     cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,
 )
