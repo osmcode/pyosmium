@@ -76,6 +76,7 @@ set_module_output(_osm osmium/osm)
 pybind11_add_module(_osmium
                     lib/osmium.cc
                     lib/merge_input_reader.cc
+                    lib/node_location_handler.cc
                     lib/simple_writer.cc
                     lib/write_handler.cc)
 set_module_output(_osmium osmium)

@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_SIMPLE_HANDLER_HPP
@@ -13,14 +13,36 @@
 #include <osmium/io/any_input.hpp>
 #include <osmium/io/file.hpp>
 #include <osmium/visitor.hpp>
+#include <osmium/area/assembler.hpp>
+#include <osmium/area/multipolygon_manager.hpp>
+#include <osmium/handler/node_locations_for_ways.hpp>
+#include <osmium/index/map/all.hpp>
+
 
 #include "base_handler.h"
 #include "osm_base_objects.h"
 
 class SimpleHandler: public BaseHandler
 {
+    using IndexType =
+        osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>;
+    using IndexFactory =
+        osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>;
+    using MpManager =
+        osmium::area::MultipolygonManager<osmium::area::Assembler>;
+
+
+protected:
+    enum pre_handler {
+        no_handler,
+        location_handler,
+        area_handler
+    };
+
+
 public:
     virtual ~SimpleHandler() = default;
+    virtual osmium::osm_entity_bits::type enabled_callbacks() = 0;
 
     void apply_file(pybind11::object filename, bool locations = false,
                     const std::string &idx = "flex_mem")
@@ -49,16 +71,14 @@ private:
     void apply_object(osmium::io::File file, bool locations, const std::string &idx)
     {
         osmium::osm_entity_bits::type entities = osmium::osm_entity_bits::nothing;
-        BaseHandler::pre_handler handler = locations?
-                                            BaseHandler::location_handler
-                                            :BaseHandler::no_handler;
+        pre_handler handler = locations? location_handler : no_handler;
 
         auto callbacks = enabled_callbacks();
 
         if (callbacks & osmium::osm_entity_bits::area)
         {
             entities = osmium::osm_entity_bits::object;
-            handler = BaseHandler::area_handler;
+            handler = area_handler;
         } else {
             if (locations || callbacks & osmium::osm_entity_bits::node)
                 entities |= osmium::osm_entity_bits::node;
@@ -73,6 +93,64 @@ private:
 
         pybind11::gil_scoped_release release;
         apply(file, entities, handler, idx);
+    }
+
+
+    void apply_with_location(osmium::io::Reader &r, const std::string &idx)
+    {
+        const auto &map_factory = IndexFactory::instance();
+        auto index = map_factory.create_map(idx);
+        osmium::handler::NodeLocationsForWays<IndexType> location_handler(*index);
+        location_handler.ignore_errors();
+
+        osmium::apply(r, location_handler, *this);
+    }
+
+    void apply_with_area(osmium::io::Reader &r, MpManager &mp_manager,
+                         const std::string &idx)
+    {
+        const auto &map_factory = IndexFactory::instance();
+        auto index = map_factory.create_map(idx);
+        osmium::handler::NodeLocationsForWays<IndexType> location_handler(*index);
+        location_handler.ignore_errors();
+
+        osmium::apply(r, location_handler, *this,
+                      mp_manager.handler([this](osmium::memory::Buffer &&ab)
+                                         { osmium::apply(ab, *this); }));
+    }
+
+    void apply(const osmium::io::File &file, osmium::osm_entity_bits::type types,
+               pre_handler pre = no_handler,
+               const std::string &idx = "flex_mem")
+    {
+         switch (pre) {
+            case no_handler:
+                {
+                    osmium::io::Reader reader(file, types);
+                    osmium::apply(reader, *this);
+                    reader.close();
+                    break;
+                }
+            case location_handler:
+                {
+                    osmium::io::Reader reader(file, types);
+                    apply_with_location(reader, idx);
+                    reader.close();
+                    break;
+                }
+            case area_handler:
+                {
+                    osmium::area::Assembler::config_type assembler_config;
+                    MpManager mp_manager{assembler_config};
+
+                    osmium::relations::read_relations(file, mp_manager);
+
+                    osmium::io::Reader reader2(file);
+                    apply_with_area(reader2, mp_manager, idx);
+                    reader2.close();
+                    break;
+                }
+        }
     }
 };
 
@@ -125,7 +203,7 @@ public:
         }
     }
 
-    void way(osmium::Way const *w) override
+    void way(osmium::Way *w) override
     {
         pybind11::gil_scoped_acquire acquire;
         auto func = callback("way");
