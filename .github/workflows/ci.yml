@@ -7,13 +7,13 @@ jobs:
         runs-on: ubuntu-20.04
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
 
             - name: Set up Python 3.6
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.6
 
@@ -24,7 +24,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.7
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.7
 
@@ -35,7 +35,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.8
 
@@ -46,7 +46,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.9
 
@@ -57,7 +57,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.10"
 
@@ -68,7 +68,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.11
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.11"
 
@@ -79,7 +79,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.12
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.12"
 
@@ -105,10 +105,10 @@ jobs:
                 python-version: [3.6, 3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python-version }}
 
@@ -167,13 +167,13 @@ jobs:
             CXX: ${{ matrix.cxx }}
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             - uses: ./.github/actions/install-dependencies
               with:
                   version: ${{ matrix.deps }}
 
-            - uses: actions/setup-python@v4
+            - uses: actions/setup-python@v5
               with:
                   python-version: "${{ matrix.python }}"
 
@@ -212,7 +212,7 @@ jobs:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             - uses: actions/cache@v3
               with:
@@ -229,7 +229,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.6
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.6
 
@@ -242,7 +242,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.7
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.7
 
@@ -255,7 +255,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.8
 
@@ -268,7 +268,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: 3.9
 
@@ -281,7 +281,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.10"
 
@@ -294,7 +294,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.11
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.11"
 
@@ -325,10 +325,10 @@ jobs:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
 
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python-version }}
 
