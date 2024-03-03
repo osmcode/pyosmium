@@ -36,9 +36,6 @@ public:
     virtual ~WriteHandler()
     { close(); }
 
-    osmium::osm_entity_bits::type enabled_callbacks() override
-    { return osmium::osm_entity_bits::all; }
-
     void node(const osmium::Node* o) override
     {
         buffer.add_item(*o);
