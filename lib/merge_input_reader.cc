@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -133,7 +133,7 @@ private:
             objects.sort(osmium::object_order_type_id_reverse_version());
             osmium::item_type prev_type = osmium::item_type::undefined;
             osmium::object_id_type prev_id = 0;
-            for (const auto &item: objects) {
+            for (auto &item: objects) {
                 if (item.type() != prev_type || item.id() != prev_id) {
                     prev_type = item.type();
                     prev_id = item.id();
@@ -142,7 +142,7 @@ private:
             }
         } else {
             objects.sort(osmium::object_order_type_id_version());
-            osmium::apply(objects.cbegin(), objects.cend(), handler);
+            osmium::apply(objects.begin(), objects.end(), handler);
         }
 
         objects = osmium::ObjectPointerCollection();

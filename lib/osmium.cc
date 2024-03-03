@@ -2,15 +2,12 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
 
 #include <osmium/osm.hpp>
-#include <osmium/osm/entity_bits.hpp>
-#include <osmium/index/map/all.hpp>
-#include <osmium/handler/node_locations_for_ways.hpp>
 
 #include "simple_handler.h"
 #include "osmium_module.h"
@@ -18,11 +15,6 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(_osmium, m) {
-    using LocationTable =
-        osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>;
-    using NodeLocationHandler =
-        osmium::handler::NodeLocationsForWays<LocationTable>;
-
     py::register_exception<osmium::invalid_location>(m, "InvalidLocationError");
     py::register_exception_translator([](std::exception_ptr p) {
         try {
@@ -32,24 +24,13 @@ PYBIND11_MODULE(_osmium, m) {
         }
     });
 
-    py::class_<osmium::handler::NodeLocationsForWays<LocationTable>>(
-        m, "NodeLocationsForWays")
-        .def(py::init<LocationTable&>())
-        .def("ignore_errors", &osmium::handler::NodeLocationsForWays<LocationTable>::ignore_errors)
-    ;
-
     m.def("apply", [](osmium::io::Reader &rd, BaseHandler &h)
                    { py::gil_scoped_release release; osmium::apply(rd, h); },
           py::arg("reader"), py::arg("handler"),
           "Apply a chain of handlers.");
-    m.def("apply", [](osmium::io::Reader &rd, NodeLocationHandler &h)
-                   { py::gil_scoped_release release; osmium::apply(rd, h); },
-          py::arg("reader"), py::arg("node_handler"),
-          "Apply a chain of handlers.");
-    m.def("apply", [](osmium::io::Reader &rd, NodeLocationHandler &l,
-                      BaseHandler &h)
-                     { py::gil_scoped_release release; osmium::apply(rd, l, h); },
-          py::arg("reader"), py::arg("node_handler"), py::arg("handler"),
+    m.def("apply", [](osmium::io::Reader &rd, BaseHandler &b1, BaseHandler &b2)
+                     { py::gil_scoped_release release; osmium::apply(rd, b1, b2); },
+          py::arg("reader"), py::arg("handler1"), py::arg("handler2"),
           "Apply a chain of handlers.");
 
     py::class_<BaseHandler>(m, "BaseHandler");
@@ -84,4 +65,5 @@ PYBIND11_MODULE(_osmium, m) {
     init_merge_input_reader(m);
     init_write_handler(m);
     init_simple_writer(m);
+    init_node_location_handler(m);
 };

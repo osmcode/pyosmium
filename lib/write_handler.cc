@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -42,7 +42,7 @@ public:
         flush_buffer();
     }
 
-    void way(const osmium::Way* o) override
+    void way(osmium::Way* o) override
     {
         buffer.add_item(*o);
         flush_buffer();

@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_SIMPLE_HANDLER_HPP
@@ -115,7 +115,7 @@ private:
         location_handler.ignore_errors();
 
         osmium::apply(r, location_handler, *this,
-                      mp_manager.handler([this](const osmium::memory::Buffer &ab)
+                      mp_manager.handler([this](osmium::memory::Buffer &&ab)
                                          { osmium::apply(ab, *this); }));
     }
 
@@ -203,7 +203,7 @@ public:
         }
     }
 
-    void way(osmium::Way const *w) override
+    void way(osmium::Way *w) override
     {
         pybind11::gil_scoped_acquire acquire;
         auto func = callback("way");
