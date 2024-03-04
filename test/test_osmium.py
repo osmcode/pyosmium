@@ -34,9 +34,8 @@ def test_apply_node_location_handler(opl_reader, ignore_error):
     if ignore_error:
         hdlr.ignore_errors()
 
-    class WayNodeHandler(o.SimpleHandler):
+    class WayNodeHandler:
         def __init__(self):
-            super().__init__()
             self.collect = []
             self.with_error = []
 
@@ -67,3 +66,28 @@ def test_apply_node_location_handler(opl_reader, ignore_error):
     else:
         with pytest.raises(osmium.InvalidLocationError):
             o.apply(opl.reader(data), hdlr, tester)
+
+
+def test_apply_invalid_handler_object(opl_reader):
+    class DummyHandler:
+        def some_func():
+            print('A')
+
+    with pytest.raises(TypeError):
+        o.apply(opl_reader("n1 x2 z4"), DummyHandler())
+
+
+def test_mixed_handlers(opl_reader):
+    logged = []
+
+    class OldStyle(o.SimpleHandler):
+        def node(self, n):
+            logged.append('old')
+
+    class NewStyle:
+        def node(self, n):
+            logged.append('new')
+
+    o.apply(opl_reader("n1 x0 y0"), NewStyle(), OldStyle(), NewStyle(), OldStyle())
+
+    assert logged == ['new', 'old', 'new', 'old']
