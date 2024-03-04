@@ -14,15 +14,32 @@
 
 #include "simple_handler.h"
 #include "osmium_module.h"
+#include "python_handler.h"
 
 namespace py = pybind11;
 
 class HandlerChain : public osmium::handler::Handler
 {
 public:
-    HandlerChain(std::vector<BaseHandler *> &&handlers)
-    : m_handlers(handlers)
-    {}
+    HandlerChain(py::args args)
+    {
+        m_python_handlers.reserve(args.size());
+        for (auto &arg: args) {
+            if (py::isinstance<BaseHandler>(arg)) {
+                // Already a handler object, push back directly.
+                m_handlers.push_back(arg.cast<BaseHandler *>());
+            } else if (py::hasattr(arg, "node") || py::hasattr(arg, "way")
+                       || py::hasattr(arg, "relation")
+                       || py::hasattr(arg, "changeset") || py::hasattr(arg, "area")) {
+                // Python object that looks like a handler.
+                // Wrap into a osmium handler object.
+                m_python_handlers.emplace_back(arg);
+                m_handlers.push_back(&m_python_handlers.back());
+            } else {
+                throw py::type_error{"Argument must be a handler-like object."};
+            }
+        }
+    }
 
     void node(osmium::Node const &o) {
         for (auto const &handler : m_handlers) {
@@ -56,22 +73,9 @@ public:
 
 private:
     std::vector<BaseHandler *> m_handlers;
+    std::vector<pyosmium::PythonHandler> m_python_handlers;
 };
 
-
-static HandlerChain make_handler_chain(py::args args)
-{
-    std::vector<BaseHandler *> handlers;
-    for (auto const &arg: args) {
-        if (py::isinstance<BaseHandler>(arg)) {
-            handlers.push_back(arg.cast<BaseHandler *>());
-        } else {
-            throw py::type_error{"Argument must be a handler-like object."};
-        }
-    }
-
-    return HandlerChain(std::move(handlers));
-}
 
 PYBIND11_MODULE(_osmium, m) {
     py::register_exception<osmium::invalid_location>(m, "InvalidLocationError");
@@ -89,7 +93,7 @@ PYBIND11_MODULE(_osmium, m) {
           "Apply a single handler.");
     m.def("apply", [](osmium::io::Reader &rd, py::args args)
                      {
-                         auto handler = make_handler_chain(args);
+                         HandlerChain handler{args};
                          {
                              py::gil_scoped_release release;
                              osmium::apply(rd, handler);
