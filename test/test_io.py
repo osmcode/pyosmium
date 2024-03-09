@@ -7,6 +7,8 @@ import pytest
 
 import osmium as o
 
+from helpers import CountingHandler
+
 def _run_file(fn):
     rd = o.io.Reader(fn)
     try:
@@ -64,3 +66,12 @@ def test_file_header(tmp_path):
         assert h.box().size() == 64800.0
     finally:
         rd.close()
+
+
+def test_reader_with_filebuffer():
+    rd = o.io.Reader(o.io.FileBuffer('n1 x4 y1'.encode('utf-8'), 'opl'))
+    handler = CountingHandler()
+
+    o.apply(rd, handler)
+
+    assert handler.counts == [1, 0, 0, 0]
