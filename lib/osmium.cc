@@ -15,67 +15,9 @@
 #include "simple_handler.h"
 #include "osmium_module.h"
 #include "python_handler.h"
+#include "handler_chain.h"
 
 namespace py = pybind11;
-
-class HandlerChain : public osmium::handler::Handler
-{
-public:
-    HandlerChain(py::args args)
-    {
-        m_python_handlers.reserve(args.size());
-        for (auto &arg: args) {
-            if (py::isinstance<BaseHandler>(arg)) {
-                // Already a handler object, push back directly.
-                m_handlers.push_back(arg.cast<BaseHandler *>());
-            } else if (py::hasattr(arg, "node") || py::hasattr(arg, "way")
-                       || py::hasattr(arg, "relation")
-                       || py::hasattr(arg, "changeset") || py::hasattr(arg, "area")) {
-                // Python object that looks like a handler.
-                // Wrap into a osmium handler object.
-                m_python_handlers.emplace_back(arg);
-                m_handlers.push_back(&m_python_handlers.back());
-            } else {
-                throw py::type_error{"Argument must be a handler-like object."};
-            }
-        }
-    }
-
-    void node(osmium::Node const &o) {
-        for (auto const &handler : m_handlers) {
-            handler->node(&o);
-        }
-    }
-
-    void way(osmium::Way &w) {
-        for (auto const &handler : m_handlers) {
-            handler->way(&w);
-        }
-    }
-
-    void relation(osmium::Relation const &o) {
-        for (auto const &handler : m_handlers) {
-            handler->relation(&o);
-        }
-    }
-
-    void changeset(osmium::Changeset const &o) {
-        for (auto const &handler : m_handlers) {
-            handler->changeset(&o);
-        }
-    }
-
-    void area(osmium::Area const &o) {
-        for (auto const &handler : m_handlers) {
-            handler->area(&o);
-        }
-    }
-
-private:
-    std::vector<BaseHandler *> m_handlers;
-    std::vector<pyosmium::PythonHandler> m_python_handlers;
-};
-
 
 PYBIND11_MODULE(_osmium, m) {
     py::register_exception<osmium::invalid_location>(m, "InvalidLocationError");
