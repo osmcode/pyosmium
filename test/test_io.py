@@ -9,10 +9,15 @@ import osmium as o
 
 from helpers import CountingHandler
 
+class NullHandler:
+
+    def node(self, n):
+        pass
+
 def _run_file(fn):
     rd = o.io.Reader(fn)
     try:
-        o.apply(rd, o.SimpleHandler())
+        o.apply(rd, NullHandler())
     finally:
         rd.close()
 
@@ -45,7 +50,7 @@ def test_broken_timestamp(test_data):
     try:
         rd = o.io.Reader(fn)
         with pytest.raises(RuntimeError):
-            o.apply(rd, o.SimpleHandler())
+            o.apply(rd, NullHandler())
     finally:
         rd.close()
 

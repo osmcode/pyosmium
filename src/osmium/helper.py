@@ -2,11 +2,11 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from typing import Optional, Callable, TypeVar
 
-from osmium._osmium import SimpleHandler
+from osmium.simple_handler import SimpleHandler
 from osmium.osm import Node, Way, Relation, Area, Changeset
 
 T = TypeVar('T')

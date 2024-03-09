@@ -11,8 +11,10 @@
 
 #include <osmium/osm.hpp>
 #include <osmium/handler.hpp>
+#include <osmium/index/index.hpp>
+#include <osmium/visitor.hpp>
 
-#include "simple_handler.h"
+#include "base_handler.h"
 #include "osmium_module.h"
 #include "python_handler.h"
 #include "handler_chain.h"
@@ -45,33 +47,6 @@ PYBIND11_MODULE(_osmium, m) {
           "Apply a chain of handlers.");
 
     py::class_<BaseHandler>(m, "BaseHandler");
-
-    py::class_<SimpleHandler, PySimpleHandler, BaseHandler>(m, "SimpleHandler",
-        "The most generic of OSM data handlers. Derive your data processor "
-        "from this class and implement callbacks for each object type you are "
-        "interested in. The following data types are recognised: \n"
-        " `node`, `way`, `relation`, `area` and `changeset`.\n "
-        "A callback takes exactly one parameter which is the object. Note that "
-        "all objects that are handed into the handler are only readable and are "
-        "only valid until the end of the callback is reached. Any data that "
-        "should be retained must be copied into other data structures.")
-        .def(py::init<>())
-        .def("apply_file", &SimpleHandler::apply_file,
-             py::arg("filename"), py::arg("locations")=false,
-             py::arg("idx")="flex_mem",
-             "Apply the handler to the given file. If locations is true, then\n"
-             "a location handler will be applied before, which saves the node\n"
-             "positions. In that case, the type of this position index can be\n"
-             "further selected in idx. If an area callback is implemented, then\n"
-             "the file will be scanned twice and a location handler and a\n"
-             "handler for assembling multipolygons and areas from ways will\n"
-             "be executed.")
-        .def("apply_buffer", &SimpleHandler::apply_buffer,
-             py::arg("buffer"), py::arg("format"),
-             py::arg("locations")=false, py::arg("idx")="flex_mem",
-             "Apply the handler to a string buffer. The buffer must be a\n"
-             "byte string.")
-        ;
 
     init_merge_input_reader(m);
     init_write_handler(m);

@@ -7,6 +7,7 @@
 
 from osmium._osmium import *
 from osmium.helper import *
+from osmium.simple_handler import SimpleHandler
 import osmium.io
 import osmium.osm
 import osmium.index

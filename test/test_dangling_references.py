@@ -153,6 +153,6 @@ class TestKeepNode(NotADanglingReferenceBase):
 
 class TestKeepMember(NotADanglingReferenceBase):
 
-    def member(self, n):
-        for m in n.members:
-            self.keep(m, lambda m: t.ref)
+    def relation(self, r):
+        for m in r.members:
+            self.keep(m, lambda m: m.ref)
