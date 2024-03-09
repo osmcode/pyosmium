@@ -159,6 +159,10 @@ PYBIND11_MODULE(_osm, m) {
         .value("CHANGESET", osmium::osm_entity_bits::changeset)
         .value("ALL", osmium::osm_entity_bits::all)
         .export_values()
+        .def("__or__", &osmium::osm_entity_bits::operator|)
+        .def("__and__", &osmium::osm_entity_bits::operator&)
+        .def("__invert__", &osmium::osm_entity_bits::operator~)
+        .def("__bool__", [](osmium::osm_entity_bits::type e) { return e != osmium::osm_entity_bits::nothing; })
     ;
 
 
