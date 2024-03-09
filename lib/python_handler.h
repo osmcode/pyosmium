@@ -11,6 +11,7 @@
 #include <pybind11/pybind11.h>
 
 #include "base_handler.h"
+#include "osm_base_objects.h"
 
 namespace pyosmium {
 

@@ -21,8 +21,8 @@
 #include <osmium/object_pointer_collection.hpp>
 #include <osmium/visitor.hpp>
 
-#include "base_handler.h"
 #include "osmium_module.h"
+#include "handler_chain.h"
 
 namespace py = pybind11;
 
@@ -60,8 +60,9 @@ namespace {
 class MergeInputReader
 {
 public:
-    void apply(BaseHandler& handler, std::string const &idx, bool simplify)
+    void apply(py::args args, std::string const &idx, bool simplify)
     {
+        HandlerChain handler{args};
         if (idx.empty())
             apply_without_location(handler, simplify);
         else
@@ -127,7 +128,7 @@ public:
     }
 
 private:
-    void apply_without_location(BaseHandler& handler, bool simplify)
+    void apply_without_location(HandlerChain& handler, bool simplify)
     {
         if (simplify) {
             objects.sort(osmium::object_order_type_id_reverse_version());
@@ -149,7 +150,7 @@ private:
         changes.clear();
     }
 
-    void apply_with_location(BaseHandler& handler, std::string const &idx,
+    void apply_with_location(HandlerChain& handler, std::string const &idx,
                              bool simplify)
     {
         using Index_fab =
@@ -207,7 +208,7 @@ void init_merge_input_reader(py::module &m)
         "deduplicates the data before applying it to a handler.")
         .def(py::init<>())
         .def("apply", &MergeInputReader::apply,
-             py::arg("handler"), py::arg("idx")="", py::arg("simplify")=true,
+             py::arg("idx")="", py::arg("simplify")=true,
              "Apply collected data to a handler. The data will be sorted first. "
              "If `simplify` is true (default) then duplicates will be eliminated "
              "and only the newest version of each object kept. If `idx` is given "
