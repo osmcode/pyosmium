@@ -4,11 +4,4 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-
-from osmium._osmium import *
-from osmium.helper import *
-import osmium.io
-import osmium.osm
-import osmium.index
-import osmium.geom
-import osmium.area
+from ._area import *

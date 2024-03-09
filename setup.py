@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
+#
+# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 import os
 import re
 import sys
@@ -164,7 +170,7 @@ setup(
         ],
 
     ext_modules=[CMakeExtension('cmake_example')],
-    packages = ['osmium', 'osmium/osm', 'osmium/replication'],
+    packages = ['osmium', 'osmium/osm', 'osmium/replication', 'osmium/area'],
     package_dir = {'' : 'src'},
     package_data = { 'osmium': ['py.typed', '*.pyi',
                                 'replication/_replication.pyi',

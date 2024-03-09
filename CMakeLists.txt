@@ -82,9 +82,13 @@ pybind11_add_module(_osmium
 set_module_output(_osmium osmium)
 pybind11_add_module(_replication lib/replication.cc)
 set_module_output(_replication osmium/replication)
+pybind11_add_module(_area lib/area.cc)
+set_module_output(_area osmium/area)
+
 
 target_link_libraries(_osmium PRIVATE ${OSMIUM_LIBRARIES})
 target_link_libraries(_replication PRIVATE ${OSMIUM_LIBRARIES})
+target_link_libraries(_area PRIVATE ${OSMIUM_LIBRARIES})
 
 # workaround for https://github.com/pybind/pybind11/issues/1272
 if(APPLE)
