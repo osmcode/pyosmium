@@ -30,6 +30,7 @@ public:
     virtual void changeset(const osmium::Changeset*) {}
     virtual void area(const osmium::Area*) {}
 
+    virtual void flush() {}
 };
 
 #endif // PYOSMIUM_BASE_HANDLER_HPP
