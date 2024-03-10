@@ -30,19 +30,22 @@ public:
                                           { osmium::apply(ab, this->m_handlers); });
     }
 
-    void node(osmium::Node const *n) override
+    bool node(osmium::Node const *n) override
     {
         m_mp_manager->handle_node(*n);
+        return false;
     }
 
-    void way(osmium::Way *w) override
+    bool way(osmium::Way *w) override
     {
         m_mp_manager->handle_way(*w);
+        return false;
     }
 
-    void relation(osmium::Relation const *r) override
+    bool relation(osmium::Relation const *r) override
     {
         m_mp_manager->handle_relation(*r);
+        return false;
     }
 
     void flush() override
@@ -67,9 +70,10 @@ public:
     BaseHandler *first_pass_handler() { return this; }
 
     // first-pass-handler
-    void relation(osmium::Relation const *r) override
+    bool relation(osmium::Relation const *r) override
     {
         m_mp_manager.relation(*r);
+        return false;
     }
 
     AreaManagerSecondPassHandler *second_pass_handler(py::args args)

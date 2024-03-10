@@ -24,3 +24,24 @@ class CountingHandler(osmium.SimpleHandler):
 
     def area(self, _):
         self.counts[3] += 1
+
+
+class IDCollector:
+
+    def __init__(self):
+        self.nodes = []
+        self.ways = []
+        self.relations = []
+        self.changesets = []
+
+    def node(self, n):
+        self.nodes.append(n.id)
+
+    def way(self, w):
+        self.ways.append(w.id)
+
+    def relation(self, r):
+        self.relations.append(r.id)
+
+    def changeset(self, c):
+        self.changesets.append(c.id)

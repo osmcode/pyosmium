@@ -36,27 +36,31 @@ public:
     virtual ~WriteHandler()
     { close(); }
 
-    void node(const osmium::Node* o) override
+    bool node(const osmium::Node* o) override
     {
         buffer.add_item(*o);
         flush_buffer();
+        return false;
     }
 
-    void way(osmium::Way* o) override
+    bool way(osmium::Way* o) override
     {
         buffer.add_item(*o);
         flush_buffer();
+        return false;
     }
 
-    void relation(const osmium::Relation* o) override
+    bool relation(const osmium::Relation* o) override
     {
         buffer.add_item(*o);
         flush_buffer();
+        return false;
     }
 
-    void changeset(const osmium::Changeset*) override {}
-
-    void area(const osmium::Area*) override {}
+    void flush() override
+    {
+        flush_buffer(true);
+    }
 
     void close()
     {
@@ -68,11 +72,11 @@ public:
     }
 
 private:
-    void flush_buffer()
+    void flush_buffer(bool force = false)
     {
         buffer.commit();
 
-        if (buffer.committed() > buffer.capacity() - BUFFER_WRAP) {
+        if (force || buffer.committed() > buffer.capacity() - BUFFER_WRAP) {
             osmium::memory::Buffer new_buffer(buffer.capacity(), osmium::memory::Buffer::auto_grow::yes);
             using std::swap;
             swap(buffer, new_buffer);

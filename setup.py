@@ -170,7 +170,8 @@ setup(
         ],
 
     ext_modules=[CMakeExtension('cmake_example')],
-    packages = ['osmium', 'osmium/osm', 'osmium/replication', 'osmium/area'],
+    packages = ['osmium', 'osmium/osm', 'osmium/replication', 'osmium/area',
+                'osmium/filter'],
     package_dir = {'' : 'src'},
     package_data = { 'osmium': ['py.typed', '*.pyi',
                                 'replication/_replication.pyi',

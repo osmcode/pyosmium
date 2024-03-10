@@ -23,12 +23,15 @@ public:
     void changeset(const osmium::Changeset &o) { changeset(&o); }
     void area(const osmium::Area &o) { area(&o); }
 
-    // actual handler functions
-    virtual void node(const osmium::Node*) {}
-    virtual void way(osmium::Way *) {}
-    virtual void relation(const osmium::Relation*) {}
-    virtual void changeset(const osmium::Changeset*) {}
-    virtual void area(const osmium::Area*) {}
+    // Actual handler functions.
+    // All object handlers return a boolean which indicates if
+    // processing is finished (true) or should be continued with the next
+    // handler (false).
+    virtual bool node(const osmium::Node*) { return false; }
+    virtual bool way(osmium::Way *) { return false; }
+    virtual bool relation(const osmium::Relation*) { return false; }
+    virtual bool changeset(const osmium::Changeset*) { return false; }
+    virtual bool area(const osmium::Area*)  { return false; }
 
     virtual void flush() {}
 };

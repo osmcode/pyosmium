@@ -25,16 +25,18 @@ public:
     : handler(idx)
     {}
 
-    void node(const osmium::Node *o) override
+    bool node(const osmium::Node *o) override
     {
         handler.node(*o);
+        return false;
     }
 
-    void way(osmium::Way *o) override
+    bool way(osmium::Way *o) override
     {
         if (apply_nodes_to_ways) {
             handler.way(*o);
         }
+        return false;
     }
 
     bool get_apply_nodes_to_ways() const { return apply_nodes_to_ways; }

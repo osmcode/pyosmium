@@ -18,22 +18,20 @@ class AmenityListHandler(o.SimpleHandler):
         print("%f %f %-15s %s" % (lon, lat, tags['amenity'], name))
 
     def node(self, n):
-        if 'amenity' in n.tags:
-            self.print_amenity(n.tags, n.location.lon, n.location.lat)
+        self.print_amenity(n.tags, n.location.lon, n.location.lat)
 
     def area(self, a):
-        if 'amenity' in a.tags:
-            wkb = wkbfab.create_multipolygon(a)
-            poly = wkblib.loads(wkb, hex=True)
-            centroid = poly.representative_point()
-            self.print_amenity(a.tags, centroid.x, centroid.y)
+        wkb = wkbfab.create_multipolygon(a)
+        poly = wkblib.loads(wkb, hex=True)
+        centroid = poly.representative_point()
+        self.print_amenity(a.tags, centroid.x, centroid.y)
 
 
 def main(osmfile):
 
     handler = AmenityListHandler()
 
-    handler.apply_file(osmfile)
+    handler.apply_file(osmfile, filters=[o.filter.KeyFilter('amenity')])
 
     return 0
 
