@@ -45,6 +45,25 @@ PYBIND11_MODULE(_osmium, m) {
                      },
           py::arg("reader"),
           "Apply a chain of handlers.");
+    m.def("apply", [](std::string fn, BaseHandler &h)
+                   {
+                       py::gil_scoped_release release;
+                       osmium::io::Reader rd{fn};
+                       osmium::apply(rd, h);
+                   },
+          py::arg("filename"), py::arg("handler"),
+          "Apply a single handler.");
+    m.def("apply", [](std::string fn, py::args args)
+                     {
+                         HandlerChain handler{args};
+                         {
+                             py::gil_scoped_release release;
+                             osmium::io::Reader rd{fn};
+                             osmium::apply(rd, handler);
+                         }
+                     },
+          py::arg("filename"),
+          "Apply a chain of handlers.");
 
     py::class_<BaseHandler>(m, "BaseHandler");
 
