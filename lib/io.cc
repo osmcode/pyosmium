@@ -12,6 +12,16 @@
 
 namespace py = pybind11;
 
+namespace {
+
+class FileBuffer : public osmium::io::File
+{
+    using osmium::io::File::File;
+};
+
+}
+
+
 PYBIND11_MODULE(io, m)
 {
     py::class_<osmium::io::File>(m, "File",
@@ -27,6 +37,17 @@ PYBIND11_MODULE(io, m)
         .def("parse_format", &osmium::io::File::parse_format,
              "Set the format of the file from a format string.")
     ;
+
+
+    py::class_<FileBuffer>(m, "FileBuffer",
+        "A buffer containing an OSM file.")
+        .def(py::init<>([] (pybind11::buffer const &buf, std::string const &format) {
+                 pybind11::buffer_info info = buf.request();
+                 return new FileBuffer(reinterpret_cast<const char *>(info.ptr),
+                                       static_cast<size_t>(info.size), format.c_str());
+             }), py::keep_alive<1, 2>())
+    ;
+
 
     py::class_<osmium::io::Header>(m, "Header",
         "File header with global information about the file.")
@@ -61,6 +82,14 @@ PYBIND11_MODULE(io, m)
         "A class that reads OSM data from a file.")
         .def(py::init<std::string>())
         .def(py::init<std::string, osmium::osm_entity_bits::type>())
+        .def(py::init<FileBuffer>(),
+             py::keep_alive<1, 2>())
+        .def(py::init<FileBuffer, osmium::osm_entity_bits::type>(),
+             py::keep_alive<1, 2>())
+        .def(py::init<osmium::io::File>(),
+             py::keep_alive<1, 2>())
+        .def(py::init<osmium::io::File, osmium::osm_entity_bits::type>(),
+             py::keep_alive<1, 2>())
         .def("eof", &osmium::io::Reader::eof,
              "Check if the end of file has been reached.")
         .def("close", &osmium::io::Reader::close,

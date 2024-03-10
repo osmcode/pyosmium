@@ -2,7 +2,7 @@
 #
 # This file is part of Pyosmium.
 #
-# Copyright (C) 2022 Sarah Hoffmann.
+# Copyright (C) 2024 Sarah Hoffmann.
 import re
 from itertools import count
 import pytest
@@ -249,3 +249,13 @@ def test_changest_attributes(area_importer):
     assert 1 == area_importer('c34 k2 s2005-04-09T19:54:13Z e2005-04-09T20:54:39Z '
                                'd34 i1 uSteve x-0.1465242 y51.5288506 X-0.1464925 Y51.5288620',
                               changeset=changeset)
+
+
+def test_entity_operations():
+    assert not o.osm.NOTHING
+    assert o.osm.NODE
+
+    assert o.osm.AREA | o.osm.NODE | o.osm.WAY | o.osm.RELATION == o.osm.OBJECT
+    assert o.osm.ALL & o.osm.RELATION == o.osm.RELATION
+
+    assert ~o.osm.CHANGESET == o.osm.OBJECT

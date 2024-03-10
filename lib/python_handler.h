@@ -11,6 +11,7 @@
 #include <pybind11/pybind11.h>
 
 #include "base_handler.h"
+#include "osm_base_objects.h"
 
 namespace pyosmium {
 
@@ -35,12 +36,30 @@ class PythonHandler : public BaseHandler
 public:
     PythonHandler(pybind11::handle handler)
     : m_handler(std::move(handler))
-    {}
+    {
+        m_enabled = osmium::osm_entity_bits::nothing;
+        if (pybind11::hasattr(m_handler, "node")) {
+            m_enabled |= osmium::osm_entity_bits::node;
+        }
+        if (pybind11::hasattr(m_handler, "way")) {
+            m_enabled |= osmium::osm_entity_bits::way;
+        }
+        if (pybind11::hasattr(m_handler, "relation")) {
+            m_enabled |= osmium::osm_entity_bits::relation;
+        }
+        if (pybind11::hasattr(m_handler, "area")) {
+            m_enabled |= osmium::osm_entity_bits::area;
+        }
+        if (pybind11::hasattr(m_handler, "changeset")) {
+            m_enabled |= osmium::osm_entity_bits::changeset;
+        }
+    }
+
 
     void node(osmium::Node const *n) override
     {
-        pybind11::gil_scoped_acquire acquire;
-        if (pybind11::hasattr(m_handler, "node")) {
+        if (m_enabled & osmium::osm_entity_bits::node) {
+            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Node")(COSMNode{n});
             ObjectGuard<COSMNode> guard(obj);
             m_handler.attr("node")(obj);
@@ -49,8 +68,8 @@ public:
 
     void way(osmium::Way *w) override
     {
-        pybind11::gil_scoped_acquire acquire;
-        if (pybind11::hasattr(m_handler, "way")) {
+        if (m_enabled & osmium::osm_entity_bits::way) {
+            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Way")(COSMWay{w});
             ObjectGuard<COSMWay> guard(obj);
             m_handler.attr("way")(obj);
@@ -59,8 +78,8 @@ public:
 
     void relation(osmium::Relation const *r) override
     {
-        pybind11::gil_scoped_acquire acquire;
-        if (pybind11::hasattr(m_handler, "relation")) {
+        if (m_enabled & osmium::osm_entity_bits::relation) {
+            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Relation")(COSMRelation{r});
             ObjectGuard<COSMRelation> guard(obj);
             m_handler.attr("relation")(obj);
@@ -69,8 +88,8 @@ public:
 
     void changeset(osmium::Changeset const *c) override
     {
-        pybind11::gil_scoped_acquire acquire;
-        if (pybind11::hasattr(m_handler, "changeset")) {
+        if (m_enabled & osmium::osm_entity_bits::changeset) {
+            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Changeset")(COSMChangeset{c});
             ObjectGuard<COSMChangeset> guard(obj);
             m_handler.attr("changeset")(obj);
@@ -79,14 +98,15 @@ public:
 
     void area(osmium::Area const *a) override
     {
-        pybind11::gil_scoped_acquire acquire;
-        if (pybind11::hasattr(m_handler, "area")) {
+        if (m_enabled & osmium::osm_entity_bits::area) {
+            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Area")(COSMArea{a});
             ObjectGuard<COSMArea> guard(obj);
             m_handler.attr("area")(obj);
         }
     }
 private:
+    osmium::osm_entity_bits::type m_enabled;
     pybind11::object m_type_module = pybind11::module_::import("osmium.osm.types");
     pybind11::handle m_handler;
 };
