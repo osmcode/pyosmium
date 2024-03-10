@@ -45,31 +45,41 @@ public:
 
     void node(osmium::Node const &o) {
         for (auto const &handler : m_handlers) {
-            handler->node(&o);
+            if (handler->node(&o)) {
+                return;
+            }
         }
     }
 
     void way(osmium::Way &w) {
         for (auto const &handler : m_handlers) {
-            handler->way(&w);
+            if (handler->way(&w)) {
+                return;
+            }
         }
     }
 
     void relation(osmium::Relation const &o) {
         for (auto const &handler : m_handlers) {
-            handler->relation(&o);
+            if (handler->relation(&o)) {
+                return;
+            }
         }
     }
 
     void changeset(osmium::Changeset const &o) {
         for (auto const &handler : m_handlers) {
-            handler->changeset(&o);
+            if (handler->changeset(&o)) {
+                return;
+            }
         }
     }
 
     void area(osmium::Area const &o) {
         for (auto const &handler : m_handlers) {
-            handler->area(&o);
+            if (handler->area(&o)) {
+                return;
+            }
         }
     }
 
