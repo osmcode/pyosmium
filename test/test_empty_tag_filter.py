@@ -33,19 +33,6 @@ def test_filter_default_config(reader):
     assert post.relations == [91]
 
 
-def test_filter_inverted(reader):
-    pre = IDCollector()
-    post = IDCollector()
-    o.apply(reader, pre, o.filter.EmptyTagFilter().invert(), post)
-
-    assert pre.nodes == [1, 2]
-    assert post.nodes == [1]
-    assert pre.ways == [1, 34]
-    assert post.ways == [34]
-    assert pre.relations == [90, 91]
-    assert post.relations == [90]
-
-
 def test_filter_restrict_entity(reader):
     pre = IDCollector()
     post = IDCollector()
@@ -59,30 +46,17 @@ def test_filter_restrict_entity(reader):
     assert post.relations == [91]
 
 
-def test_filter_restrict_entity_invert(reader):
-    pre = IDCollector()
-    post = IDCollector()
-    o.apply(reader, pre, o.filter.EmptyTagFilter().enable_for(o.osm.NODE).invert(), post)
-
-    assert pre.nodes == [1, 2]
-    assert post.nodes == [1]
-    assert pre.ways == [1, 34]
-    assert post.ways == [1, 34]
-    assert pre.relations == [90, 91]
-    assert post.relations == [90, 91]
-
-
 def test_filter_chained(reader):
     pre = IDCollector()
     post = IDCollector()
     o.apply(reader, pre,
-            o.filter.EmptyTagFilter().enable_for(o.osm.NODE).invert(False),
-            o.filter.EmptyTagFilter().enable_for(o.osm.WAY).invert(True),
+            o.filter.EmptyTagFilter().enable_for(o.osm.NODE),
+            o.filter.EmptyTagFilter().enable_for(o.osm.WAY),
             post)
 
     assert pre.nodes == [1, 2]
     assert post.nodes == [2]
     assert pre.ways == [1, 34]
-    assert post.ways == [34]
+    assert post.ways == [1]
     assert pre.relations == [90, 91]
     assert post.relations == [90, 91]

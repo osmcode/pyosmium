@@ -17,8 +17,6 @@ PYBIND11_MODULE(_filter, m) {
         .def("enable_for", &pyosmium::BaseFilter::enable_for,
              py::arg("entities"),
              "Set the OSM types this filter should be used for.")
-        .def("invert", &pyosmium::BaseFilter::invert,
-             py::arg("new_state")=true)
     ;
 
     pyosmium::init_empty_tag_filter(m);

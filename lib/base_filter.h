@@ -20,42 +20,36 @@ public:
     bool node(osmium::Node const *n) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::node)
-               && (filter_node(n) != m_inverted);
+               && filter_node(n);
     }
 
     bool way(osmium::Way *n) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::way)
-               && (filter_way(n) != m_inverted);
+               && filter_way(n);
     }
 
     bool relation(osmium::Relation const *n) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::relation)
-               && (filter_relation(n) != m_inverted);
+               && filter_relation(n);
     }
 
     bool area(osmium::Area const *n) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::area)
-               && (filter_area(n) != m_inverted);
+               && filter_area(n);
     }
 
     bool changeset(osmium::Changeset const *n) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::changeset)
-               && (filter_changeset(n) != m_inverted);
+               && filter_changeset(n);
     }
 
     BaseFilter *enable_for(osmium::osm_entity_bits::type entities)
     {
         m_enabled_for = entities;
-        return this;
-    }
-
-    BaseFilter *invert(bool new_state)
-    {
-        m_inverted = new_state;
         return this;
     }
 
@@ -68,7 +62,6 @@ protected:
     virtual bool filter_changeset(osmium::Changeset const *) { return false; }
 
 private:
-    bool m_inverted = false;
     osmium::osm_entity_bits::type m_enabled_for = osmium::osm_entity_bits::all;
 
 };
