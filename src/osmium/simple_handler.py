@@ -40,7 +40,7 @@ class SimpleHandler:
 
         return entities
 
-    def apply_file(self, filename, locations=False, idx='flex_mem'):
+    def apply_file(self, filename, locations=False, idx='flex_mem', filters=[]):
         """ Apply the handler to the given file. If locations is true, then
             a location handler will be applied before, which saves the node
             positions. In that case, the type of this position index can be
@@ -49,38 +49,37 @@ class SimpleHandler:
             handler for assembling multipolygons and areas from ways will
             be executed.
         """
-        self._apply_object(str(filename), locations, idx)
+        self._apply_object(str(filename), locations, idx, filters)
 
 
-    def apply_buffer(self, buffer, format, locations=False, idx='flex_mem'):
+    def apply_buffer(self, buffer, format, locations=False, idx='flex_mem', filters=[]):
         """Apply the handler to a string buffer. The buffer must be a
            byte string.
         """
-        self._apply_object(FileBuffer(buffer, format), locations, idx)
+        self._apply_object(FileBuffer(buffer, format), locations, idx, filters)
 
 
-    def _apply_object(self, obj, locations, idx):
+    def _apply_object(self, obj, locations, idx, filters):
         entities = self.enabled_for()
-        handlers = [self]
         if entities & osm_entity_bits.AREA:
             area = AreaManager()
             rd = Reader(obj, osm_entity_bits.RELATION)
             try:
-                apply(rd, area.first_pass_handler())
+                apply(rd, *filters, area.first_pass_handler())
             finally:
                 rd.close()
 
             entities |= osm_entity_bits.OBJECT
             lh = NodeLocationsForWays(create_map(idx))
             lh.ignore_errors()
-            handlers = [lh, self, area.second_pass_handler(self)]
+            handlers = [lh, area.second_pass_handler(*filters, self), *filters, self]
         elif locations:
             entities |= osm_entity_bits.NODE
             lh = NodeLocationsForWays(create_map(idx))
             lh.ignore_errors()
-            handlers = [lh, self]
+            handlers = [lh, *filters, self]
         else:
-            handlers = [self]
+            handlers = [*filters, self]
 
         rd = Reader(obj, entities)
         try:
