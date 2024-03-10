@@ -86,7 +86,8 @@ pybind11_add_module(_area lib/area.cc)
 set_module_output(_area osmium/area)
 pybind11_add_module(_filter
                     lib/filter.cc
-                    lib/empty_tag_filter.cc)
+                    lib/empty_tag_filter.cc
+                    lib/key_filter.cc)
 set_module_output(_filter osmium/filter)
 
 target_link_libraries(_osmium PRIVATE ${OSMIUM_LIBRARIES})

@@ -75,6 +75,7 @@ private:
 
 
 void init_empty_tag_filter(pybind11::module &m);
+void init_key_filter(pybind11::module &m);
 
 } // namespace
 
