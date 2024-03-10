@@ -32,6 +32,7 @@ class IDCollector:
         self.nodes = []
         self.ways = []
         self.relations = []
+        self.changesets = []
 
     def node(self, n):
         self.nodes.append(n.id)
@@ -41,3 +42,6 @@ class IDCollector:
 
     def relation(self, r):
         self.relations.append(r.id)
+
+    def changeset(self, c):
+        self.changesets.append(c.id)

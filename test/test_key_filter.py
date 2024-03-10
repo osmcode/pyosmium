@@ -20,19 +20,22 @@ def test_filter_bad_argument_types(key):
         o.filter.KeyFilter("foo", key)
 
 
-@pytest.mark.parametrize('key,result', [('foo', [1]),
-                                        ('name', [1, 2]),
-                                        ('kö*', [4])])
-def test_filter_simple(opl_reader, key, result):
+@pytest.mark.parametrize('key,nodes,changesets', [('foo', [1], [10]),
+                                                  ('name', [1, 2], [20]),
+                                                  ('kö*', [4], [])])
+def test_filter_simple(opl_reader, key, nodes, changesets):
     data = """\
            n1 Tfoo=bar,name=loo
            n2 Tname=else
            n3 x9 y0
            n4 Tkö*=fr
+           c10 Tfoo=baz
+           c20 Tname=none
            """
 
     post = IDCollector()
 
     o.apply(opl_reader(data), o.filter.KeyFilter(key), post)
 
-    assert post.nodes == result
+    assert post.nodes == nodes
+    assert post.changesets == changesets

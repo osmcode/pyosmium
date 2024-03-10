@@ -46,6 +46,18 @@ public:
         return true;
     }
 
+    bool filter_changeset(osmium::Changeset const *o) override
+    {
+        auto const &tags = o->tags();
+        for (auto const &key: m_keys) {
+            if (tags.has_key(key.c_str())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 private:
     std::vector<std::string> m_keys;
 };

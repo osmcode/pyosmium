@@ -18,6 +18,8 @@ def reader(opl_reader):
                w34 Nn2,n1
                r90
                r91 Tsome=thing
+               c222 Ttodo=done
+               c223
                """)
 
 def test_filter_default_config(reader):
@@ -31,6 +33,8 @@ def test_filter_default_config(reader):
     assert post.ways == [1]
     assert pre.relations == [90, 91]
     assert post.relations == [91]
+    assert pre.changesets == [222, 223]
+    assert post.changesets == [222]
 
 
 def test_filter_restrict_entity(reader):
