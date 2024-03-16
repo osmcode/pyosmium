@@ -12,14 +12,15 @@ class FileProcessor:
     """ A generator that emits OSM objects read from a file.
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, entities=osmium.osm.ALL):
         if isinstance(filename, (osmium.io.File, osmium.io.FileBuffer)):
             self._file = filename
         elif isinstance(filename, (str, Path)):
             self._file = osmium.io.File(str(filename))
         else:
             raise TypeError("File must be an osmium.io.File, osmium.io.FileBuffer, str or Path")
-        self._reader = osmium.io.Reader(self._file)
+        self._reader = osmium.io.Reader(self._file, entities)
+        self._entities = entities
         self._node_store = None
         self._area_handler = None
         self._filters = []
@@ -41,6 +42,8 @@ class FileProcessor:
         """ Enable caching of node locations. This is necessary in order
             to get geometries for ways and relations.
         """
+        if not (self._entities & osmium.osm.NODE):
+            raise RuntimeError('Nodes not read from file. Cannot enable location cache.')
         if isinstance(storage, str):
             self._node_store = osmium.index.create_map(storage)
         elif storage is None or isinstance(storage, osmium.index.LocationTable):

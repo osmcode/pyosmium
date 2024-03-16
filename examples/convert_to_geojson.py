@@ -48,7 +48,7 @@ class GeoJsonWriter(o.SimpleHandler):
 def main(osmfile):
     handler = GeoJsonWriter()
 
-    handler.apply_file(osmfile)
+    handler.apply_file(osmfile,filters=[o.filter.EmptyTagFilter().apply_to(o.osm.NODE)])
     handler.finish()
 
     return 0
