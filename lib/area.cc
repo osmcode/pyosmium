@@ -13,6 +13,7 @@
 
 #include "base_handler.h"
 #include "handler_chain.h"
+#include "buffer_iterator.h"
 
 namespace py = pybind11;
 
@@ -20,15 +21,13 @@ namespace {
 
 using MpManager = osmium::area::MultipolygonManager<osmium::area::Assembler>;
 
-class AreaManagerSecondPassHandler : public BaseHandler
+class AreaManagerSecondPassHandlerBase : public BaseHandler
 {
 public:
-    AreaManagerSecondPassHandler(MpManager *mp_manager, py::args args)
-    : m_mp_manager(mp_manager), m_args(args), m_handlers(m_args)
-    {
-        m_mp_manager->set_callback([this](osmium::memory::Buffer &&ab)
-                                          { osmium::apply(ab, this->m_handlers); });
-    }
+    AreaManagerSecondPassHandlerBase(MpManager *mp_manager)
+    : m_mp_manager(mp_manager)
+    {}
+
 
     bool node(osmium::Node const *n) override
     {
@@ -53,10 +52,37 @@ public:
         m_mp_manager->flush_output();
     }
 
-private:
+protected:
     MpManager *m_mp_manager;
+};
+
+
+class AreaManagerSecondPassHandler : public AreaManagerSecondPassHandlerBase
+{
+public:
+    AreaManagerSecondPassHandler(MpManager *mp_manager, py::args args)
+    : AreaManagerSecondPassHandlerBase(mp_manager), m_args(args), m_handlers(m_args)
+    {
+        m_mp_manager->set_callback([this](osmium::memory::Buffer &&ab)
+                                          { osmium::apply(ab, this->m_handlers); });
+    }
+
+private:
     py::args m_args;
     HandlerChain m_handlers;
+
+};
+
+
+class AreaManagerBufferHandler : public AreaManagerSecondPassHandlerBase
+{
+public:
+    AreaManagerBufferHandler(MpManager *mp_manager, pyosmium::BufferIterator *cb)
+    : AreaManagerSecondPassHandlerBase(mp_manager)
+    {
+        m_mp_manager->set_callback([cb](osmium::memory::Buffer &&ab)
+                                       { cb->add_buffer(std::move(ab)); });
+    }
 };
 
 
@@ -82,6 +108,12 @@ public:
         return new AreaManagerSecondPassHandler(&m_mp_manager, args);
     }
 
+    AreaManagerBufferHandler *second_pass_to_buffer(pyosmium::BufferIterator *cb)
+    {
+        m_mp_manager.prepare_for_lookup();
+        return new AreaManagerBufferHandler(&m_mp_manager, cb);
+    }
+
 private:
     osmium::area::Assembler::config_type m_assembler_config;
     osmium::area::MultipolygonManager<osmium::area::Assembler> m_mp_manager;
@@ -93,6 +125,8 @@ PYBIND11_MODULE(_area, m)
 {
     py::class_<AreaManagerSecondPassHandler, BaseHandler>(m,
                 "AreaManagerSecondPassHandler");
+    py::class_<AreaManagerBufferHandler, BaseHandler>(m,
+                "AreaManagerBufferHandler");
 
     py::class_<AreaManager, BaseHandler>(m, "AreaManager",
         "Object manager class that manages building area objects from "
@@ -107,5 +141,9 @@ PYBIND11_MODULE(_area, m)
              "file, where areas are assembled. Pass the handlers that "
              "should handle the areas.",
              py::return_value_policy::take_ownership, py::keep_alive<1, 2>())
+        .def("second_pass_to_buffer", &AreaManager::second_pass_to_buffer,
+             py::keep_alive<1, 2>(),
+             "Return a handler object for the second pass of the file. "
+             "The handler holds a buffer, which can be iterated over.")
     ;
 }

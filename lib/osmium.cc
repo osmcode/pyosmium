@@ -18,6 +18,7 @@
 #include "osmium_module.h"
 #include "python_handler.h"
 #include "handler_chain.h"
+#include "buffer_iterator.h"
 
 namespace py = pybind11;
 
@@ -66,6 +67,15 @@ PYBIND11_MODULE(_osmium, m) {
           "Apply a chain of handlers.");
 
     py::class_<BaseHandler>(m, "BaseHandler");
+
+    py::class_<pyosmium::BufferIterator>(m, "BufferIterator",
+    "Iterator interface for reading from a queue of buffers.")
+    .def(py::init<py::args>())
+    .def("__bool__", [](pyosmium::BufferIterator const &it) { return !it.empty(); })
+    .def("__iter__", [](py::object const &self) { return self; })
+    .def("__next__", &pyosmium::BufferIterator::next,
+         "Get the next OSM object from the buffer or raise an StopIteration.")
+    ;
 
     init_merge_input_reader(m);
     init_write_handler(m);
