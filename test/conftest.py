@@ -53,13 +53,20 @@ def test_data(tmp_path, to_opl):
     return _mkfile
 
 @pytest.fixture
-def opl_reader(to_opl):
+def opl_buffer(to_opl):
 
     def _mkbuffer(data):
-        return o.io.Reader(o.io.FileBuffer(to_opl(data).encode('utf-8'), 'opl'))
+        return o.io.FileBuffer(to_opl(data).encode('utf-8'), 'opl')
 
     return _mkbuffer
 
+@pytest.fixture
+def opl_reader(opl_buffer):
+
+    def _mkbuffer(data):
+        return o.io.Reader(opl_buffer(data))
+
+    return _mkbuffer
 
 @pytest.fixture
 def simple_handler(to_opl):

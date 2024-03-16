@@ -8,6 +8,7 @@
 from osmium._osmium import *
 from osmium.helper import *
 from osmium.simple_handler import SimpleHandler
+from osmium.file_processor import FileProcessor
 import osmium.io
 import osmium.osm
 import osmium.index

@@ -81,4 +81,5 @@ PYBIND11_MODULE(_osmium, m) {
     init_write_handler(m);
     init_simple_writer(m);
     init_node_location_handler(m);
+    init_osm_file_iterator(m);
 };
