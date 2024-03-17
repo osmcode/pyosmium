@@ -370,6 +370,32 @@ class OSMObject(Generic[T_obj]):
         """
         return self._pyosmium_data.user_is_anonymous()
 
+    def type_str(self) -> str:
+        """ Return a single character identifying the type of the object.
+            The character is the same as used in OPL.
+        """
+        return 'o'
+
+    def is_node(self) -> bool:
+        """ Return true if the object is a Node object.
+        """
+        return isinstance(self, Node)
+
+    def is_way(self) -> bool:
+        """ Return true if the object is a Way object.
+        """
+        return isinstance(self, Way)
+
+    def is_relation(self) -> bool:
+        """ Return true if the object is a Relation object.
+        """
+        return isinstance(self, Relation)
+
+    def is_area(self) -> bool:
+        """ Return true if the object is a Way object.
+        """
+        return isinstance(self, Area)
+
 
 class Node(OSMObject['cosm.COSMNode']):
     """ Represents a single OSM node. It inherits all properties from OSMObjects
@@ -402,6 +428,9 @@ class Node(OSMObject['cosm.COSMNode']):
             self._location = self._pyosmium_data.location()
 
         return self._location
+
+    def type_str(self) -> str:
+        return 'n'
 
     def __str__(self) -> str:
         if self._pyosmium_data.is_valid():
@@ -467,6 +496,9 @@ class Way(OSMObject['cosm.COSMWay']):
         """
         return self._pyosmium_data.ends_have_same_location()
 
+    def type_str(self) -> str:
+        return 'w'
+
     def __str__(self) -> str:
         if self._pyosmium_data.is_valid():
             return f'w{self.id:d}: nodes={self.nodes!s} tags={self.tags!s}'
@@ -502,6 +534,9 @@ class Relation(OSMObject['cosm.COSMRelation']):
             ``rel.replace(tags=dict(rel.tags), members=list(rel.members))``
         """
         return osmium.osm.mutable.Relation(self, **kwargs)
+
+    def type_str(self) -> str:
+        return 'r'
 
     def __str__(self) -> str:
         if self._pyosmium_data.is_valid():
@@ -593,6 +628,9 @@ class Area(OSMObject['cosm.COSMArea']):
         """
         return InnerRingIterator(self._pyosmium_data, oring)
 
+    def type_str(self) -> str:
+        return 'a'
+
     def __str__(self) -> str:
         if self._pyosmium_data.is_valid():
             return f"a{self.id:d}: num_rings={self.num_rings()}, tags={self.tags!s}"
@@ -676,6 +714,9 @@ class Changeset:
             in general.
         """
         return self._pyosmium_data.user_is_anonymous()
+
+    def type_str(self) -> str:
+        return 'c'
 
     def __str__(self) -> str:
         if self._pyosmium_data.is_valid():

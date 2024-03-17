@@ -6,27 +6,22 @@ Shows how to extract the geometry of a way.
 import osmium as o
 import sys
 
-class RoadLengthHandler(o.SimpleHandler):
-    def __init__(self):
-        super(RoadLengthHandler, self).__init__()
-        self.length = 0.0
-
-    def way(self, w):
-        if 'highway' in w.tags:
+def main(osmfile):
+    total = 0.0
+    # As we need the way geometry, the node locations need to be cached.
+    # This is enabled with the with_locations() function.
+    for obj in o.FileProcessor(osmfile, o.osm.NODE | o.osm.WAY)\
+                .with_locations()\
+                .with_filter(o.filter.KeyFilter('highway')):
+        if obj.is_way():
             try:
-                self.length += o.geom.haversine_distance(w.nodes)
+                total += o.geom.haversine_distance(obj.nodes)
             except o.InvalidLocationError:
                 # A location error might occur if the osm file is an extract
                 # where nodes of ways near the boundary are missing.
-                print("WARNING: way %d incomplete. Ignoring." % w.id)
+                print("WARNING: way %d incomplete. Ignoring." % obj.id)
 
-def main(osmfile):
-    h = RoadLengthHandler()
-    # As we need the geometry, the node locations need to be cached. Therefore
-    # set 'locations' to true.
-    h.apply_file(osmfile, locations=True)
-
-    print('Total way length: %.2f km' % (h.length/1000))
+    print('Total way length: %.2f km' % (total/1000))
 
     return 0
 

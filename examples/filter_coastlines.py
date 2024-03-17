@@ -7,36 +7,8 @@ We need to go twice over the file. First read the ways, filter the ones
 we are interested in and remember the nodes required. Then, in a second
 run all the relevant nodes and ways are written out.
 """
-
 import osmium as o
 import sys
-
-class WayFilter(o.SimpleHandler):
-
-    def __init__(self):
-        super(WayFilter, self).__init__()
-        self.nodes = set()
-
-    def way(self, w):
-        if 'natural' in w.tags and w.tags['natural'] == 'coastline':
-            for n in w.nodes:
-                self.nodes.add(n.ref)
-
-
-class CoastlineWriter(o.SimpleHandler):
-
-    def __init__(self, writer, nodes):
-        super(CoastlineWriter, self).__init__()
-        self.writer = writer
-        self.nodes = nodes
-
-    def node(self, n):
-        if n.id in self.nodes:
-            self.writer.add_node(n)
-
-    def way(self, w):
-        if 'natural' in w.tags and w.tags['natural'] == 'coastline':
-            self.writer.add_way(w)
 
 
 if __name__ == '__main__':
@@ -46,11 +18,27 @@ if __name__ == '__main__':
 
 
     # go through the ways to find all relevant nodes
-    ways = WayFilter()
-    ways.apply_file(sys.argv[1])
+    nodes = set()
+    # Pre-filter the ways by tags. The less object we need to look at, the better.
+    way_filter = o.filter.KeyFilter('natural')
+    # only scan the ways of the file
+    for obj in o.FileProcessor(sys.argv[1], o.osm.WAY).with_filter(way_filter):
+        if obj.tags['natural'] == 'coastline':
+            nodes.update(n.ref for n in obj.nodes)
+
 
     # go through the file again and write out the data
     writer = o.SimpleWriter(sys.argv[2])
-    CoastlineWriter(writer, ways.nodes).apply_file(sys.argv[1])
+
+    # This time the pre-filtering should only apply to ways.
+    way_filter = o.filter.KeyFilter('natural').enable_for(o.osm.WAY)
+
+    # We need nodes and ways in the second pass.
+    for obj in o.FileProcessor(sys.argv[1], o.osm.WAY | o.osm.NODE).with_filter(way_filter):
+        if obj.is_node() and obj.id in nodes:
+            # Strip the object of tags along the way
+            writer.add_node(obj.replace(tags={}))
+        elif obj.is_way() and obj.tags['natural'] == 'coastline':
+            writer.add_way(obj)
 
     writer.close()

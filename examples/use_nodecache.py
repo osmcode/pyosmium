@@ -1,10 +1,9 @@
 import osmium as o
 import sys
 
-class WayHandler(o.SimpleHandler):
+class WayHandler:
 
     def __init__(self, idx):
-        super(WayHandler, self).__init__()
         self.idx = idx
 
     def way(self, w):
@@ -13,7 +12,7 @@ class WayHandler(o.SimpleHandler):
         print("%d %s" % (w.id, len(w.nodes)))
 
 if len(sys.argv) != 3:
-    print("Usage: python create_nodecache.py <osm file> <node cache>")
+    print("Usage: python use_nodecache.py <osm file> <node cache>")
     exit()
 
 reader = o.io.Reader(sys.argv[1], o.osm.osm_entity_bits.WAY)

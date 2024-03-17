@@ -7,14 +7,14 @@ use the handler generator function instead of a handler class.
 import osmium as o
 import sys
 
-class Stats(object):
+class Stats:
 
     def __init__(self):
         self.added = 0
         self.modified = 0
         self.deleted = 0
 
-    def __call__(self, o):
+    def add(self, o):
         if o.deleted:
             self.deleted += 1
         elif o.version == 1:
@@ -23,23 +23,20 @@ class Stats(object):
             self.modified += 1
 
     def outstats(self, prefix):
-        print("%s added: %d" % (prefix, self.added))
-        print("%s modified: %d" % (prefix, self.modified))
-        print("%s deleted: %d" % (prefix, self.deleted))
+        print(f"{prefix} added: {self.added}")
+        print(f"{prefix} modified: {self.modified}")
+        print(f"{prefix} deleted: {self.deleted}")
 
 
 def main(osmfile):
-    nodes = Stats()
-    ways = Stats()
-    rels = Stats()
+    stats = {t: Stats() for t in 'nwr'}
 
-    h = o.make_simple_handler(node=nodes, way=ways, relation=rels)
+    for obj in o.FileProcessor(osmfile):
+        stats[obj.type_str()].add(obj)
 
-    h.apply_file(osmfile)
-
-    nodes.outstats("Nodes")
-    ways.outstats("Ways")
-    rels.outstats("Relations")
+    stats['n'].outstats("Nodes")
+    stats['w'].outstats("Ways")
+    stats['r'].outstats("Relations")
 
     return 0
 

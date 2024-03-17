@@ -43,44 +43,59 @@ public:
         }
     }
 
-    void node(osmium::Node const &o) {
+    void node(osmium::Node const &o) { handle_node(o); }
+
+    bool handle_node(osmium::Node const &o) {
         for (auto const &handler : m_handlers) {
             if (handler->node(&o)) {
-                return;
+                return true;
             }
         }
+        return false;
     }
 
-    void way(osmium::Way &w) {
+    void way(osmium::Way &w) { handle_way(w); }
+
+    bool handle_way(osmium::Way &w) {
         for (auto const &handler : m_handlers) {
             if (handler->way(&w)) {
-                return;
+                return true;
             }
         }
+        return false;
     }
 
-    void relation(osmium::Relation const &o) {
+    void relation(osmium::Relation const &o) { handle_relation(o); }
+
+    bool handle_relation(osmium::Relation const &o) {
         for (auto const &handler : m_handlers) {
             if (handler->relation(&o)) {
-                return;
+                return true;
             }
         }
+        return false;
     }
 
-    void changeset(osmium::Changeset const &o) {
+    void changeset(osmium::Changeset const &o) { handle_changeset(o); }
+
+    bool handle_changeset(osmium::Changeset const &o) {
         for (auto const &handler : m_handlers) {
             if (handler->changeset(&o)) {
-                return;
+                return true;
             }
         }
+        return false;
     }
 
-    void area(osmium::Area const &o) {
+    void area(osmium::Area const &o) { handle_area(o); }
+
+    bool handle_area(osmium::Area const &o) {
         for (auto const &handler : m_handlers) {
             if (handler->area(&o)) {
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     void flush() {
