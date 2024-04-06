@@ -11,24 +11,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11]
+        os: [ubuntu-20.04, windows-2019, macos-11, macos-14]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: pybind/pybind11
           ref: v2.11.1
           path: contrib/pybind11
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: mapbox/protozero
           ref: v1.7.1
           path: contrib/protozero
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: osmcode/libosmium
           ref: v2.20.0
@@ -36,10 +36,10 @@ jobs:
 
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.17.0
         env:
            CIBW_ARCHS: native
-           CIBW_SKIP: "pp* *musllinux*"
+           CIBW_SKIP: "pp* *musllinux* cp38-macosx_arm64"
            CIBW_TEST_REQUIRES: pytest pytest-httpserver shapely
            CIBW_TEST_REQUIRES_LINUX: urllib3<2.0 pytest pytest-httpserver shapely
            CIBW_TEST_COMMAND: pytest {project}/test
@@ -49,6 +49,7 @@ jobs:
            CIBW_BEFORE_BUILD_WINDOWS: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
            CIBW_ENVIRONMENT_WINDOWS: 'CMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"'
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: pyosmium-wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl

@@ -131,7 +131,7 @@ jobs:
 
         strategy:
             matrix:
-                compiler: [gcc-old, clang-old, gcc, clang, macos]
+                compiler: [gcc-old, clang-old, gcc, clang, macos-intel, macos-arm]
                 include:
                     - compiler: gcc-old
                       cc: gcc-10
@@ -139,28 +139,38 @@ jobs:
                       platform: ubuntu-20.04
                       python: 3.6
                       deps: release
+                      flavour: linux
                     - compiler: clang-old
                       cc: clang-10
                       cxx: clang++-10
                       platform: ubuntu-20.04
                       python: 3.6
                       deps: release
+                      flavour: linux
                     - compiler: gcc
                       cc: gcc-12
                       cxx: g++-12
                       platform: ubuntu-22.04
-                      python: "3.11"
+                      python: "3.12"
                       deps: develop
+                      flavour: linux
                     - compiler: clang
                       cc: clang-14
                       cxx: clang++-14
                       platform: ubuntu-22.04
-                      python: "3.11"
+                      python: "3.12"
                       deps: develop
-                    - compiler: macos
-                      platform: macos-latest
-                      python: "3.11"
+                      flavour: linux
+                    - compiler: macos-intel
+                      platform: macos-13
+                      python: "3.10"
                       deps: develop
+                      flavour: macos
+                    - compiler: macos-arm
+                      platform: macos-14
+                      python: "3.12"
+                      deps: develop
+                      flavour: macos
 
         env:
             CC: ${{ matrix.cc }}
@@ -179,12 +189,12 @@ jobs:
 
             - name: Install packages
               run: sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
-              if: ${{ matrix.compiler != 'macos' }}
+              if: ${{ matrix.flavour == 'linux' }}
 
             - name: Install packages
               run: brew install boost geos lz4
               shell: bash
-              if: ${{ matrix.compiler == 'macos' }}
+              if: ${{ matrix.flavour == 'macos' }}
 
             - name: Install clang package
               run: sudo apt-get install -y -qq clang-6.0
@@ -214,7 +224,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - uses: actions/cache@v3
+            - uses: actions/cache@v4
               with:
                   path: |
                     C:/vcpkg_binary_cache
