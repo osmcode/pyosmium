@@ -33,7 +33,7 @@ for a detailed discussion of the data formats understood for each attribute.
 .. warning::
 
    Writers are considerably faster in handling native osmium data types than
-   Python objects. You should therefore avoid converting objects whereever
+   Python objects. You should therefore avoid converting objects wherever
    possible. This is not only true for the OSM data types like Node, Way and
    Relation but also for tag lists, node lists and member lists.
 
