@@ -1,6 +1,8 @@
 """
-Extract all objects with an amenity tag from an osm file and list them
+Extract objects with an amenity tag from an osm file and list them
 with their name and position.
+
+Points and areas will be processed, unclosed ways will be skipped.
 
 This example shows how geometries from osmium objects can be imported
 into shapely using the WKBFactory.
