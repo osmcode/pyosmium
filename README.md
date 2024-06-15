@@ -59,7 +59,7 @@ mkdir contrib
 cd contrib
 git clone https://github.com/osmcode/libosmium.git
 git clone https://github.com/mapbox/protozero.git
-git clone https://github.com/pybind/pybind
+git clone https://github.com/pybind/pybind11.git
 ```
 
 You can also set custom locations with `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
