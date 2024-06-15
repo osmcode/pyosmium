@@ -52,6 +52,16 @@ recommended that you put them in a subdirectory `contrib`.
 
 You can do this by cloning their repositories into that location.
 
+Following commands should achieve this:
+
+```
+mkdir contrib
+cd contrib
+git clone https://github.com/osmcode/libosmium.git
+git clone https://github.com/mapbox/protozero.git
+git clone https://github.com/pybind/pybind
+```
+
 You can also set custom locations with `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
 `PYBIND11_PREFIX` respectively.
 
