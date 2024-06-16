@@ -47,9 +47,22 @@ pyosmium has the following dependencies:
 
 ### Compiling from Source
 
-Get the latest versions of libosmium, protozero and pybind11. It is
-recommended that you put them in a subdirectory `contrib`. You can also
-set custom locations with `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
+Get the latest versions of libosmium, protozero and pybind11 source code. It is
+recommended that you put them in a subdirectory `contrib`. 
+
+You can do this by cloning their repositories into that location.
+
+Following commands should achieve this:
+
+```
+mkdir contrib
+cd contrib
+git clone https://github.com/osmcode/libosmium.git
+git clone https://github.com/mapbox/protozero.git
+git clone https://github.com/pybind/pybind11.git
+```
+
+You can also set custom locations with `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
 `PYBIND11_PREFIX` respectively.
 
 To use a custom boost installation, set `BOOST_PREFIX`.
