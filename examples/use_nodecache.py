@@ -1,3 +1,6 @@
+"""
+Iterate over all ways (and ways only) using node cache to obtain geometries
+"""
 import osmium as o
 import sys
 
@@ -8,7 +11,7 @@ class WayHandler:
 
     def way(self, w):
         for n in w.nodes:
-            loc = idx.get(n.ref)
+            loc = idx.get(n.ref) # note that cache is used here
         print("%d %s" % (w.id, len(w.nodes)))
 
 if len(sys.argv) != 3:
