@@ -59,7 +59,6 @@ public:
     bool node(osmium::Node const *n) override
     {
         if (m_enabled & osmium::osm_entity_bits::node) {
-            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Node")(COSMNode{n});
             ObjectGuard<COSMNode> guard(obj);
             m_handler.attr("node")(obj);
@@ -70,7 +69,6 @@ public:
     bool way(osmium::Way *w) override
     {
         if (m_enabled & osmium::osm_entity_bits::way) {
-            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Way")(COSMWay{w});
             ObjectGuard<COSMWay> guard(obj);
             m_handler.attr("way")(obj);
@@ -81,7 +79,6 @@ public:
     bool relation(osmium::Relation const *r) override
     {
         if (m_enabled & osmium::osm_entity_bits::relation) {
-            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Relation")(COSMRelation{r});
             ObjectGuard<COSMRelation> guard(obj);
             m_handler.attr("relation")(obj);
@@ -92,7 +89,6 @@ public:
     bool changeset(osmium::Changeset const *c) override
     {
         if (m_enabled & osmium::osm_entity_bits::changeset) {
-            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Changeset")(COSMChangeset{c});
             ObjectGuard<COSMChangeset> guard(obj);
             m_handler.attr("changeset")(obj);
@@ -103,7 +99,6 @@ public:
     bool area(osmium::Area const *a) override
     {
         if (m_enabled & osmium::osm_entity_bits::area) {
-            pybind11::gil_scoped_acquire acquire;
             auto obj = m_type_module.attr("Area")(COSMArea{a});
             ObjectGuard<COSMArea> guard(obj);
             m_handler.attr("area")(obj);

@@ -33,22 +33,18 @@ PYBIND11_MODULE(_osmium, m) {
     });
 
     m.def("apply", [](osmium::io::Reader &rd, pyosmium::BaseHandler &h)
-                   { py::gil_scoped_release release; osmium::apply(rd, h); },
+                   { osmium::apply(rd, h); },
           py::arg("reader"), py::arg("handler"),
           "Apply a single handler.");
     m.def("apply", [](osmium::io::Reader &rd, py::args args)
                      {
                          pyosmium::HandlerChain handler{args};
-                         {
-                             py::gil_scoped_release release;
-                             osmium::apply(rd, handler);
-                         }
+                         osmium::apply(rd, handler);
                      },
           py::arg("reader"),
           "Apply a chain of handlers.");
     m.def("apply", [](std::string fn, pyosmium::BaseHandler &h)
                    {
-                       py::gil_scoped_release release;
                        osmium::io::Reader rd{fn};
                        osmium::apply(rd, h);
                    },
@@ -57,11 +53,8 @@ PYBIND11_MODULE(_osmium, m) {
     m.def("apply", [](std::string fn, py::args args)
                      {
                          pyosmium::HandlerChain handler{args};
-                         {
-                             py::gil_scoped_release release;
-                             osmium::io::Reader rd{fn};
-                             osmium::apply(rd, handler);
-                         }
+                         osmium::io::Reader rd{fn};
+                         osmium::apply(rd, handler);
                      },
           py::arg("filename"),
           "Apply a chain of handlers.");
