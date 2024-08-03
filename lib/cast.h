@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_CAST_H
@@ -122,6 +122,6 @@ T const &cast_list(pybind11::object const &o) {
     return o.attr("_list").cast<T const &>();
 }
 
-}
+} // namespace
 
 #endif // PYOSMIUM_CAST_H

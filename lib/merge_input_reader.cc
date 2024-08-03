@@ -62,7 +62,7 @@ class MergeInputReader
 public:
     void apply(py::args args, std::string const &idx, bool simplify)
     {
-        HandlerChain handler{args};
+        pyosmium::HandlerChain handler{args};
         if (idx.empty())
             apply_without_location(handler, simplify);
         else
@@ -128,7 +128,7 @@ public:
     }
 
 private:
-    void apply_without_location(HandlerChain& handler, bool simplify)
+    void apply_without_location(pyosmium::HandlerChain& handler, bool simplify)
     {
         if (simplify) {
             objects.sort(osmium::object_order_type_id_reverse_version());
@@ -150,7 +150,7 @@ private:
         changes.clear();
     }
 
-    void apply_with_location(HandlerChain& handler, std::string const &idx,
+    void apply_with_location(pyosmium::HandlerChain& handler, std::string const &idx,
                              bool simplify)
     {
         using Index_fab =
@@ -199,7 +199,9 @@ private:
     osmium::ObjectPointerCollection objects;
 };
 
-}
+} // namespace
+
+namespace pyosmium {
 
 void init_merge_input_reader(py::module &m)
 {
@@ -240,3 +242,5 @@ void init_merge_input_reader(py::module &m)
              "safely discarded after the function has been called.")
     ;
 };
+
+} // namespace

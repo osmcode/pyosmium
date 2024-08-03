@@ -19,6 +19,8 @@
 
 namespace py = pybind11;
 
+namespace pyosmium {
+
 class HandlerChain : public osmium::handler::Handler
 {
 public:
@@ -108,5 +110,7 @@ private:
     std::vector<BaseHandler *> m_handlers;
     std::vector<pyosmium::PythonHandler> m_python_handlers;
 };
+
+} // namespace
 
 #endif //PYOSMIUM_HANDLER_CHAIN_H

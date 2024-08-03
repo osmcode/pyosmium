@@ -62,7 +62,7 @@ private:
     std::vector<std::string> m_keys;
 };
 
-}
+} // namespace
 
 namespace pyosmium {
 

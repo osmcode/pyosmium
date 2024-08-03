@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -20,6 +20,8 @@
 
 namespace py = pybind11;
 namespace og = osmium::geom;
+
+namespace {
 
 struct WKBFactory : osmium::geom::WKBFactory<>
 {
@@ -46,7 +48,7 @@ void make_factory_class(py::module_ &m, char const *name, char const *doc)
                  if (py::isinstance<osmium::Location>(o)) {
                     return f.create_point(o.cast<osmium::Location const &>());
                  }
-                 auto const *node = pyosmium::try_cast<COSMNode>(o);
+                 auto const *node = pyosmium::try_cast<pyosmium::COSMNode>(o);
                  if (node) {
                     return f.create_point(*node->get());
                  }
@@ -57,7 +59,7 @@ void make_factory_class(py::module_ &m, char const *name, char const *doc)
              "Create a point geometry from a :py:class:`osmium.osm.Node`.")
         .def("create_linestring",
              [](Factory &f, py::object const &o, og::use_nodes un, og::direction dir) {
-                 auto const *way = pyosmium::try_cast<COSMWay>(o);
+                 auto const *way = pyosmium::try_cast<pyosmium::COSMWay>(o);
                  if (way) {
                     return f.create_linestring(*way->get(), un, dir);
                  }
@@ -69,12 +71,14 @@ void make_factory_class(py::module_ &m, char const *name, char const *doc)
              "Create a LineString geometry from a :py:class:`osmium.osm.Way`.")
         .def("create_multipolygon",
              [](Factory &f, py::object const &o) {
-                 return f.create_multipolygon(*pyosmium::cast<COSMArea>(o).get());
+                 return f.create_multipolygon(*pyosmium::cast<pyosmium::COSMArea>(o).get());
              },
              py::arg("area"),
              "Create a MultiPolygon geometry from a :py:class:`osmium.osm.Area`.")
     ;
 }
+
+} // namespace
 
 PYBIND11_MODULE(geom, m)
 {

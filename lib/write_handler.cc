@@ -15,7 +15,7 @@
 
 namespace {
 
-class WriteHandler : public BaseHandler
+class WriteHandler : public pyosmium::BaseHandler
 {
     enum { BUFFER_WRAP = 4096 };
 
@@ -88,9 +88,11 @@ private:
     osmium::memory::Buffer buffer;
 };
 
-}
+} // namespace
 
 namespace py = pybind11;
+
+namespace pyosmium {
 
 void init_write_handler(pybind11::module &m)
 {
@@ -117,3 +119,5 @@ void init_write_handler(pybind11::module &m)
              "that the buffer memory can be freed.")
     ;
 }
+
+} // namespace

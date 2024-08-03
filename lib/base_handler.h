@@ -10,6 +10,8 @@
 
 #include <osmium/handler.hpp>
 
+namespace pyosmium {
+
 class BaseHandler : public osmium::handler::Handler
 {
 public:
@@ -35,5 +37,7 @@ public:
 
     virtual void flush() {}
 };
+
+} // namespace
 
 #endif // PYOSMIUM_BASE_HANDLER_HPP

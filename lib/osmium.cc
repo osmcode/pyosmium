@@ -32,13 +32,13 @@ PYBIND11_MODULE(_osmium, m) {
         }
     });
 
-    m.def("apply", [](osmium::io::Reader &rd, BaseHandler &h)
+    m.def("apply", [](osmium::io::Reader &rd, pyosmium::BaseHandler &h)
                    { py::gil_scoped_release release; osmium::apply(rd, h); },
           py::arg("reader"), py::arg("handler"),
           "Apply a single handler.");
     m.def("apply", [](osmium::io::Reader &rd, py::args args)
                      {
-                         HandlerChain handler{args};
+                         pyosmium::HandlerChain handler{args};
                          {
                              py::gil_scoped_release release;
                              osmium::apply(rd, handler);
@@ -46,7 +46,7 @@ PYBIND11_MODULE(_osmium, m) {
                      },
           py::arg("reader"),
           "Apply a chain of handlers.");
-    m.def("apply", [](std::string fn, BaseHandler &h)
+    m.def("apply", [](std::string fn, pyosmium::BaseHandler &h)
                    {
                        py::gil_scoped_release release;
                        osmium::io::Reader rd{fn};
@@ -56,7 +56,7 @@ PYBIND11_MODULE(_osmium, m) {
           "Apply a single handler.");
     m.def("apply", [](std::string fn, py::args args)
                      {
-                         HandlerChain handler{args};
+                         pyosmium::HandlerChain handler{args};
                          {
                              py::gil_scoped_release release;
                              osmium::io::Reader rd{fn};
@@ -66,7 +66,7 @@ PYBIND11_MODULE(_osmium, m) {
           py::arg("filename"),
           "Apply a chain of handlers.");
 
-    py::class_<BaseHandler>(m, "BaseHandler");
+    py::class_<pyosmium::BaseHandler>(m, "BaseHandler");
 
     py::class_<pyosmium::BufferIterator>(m, "BufferIterator",
     "Iterator interface for reading from a queue of buffers.")
@@ -77,9 +77,9 @@ PYBIND11_MODULE(_osmium, m) {
          "Get the next OSM object from the buffer or raise an StopIteration.")
     ;
 
-    init_merge_input_reader(m);
-    init_write_handler(m);
-    init_simple_writer(m);
-    init_node_location_handler(m);
-    init_osm_file_iterator(m);
+    pyosmium::init_merge_input_reader(m);
+    pyosmium::init_write_handler(m);
+    pyosmium::init_simple_writer(m);
+    pyosmium::init_node_location_handler(m);
+    pyosmium::init_osm_file_iterator(m);
 };

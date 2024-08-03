@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -14,9 +14,6 @@
 #include "osm_base_objects.h"
 
 namespace py = pybind11;
-
-using TagIterator = osmium::TagList::const_iterator;
-using MemberIterator = osmium::RelationMemberList::const_iterator;
 
 #if PYBIND11_VERSION_MINOR >= 11 || PYBIND11_VERSION_MAJOR > 2
 /*
@@ -49,6 +46,11 @@ struct is_move_constructible<osmium::memory::ItemIterator<T>>
 } // namespace detail
 } // namespace pybind11
 #endif
+
+namespace {
+
+using TagIterator = osmium::TagList::const_iterator;
+using MemberIterator = osmium::RelationMemberList::const_iterator;
 
 static py::object tag_iterator_next(TagIterator &it, TagIterator const &cend)
 {
@@ -146,6 +148,8 @@ py::class_<COSMObject> make_osm_object_class(py::module_ &m, char const *class_n
         .def("is_valid", &COSMObject::is_valid)
     ;
 }
+
+} // namespace
 
 
 PYBIND11_MODULE(_osm, m) {
@@ -246,68 +250,68 @@ PYBIND11_MODULE(_osm, m) {
     py::class_<InnerRingIterator>(m, "CInnerRingIterator");
 
 
-    make_osm_object_class<COSMNode>(m, "COSMNode")
-        .def("location", [](COSMNode const &o) { return o.get()->location(); })
+    make_osm_object_class<pyosmium::COSMNode>(m, "COSMNode")
+        .def("location", [](pyosmium::COSMNode const &o) { return o.get()->location(); })
     ;
 
-    make_osm_object_class<COSMWay>(m, "COSMWay")
-        .def("is_closed", [](COSMWay const &o) { return o.get()->is_closed(); })
-        .def("ends_have_same_location", [](COSMWay const &o) { return o.get()->ends_have_same_location(); })
-        .def("nodes", [](COSMWay const &o) { return &o.get()->nodes(); },
+    make_osm_object_class<pyosmium::COSMWay>(m, "COSMWay")
+        .def("is_closed", [](pyosmium::COSMWay const &o) { return o.get()->is_closed(); })
+        .def("ends_have_same_location", [](pyosmium::COSMWay const &o) { return o.get()->ends_have_same_location(); })
+        .def("nodes", [](pyosmium::COSMWay const &o) { return &o.get()->nodes(); },
              py::return_value_policy::reference)
     ;
 
 
-    make_osm_object_class<COSMRelation>(m, "COSMRelation")
-        .def("members_size", [](COSMRelation const &o) { return o.get()->members().size(); })
-        .def("members_begin", [](COSMRelation const &o) { return o.get()->members().cbegin(); })
-        .def("members_next", [](COSMRelation const &o, MemberIterator &it)
+    make_osm_object_class<pyosmium::COSMRelation>(m, "COSMRelation")
+        .def("members_size", [](pyosmium::COSMRelation const &o) { return o.get()->members().size(); })
+        .def("members_begin", [](pyosmium::COSMRelation const &o) { return o.get()->members().cbegin(); })
+        .def("members_next", [](pyosmium::COSMRelation const &o, MemberIterator &it)
             { return member_iterator_next(it, o.get()->members().cend()); })
 
     ;
 
-    make_osm_object_class<COSMArea>(m, "COSMArea")
-        .def("from_way", [](COSMArea const &o) { return o.get()->from_way(); })
-        .def("orig_id", [](COSMArea const &o) { return o.get()->orig_id(); })
-        .def("is_multipolygon", [](COSMArea const &o) { return o.get()->is_multipolygon(); })
-        .def("num_rings", [](COSMArea const &o) { return o.get()->num_rings(); })
-        .def("outer_begin", [](COSMArea const &o) { return o.get()->outer_rings().cbegin(); })
-        .def("outer_next", [](COSMArea const &o, OuterRingIterator &it) {
+    make_osm_object_class<pyosmium::COSMArea>(m, "COSMArea")
+        .def("from_way", [](pyosmium::COSMArea const &o) { return o.get()->from_way(); })
+        .def("orig_id", [](pyosmium::COSMArea const &o) { return o.get()->orig_id(); })
+        .def("is_multipolygon", [](pyosmium::COSMArea const &o) { return o.get()->is_multipolygon(); })
+        .def("num_rings", [](pyosmium::COSMArea const &o) { return o.get()->num_rings(); })
+        .def("outer_begin", [](pyosmium::COSMArea const &o) { return o.get()->outer_rings().cbegin(); })
+        .def("outer_next", [](pyosmium::COSMArea const &o, OuterRingIterator &it) {
             o.get();
             return ring_iterator_next<osmium::OuterRing>(it);
         },
              py::return_value_policy::reference)
-        .def("inner_begin", [](COSMArea const &o, osmium::OuterRing const &ring)
+        .def("inner_begin", [](pyosmium::COSMArea const &o, osmium::OuterRing const &ring)
             { return o.get()->inner_rings(ring).cbegin(); })
-        .def("inner_next", [](COSMArea const &o, InnerRingIterator &it) {
+        .def("inner_next", [](pyosmium::COSMArea const &o, InnerRingIterator &it) {
             o.get();
             return ring_iterator_next<osmium::InnerRing>(it);
         },
              py::return_value_policy::reference)
     ;
 
-    py::class_<COSMChangeset>(m, "COSMChangeset")
-        .def("id", [](COSMChangeset const &o) { return o.get()->id(); })
-        .def("uid", [](COSMChangeset const &o) { return o.get()->uid(); })
-        .def("created_at", [](COSMChangeset const &o) { return o.get()->created_at(); })
-        .def("closed_at", [](COSMChangeset const &o) { return o.get()->closed_at(); })
-        .def("open", [](COSMChangeset const &o) { return o.get()->open(); })
-        .def("num_changes", [](COSMChangeset const &o) { return o.get()->num_changes(); })
-        .def("user", [](COSMChangeset const &o) { return o.get()->user(); })
-        .def("user_is_anonymous", [](COSMChangeset const &o) { return o.get()->user_is_anonymous(); })
-        .def("bounds", [](COSMChangeset const &o) { return o.get()->bounds(); })
-        .def("tags_size", [](COSMChangeset const &o) { return o.get()->tags().size(); })
-        .def("tags_get_value_by_key", [](COSMChangeset const &o, char const *key, char const *def)
+    py::class_<pyosmium::COSMChangeset>(m, "COSMChangeset")
+        .def("id", [](pyosmium::COSMChangeset const &o) { return o.get()->id(); })
+        .def("uid", [](pyosmium::COSMChangeset const &o) { return o.get()->uid(); })
+        .def("created_at", [](pyosmium::COSMChangeset const &o) { return o.get()->created_at(); })
+        .def("closed_at", [](pyosmium::COSMChangeset const &o) { return o.get()->closed_at(); })
+        .def("open", [](pyosmium::COSMChangeset const &o) { return o.get()->open(); })
+        .def("num_changes", [](pyosmium::COSMChangeset const &o) { return o.get()->num_changes(); })
+        .def("user", [](pyosmium::COSMChangeset const &o) { return o.get()->user(); })
+        .def("user_is_anonymous", [](pyosmium::COSMChangeset const &o) { return o.get()->user_is_anonymous(); })
+        .def("bounds", [](pyosmium::COSMChangeset const &o) { return o.get()->bounds(); })
+        .def("tags_size", [](pyosmium::COSMChangeset const &o) { return o.get()->tags().size(); })
+        .def("tags_get_value_by_key", [](pyosmium::COSMChangeset const &o, char const *key, char const *def)
             { return o.get()->tags().get_value_by_key(key, def); })
-        .def("tags_has_key", [](COSMChangeset const &o, char const *key)
+        .def("tags_has_key", [](pyosmium::COSMChangeset const &o, char const *key)
             { return o.get()->tags().has_key(key); })
-        .def("tags_begin", [](COSMChangeset const &o) { return o.get()->tags().cbegin(); })
-        .def("tags_next", [](COSMChangeset const &o, TagIterator &it)
+        .def("tags_begin", [](pyosmium::COSMChangeset const &o) { return o.get()->tags().cbegin(); })
+        .def("tags_next", [](pyosmium::COSMChangeset const &o, TagIterator &it)
             { return tag_iterator_next(it, o.get()->tags().cend()); })
-        .def("is_valid", &COSMChangeset::is_valid)
+        .def("is_valid", &pyosmium::COSMChangeset::is_valid)
     ;
 
-    make_node_list<osmium::WayNodeList, COSMWay>(m, "CWayNodeList");
-    make_node_list<osmium::OuterRing, COSMArea>(m, "COuterRing");
-    make_node_list<osmium::InnerRing, COSMArea>(m, "CInnerRing");
+    make_node_list<osmium::WayNodeList, pyosmium::COSMWay>(m, "CWayNodeList");
+    make_node_list<osmium::OuterRing, pyosmium::COSMArea>(m, "COuterRing");
+    make_node_list<osmium::InnerRing, pyosmium::COSMArea>(m, "CInnerRing");
 }

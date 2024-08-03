@@ -21,7 +21,7 @@ namespace {
 
 using MpManager = osmium::area::MultipolygonManager<osmium::area::Assembler>;
 
-class AreaManagerSecondPassHandlerBase : public BaseHandler
+class AreaManagerSecondPassHandlerBase : public pyosmium::BaseHandler
 {
 public:
     AreaManagerSecondPassHandlerBase(MpManager *mp_manager)
@@ -69,7 +69,7 @@ public:
 
 private:
     py::args m_args;
-    HandlerChain m_handlers;
+    pyosmium::HandlerChain m_handlers;
 
 };
 
@@ -86,14 +86,14 @@ public:
 };
 
 
-class AreaManager : public BaseHandler
+class AreaManager : public pyosmium::BaseHandler
 {
 public:
     AreaManager()
     : m_mp_manager(m_assembler_config)
     {}
 
-    BaseHandler *first_pass_handler() { return this; }
+    pyosmium::BaseHandler *first_pass_handler() { return this; }
 
     // first-pass-handler
     bool relation(osmium::Relation const *r) override
@@ -119,16 +119,16 @@ private:
     osmium::area::MultipolygonManager<osmium::area::Assembler> m_mp_manager;
 };
 
-}
+} // namespace
 
 PYBIND11_MODULE(_area, m)
 {
-    py::class_<AreaManagerSecondPassHandler, BaseHandler>(m,
+    py::class_<AreaManagerSecondPassHandler, pyosmium::BaseHandler>(m,
                 "AreaManagerSecondPassHandler");
-    py::class_<AreaManagerBufferHandler, BaseHandler>(m,
+    py::class_<AreaManagerBufferHandler, pyosmium::BaseHandler>(m,
                 "AreaManagerBufferHandler");
 
-    py::class_<AreaManager, BaseHandler>(m, "AreaManager",
+    py::class_<AreaManager, pyosmium::BaseHandler>(m, "AreaManager",
         "Object manager class that manages building area objects from "
         "ways and relations.")
         .def(py::init<>())

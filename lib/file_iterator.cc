@@ -63,7 +63,7 @@ public:
                 {
                     auto *node = static_cast<osmium::Node *>(entity);
                     if (!m_pre_handler.handle_node(*node)) {
-                        m_current = m_type_module.attr("Node")(COSMNode{node});
+                        m_current = m_type_module.attr("Node")(pyosmium::COSMNode{node});
                         m_current_type = osmium::item_type::node;
                         return m_current;
                     }
@@ -73,7 +73,7 @@ public:
                 {
                     auto *way = static_cast<osmium::Way *>(entity);
                     if (!m_pre_handler.handle_way(*way)) {
-                        m_current = m_type_module.attr("Way")(COSMWay{way});
+                        m_current = m_type_module.attr("Way")(pyosmium::COSMWay{way});
                         m_current_type = osmium::item_type::way;
                         return m_current;
                     }
@@ -83,7 +83,7 @@ public:
                 {
                     auto *rel = static_cast<osmium::Relation *>(entity);
                     if (!m_pre_handler.handle_relation(*rel)) {
-                        m_current = m_type_module.attr("Relation")(COSMRelation{rel});
+                        m_current = m_type_module.attr("Relation")(pyosmium::COSMRelation{rel});
                         m_current_type = osmium::item_type::relation;
                         return m_current;
                     }
@@ -93,7 +93,7 @@ public:
                 {
                     auto *cs = static_cast<osmium::Changeset *>(entity);
                     if (!m_pre_handler.handle_changeset(*cs)) {
-                        m_current = m_type_module.attr("Changeset")(COSMChangeset{cs});
+                        m_current = m_type_module.attr("Changeset")(pyosmium::COSMChangeset{cs});
                         m_current_type = osmium::item_type::changeset;
                         return m_current;
                     }
@@ -112,16 +112,16 @@ private:
     {
         switch (m_current_type) {
             case osmium::item_type::node:
-                m_current.attr("_pyosmium_data").template cast<COSMNode *>()->invalidate();
+                m_current.attr("_pyosmium_data").template cast<pyosmium::COSMNode *>()->invalidate();
                 break;
             case osmium::item_type::way:
-                m_current.attr("_pyosmium_data").template cast<COSMWay *>()->invalidate();
+                m_current.attr("_pyosmium_data").template cast<pyosmium::COSMWay *>()->invalidate();
                 break;
             case osmium::item_type::relation:
-                m_current.attr("_pyosmium_data").template cast<COSMRelation *>()->invalidate();
+                m_current.attr("_pyosmium_data").template cast<pyosmium::COSMRelation *>()->invalidate();
                 break;
             case osmium::item_type::changeset:
-                m_current.attr("_pyosmium_data").template cast<COSMChangeset *>()->invalidate();
+                m_current.attr("_pyosmium_data").template cast<pyosmium::COSMChangeset *>()->invalidate();
                 break;
         }
         m_current_type = osmium::item_type::undefined;
@@ -133,12 +133,14 @@ private:
     osmium::item_type m_current_type = osmium::item_type::undefined;
     pybind11::object m_current;
 
-    HandlerChain m_pre_handler;
+    pyosmium::HandlerChain m_pre_handler;
 
     pybind11::object m_type_module = pybind11::module_::import("osmium.osm.types");
 };
 
-}
+} // namespace
+
+namespace pyosmium {
 
 void init_osm_file_iterator(py::module &m)
 {
@@ -151,3 +153,4 @@ void init_osm_file_iterator(py::module &m)
         ;
 }
 
+} // namespace

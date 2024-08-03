@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_OSM_BASE_OBJECTS_HPP
@@ -11,6 +11,8 @@
 #include <pybind11/pybind11.h>
 
 #include <osmium/osm.hpp>
+
+namespace pyosmium {
 
 template <typename T>
 class COSMDerivedObject {
@@ -38,5 +40,6 @@ using COSMRelation = COSMDerivedObject<osmium::Relation const>;
 using COSMArea = COSMDerivedObject<osmium::Area const>;
 using COSMChangeset = COSMDerivedObject<osmium::Changeset const>;
 
+} // namespace
 
 #endif //PYOSMIUM_OSM_BASE_OBJECTS_HPP

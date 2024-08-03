@@ -12,13 +12,14 @@
 
 #include "base_handler.h"
 
+namespace {
+
 using LocationTable =
         osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>;
 using NodeLocationHandler =
         osmium::handler::NodeLocationsForWays<LocationTable>;
 
-
-class NodeLocationsForWays : public BaseHandler
+class NodeLocationsForWays : public pyosmium::BaseHandler
 {
 public:
     NodeLocationsForWays(LocationTable &idx)
@@ -50,7 +51,11 @@ private:
     bool apply_nodes_to_ways = true;
 };
 
+} // namespace
+
 namespace py = pybind11;
+
+namespace pyosmium {
 
 void init_node_location_handler(py::module &m)
 {
@@ -65,3 +70,5 @@ void init_node_location_handler(py::module &m)
     ;
 
 }
+
+} // namespace

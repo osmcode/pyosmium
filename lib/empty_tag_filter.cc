@@ -29,7 +29,7 @@ class EmptyTagFilter : public pyosmium::BaseFilter
 
 };
 
-}
+} // namespace
 
 namespace pyosmium {
 
