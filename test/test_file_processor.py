@@ -97,3 +97,15 @@ def test_file_processor_access_nodestore(opl_buffer):
 def test_file_processor_bad_location_type(opl_buffer):
     with pytest.raises(TypeError, match='LocationTable'):
         o.FileProcessor(opl_buffer('n56 x3 y-3')).with_locations(67)
+
+
+def test_propagate_data_from_filters(opl_buffer):
+    class MyFilter:
+        def node(self, n):
+            n.saved = 'test'
+            return False
+
+    fp = o.FileProcessor(opl_buffer('n56 x3 y-3')).with_filter(MyFilter())
+
+    for obj in fp:
+        assert obj.saved == 'test'

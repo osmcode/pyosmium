@@ -91,3 +91,19 @@ def test_mixed_handlers(opl_reader):
     o.apply(opl_reader("n1 x0 y0"), NewStyle(), OldStyle(), NewStyle(), OldStyle())
 
     assert logged == ['new', 'old', 'new', 'old']
+
+
+def test_value_propagation(opl_reader):
+    logged = []
+
+    class FirstHandler:
+        def node(self, n):
+            n.saved = 45674
+
+    class SecondHandler:
+        def node(self, n):
+            logged.append(n.saved)
+
+    o.apply(opl_reader("n1 x0 y0"), FirstHandler(), SecondHandler())
+
+    assert logged == [45674]
