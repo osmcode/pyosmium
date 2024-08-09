@@ -85,6 +85,18 @@ def test_valid_location():
     assert repr(loc) == 'osmium.osm.Location(x=-10000000, y=100000000)'
 
 
+@pytest.mark.parametrize('attrname', ['id', 'deleted', 'visible',
+                                      'changeset', 'uid', 'timestamp', 'user',
+                                      'tags'])
+@pytest.mark.parametrize('osmdata', ['n1 v5 c58674 uänonymous',
+                                     'w34 Nn34',
+                                     'r45 Tfoo=rte'])
+def test_object_attribute_do_not_overwrite(opl_buffer, attrname, osmdata):
+    for n in o.FileProcessor(opl_buffer(osmdata)):
+        with pytest.raises(AttributeError):
+            setattr(n, attrname, 3)
+
+
 def test_node_attributes(test_importer):
     def node(n):
         assert n.deleted == False
@@ -147,6 +159,15 @@ def test_way_attributes(test_importer):
                               way=way, locations=True)
 
 
+def test_way_attribute_do_not_overwrite(opl_buffer):
+    data = """\
+           w34 Nn34
+           """
+    for w in o.FileProcessor(opl_buffer(data)):
+        with pytest.raises(AttributeError):
+            w.nodes = [3,4,5]
+
+
 def test_relation_attributes(test_importer):
     def relation(o):
         assert o.id == 1
@@ -170,6 +191,15 @@ def test_relation_attributes(test_importer):
 
     assert 1 == test_importer('r1 v5 c58674 t2014-01-31T06:23:35Z i42 u%20%anonymous Mw1@',
                               relation=relation)
+
+
+def test_relation_attribute_do_not_overwrite(opl_buffer):
+    data = """\
+           r34 Mn23@,w34@
+           """
+    for r in o.FileProcessor(opl_buffer(data)):
+        with pytest.raises(AttributeError):
+            r.members = [3,4,5]
 
 
 def test_area_from_way_attributes(area_importer):
