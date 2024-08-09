@@ -71,8 +71,8 @@ def test_invalid_location():
     with pytest.raises(o.InvalidLocationError):
         lon = loc.lon
     # these two don't raise an exception
-    lat = loc.lat_without_check()
-    lon = loc.lon_without_check()
+    assert loc.lat_without_check() is not None
+    assert loc.lon_without_check() is not None
 
 
 def test_valid_location():
@@ -97,8 +97,10 @@ def test_object_attribute_do_not_overwrite(opl_buffer, attrname, osmdata):
             setattr(n, attrname, 3)
 
 
-def test_node_attributes(test_importer):
-    def node(n):
+def test_node_attributes(opl_buffer):
+    node_data = 'n1 v5 c58674 t2014-01-31T06:23:35Z i42 uänonymous'
+
+    for n in o.FileProcessor(opl_buffer(node_data)):
         assert n.deleted == False
         assert n.visible == True
         assert n.version == 5
@@ -113,21 +115,25 @@ def test_node_attributes(test_importer):
         assert n.type_str() == 'n'
         assert str(n) == 'n1: location=invalid tags={}'
         assert repr(n) == "osmium.osm.Node(id=1, deleted=False, visible=True, version=5, changeset=58674, uid=42, timestamp=datetime.datetime(2014, 1, 31, 6, 23, 35, tzinfo=datetime.timezone.utc), user='änonymous', tags=osmium.osm.TagList({}), location=osmium.osm.Location())"
+        break
+    else:
+        assert False
 
-    assert 1 == test_importer('n1 v5 c58674 t2014-01-31T06:23:35Z i42 uänonymous',
-                              node=node)
 
+def test_node_location(opl_buffer):
+    for n in o.FileProcessor(opl_buffer("n1 x4 y5")):
+        assert n.lat == 5.0
+        assert n.lon == 4.0
 
 
 @pytest.mark.parametrize('nid', (23, 0, -68373, 17179869418, -17179869417))
-def test_node_positive_id(test_importer, nid):
-
-    def node(n):
+def test_node_positive_id(opl_buffer, nid):
+    for n in o.FileProcessor(opl_buffer(f"n{nid} v5 c58674")):
         assert n.id == nid
         assert n.positive_id() == abs(nid)
-
-    assert 1 == test_importer('n{} v5 c58674'.format(nid),
-                              node=node)
+        break
+    else:
+        assert False
 
 
 def test_way_attributes(test_importer):

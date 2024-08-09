@@ -435,6 +435,19 @@ class Node(OSMObject['cosm.COSMNode']):
 
         return self._location
 
+    @property
+    def lat(self) -> float:
+        """ Return latitude of the node.
+        """
+        return self.location.lat
+
+
+    @property
+    def lon(self) -> float:
+        """ Return longitude of the node.
+        """
+        return self.location.lon
+
     def type_str(self) -> str:
         return 'n'
 
