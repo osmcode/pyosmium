@@ -114,6 +114,15 @@ PYBIND11_MODULE(geom, m)
         "curvature of earth into account. If a :py:class:`WayNodeList` is given "
         "as a parameter the total length of the way in meters is computed.");
 
+    m.def("haversine_distance",
+          static_cast<double (*)(og::Coordinates const &, og::Coordinates const &)>(&og::haversine::distance),
+          "Compute the Haversine distance between two coordinates.");
+    m.def("haversine_distance",
+          [](osmium::Location const &l1, osmium::Location const &l2) {
+            return og::haversine::distance(og::Coordinates(l1), og::Coordinates(l2));
+          },
+          "Compute the Haversine distance between two osmium locations.");
+
     m.def("lonlat_to_mercator", &og::lonlat_to_mercator,
           py::arg("coordinate"),
         "Convert coordinates from WGS84 to Mercator projection.");

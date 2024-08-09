@@ -2,7 +2,7 @@
 #
 # This file is part of Pyosmium.
 #
-# Copyright (C) 2022 Sarah Hoffmann.
+# Copyright (C) 2024 Sarah Hoffmann.
 import json
 
 import pytest
@@ -163,7 +163,6 @@ def test_haversine_invalid_object():
 
     results = []
     def call_haversine(w):
-        print('AAAA')
         results.append(w.nodes)
     handler = o.make_simple_handler(way=call_haversine)
     handler.apply_buffer('\n'.join(data).encode('utf-8'), 'opl', locations=True)
@@ -172,3 +171,13 @@ def test_haversine_invalid_object():
 
     with pytest.raises(RuntimeError, match="removed OSM object"):
         o.geom.haversine_distance(results[0])
+
+
+def test_haversine_coordinates():
+    dist = o.geom.haversine_distance(o.geom.Coordinates(0,0), o.geom.Coordinates(1,1))
+    assert dist == pytest.approx(157293.74877)
+
+
+def test_haversine_location():
+    dist = o.geom.haversine_distance(o.osm.Location(0,0), o.osm.Location(1,1))
+    assert dist == pytest.approx(157293.74877)
