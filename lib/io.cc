@@ -61,7 +61,8 @@ PYBIND11_MODULE(io, m)
         .def("box", &osmium::io::Header::box,
              "Return the bounding box of the data in the file or an invalid "
              "box if the information is not available.")
-        .def("get", &osmium::io::Header::get,
+        .def("get", (std::string (osmium::io::Header::*)(std::string const &, std::string const &))
+                     &osmium::io::Header::get,
              py::arg("key"), py::arg("default")="",
              "Get the value of header option 'key' or default value if "
              "there is no header option with that name. The default cannot be "

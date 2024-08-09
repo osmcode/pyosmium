@@ -22,9 +22,9 @@ class EmptyTagFilter : public pyosmium::BaseFilter
         return o->tags().empty();
     }
 
-    bool filter_changeset(osmium::Changeset const *o) override
+    bool filter_changeset(pyosmium::PyOSMChangeset &o) override
     {
-        return o->tags().empty();
+        return o.get()->tags().empty();
     }
 
 };

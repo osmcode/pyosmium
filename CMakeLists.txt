@@ -26,7 +26,7 @@ include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 if(NOT "${CMAKE_CXX_STANDARD}")
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 endif()
 
 # required for pybind11 < 2.6

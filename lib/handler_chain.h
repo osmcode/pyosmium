@@ -21,7 +21,7 @@ namespace py = pybind11;
 
 namespace pyosmium {
 
-class HandlerChain : public osmium::handler::Handler
+class HandlerChain : public BaseHandler
 {
 public:
     HandlerChain(py::args args)
@@ -45,62 +45,57 @@ public:
         }
     }
 
-    void node(osmium::Node const &o) { handle_node(o); }
-
-    bool handle_node(osmium::Node const &o) {
+    bool node(PyOSMNode &o) override {
         for (auto const &handler : m_handlers) {
-            if (handler->node(&o)) {
+            if (handler->is_enabled_for(osmium::osm_entity_bits::node)
+                && handler->node(o)) {
                 return true;
             }
         }
         return false;
     }
 
-    void way(osmium::Way &w) { handle_way(w); }
-
-    bool handle_way(osmium::Way &w) {
+    bool way(PyOSMWay &w) override {
         for (auto const &handler : m_handlers) {
-            if (handler->way(&w)) {
+            if (handler->is_enabled_for(osmium::osm_entity_bits::way)
+                && handler->way(w)) {
                 return true;
             }
         }
         return false;
     }
 
-    void relation(osmium::Relation const &o) { handle_relation(o); }
-
-    bool handle_relation(osmium::Relation const &o) {
+    bool relation(PyOSMRelation &o) override {
         for (auto const &handler : m_handlers) {
-            if (handler->relation(&o)) {
+            if (handler->is_enabled_for(osmium::osm_entity_bits::relation)
+                && handler->relation(o)) {
                 return true;
             }
         }
         return false;
     }
 
-    void changeset(osmium::Changeset const &o) { handle_changeset(o); }
-
-    bool handle_changeset(osmium::Changeset const &o) {
+    bool changeset(PyOSMChangeset &o) override {
         for (auto const &handler : m_handlers) {
-            if (handler->changeset(&o)) {
+            if (handler->is_enabled_for(osmium::osm_entity_bits::changeset)
+                && handler->changeset(o)) {
                 return true;
             }
         }
         return false;
     }
 
-    void area(osmium::Area const &o) { handle_area(o); }
-
-    bool handle_area(osmium::Area const &o) {
+    bool area(PyOSMArea &o) override {
         for (auto const &handler : m_handlers) {
-            if (handler->area(&o)) {
+            if (handler->is_enabled_for(osmium::osm_entity_bits::area)
+                && handler->area(o)) {
                 return true;
             }
         }
         return false;
     }
 
-    void flush() {
+    void flush() override {
         for (auto const &handler : m_handlers) {
             handler->flush();
         }
@@ -108,7 +103,7 @@ public:
 
 private:
     std::vector<BaseHandler *> m_handlers;
-    std::vector<pyosmium::PythonHandler> m_python_handlers;
+    std::vector<PythonHandler> m_python_handlers;
 };
 
 } // namespace

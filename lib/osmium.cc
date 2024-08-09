@@ -14,6 +14,7 @@
 #include <osmium/index/index.hpp>
 #include <osmium/visitor.hpp>
 
+#include "osm_base_objects.h"
 #include "base_handler.h"
 #include "osmium_module.h"
 #include "python_handler.h"
@@ -21,6 +22,53 @@
 #include "buffer_iterator.h"
 
 namespace py = pybind11;
+
+void pyosmium::apply_item(osmium::OSMEntity &obj, pyosmium::BaseHandler &handler)
+{
+    switch (obj.type()) {
+        case osmium::item_type::node:
+        {
+            PyOSMNode node{static_cast<osmium::Node *>(&obj)};
+            handler.node(node);
+            break;
+        }
+        case osmium::item_type::way:
+        {
+            PyOSMWay way{static_cast<osmium::Way *>(&obj)};
+            handler.way(way);
+            break;
+        }
+        case osmium::item_type::relation:
+        {
+            PyOSMRelation rel{static_cast<osmium::Relation *>(&obj)};
+            handler.relation(rel);
+            break;
+        }
+        case osmium::item_type::area:
+        {
+            PyOSMArea area{static_cast<osmium::Area *>(&obj)};
+            handler.area(area);
+            break;
+        }
+        case osmium::item_type::changeset:
+        {
+            PyOSMChangeset chg{static_cast<osmium::Changeset *>(&obj)};
+            handler.changeset(chg);
+            break;
+        }
+    }
+}
+
+void pyosmium::apply(osmium::io::Reader &reader, pyosmium::BaseHandler &handler)
+{
+    while (auto buffer = reader.read()) {
+        for (auto &obj : buffer.select<osmium::OSMEntity>()) {
+            pyosmium::apply_item(obj, handler);
+        }
+    }
+    handler.flush();
+}
+
 
 PYBIND11_MODULE(_osmium, m) {
     py::register_exception<osmium::invalid_location>(m, "InvalidLocationError");
@@ -32,21 +80,20 @@ PYBIND11_MODULE(_osmium, m) {
         }
     });
 
-    m.def("apply", [](osmium::io::Reader &rd, pyosmium::BaseHandler &h)
-                   { osmium::apply(rd, h); },
+    m.def("apply", &pyosmium::apply,
           py::arg("reader"), py::arg("handler"),
           "Apply a single handler.");
     m.def("apply", [](osmium::io::Reader &rd, py::args args)
                      {
                          pyosmium::HandlerChain handler{args};
-                         osmium::apply(rd, handler);
+                         pyosmium::apply(rd, handler);
                      },
           py::arg("reader"),
           "Apply a chain of handlers.");
     m.def("apply", [](std::string fn, pyosmium::BaseHandler &h)
                    {
                        osmium::io::Reader rd{fn};
-                       osmium::apply(rd, h);
+                       pyosmium::apply(rd, h);
                    },
           py::arg("filename"), py::arg("handler"),
           "Apply a single handler.");
@@ -54,7 +101,7 @@ PYBIND11_MODULE(_osmium, m) {
                      {
                          pyosmium::HandlerChain handler{args};
                          osmium::io::Reader rd{fn};
-                         osmium::apply(rd, handler);
+                         pyosmium::apply(rd, handler);
                      },
           py::arg("filename"),
           "Apply a chain of handlers.");

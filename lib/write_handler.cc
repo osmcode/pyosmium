@@ -24,35 +24,39 @@ public:
     : writer(filename),
       buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
              osmium::memory::Buffer::auto_grow::yes)
-    {}
+    {
+        m_enabled_for = osmium::osm_entity_bits::nwr;
+    }
 
     WriteHandler(const char* filename, size_t bufsz,
                  const std::string& filetype)
     : writer(osmium::io::File(filename, filetype)),
       buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
              osmium::memory::Buffer::auto_grow::yes)
-    {}
+    {
+        m_enabled_for = osmium::osm_entity_bits::nwr;
+    }
 
     virtual ~WriteHandler()
     { close(); }
 
-    bool node(const osmium::Node* o) override
+    bool node(pyosmium::PyOSMNode &o) override
     {
-        buffer.add_item(*o);
+        buffer.add_item(*(o.get()));
         flush_buffer();
         return false;
     }
 
-    bool way(osmium::Way* o) override
+    bool way(pyosmium::PyOSMWay &o) override
     {
-        buffer.add_item(*o);
+        buffer.add_item(*(o.get()));
         flush_buffer();
         return false;
     }
 
-    bool relation(const osmium::Relation* o) override
+    bool relation(pyosmium::PyOSMRelation &o) override
     {
-        buffer.add_item(*o);
+        buffer.add_item(*(o.get()));
         flush_buffer();
         return false;
     }
