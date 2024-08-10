@@ -101,9 +101,20 @@ def test_location(test_writer, location, out):
         w.add_node(O(location=location))
 
 
+def test_location_generic(test_writer):
+    with test_writer('n0 v0 dV c0 t i0 u T x30.46 y50.37') as w:
+        w.add_node(O(location=(30.46, 50.37)))
+
+
 def test_node_list(test_writer):
     with test_writer('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
         w.add_way(O(nodes=(1, 2, 3, -4)))
+
+
+def test_node_list_generic(test_writer):
+    with test_writer('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
+        w.add(O(nodes=(1, 2, 3, -4)))
+
 
 def test_node_list_none(test_writer):
     with test_writer('w0 v0 dV c0 t i0 u T N') as w:
@@ -117,6 +128,15 @@ def test_relation_members(test_writer):
                                   ('w', 1111, 'x')
                                  )))
 
+
+def test_relation_members_generic(test_writer):
+    with test_writer('r0 v0 dV c0 t i0 u T Mn34@foo,r200@,w1111@x') as w:
+        w.add(O(members=(('n', 34, 'foo'),
+                         ('r', 200, ''),
+                         ('w', 1111, 'x')
+                        )))
+
+
 def test_relation_members_None(test_writer):
     with test_writer('r0 v0 dV c0 t i0 u T M') as w:
         w.add_relation(O(members=None))
@@ -127,6 +147,13 @@ def test_node_object(test_writer, simple_handler):
 
     with test_writer(node_opl) as w:
         simple_handler(node_opl, node=lambda o: w.add_node(o))
+
+
+def test_node_object_generic(test_writer, simple_handler):
+    node_opl = 'n235 v1 dV c0 t i0 u Telephant=yes x98.7 y-3.45'
+
+    with test_writer(node_opl) as w:
+        simple_handler(node_opl, node=lambda o: w.add(o))
 
 
 def test_location_object(test_writer, simple_handler):
@@ -150,6 +177,13 @@ def test_way_object(test_writer, simple_handler):
         simple_handler(way_opl, way=lambda o: w.add_way(o))
 
 
+def test_way_object_generic(test_writer, simple_handler):
+    way_opl = 'w45 v14 dV c0 t i0 u Thighway=top Nn23,n56,n34,n23'
+
+    with test_writer(way_opl) as w:
+        simple_handler(way_opl, way=lambda o: w.add(o))
+
+
 def test_nodelist_object(test_writer, simple_handler):
     way_opl = 'w45 v14 dV c0 t i0 u Thighway=top Nn23,n56,n34,n23'
 
@@ -170,6 +204,13 @@ def test_relation_object(test_writer, simple_handler):
 
     with test_writer(rel_opl) as w:
         simple_handler(rel_opl, relation=lambda o: w.add_relation(o))
+
+
+def test_relation_object_generic(test_writer, simple_handler):
+    rel_opl = 'r2 v0 dV c0 t i0 u Ttype=multipolygon Mw1@,w2@,w3@inner'
+
+    with test_writer(rel_opl) as w:
+        simple_handler(rel_opl, relation=lambda o: w.add(o))
 
 
 def test_memberlist_object(test_writer, simple_handler):

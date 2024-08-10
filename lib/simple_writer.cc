@@ -335,6 +335,19 @@ void init_simple_writer(pybind11::module &m)
              "Add a new relation to the file. The relation may be an "
              "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Relation`` "
              "object or any other Python object that implements the same attributes.")
+        .def("add", [](SimpleWriter &self, py::object const &o) {
+                           if (py::isinstance<pyosmium::COSMNode>(o) || py::hasattr(o, "location")) {
+                               self.add_node(o);
+                           } else if (py::isinstance<pyosmium::COSMWay>(o) || py::hasattr(o, "nodes")) {
+                               self.add_way(o);
+                           } else if (py::isinstance<pyosmium::COSMRelation>(o) || py::hasattr(o, "members")) {
+                               self.add_relation(o);
+                           } else {
+                               throw py::type_error("Need node, way or relation object.");
+                           }
+                    },
+             "Add a new object to the file. The function will try to determine "
+             "the kind of object automatically.")
         .def("close", &SimpleWriter::close,
              "Flush the remaining buffers and close the writer. While it is not "
              "strictly necessary to call this function explicitly, it is still "
