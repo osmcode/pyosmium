@@ -67,6 +67,7 @@ protected:
 void init_empty_tag_filter(pybind11::module &m);
 void init_key_filter(pybind11::module &m);
 void init_tag_filter(pybind11::module &m);
+void init_id_filter(pybind11::module &m);
 void init_entity_filter(pybind11::module &m);
 
 } // namespace

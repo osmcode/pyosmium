@@ -96,6 +96,7 @@ pybind11_add_module(filter
                     lib/empty_tag_filter.cc
                     lib/key_filter.cc
                     lib/tag_filter.cc
+                    lib/id_filter.cc
                     lib/entity_filter.cc)
 set_module_output(filter osmium)
 target_link_libraries(filter PRIVATE ${OSMIUM_LIBRARIES})
