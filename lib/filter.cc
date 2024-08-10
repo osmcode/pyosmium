@@ -21,5 +21,6 @@ PYBIND11_MODULE(_filter, m) {
 
     pyosmium::init_empty_tag_filter(m);
     pyosmium::init_key_filter(m);
+    pyosmium::init_entity_filter(m);
 };
 
