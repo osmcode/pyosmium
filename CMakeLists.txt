@@ -89,6 +89,7 @@ pybind11_add_module(_filter
                     lib/filter.cc
                     lib/empty_tag_filter.cc
                     lib/key_filter.cc
+                    lib/tag_filter.cc
                     lib/entity_filter.cc)
 set_module_output(_filter osmium/filter)
 
