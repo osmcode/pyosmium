@@ -127,7 +127,7 @@ private:
 
 } // namespace
 
-PYBIND11_MODULE(_area, m)
+PYBIND11_MODULE(area, m)
 {
     py::class_<AreaManagerSecondPassHandler, pyosmium::BaseHandler>(m,
                 "AreaManagerSecondPassHandler");
