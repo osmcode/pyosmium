@@ -335,6 +335,8 @@ void init_simple_writer(pybind11::module &m)
              "strictly necessary to call this function explicitly, it is still "
              "strongly recommended to close the writer as soon as possible, so "
              "that the buffer memory can be freed.")
+        .def("__enter__", [](py::object const &self) { return self; })
+        .def("__exit__", [](SimpleWriter &self, py::args args) { self.close(); })
     ;
 }
 

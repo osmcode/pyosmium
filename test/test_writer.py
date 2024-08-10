@@ -18,11 +18,8 @@ from helpers import mkdate
 def test_writer(tmp_path):
     @contextmanager
     def _WriteExpect(filename, expected):
-        writer = o.SimpleWriter(str(filename), 1024*1024)
-        try:
+        with o.SimpleWriter(str(filename), 1024*1024) as writer:
             yield writer
-        finally:
-            writer.close()
 
         assert filename.read_text().strip() == expected
 
@@ -205,15 +202,12 @@ def test_set_custom_header(tmp_path):
     finally:
         writer.close()
 
-    rd = o.io.Reader(fn)
-    try:
+    with o.io.Reader(fn) as rd:
         h = rd.header()
         assert h.get('generator') == 'foo'
         assert h.box().valid()
         assert h.box().bottom_left == o.osm.Location(0.1, -4)
         assert h.box().top_right == o.osm.Location(10, 45)
-    finally:
-        rd.close()
 
 
 def test_add_node_after_close(tmp_path, simple_handler):
@@ -252,16 +246,12 @@ def test_add_relation_after_close(tmp_path, simple_handler):
 def test_catch_errors_in_add_node(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    writer = o.SimpleWriter(str(test_file), 4000)
-
-    try:
+    with o.SimpleWriter(str(test_file), 4000) as writer:
         writer.add_node(o.osm.mutable.Node(id=123))
         with pytest.raises(TypeError):
             writer.add_node(o.osm.mutable.Node(id=124, tags=34))
         if not final_item:
             writer.add_node(o.osm.mutable.Node(id=125))
-    finally:
-        writer.close()
 
     output = test_file.read_text()
 
@@ -276,16 +266,12 @@ def test_catch_errors_in_add_node(tmp_path, final_item):
 def test_catch_errors_in_add_way(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    writer = o.SimpleWriter(str(test_file), 4000)
-
-    try:
+    with o.SimpleWriter(str(test_file), 4000) as writer:
         writer.add_way(o.osm.mutable.Way(id=123, nodes=[1, 2, 3]))
         with pytest.raises(TypeError):
             writer.add_way(o.osm.mutable.Way(id=124, nodes=34))
         if not final_item:
             writer.add_way(o.osm.mutable.Way(id=125, nodes=[11, 12]))
-    finally:
-        writer.close()
 
     output = test_file.read_text()
 
@@ -300,16 +286,12 @@ def test_catch_errors_in_add_way(tmp_path, final_item):
 def test_catch_errors_in_add_relation(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    writer = o.SimpleWriter(filename=str(test_file), bufsz=4000)
-
-    try:
+    with o.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
         writer.add_relation(o.osm.mutable.Relation(id=123))
         with pytest.raises(TypeError):
             writer.add_relation(o.osm.mutable.Relation(id=124, members=34))
         if not final_item:
             writer.add_relation(o.osm.mutable.Relation(id=125))
-    finally:
-        writer.close()
 
     output = test_file.read_text()
 

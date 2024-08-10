@@ -15,11 +15,9 @@ class NullHandler:
         pass
 
 def _run_file(fn):
-    rd = o.io.Reader(fn)
-    try:
+    with o.io.Reader(fn) as rd:
         o.apply(rd, NullHandler())
-    finally:
-        rd.close()
+
 
 def test_node_only(test_data):
     _run_file(test_data('n1'))
@@ -47,12 +45,10 @@ def test_relation_with_tags(test_data):
 
 def test_broken_timestamp(test_data):
     fn = test_data('n1 tx')
-    try:
-        rd = o.io.Reader(fn)
+
+    with o.io.Reader(fn) as rd:
         with pytest.raises(RuntimeError):
             o.apply(rd, NullHandler())
-    finally:
-        rd.close()
 
 
 def test_file_header(tmp_path):
@@ -63,14 +59,11 @@ def test_file_header(tmp_path):
     </osm>
     """)
 
-    rd = o.io.Reader(str(fn))
-    try:
+    with o.io.Reader(str(fn)) as rd:
         h = rd.header()
         assert not h.has_multiple_object_versions
         assert h.box().valid()
         assert h.box().size() == 64800.0
-    finally:
-        rd.close()
 
 
 def test_reader_with_filebuffer():

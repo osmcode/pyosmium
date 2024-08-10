@@ -97,6 +97,8 @@ PYBIND11_MODULE(io, m)
              "Close any open file handles. The reader is unusable afterwards.")
         .def("header", &osmium::io::Reader::header,
              "Return the header with file information, see :py:class:`osmium.io.Header`.")
+        .def("__enter__", [](py::object const &self) { return self; })
+        .def("__exit__", [](osmium::io::Reader &self, py::args args) { self.close(); })
     ;
 
     py::class_<osmium::io::Writer>(m, "Writer",
