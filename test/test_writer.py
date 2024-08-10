@@ -300,7 +300,7 @@ def test_catch_errors_in_add_way(tmp_path, final_item):
 def test_catch_errors_in_add_relation(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    writer = o.SimpleWriter(str(test_file), 4000)
+    writer = o.SimpleWriter(filename=str(test_file), bufsz=4000)
 
     try:
         writer.add_relation(o.osm.mutable.Relation(id=123))
