@@ -26,8 +26,10 @@ class SimpleWriter
     enum { BUFFER_WRAP = 4096 };
 
 public:
-    SimpleWriter(const char* filename, size_t bufsz, osmium::io::Header const *header)
-    : writer(filename, header ? *header : osmium::io::Header()),
+    SimpleWriter(const char* filename, size_t bufsz, osmium::io::Header const *header,
+                 bool overwrite)
+    : writer(filename, header ? *header : osmium::io::Header(),
+             overwrite ? osmium::io::overwrite::allow : osmium::io::overwrite::no),
       buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
              osmium::memory::Buffer::auto_grow::yes),
       buffer_size(buffer.capacity()) // same rounding to BUFFER_WRAP
@@ -314,10 +316,13 @@ void init_simple_writer(pybind11::module &m)
         "output data in an internal memory buffer before writing it on disk. This "
         "parameter allows changing the default buffer size of 4MB. Larger buffers "
         "are normally better but you should be aware that there are normally multiple "
-        "buffers in use during the write process.")
-        .def(py::init<const char*, unsigned long, osmium::io::Header const *>(),
+        "buffers in use during the write process. "
+        "The writer will not overwrite existing files by default. Set `overwrite` "
+        "to True to allow overwriting.")
+        .def(py::init<const char*, unsigned long, osmium::io::Header const *, bool>(),
              py::arg("filename"), py::arg("bufsz") = 4096*1024,
-             py::arg("header") = nullptr)
+             py::arg("header") = nullptr,
+             py::arg("overwrite") = false)
         .def("add_node", &SimpleWriter::add_node, py::arg("node"),
              "Add a new node to the file. The node may be an ``osmium.osm.Node`` object, "
              "an ``osmium.osm.mutable.Node`` object or any other Python object that "

@@ -300,3 +300,24 @@ def test_catch_errors_in_add_relation(tmp_path, final_item):
         expected += 'r125 v0 dV c0 t i0 u T M\n'
 
     assert output == expected
+
+
+def test_do_not_overwrite_by_default(tmp_path):
+    test_file = tmp_path / 'test.opl'
+
+    with o.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
+        writer.add_node(o.osm.mutable.Node(id=123))
+
+    # try to open again
+    with pytest.raises(RuntimeError, match='Open failed'):
+        o.SimpleWriter(filename=str(test_file))
+
+
+def test_do_overwrite(tmp_path):
+    test_file = tmp_path / 'test.opl'
+
+    with o.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
+        writer.add_node(o.osm.mutable.Node(id=123))
+
+    with o.SimpleWriter(filename=str(test_file), overwrite=True) as writer:
+        pass
