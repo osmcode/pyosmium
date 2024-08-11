@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -10,6 +10,7 @@
 #include <osmium/osm.hpp>
 #include <osmium/index/map/all.hpp>
 #include <osmium/index/node_locations_map.hpp>
+#include <osmium/index/id_set.hpp>
 
 namespace py = pybind11;
 
@@ -53,4 +54,23 @@ PYBIND11_MODULE(index, m)
         return l;
         },
         "Return a list of strings with valid types for the location table.");
+
+    using IdSet = osmium::index::IdSetDense<osmium::unsigned_object_id_type>;
+
+    py::class_<IdSet>(m, "IdSet",
+        "Compact storage for a set of IDs.")
+        .def(py::init<>())
+        .def("set", &IdSet::set,
+             "Add an ID to the storage. Does nothing if the ID is already contained.")
+        .def("unset", &IdSet::unset,
+             "Remove an ID from the storage. Does nothing if the ID is not in the storage.")
+        .def("get", &IdSet::get,
+             "Check if the given ID is in the storage.")
+        .def("empty", &IdSet::empty,
+             "Return true if no IDs are stored.")
+        .def("clear", &IdSet::clear,
+             "Remove all IDs from the storage.")
+        .def("__len__", &IdSet::size)
+        .def("__contains__", &IdSet::get)
+    ;
 }
