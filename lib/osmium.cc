@@ -16,6 +16,7 @@
 
 #include "osm_base_objects.h"
 #include "base_handler.h"
+#include "base_filter.h"
 #include "osmium_module.h"
 #include "python_handler.h"
 #include "handler_chain.h"
@@ -107,6 +108,11 @@ PYBIND11_MODULE(_osmium, m) {
           "Apply a chain of handlers.");
 
     py::class_<pyosmium::BaseHandler>(m, "BaseHandler");
+    py::class_<pyosmium::BaseFilter, pyosmium::BaseHandler>(m, "BaseFilter")
+        .def("enable_for", &pyosmium::BaseFilter::enable_for,
+             py::arg("entities"),
+             "Set the OSM types this filter should be used for.")
+    ;
 
     py::class_<pyosmium::BufferIterator>(m, "BufferIterator",
     "Iterator interface for reading from a queue of buffers.")
