@@ -17,6 +17,7 @@ void init_write_handler(pybind11::module &m);
 void init_simple_writer(pybind11::module &m);
 void init_node_location_handler(pybind11::module &m);
 void init_osm_file_iterator(pybind11::module &m);
+void init_id_tracker(pybind11::module &m);
 
 } // namespace
 
