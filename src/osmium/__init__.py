@@ -9,7 +9,8 @@ from typing import Any
 from osmium._osmium import *
 from osmium.helper import *
 from osmium.simple_handler import SimpleHandler
-from osmium.file_processor import FileProcessor
+from osmium.file_processor import FileProcessor, zip_processors
+from osmium.back_reference_writer import BackReferenceWriter
 import osmium.io
 import osmium.osm
 import osmium.index

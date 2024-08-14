@@ -4,6 +4,7 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
+from typing import Iterable, Tuple, Any
 from pathlib import Path
 
 import osmium
@@ -110,3 +111,50 @@ class FileProcessor:
         # catch anything after the final flush
         if buffer_it:
             yield from buffer_it
+
+
+def zip_processors(*procs: FileProcessor) -> Iterable[Tuple[Any, ...]]:
+    """ Return the data from the FileProcessors in parallel such
+        that objects with the same ID are returned at the same time.
+
+        The processors must contain sorted data or the results are
+        undefined.
+    """
+    TID = {'n': 0, 'w': 1, 'r': 2, 'a': 3, 'c': 4}
+
+    class _CompIter:
+
+        def __init__(self, fp):
+            self.iter = iter(fp)
+            self.current = None
+            self.comp = None
+
+        def val(self, nextid):
+            """ Return current object if it corresponds to the given object ID.
+            """
+            if self.comp == nextid:
+                return self.current
+            return None
+
+        def next(self, nextid):
+            """ Get the next object ID, if and only if nextid points to the
+                previously returned object ID. Otherwise return the previous
+                ID again.
+            """
+            if self.comp == nextid:
+                self.current = next(self.iter, None)
+                if self.current is None:
+                    self.comp = (100, 0) # end of file marker. larger than any ID
+                else:
+                    self.comp = (TID[self.current.type_str()], self.current.id)
+            return self.comp
+
+
+    iters = [_CompIter(p) for p in procs]
+
+    nextid = min(i.next(None) for i in iters)
+
+    while nextid[0] < 100:
+        yield (i.val(nextid) for i in iters)
+
+        nextid = min(i.next(nextid) for i in iters)

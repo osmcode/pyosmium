@@ -1,8 +1,9 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann.
+# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 import pytest
 import osmium as o
 
@@ -109,3 +110,36 @@ def test_propagate_data_from_filters(opl_buffer):
 
     for obj in fp:
         assert obj.saved == 'test'
+
+
+def test_simple_zip(opl_buffer):
+    fp1 = o.FileProcessor(opl_buffer("""\
+            n1
+            n3
+            n5
+            w10 Nn1,n2
+            r1 Mw1@
+          """))
+
+    fp2 = o.FileProcessor(opl_buffer("""\
+            n2
+            n3
+            n456
+            w12 Nn45,n85
+            r1 Mw2@
+          """))
+
+    results = []
+    for o1, o2 in o.zip_processors(fp1, fp2):
+        results.append(((None if o1 is None else o1.type_str() + str(o1.id)),
+                       (None if o2 is None else o2.type_str() + str(o2.id))))
+
+    assert results == [('n1', None),
+                      (None, 'n2'),
+                      ('n3', 'n3'),
+                      ('n5', None),
+                      (None, 'n456'),
+                      ('w10', None),
+                      (None, 'w12'),
+                      ('r1', 'r1')]
+
