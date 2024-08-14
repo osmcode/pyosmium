@@ -131,6 +131,8 @@ def get_arg_parser(from_main=False):
                         help="Format the data should be saved in.")
     parser.add_argument('--server', action='store', dest='server_url',
                         help='Base URL of the replication server')
+    parser.add_argument('--diff-type', action='store', dest='server_diff_type',
+                        help='File format used by the replication server (default: osc.gz)')
     parser.add_argument('--cookie', dest='cookie',
                         help="""Netscape-style cookie jar file to read cookies from
                               and where received cookies will be written to.""")
@@ -207,7 +209,7 @@ def main(args):
             or 'https://planet.osm.org/replication/minute/'
     logging.info("Using replication server at %s" % url)
 
-    with rserv.ReplicationServer(url) as svr:
+    with rserv.ReplicationServer(url, diff_type=options.server_diff_type) as svr:
         svr.set_request_parameter('timeout', options.socket_timeout or None)
 
         if options.cookie is not None:

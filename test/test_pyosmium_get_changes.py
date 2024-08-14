@@ -10,6 +10,9 @@ from textwrap import dedent
 
 import pytest
 import osmium.replication.server
+import osmium as o
+
+from helpers import IDCollector
 
 try:
     import http.cookiejar as cookiejarlib
@@ -91,3 +94,28 @@ class TestPyosmiumGetChanges:
         output = capsys.readouterr().out.strip()
 
         assert output == '-1'
+
+
+    def test_get_simple_update(self, tmp_path, httpserver):
+        outfile = tmp_path / 'outfile.opl'
+
+        httpserver.expect_request('/state.txt').respond_with_data(dedent("""\
+                    sequenceNumber=454
+                    timestamp=2017-08-26T11\\:04\\:02Z
+                 """))
+        httpserver.expect_request('/000/000/454.state.txt').respond_with_data(dedent("""\
+                    sequenceNumber=454
+                    timestamp=2016-08-26T11\\:04\\:02Z
+                 """))
+        httpserver.expect_request('/000/000/454.opl').respond_with_data(
+                 "n12 v1 x4 y6\nn13 v1 x9 y-6\nw2 v2 Nn1,n2")
+
+        assert 0 == self.main(httpserver, '--diff-type', 'opl',
+                              '-I', '453', '-o', str(outfile))
+
+        ids = IDCollector()
+        o.apply(str(outfile), ids)
+
+        assert ids.nodes == [12, 13]
+        assert ids.ways == [2]
+        assert ids.relations == []
