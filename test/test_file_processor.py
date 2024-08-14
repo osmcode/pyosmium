@@ -7,6 +7,8 @@
 import pytest
 import osmium as o
 
+from helpers import IDCollector
+
 @pytest.mark.parametrize('init', [None, 1])
 def test_file_processor_bad_init(init):
     with pytest.raises(TypeError):
@@ -142,4 +144,61 @@ def test_simple_zip(opl_buffer):
                       ('w10', None),
                       (None, 'w12'),
                       ('r1', 'r1')]
+
+
+def test_filtered_handler_python(opl_buffer):
+    data = opl_buffer("""\
+            n1 Tamenity=foo
+            n3
+            w1 Thighway=residential
+            w2
+            r4
+            """)
+
+    ids = IDCollector()
+
+    processed = []
+
+    fp = o.FileProcessor(data)\
+            .handler_for_filtered(ids)\
+            .with_filter(o.filter.EmptyTagFilter())
+
+    for obj in fp:
+        processed.append(f"{obj.type_str()}{obj.id}")
+
+    assert processed == ['n1', 'w1']
+    assert ids.nodes == [3]
+    assert ids.ways == [2]
+    assert ids.relations == [4]
+
+
+def test_filtered_handler_basehandler(opl_buffer, tmp_path):
+    data = opl_buffer("""\
+            n1 Tamenity=foo
+            n3
+            w1 Thighway=residential
+            w2
+            r4
+            """)
+
+    testf = tmp_path / 'test.opl'
+
+    with o.SimpleWriter(str(testf)) as writer:
+        fp = o.FileProcessor(data)\
+                .handler_for_filtered(writer)\
+                .with_filter(o.filter.EmptyTagFilter())
+
+        processed = []
+        for obj in fp:
+            processed.append(f"{obj.type_str()}{obj.id}")
+
+    assert processed == ['n1', 'w1']
+
+    ids = IDCollector()
+
+    o.apply(str(testf), ids)
+
+    assert ids.nodes == [3]
+    assert ids.ways == [2]
+    assert ids.relations == [4]
 

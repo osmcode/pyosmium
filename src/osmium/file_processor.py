@@ -25,6 +25,7 @@ class FileProcessor:
         self._node_store = None
         self._area_handler = None
         self._filters = []
+        self._filtered_handler = None
 
     @property
     def header(self):
@@ -79,6 +80,14 @@ class FileProcessor:
         self._filters.append(filt)
         return self
 
+
+    def handler_for_filtered(self, handler):
+        """ Set a handler to be called on all objects that have been
+            filtered out and are not presented to the iterator loop.
+        """
+        self._filtered_handler = handler
+        return self
+
     def __iter__(self):
         """ Return the iterator over the file.
         """
@@ -90,7 +99,10 @@ class FileProcessor:
             handlers.append(lh)
 
         if self._area_handler is None:
-            yield from osmium.OsmFileIterator(self._reader, *handlers, *self._filters)
+            it = osmium.OsmFileIterator(self._reader, *handlers, *self._filters)
+            if self._filtered_handler:
+                it.set_filtered_handler(self._filtered_handler)
+            yield from it
             return
 
         # need areas, do two pass handling
@@ -103,7 +115,10 @@ class FileProcessor:
         buffer_it = osmium.BufferIterator(*self._filters)
         handlers.append(self._area_handler.second_pass_to_buffer(buffer_it))
 
-        for obj in osmium.OsmFileIterator(self._reader, *handlers, *self._filters):
+        it = osmium.OsmFileIterator(self._reader, *handlers, *self._filters)
+        if self._filtered_handler:
+            it.set_filtered_handler(self._filtered_handler)
+        for obj in it:
             yield obj
             if buffer_it:
                 yield from buffer_it

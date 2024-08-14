@@ -14,6 +14,7 @@
 #include "base_handler.h"
 #include "osm_base_objects.h"
 #include "handler_chain.h"
+#include "python_handler.h"
 
 namespace py = pybind11;
 
@@ -59,6 +60,8 @@ public:
                     auto &obj = m_current.emplace<pyosmium::PyOSMNode>(entity);
                     if (!m_handler.node(obj)) {
                         return obj.get_or_create_python_object();
+                    } else if (m_filtered_handler) {
+                        m_filtered_handler->node(obj);
                     }
                     break;
                 }
@@ -67,6 +70,8 @@ public:
                     auto &obj = m_current.emplace<pyosmium::PyOSMWay>(entity);
                     if (!m_handler.way(obj)) {
                         return obj.get_or_create_python_object();
+                    } else if (m_filtered_handler) {
+                        m_filtered_handler->way(obj);
                     }
                     break;
                 }
@@ -75,6 +80,8 @@ public:
                     auto &obj = m_current.emplace<pyosmium::PyOSMRelation>(entity);
                     if (!m_handler.relation(obj)) {
                         return obj.get_or_create_python_object();
+                    } else if (m_filtered_handler) {
+                        m_filtered_handler->relation(obj);
                     }
                     break;
                 }
@@ -83,6 +90,8 @@ public:
                     auto &obj = m_current.emplace<pyosmium::PyOSMArea>(entity);
                     if (!m_handler.area(obj)) {
                         return obj.get_or_create_python_object();
+                    } else if (m_filtered_handler) {
+                        m_filtered_handler->area(obj);
                     }
                     break;
                 }
@@ -91,6 +100,8 @@ public:
                     auto &obj = m_current.emplace<pyosmium::PyOSMChangeset>(entity);
                     if (!m_handler.changeset(obj)) {
                         return obj.get_or_create_python_object();
+                    } else if (m_filtered_handler) {
+                        m_filtered_handler->changeset(obj);
                     }
                     break;
                 }
@@ -102,6 +113,15 @@ public:
        return pybind11::object();
     }
 
+    void set_filtered_handler(pyosmium::BaseHandler *handler) {
+        m_filtered_handler = handler;
+    }
+
+    void set_filtered_python_handler(pybind11::handle handler) {
+        m_filtered_python_handler = std::make_unique<pyosmium::PythonHandler>(handler);
+        m_filtered_handler = m_filtered_python_handler.get();
+    }
+
 private:
     osmium::io::Reader *m_reader;
     osmium::memory::Buffer m_buffer;
@@ -109,6 +129,8 @@ private:
     pyosmium::PyOSMAny m_current;
 
     pyosmium::HandlerChain m_handler;
+    pyosmium::BaseHandler *m_filtered_handler = nullptr;
+    std::unique_ptr<pyosmium::PythonHandler> m_filtered_python_handler;
 };
 
 } // namespace
@@ -120,6 +142,10 @@ void init_osm_file_iterator(py::module &m)
     py::class_<OsmFileIterator>(m, "OsmFileIterator",
         "Iterator interface for reading an OSM file.")
         .def(py::init<osmium::io::Reader *, py::args>(),
+             py::keep_alive<0, 1>())
+        .def("set_filtered_handler", &OsmFileIterator::set_filtered_handler,
+             py::keep_alive<0, 1>())
+        .def("set_filtered_handler", &OsmFileIterator::set_filtered_python_handler,
              py::keep_alive<0, 1>())
         .def("__iter__", [](py::object const &self) { return self; })
         .def("__next__", &OsmFileIterator::next,
