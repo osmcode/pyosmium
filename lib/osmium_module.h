@@ -13,7 +13,6 @@
 namespace pyosmium {
 
 void init_merge_input_reader(pybind11::module &m);
-void init_write_handler(pybind11::module &m);
 void init_simple_writer(pybind11::module &m);
 void init_node_location_handler(pybind11::module &m);
 void init_osm_file_iterator(pybind11::module &m);

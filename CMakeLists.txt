@@ -86,7 +86,6 @@ pybind11_add_module(_osmium
                     lib/merge_input_reader.cc
                     lib/node_location_handler.cc
                     lib/simple_writer.cc
-                    lib/write_handler.cc
                     lib/file_iterator.cc
                     lib/id_tracker.cc)
 set_module_output(_osmium osmium)

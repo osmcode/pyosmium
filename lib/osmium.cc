@@ -124,7 +124,6 @@ PYBIND11_MODULE(_osmium, m) {
     ;
 
     pyosmium::init_merge_input_reader(m);
-    pyosmium::init_write_handler(m);
     pyosmium::init_simple_writer(m);
     pyosmium::init_node_location_handler(m);
     pyosmium::init_osm_file_iterator(m);

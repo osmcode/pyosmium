@@ -18,6 +18,18 @@ import osmium.geom
 import osmium.area
 import osmium.filter
 
+# WriteHandler no longer exists. SimpleWriter can now function as a handler.
+class WriteHandler(SimpleWriter):
+    """ (Deprecated) Handler function that writes all data directly to a file.
+
+        This is now simply an alias for SimpleWriter. Please refer to its
+        documentation.
+    """
+
+    def __init__(filename: str, bufsz: int=4096*1024, filetype: str="") -> None:
+        super().__init__(filename, bufsz=bufsz, filetype=filetype)
+
+
 def _merge_apply(self, *handlers: Any, idx: str = '', simplify: bool = True) -> None:
     """ Apply collected data to a handler. The data will be sorted first.
         If `simplify` is true (default) then duplicates will be eliminated
