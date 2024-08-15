@@ -24,6 +24,7 @@ class FileProcessor:
         self._node_store = None
         self._area_handler = None
         self._filters = []
+        self._area_filters = []
         self._filtered_handler = None
 
     @property
@@ -54,14 +55,21 @@ class FileProcessor:
 
         return self
 
-    def with_areas(self):
+    def with_areas(self, *filters):
         """ Enable area processing. When enabled, then closed ways and
             relations of type multipolygon will also be returned as an
             Area type.
 
+            Optionally one or more filters can be passed. These filters
+            will be applied in the first pass, when relation candidates
+            for areas are selected.
+
+            Calling this function multiple times causes more filters to
+            be added to the filter chain.
+
             Automatically enables location caching, if it was not yet set.
             It uses the default location cache type. To use a different
-            cache tyoe, you need to call with_locations() explicity.
+            cache type, you need to call with_locations() explicity.
 
             Area processing requires that the file is read twice. This
             happens transparently.
@@ -70,11 +78,13 @@ class FileProcessor:
             self._area_handler = osmium.area.AreaManager()
             if self._node_store is None:
                 self.with_locations()
+        self._area_filters.extend(filters)
         return self
 
     def with_filter(self, filt):
         """ Add a filter function that is called before an object is
-            returned in the iterator.
+            returned in the iterator. Filters are applied sequentially
+            in the order they were added.
         """
         self._filters.append(filt)
         return self
@@ -108,7 +118,7 @@ class FileProcessor:
         # need areas, do two pass handling
         rd = osmium.io.Reader(self._file, osmium.osm.RELATION)
         try:
-            osmium.apply(rd, *self._filters, self._area_handler.first_pass_handler())
+            osmium.apply(rd, *self._area_filters, self._area_handler.first_pass_handler())
         finally:
             rd.close()
 

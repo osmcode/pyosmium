@@ -59,6 +59,50 @@ def test_generator_with_areas(opl_buffer):
 
     assert count == 1
 
+
+def test_generator_with_areas_with_filter(opl_buffer):
+    data = opl_buffer("""\
+            n10 x3 y3
+            n11 x3 y3.01
+            n12 x3.01 y3.01
+            n13 x3.01 y3
+            w11 Nn10,n11,n12,n13
+            w12 Nn13,n10
+            r1 Tbuilding=yes,type=multipolygon Mw11@,w12@
+            """)
+
+    count = 0
+    for obj in o.FileProcessor(data)\
+                .with_areas()\
+                .with_filter(o.filter.EntityFilter(o.osm.AREA)):
+        assert obj.is_area()
+        count += 1
+
+    assert count == 1
+
+def test_generator_with_areas_with_area_filter(opl_buffer):
+    data = opl_buffer("""\
+            n10 x3 y3
+            n11 x3 y3.01
+            n12 x3.01 y3.01
+            n13 x3.01 y3
+            w11 Nn10,n11,n12,n13
+            w12 Nn13,n10
+            r1 Tbuilding=yes,type=multipolygon Mw11@,w12@
+            r2 Tlanduse=grass,type=multipolygon Mw11@,w12@
+            """)
+
+    count = 0
+    for obj in o.FileProcessor(data)\
+                .with_areas(o.filter.KeyFilter('building'))\
+                .with_filter(o.filter.EntityFilter(o.osm.AREA)):
+        assert obj.is_area()
+        assert obj.id == 3
+        count += 1
+
+    assert count == 1
+
+
 def test_generator_with_filter(opl_buffer):
     data = opl_buffer("""\
             n10 x3 y3
