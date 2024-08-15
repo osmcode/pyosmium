@@ -20,7 +20,6 @@ class FileProcessor:
             self._file = osmium.io.File(str(filename))
         else:
             raise TypeError("File must be an osmium.io.File, osmium.io.FileBuffer, str or Path")
-        self._reader = osmium.io.Reader(self._file, entities)
         self._entities = entities
         self._node_store = None
         self._area_handler = None
@@ -31,7 +30,7 @@ class FileProcessor:
     def header(self):
         """ Return the header information for the file to be read.
         """
-        return self._reader.header()
+        return osmium.io.Reader(self._file, osmium.osm.NOTHING).header()
 
     @property
     def node_location_storage(self):
@@ -99,7 +98,8 @@ class FileProcessor:
             handlers.append(lh)
 
         if self._area_handler is None:
-            it = osmium.OsmFileIterator(self._reader, *handlers, *self._filters)
+            reader = osmium.io.Reader(self._file, self._entities)
+            it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
             if self._filtered_handler:
                 it.set_filtered_handler(self._filtered_handler)
             yield from it
@@ -115,7 +115,8 @@ class FileProcessor:
         buffer_it = osmium.BufferIterator(*self._filters)
         handlers.append(self._area_handler.second_pass_to_buffer(buffer_it))
 
-        it = osmium.OsmFileIterator(self._reader, *handlers, *self._filters)
+        reader = osmium.io.Reader(self._file, self._entities)
+        it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
         if self._filtered_handler:
             it.set_filtered_handler(self._filtered_handler)
         for obj in it:
