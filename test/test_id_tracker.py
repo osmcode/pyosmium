@@ -8,6 +8,18 @@ import pytest
 
 import osmium as o
 
+def assert_tracker_content(ids, nodes, ways, rels):
+    assert len(ids.node_ids()) == len(nodes)
+    assert all(n in ids.node_ids() for n in nodes), \
+           f"Nodes not found: {[n for n in nodes if n not in ids.node_ids()]}"
+    assert len(ids.way_ids()) == len(ways)
+    assert all(n in ids.way_ids() for n in ways), \
+           f"Ways not found: {[n for n in ways if n not in ids.way_ids()]}"
+    assert len(ids.relation_ids()) == len(rels)
+    assert all(n in ids.relation_ids() for n in rels), \
+           f"Relations not found: {[n for n in rels if n not in ids.relation_ids()]}"
+
+
 def test_add_node():
     ids = o.IdTracker()
 
@@ -143,8 +155,8 @@ def test_contains_references_not_in_relation(opl_buffer):
         assert not ids.contains_any_references(obj)
 
 
-@pytest.mark.parametrize('depth', [0, 1, 2])
-def test_complete_references(tmp_path, depth):
+@pytest.mark.parametrize('depth', range(3))
+def test_complete_backward_references(tmp_path, depth):
     data_file = tmp_path / 'test.opl'
     data_file.write_text("""\
 w12 Nn1,n2
@@ -160,23 +172,32 @@ r10 Mn100@,w90@,r2@
     ids.complete_backward_references(data_file, relation_depth=depth)
 
     if depth == 0:
-        assert len(ids.node_ids()) == 2
-        assert all(n in ids.node_ids() for n in (1, 2))
-        assert len(ids.way_ids()) == 1
-        assert all(n in ids.way_ids() for n in (12,))
-        assert len(ids.relation_ids()) == 1
-        assert all(n in ids.relation_ids() for n in (10,))
+        assert_tracker_content(ids, nodes=(1, 2), ways=(12,), rels=(10,))
     elif depth == 1:
-        assert len(ids.way_ids()) == 2
-        assert all(n in ids.way_ids() for n in (12, 90))
-        assert len(ids.relation_ids()) == 2
-        assert all(n in ids.relation_ids() for n in (10, 2))
-        assert len(ids.node_ids()) == 5
-        assert all(n in ids.node_ids() for n in (1, 2, 10, 11, 100))
+        assert_tracker_content(ids, nodes=(1, 2, 10, 11, 100), ways=(12, 90), rels=(10, 2))
     elif depth == 2:
-        assert len(ids.node_ids()) == 6
-        assert all(n in ids.node_ids() for n in (1, 2, 10, 11, 99, 100))
-        assert len(ids.way_ids()) == 2
-        assert all(n in ids.way_ids() for n in (12, 90))
-        assert len(ids.relation_ids()) == 2
-        assert all(n in ids.relation_ids() for n in (10, 2))
+        assert_tracker_content(ids, nodes=(1, 2, 10, 11, 99, 100), ways=(12, 90), rels=(10, 2))
+
+
+@pytest.mark.parametrize('depth', range(-1, 2))
+def test_complete_forward_references(tmp_path, depth):
+    data_file = tmp_path / 'test.opl'
+    data_file.write_text("""\
+w12 Nn1,n2
+w90 Nn10,n11
+r2 Mn99@
+r10 Mn100@,w90@,r2@
+""")
+
+    ids = o.IdTracker()
+    ids.add_node(1)
+    ids.add_node(99)
+
+    ids.complete_forward_references(data_file, relation_depth=depth)
+
+    if depth == -1:
+        assert_tracker_content(ids, nodes=(1, 99), ways=(12,), rels=[])
+    elif depth == 0:
+        assert_tracker_content(ids, nodes=(1, 99), ways=(12,), rels=[2])
+    elif depth == 1:
+        assert_tracker_content(ids, nodes=(1, 99), ways=(12,), rels=[2, 10])

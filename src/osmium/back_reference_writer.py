@@ -36,7 +36,7 @@ class BackReferenceWriter:
         need nested relations, set `relation_depth` to the minimum depth
         to which relations shall be completed.
 
-        The writer should usually used as a context manager.
+        The writer should usually be used as a context manager.
     """
 
     def __init__(self, outfile: str, ref_src: str,

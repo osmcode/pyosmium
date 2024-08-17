@@ -135,6 +135,68 @@ public:
         }
     }
 
+
+    void complete_forward_references(std::string const &file, int relation_depth)
+    {
+        // standard pass: find directly referenced ways and relations
+        {
+            auto entities = osmium::osm_entity_bits::way;
+            if (relation_depth >= 0) {
+                entities |= osmium::osm_entity_bits::relation;
+            }
+            osmium::io::Reader rd{file, entities};
+            while (auto const buffer = rd.read()) {
+                for (auto const &object: buffer.select<osmium::OSMObject>()) {
+                    if (object.type() == osmium::item_type::way) {
+                        const auto& way = static_cast<const osmium::Way&>(object);
+                        for (const auto& nr : way.nodes()) {
+                            if (m_ids(osmium::item_type::node).get(nr.positive_ref())) {
+                                m_ids(osmium::item_type::way).set(way.id());
+                                break;
+                            }
+                        }
+                    } else if (object.type() == osmium::item_type::relation) {
+                        const auto& relation = static_cast<const osmium::Relation&>(object);
+                        for (const auto& member : relation.members()) {
+                            if (member.type() != osmium::item_type::relation) {
+                                if (m_ids(member.type()).get(member.positive_ref())) {
+                                    m_ids(osmium::item_type::relation).set(relation.id());
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // recursive passes: find additional referenced relations
+        while (relation_depth > 0 && !m_ids.relations().empty()) {
+            bool need_recurse = false;
+            osmium::io::Reader rd{file, osmium::osm_entity_bits::relation};
+            while (auto const buffer = rd.read()) {
+                for (auto const &rel: buffer.select<osmium::Relation>()) {
+                    if (!m_ids.relations().get(rel.id())) {
+                        for (auto const &member: rel.members()) {
+                            if (member.type() == osmium::item_type::relation
+                                && m_ids.relations().get(member.ref())) {
+                                need_recurse = true;
+                                m_ids(member.type()).set(rel.id());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (!need_recurse) {
+                break;
+            }
+            --relation_depth;
+        }
+
+    }
+
+
     IdSet const &node_ids() const { return m_ids.nodes(); }
     IdSet const &way_ids() const { return m_ids.ways(); }
     IdSet const &relation_ids() const { return m_ids.relations(); }
@@ -231,6 +293,11 @@ void init_id_tracker(pybind11::module &m)
         .def("complete_backward_references",
              [](IdTracker &self, py::object const &fname, int relation_depth) {
                 self.complete_backward_references(py::str(fname), relation_depth);
+             },
+             py::arg("fname"), py::arg("relation_depth") = 0)
+        .def("complete_forward_references",
+             [](IdTracker &self, py::object const &fname, int relation_depth) {
+                self.complete_forward_references(py::str(fname), relation_depth);
              },
              py::arg("fname"), py::arg("relation_depth") = 0)
         .def("id_filter",
