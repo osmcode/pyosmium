@@ -4,16 +4,19 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Iterable, Tuple, Any
+from typing import Iterable, Iterator, Tuple, Any, Union, Optional, List
 from pathlib import Path
 
 import osmium
+from osmium.index import LocationTable
+from osmium.osm.types import OSMEntity
 
 class FileProcessor:
     """ A generator that emits OSM objects read from a file.
     """
 
-    def __init__(self, filename, entities=osmium.osm.ALL):
+    def __init__(self, filename: Union[osmium.io.File, osmium.io.FileBuffer, str, Path],
+                 entities: osmium.osm.osm_entity_bits=osmium.osm.ALL) -> None:
         if isinstance(filename, (osmium.io.File, osmium.io.FileBuffer)):
             self._file = filename
         elif isinstance(filename, (str, Path)):
@@ -21,26 +24,26 @@ class FileProcessor:
         else:
             raise TypeError("File must be an osmium.io.File, osmium.io.FileBuffer, str or Path")
         self._entities = entities
-        self._node_store = None
-        self._area_handler = None
-        self._filters = []
-        self._area_filters = []
-        self._filtered_handler = None
+        self._node_store: Optional[LocationTable] = None
+        self._area_handler: Optional[osmium.area.AreaManager] = None
+        self._filters: List['osmium._osmium.HandlerLike'] = []
+        self._area_filters: List['osmium._osmium.HandlerLike'] = []
+        self._filtered_handler: Optional['osmium._osmium.HandlerLike'] = None
 
     @property
-    def header(self):
+    def header(self) -> osmium.io.Header:
         """ Return the header information for the file to be read.
         """
         return osmium.io.Reader(self._file, osmium.osm.NOTHING).header()
 
     @property
-    def node_location_storage(self):
+    def node_location_storage(self) -> Optional[LocationTable]:
         """ Return the node location cache, if enabled.
             This can be used to manually look up locations of nodes.
         """
         return self._node_store
 
-    def with_locations(self, storage='flex_mem'):
+    def with_locations(self, storage: str='flex_mem') -> 'FileProcessor':
         """ Enable caching of node locations. This is necessary in order
             to get geometries for ways and relations.
         """
@@ -55,7 +58,7 @@ class FileProcessor:
 
         return self
 
-    def with_areas(self, *filters):
+    def with_areas(self, *filters: 'osmium._osmium.HandlerLike') -> 'FileProcessor':
         """ Enable area processing. When enabled, then closed ways and
             relations of type multipolygon will also be returned as an
             Area type.
@@ -81,7 +84,7 @@ class FileProcessor:
         self._area_filters.extend(filters)
         return self
 
-    def with_filter(self, filt):
+    def with_filter(self, filt: 'osmium._osmium.HandlerLike') -> 'FileProcessor':
         """ Add a filter function that is called before an object is
             returned in the iterator. Filters are applied sequentially
             in the order they were added.
@@ -90,17 +93,17 @@ class FileProcessor:
         return self
 
 
-    def handler_for_filtered(self, handler):
+    def handler_for_filtered(self, handler: 'osmium._osmium.HandlerLike') -> 'FileProcessor':
         """ Set a handler to be called on all objects that have been
             filtered out and are not presented to the iterator loop.
         """
         self._filtered_handler = handler
         return self
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[OSMEntity]:
         """ Return the iterator over the file.
         """
-        handlers = []
+        handlers: List['osmium._osmium.HandlerLike'] = []
 
         if self._node_store is not None:
             lh = osmium.NodeLocationsForWays(self._node_store)
@@ -139,7 +142,7 @@ class FileProcessor:
             yield from buffer_it
 
 
-def zip_processors(*procs: FileProcessor) -> Iterable[Tuple[Any, ...]]:
+def zip_processors(*procs: FileProcessor) -> Iterable[List[Optional[OSMEntity]]]:
     """ Return the data from the FileProcessors in parallel such
         that objects with the same ID are returned at the same time.
 
@@ -150,19 +153,19 @@ def zip_processors(*procs: FileProcessor) -> Iterable[Tuple[Any, ...]]:
 
     class _CompIter:
 
-        def __init__(self, fp):
+        def __init__(self, fp: FileProcessor) -> None:
             self.iter = iter(fp)
-            self.current = None
-            self.comp = None
+            self.current: Optional[OSMEntity] = None
+            self.comp: Optional[Tuple[int, int]] = None
 
-        def val(self, nextid):
+        def val(self, nextid: Tuple[int, int]) -> Optional[OSMEntity]:
             """ Return current object if it corresponds to the given object ID.
             """
             if self.comp == nextid:
                 return self.current
             return None
 
-        def next(self, nextid):
+        def next(self, nextid: Optional[Tuple[int, int]]) -> Tuple[int, int]:
             """ Get the next object ID, if and only if nextid points to the
                 previously returned object ID. Otherwise return the previous
                 ID again.
@@ -173,6 +176,7 @@ def zip_processors(*procs: FileProcessor) -> Iterable[Tuple[Any, ...]]:
                     self.comp = (100, 0) # end of file marker. larger than any ID
                 else:
                     self.comp = (TID[self.current.type_str()], self.current.id)
+            assert self.comp is not None
             return self.comp
 
 
@@ -181,6 +185,5 @@ def zip_processors(*procs: FileProcessor) -> Iterable[Tuple[Any, ...]]:
     nextid = min(i.next(None) for i in iters)
 
     while nextid[0] < 100:
-        yield (i.val(nextid) for i in iters)
-
+        yield [i.val(nextid) for i in iters]
         nextid = min(i.next(nextid) for i in iters)

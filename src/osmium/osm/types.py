@@ -4,7 +4,8 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Sequence, Any, NamedTuple, Callable, Optional, Iterator, Iterable, TYPE_CHECKING, TypeVar, Generic, Tuple
+from typing import Sequence, Any, NamedTuple, Callable, Optional, Iterator, \
+                   Iterable, TYPE_CHECKING, TypeVar, Generic, Tuple, Union
 import datetime as dt
 
 import osmium.osm.mutable
@@ -759,6 +760,4 @@ class Changeset:
                                         'tags')
 
 
-
-
-
+OSMEntity = Union[Node, Way, Relation, Area, Changeset]

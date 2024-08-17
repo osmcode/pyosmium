@@ -103,7 +103,10 @@ class BackReferenceWriter:
             for o1, o2 in zip_processors(fp1, fp2):
                 if o1:
                     writer.add(o1)
-                else:
-                    writer.add(o2.replace(tags={}) if self.remove_tags else o2)
+                elif o2:
+                    if self.remove_tags and hasattr(o2, 'replace'):
+                        writer.add(o2.replace(tags={}))
+                    else:
+                        writer.add(o2)
 
         self.tmpdir.cleanup()

@@ -27,11 +27,11 @@ class WriteHandler(SimpleWriter):
         documentation.
     """
 
-    def __init__(filename: str, bufsz: int=4096*1024, filetype: str="") -> None:
+    def __init__(self, filename: str, bufsz: int=4096*1024, filetype: str="") -> None:
         super().__init__(filename, bufsz=bufsz, filetype=filetype)
 
 
-def _merge_apply(self, *handlers: Any, idx: str = '', simplify: bool = True) -> None:
+def _merge_apply(self: osmium.MergeInputReader, *handlers: Any, idx: str = '', simplify: bool = True) -> None:
     """ Apply collected data to a handler. The data will be sorted first.
         If `simplify` is true (default) then duplicates will be eliminated
         and only the newest version of each object kept. If `idx` is given
@@ -51,4 +51,4 @@ def _merge_apply(self, *handlers: Any, idx: str = '', simplify: bool = True) -> 
 
     self._apply_internal(*handlers, simplify=simplify)
 
-osmium.MergeInputReader.apply = _merge_apply
+osmium.MergeInputReader.apply = _merge_apply # type: ignore[method-assign]

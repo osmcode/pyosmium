@@ -10,10 +10,7 @@ from datetime import datetime
 if TYPE_CHECKING:
     import osmium.osm
 
-    OSMObjectLike = Union['OSMObject', osmium.osm.OSMObject]
-    NodeLike = Union[Node, osmium.osm.Node]
-    WayLike = Union[Way, osmium.osm.Way]
-    RelationLike = Union[Relation, osmium.osm.Relation]
+    OSMObjectLike = Union['OSMObject', osmium.osm.OSMObject[Any]]
 
     TagSequence = Union[osmium.osm.TagList, Mapping[str, str], Sequence[Tuple[str, str]]]
     LocationLike = Union[osmium.osm.Location, Tuple[float, float]]
@@ -63,7 +60,7 @@ class Node(OSMObject):
        may either be an `osmium.osm.Location` or a tuple of lon/lat coordinates.
     """
 
-    def __init__(self, base: Optional['NodeLike'] = None,
+    def __init__(self, base: Optional[Union['Node', 'osmium.osm.Node']] = None,
                  location: Optional['LocationLike'] = None,
                  **attrs: Any) -> None:
         OSMObject.__init__(self, base=base, **attrs)
@@ -80,7 +77,7 @@ class Way(OSMObject):
        ``osmium.osm.NodeRef`` or simple node ids.
     """
 
-    def __init__(self, base: Optional['WayLike'] = None,
+    def __init__(self, base: Optional[Union['Way', 'osmium.osm.Way']] = None,
                  nodes: Optional['NodeSequence'] = None, **attrs: Any) -> None:
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
@@ -96,7 +93,7 @@ class Relation(OSMObject):
        member type should be a single character 'n', 'w' or 'r'.
     """
 
-    def __init__(self, base: Optional['RelationLike'] = None,
+    def __init__(self, base: Optional[Union['Relation', 'osmium.osm.Relation']] = None,
                  members: Optional['MemberSequence'] = None, **attrs: Any) -> None:
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
@@ -105,21 +102,21 @@ class Relation(OSMObject):
             self.members = members if members is not None else base.members
 
 
-def create_mutable_node(node: 'NodeLike', **args: Any) -> Node:
+def create_mutable_node(node: Union[Node, 'osmium.osm.Node'], **args: Any) -> Node:
     """ Create a mutable node replacing the properties given in the
         named parameters. Note that this function only creates a shallow
         copy which is still bound to the scope of the original object.
     """
     return Node(base=node, **args)
 
-def create_mutable_way(way: 'WayLike', **args: Any) -> Way:
+def create_mutable_way(way: Union[Way, 'osmium.osm.Way'], **args: Any) -> Way:
     """ Create a mutable way replacing the properties given in the
         named parameters. Note that this function only creates a shallow
         copy which is still bound to the scope of the original object.
     """
     return Way(base=way, **args)
 
-def create_mutable_relation(rel: 'RelationLike', **args: Any) -> Relation:
+def create_mutable_relation(rel: Union[Relation, 'osmium.osm.Relation'], **args: Any) -> Relation:
     """ Create a mutable relation replacing the properties given in the
         named parameters. Note that this function only creates a shallow
         copy which is still bound to the scope of the original object.

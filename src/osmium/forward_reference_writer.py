@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Any
+from typing import Any, Optional
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -45,7 +45,7 @@ class ForwardReferenceWriter:
                  remove_tags: bool=True, forward_relation_depth: int=0,
                  backward_relation_depth: int=1) -> None:
         self.outfile = outfile
-        self.tmpdir = TemporaryDirectory()
+        self.tmpdir: Optional['TemporaryDirectory[Any]'] = TemporaryDirectory()
         self.writer = SimpleWriter(str(Path(self.tmpdir.name, 'forward_writer.osm.pbf')))
         self.overwrite = overwrite
         self.back_references = back_references
@@ -67,18 +67,18 @@ class ForwardReferenceWriter:
             self.writer.close()
 
 
-    def add(self, obj):
+    def add(self, obj: Any) -> None:
         """ Write an arbitrary OSM object. This can be either an
             osmium object or a Python object that has the appropriate
             attributes.
         """
-        if obj.is_node():
+        if hasattr(obj, 'location'):
             self.id_tracker.add_node(obj.id)
-        elif obj.is_way():
+        elif hasattr(obj, 'nodes'):
             self.id_tracker.add_way(obj.id)
-        elif obj.is_relation():
+        elif hasattr(obj, 'members'):
             self.id_tracker.add_relation(obj.id)
-        self.writer().add(obj)
+        self.writer.add(obj)
 
 
     def add_node(self, n: Any) -> None:
@@ -91,14 +91,14 @@ class ForwardReferenceWriter:
     def add_way(self, w: Any) -> None:
         """ Write out an OSM way.
         """
-        self.id_tracker.add_way(w)
+        self.id_tracker.add_way(w.id)
         self.writer.add_way(w)
 
 
     def add_relation(self, r: Any) -> None:
         """ Write out an OSM relation.
         """
-        self.id_tracker.add_relation(r)
+        self.id_tracker.add_relation(r.id)
         self.writer.add_relation(r)
 
 
@@ -108,13 +108,9 @@ class ForwardReferenceWriter:
             The function will be automatically called when the writer
             is used as a context manager.
         """
-        if self.writer is None:
-            return # already closed
-
-        self.writer.close()
-        self.writer = None
-
         if self.tmpdir is not None:
+            self.writer.close()
+
             self.id_tracker.complete_forward_references(self.ref_src,
                                                         relation_depth=self.forward_relation_depth)
             if self.back_references:
