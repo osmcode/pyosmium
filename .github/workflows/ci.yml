@@ -181,6 +181,14 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Install prerequisites
+              run: |
+                  # Workaround for github/brew problem. Python is already install
+                  # on the Github action runner and then homebrew comes along...
+                  # See also: https://github.com/Homebrew/homebrew-core/issues/173191
+                  rm -f /usr/local/bin/2to3* /usr/local/bin/idle3* /usr/local/bin/pydoc3* /usr/local/bin/python3*
+              if: ${{ matrix.flavour == 'macos' }}
+
             - uses: ./.github/actions/install-dependencies
               with:
                   version: ${{ matrix.deps }}
