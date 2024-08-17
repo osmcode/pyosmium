@@ -33,7 +33,7 @@ from osmium.replication import server as rserv
 from osmium.replication import newest_change_from_file
 from osmium.replication.utils import get_replication_header
 from osmium.version import pyosmium_release
-from osmium import SimpleHandler, WriteHandler
+from osmium import SimpleHandler, SimpleWriter
 
 
 import re
@@ -131,6 +131,8 @@ def get_arg_parser(from_main=False):
                         help="Format the data should be saved in.")
     parser.add_argument('--server', action='store', dest='server_url',
                         help='Base URL of the replication server')
+    parser.add_argument('--diff-type', action='store', dest='server_diff_type',
+                        help='File format used by the replication server (default: osc.gz)')
     parser.add_argument('--cookie', dest='cookie',
                         help="""Netscape-style cookie jar file to read cookies from
                               and where received cookies will be written to.""")
@@ -207,7 +209,7 @@ def main(args):
             or 'https://planet.osm.org/replication/minute/'
     logging.info("Using replication server at %s" % url)
 
-    with rserv.ReplicationServer(url) as svr:
+    with rserv.ReplicationServer(url, diff_type=options.server_diff_type) as svr:
         svr.set_request_parameter('timeout', options.socket_timeout or None)
 
         if options.cookie is not None:
@@ -226,9 +228,9 @@ def main(args):
 
         log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
         if options.outformat is not None:
-            outhandler = WriteHandler(options.outfile, 4096*1024, options.outformat)
+            outhandler = SimpleWriter(options.outfile, filetype=options.outformat)
         else:
-            outhandler = WriteHandler(options.outfile)
+            outhandler = SimpleWriter(options.outfile)
 
         endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
                                  simplify=options.simplify)

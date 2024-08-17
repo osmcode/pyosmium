@@ -17,34 +17,34 @@ namespace pyosmium {
 
 class BaseFilter : public BaseHandler {
 public:
-    bool node(osmium::Node const *n) override
+    bool node(PyOSMNode &o) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::node)
-               && filter_node(n);
+               && filter_node(o);
     }
 
-    bool way(osmium::Way *n) override
+    bool way(PyOSMWay &o) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::way)
-               && filter_way(n);
+               && filter_way(o);
     }
 
-    bool relation(osmium::Relation const *n) override
+    bool relation(PyOSMRelation &o) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::relation)
-               && filter_relation(n);
+               && filter_relation(o);
     }
 
-    bool area(osmium::Area const *n) override
+    bool area(PyOSMArea &o) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::area)
-               && filter_area(n);
+               && filter_area(o);
     }
 
-    bool changeset(osmium::Changeset const *n) override
+    bool changeset(PyOSMChangeset &o) override
     {
         return (m_enabled_for & osmium::osm_entity_bits::changeset)
-               && filter_changeset(n);
+               && filter_changeset(o);
     }
 
     BaseFilter *enable_for(osmium::osm_entity_bits::type entities)
@@ -55,20 +55,21 @@ public:
 
 protected:
     virtual bool filter(osmium::OSMObject const *) { return false; }
-    virtual bool filter_node(osmium::Node const *n) { return filter(n); }
-    virtual bool filter_way(osmium::Way const *w) { return filter(w); }
-    virtual bool filter_relation(osmium::Relation const *r) { return filter(r); }
-    virtual bool filter_area(osmium::Area const *a) { return filter(a); }
-    virtual bool filter_changeset(osmium::Changeset const *) { return false; }
 
-private:
-    osmium::osm_entity_bits::type m_enabled_for = osmium::osm_entity_bits::all;
-
+    virtual bool filter_node(PyOSMNode &o) { return filter(o.get()); }
+    virtual bool filter_way(PyOSMWay &o) { return filter(o.get()); }
+    virtual bool filter_relation(PyOSMRelation &o) { return filter(o.get()); }
+    virtual bool filter_area(PyOSMArea &o) { return filter(o.get()); }
+    virtual bool filter_changeset(PyOSMChangeset &o) { return false; }
 };
 
 
 void init_empty_tag_filter(pybind11::module &m);
 void init_key_filter(pybind11::module &m);
+void init_tag_filter(pybind11::module &m);
+void init_id_filter(pybind11::module &m);
+void init_entity_filter(pybind11::module &m);
+void init_geo_interface_filter(pybind11::module &m);
 
 } // namespace
 

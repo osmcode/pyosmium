@@ -18,11 +18,8 @@ from helpers import mkdate
 def test_writer(tmp_path):
     @contextmanager
     def _WriteExpect(filename, expected):
-        writer = o.SimpleWriter(str(filename), 1024*1024)
-        try:
+        with o.SimpleWriter(str(filename), 1024*1024) as writer:
             yield writer
-        finally:
-            writer.close()
 
         assert filename.read_text().strip() == expected
 
@@ -104,9 +101,20 @@ def test_location(test_writer, location, out):
         w.add_node(O(location=location))
 
 
+def test_location_generic(test_writer):
+    with test_writer('n0 v0 dV c0 t i0 u T x30.46 y50.37') as w:
+        w.add_node(O(location=(30.46, 50.37)))
+
+
 def test_node_list(test_writer):
     with test_writer('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
         w.add_way(O(nodes=(1, 2, 3, -4)))
+
+
+def test_node_list_generic(test_writer):
+    with test_writer('w0 v0 dV c0 t i0 u T Nn1,n2,n3,n-4') as w:
+        w.add(O(nodes=(1, 2, 3, -4)))
+
 
 def test_node_list_none(test_writer):
     with test_writer('w0 v0 dV c0 t i0 u T N') as w:
@@ -120,6 +128,15 @@ def test_relation_members(test_writer):
                                   ('w', 1111, 'x')
                                  )))
 
+
+def test_relation_members_generic(test_writer):
+    with test_writer('r0 v0 dV c0 t i0 u T Mn34@foo,r200@,w1111@x') as w:
+        w.add(O(members=(('n', 34, 'foo'),
+                         ('r', 200, ''),
+                         ('w', 1111, 'x')
+                        )))
+
+
 def test_relation_members_None(test_writer):
     with test_writer('r0 v0 dV c0 t i0 u T M') as w:
         w.add_relation(O(members=None))
@@ -130,6 +147,13 @@ def test_node_object(test_writer, simple_handler):
 
     with test_writer(node_opl) as w:
         simple_handler(node_opl, node=lambda o: w.add_node(o))
+
+
+def test_node_object_generic(test_writer, simple_handler):
+    node_opl = 'n235 v1 dV c0 t i0 u Telephant=yes x98.7 y-3.45'
+
+    with test_writer(node_opl) as w:
+        simple_handler(node_opl, node=lambda o: w.add(o))
 
 
 def test_location_object(test_writer, simple_handler):
@@ -153,6 +177,13 @@ def test_way_object(test_writer, simple_handler):
         simple_handler(way_opl, way=lambda o: w.add_way(o))
 
 
+def test_way_object_generic(test_writer, simple_handler):
+    way_opl = 'w45 v14 dV c0 t i0 u Thighway=top Nn23,n56,n34,n23'
+
+    with test_writer(way_opl) as w:
+        simple_handler(way_opl, way=lambda o: w.add(o))
+
+
 def test_nodelist_object(test_writer, simple_handler):
     way_opl = 'w45 v14 dV c0 t i0 u Thighway=top Nn23,n56,n34,n23'
 
@@ -173,6 +204,13 @@ def test_relation_object(test_writer, simple_handler):
 
     with test_writer(rel_opl) as w:
         simple_handler(rel_opl, relation=lambda o: w.add_relation(o))
+
+
+def test_relation_object_generic(test_writer, simple_handler):
+    rel_opl = 'r2 v0 dV c0 t i0 u Ttype=multipolygon Mw1@,w2@,w3@inner'
+
+    with test_writer(rel_opl) as w:
+        simple_handler(rel_opl, relation=lambda o: w.add(o))
 
 
 def test_memberlist_object(test_writer, simple_handler):
@@ -205,15 +243,12 @@ def test_set_custom_header(tmp_path):
     finally:
         writer.close()
 
-    rd = o.io.Reader(fn)
-    try:
+    with o.io.Reader(fn) as rd:
         h = rd.header()
         assert h.get('generator') == 'foo'
         assert h.box().valid()
         assert h.box().bottom_left == o.osm.Location(0.1, -4)
         assert h.box().top_right == o.osm.Location(10, 45)
-    finally:
-        rd.close()
 
 
 def test_add_node_after_close(tmp_path, simple_handler):
@@ -252,16 +287,12 @@ def test_add_relation_after_close(tmp_path, simple_handler):
 def test_catch_errors_in_add_node(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    writer = o.SimpleWriter(str(test_file), 4000)
-
-    try:
+    with o.SimpleWriter(str(test_file), 4000) as writer:
         writer.add_node(o.osm.mutable.Node(id=123))
         with pytest.raises(TypeError):
             writer.add_node(o.osm.mutable.Node(id=124, tags=34))
         if not final_item:
             writer.add_node(o.osm.mutable.Node(id=125))
-    finally:
-        writer.close()
 
     output = test_file.read_text()
 
@@ -276,16 +307,12 @@ def test_catch_errors_in_add_node(tmp_path, final_item):
 def test_catch_errors_in_add_way(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    writer = o.SimpleWriter(str(test_file), 4000)
-
-    try:
+    with o.SimpleWriter(str(test_file), 4000) as writer:
         writer.add_way(o.osm.mutable.Way(id=123, nodes=[1, 2, 3]))
         with pytest.raises(TypeError):
             writer.add_way(o.osm.mutable.Way(id=124, nodes=34))
         if not final_item:
             writer.add_way(o.osm.mutable.Way(id=125, nodes=[11, 12]))
-    finally:
-        writer.close()
 
     output = test_file.read_text()
 
@@ -300,16 +327,12 @@ def test_catch_errors_in_add_way(tmp_path, final_item):
 def test_catch_errors_in_add_relation(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    writer = o.SimpleWriter(str(test_file), 4000)
-
-    try:
+    with o.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
         writer.add_relation(o.osm.mutable.Relation(id=123))
         with pytest.raises(TypeError):
             writer.add_relation(o.osm.mutable.Relation(id=124, members=34))
         if not final_item:
             writer.add_relation(o.osm.mutable.Relation(id=125))
-    finally:
-        writer.close()
 
     output = test_file.read_text()
 
@@ -318,3 +341,24 @@ def test_catch_errors_in_add_relation(tmp_path, final_item):
         expected += 'r125 v0 dV c0 t i0 u T M\n'
 
     assert output == expected
+
+
+def test_do_not_overwrite_by_default(tmp_path):
+    test_file = tmp_path / 'test.opl'
+
+    with o.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
+        writer.add_node(o.osm.mutable.Node(id=123))
+
+    # try to open again
+    with pytest.raises(RuntimeError, match='Open failed'):
+        o.SimpleWriter(filename=str(test_file))
+
+
+def test_do_overwrite(tmp_path):
+    test_file = tmp_path / 'test.opl'
+
+    with o.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
+        writer.add_node(o.osm.mutable.Node(id=123))
+
+    with o.SimpleWriter(filename=str(test_file), overwrite=True) as writer:
+        pass

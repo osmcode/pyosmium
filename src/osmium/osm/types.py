@@ -2,7 +2,7 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from typing import Sequence, Any, NamedTuple, Callable, Optional, Iterator, Iterable, TYPE_CHECKING, TypeVar, Generic, Tuple
 import datetime as dt
@@ -303,8 +303,7 @@ class OSMObject(Generic[T_obj]):
         all common attributes.
     """
     _pyosmium_data: T_obj
-    tags: TagList
-    "(read-only) List of tags describing the object. See :py:class:`osmium.osm.TagList`."
+    _tags: TagList
 
     @property
     def id(self) -> int:
@@ -358,6 +357,13 @@ class OSMObject(Generic[T_obj]):
         """
         return self._pyosmium_data.user()
 
+    @property
+    def tags(self) -> TagList:
+        """ (read-only) List of tags describing the object.
+            See :py:class:`osmium.osm.TagList`.
+        """
+        return self._tags
+
     def positive_id(self) -> int:
         """ Get the absolute value of the id of this object.
         """
@@ -405,7 +411,7 @@ class Node(OSMObject['cosm.COSMNode']):
     def __init__(self, cnode: 'cosm.COSMNode'):
         self._pyosmium_data = cnode
         self._location: Optional['osmium.osm.Location'] = None
-        self.tags = TagList(self._pyosmium_data)
+        self._tags = TagList(self._pyosmium_data)
 
     def replace(self, **kwargs: Any) -> 'osmium.osm.mutable.Node':
         """ Create a mutable node replacing the properties given in the
@@ -429,6 +435,19 @@ class Node(OSMObject['cosm.COSMNode']):
 
         return self._location
 
+    @property
+    def lat(self) -> float:
+        """ Return latitude of the node.
+        """
+        return self.location.lat
+
+
+    @property
+    def lon(self) -> float:
+        """ Return longitude of the node.
+        """
+        return self.location.lon
+
     def type_str(self) -> str:
         return 'n'
 
@@ -451,7 +470,7 @@ class Way(OSMObject['cosm.COSMWay']):
 
     def __init__(self, cway: 'cosm.COSMWay'):
         self._pyosmium_data = cway
-        self.tags = TagList(self._pyosmium_data)
+        self._tags = TagList(self._pyosmium_data)
         self._nodes: Optional[WayNodeList] = None
 
     def replace(self, **kwargs: Any) -> 'osmium.osm.mutable.Way':
@@ -513,15 +532,12 @@ class Relation(OSMObject['cosm.COSMRelation']):
     """ Represents a OSM relation. It inherits the attributes from OSMObject
         and adds an ordered list of members.
     """
-    members: RelationMemberList
-    """(read-only) Ordered list of relation members.
-       See :py:class:`osmium.osm.RelationMemberList`.
-    """
+    _members: RelationMemberList
 
     def __init__(self, crelation: 'cosm.COSMRelation'):
         self._pyosmium_data = crelation
-        self.tags = TagList(self._pyosmium_data)
-        self.members = RelationMemberList(self._pyosmium_data)
+        self._tags = TagList(self._pyosmium_data)
+        self._members = RelationMemberList(self._pyosmium_data)
 
     def replace(self, **kwargs: Any) -> 'osmium.osm.mutable.Relation':
         """ Create a mutable relation replacing the properties given in the
@@ -534,6 +550,13 @@ class Relation(OSMObject['cosm.COSMRelation']):
             ``rel.replace(tags=dict(rel.tags), members=list(rel.members))``
         """
         return osmium.osm.mutable.Relation(self, **kwargs)
+
+    @property
+    def members(self) -> RelationMemberList:
+        """(read-only) Ordered list of relation members.
+           See :py:class:`osmium.osm.RelationMemberList`.
+        """
+        return self._members
 
     def type_str(self) -> str:
         return 'r'
@@ -590,7 +613,7 @@ class Area(OSMObject['cosm.COSMArea']):
 
     def __init__(self, carea: 'cosm.COSMArea') -> None:
         self._pyosmium_data = carea
-        self.tags = TagList(self._pyosmium_data)
+        self._tags = TagList(self._pyosmium_data)
 
     def from_way(self) -> bool:
         """ Return true if the area was created from a way, false if it was
@@ -647,12 +670,12 @@ class Changeset:
     """
     _pyosmium_data: 'cosm.COSMChangeset'
     _bounds: Optional['osmium.osm.Box']
-    tags: TagList
+    _tags: TagList
 
     def __init__(self, carea: 'cosm.COSMChangeset') -> None:
         self._pyosmium_data = carea
         self._bounds = None
-        self.tags = TagList(self._pyosmium_data)
+        self._tags = TagList(self._pyosmium_data)
 
     @property
     def id(self) -> int:
@@ -707,6 +730,13 @@ class Changeset:
             self._bounds = self._pyosmium_data.bounds()
 
         return self._bounds
+
+    @property
+    def tags(self) -> TagList:
+        """ (read-only) List of tags describing the object.
+            See :py:class:`osmium.osm.TagList`.
+        """
+        return self._tags
 
     def user_is_anonymous(self) -> bool:
         """ Check if the user anonymous. If true, the uid does not uniquely

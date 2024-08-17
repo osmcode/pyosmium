@@ -46,9 +46,9 @@ public:
         return true;
     }
 
-    bool filter_changeset(osmium::Changeset const *o) override
+    bool filter_changeset(pyosmium::PyOSMChangeset &o) override
     {
-        auto const &tags = o->tags();
+        auto const &tags = o.get()->tags();
         for (auto const &key: m_keys) {
             if (tags.has_key(key.c_str())) {
                 return false;

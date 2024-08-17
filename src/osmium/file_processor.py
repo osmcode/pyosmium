@@ -4,6 +4,7 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
+from typing import Iterable, Tuple, Any
 from pathlib import Path
 
 import osmium
@@ -19,17 +20,18 @@ class FileProcessor:
             self._file = osmium.io.File(str(filename))
         else:
             raise TypeError("File must be an osmium.io.File, osmium.io.FileBuffer, str or Path")
-        self._reader = osmium.io.Reader(self._file, entities)
         self._entities = entities
         self._node_store = None
         self._area_handler = None
         self._filters = []
+        self._area_filters = []
+        self._filtered_handler = None
 
     @property
     def header(self):
         """ Return the header information for the file to be read.
         """
-        return self._reader.header()
+        return osmium.io.Reader(self._file, osmium.osm.NOTHING).header()
 
     @property
     def node_location_storage(self):
@@ -53,14 +55,21 @@ class FileProcessor:
 
         return self
 
-    def with_areas(self):
+    def with_areas(self, *filters):
         """ Enable area processing. When enabled, then closed ways and
             relations of type multipolygon will also be returned as an
             Area type.
 
+            Optionally one or more filters can be passed. These filters
+            will be applied in the first pass, when relation candidates
+            for areas are selected.
+
+            Calling this function multiple times causes more filters to
+            be added to the filter chain.
+
             Automatically enables location caching, if it was not yet set.
             It uses the default location cache type. To use a different
-            cache tyoe, you need to call with_locations() explicity.
+            cache type, you need to call with_locations() explicity.
 
             Area processing requires that the file is read twice. This
             happens transparently.
@@ -69,13 +78,23 @@ class FileProcessor:
             self._area_handler = osmium.area.AreaManager()
             if self._node_store is None:
                 self.with_locations()
+        self._area_filters.extend(filters)
         return self
 
     def with_filter(self, filt):
         """ Add a filter function that is called before an object is
-            returned in the iterator.
+            returned in the iterator. Filters are applied sequentially
+            in the order they were added.
         """
         self._filters.append(filt)
+        return self
+
+
+    def handler_for_filtered(self, handler):
+        """ Set a handler to be called on all objects that have been
+            filtered out and are not presented to the iterator loop.
+        """
+        self._filtered_handler = handler
         return self
 
     def __iter__(self):
@@ -89,20 +108,28 @@ class FileProcessor:
             handlers.append(lh)
 
         if self._area_handler is None:
-            yield from osmium.OsmFileIterator(self._reader, *handlers, *self._filters)
+            reader = osmium.io.Reader(self._file, self._entities)
+            it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
+            if self._filtered_handler:
+                it.set_filtered_handler(self._filtered_handler)
+            yield from it
             return
 
         # need areas, do two pass handling
         rd = osmium.io.Reader(self._file, osmium.osm.RELATION)
         try:
-            osmium.apply(rd, *self._filters, self._area_handler.first_pass_handler())
+            osmium.apply(rd, *self._area_filters, self._area_handler.first_pass_handler())
         finally:
             rd.close()
 
         buffer_it = osmium.BufferIterator(*self._filters)
         handlers.append(self._area_handler.second_pass_to_buffer(buffer_it))
 
-        for obj in osmium.OsmFileIterator(self._reader, *handlers, *self._filters):
+        reader = osmium.io.Reader(self._file, self._entities)
+        it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
+        if self._filtered_handler:
+            it.set_filtered_handler(self._filtered_handler)
+        for obj in it:
             yield obj
             if buffer_it:
                 yield from buffer_it
@@ -110,3 +137,50 @@ class FileProcessor:
         # catch anything after the final flush
         if buffer_it:
             yield from buffer_it
+
+
+def zip_processors(*procs: FileProcessor) -> Iterable[Tuple[Any, ...]]:
+    """ Return the data from the FileProcessors in parallel such
+        that objects with the same ID are returned at the same time.
+
+        The processors must contain sorted data or the results are
+        undefined.
+    """
+    TID = {'n': 0, 'w': 1, 'r': 2, 'a': 3, 'c': 4}
+
+    class _CompIter:
+
+        def __init__(self, fp):
+            self.iter = iter(fp)
+            self.current = None
+            self.comp = None
+
+        def val(self, nextid):
+            """ Return current object if it corresponds to the given object ID.
+            """
+            if self.comp == nextid:
+                return self.current
+            return None
+
+        def next(self, nextid):
+            """ Get the next object ID, if and only if nextid points to the
+                previously returned object ID. Otherwise return the previous
+                ID again.
+            """
+            if self.comp == nextid:
+                self.current = next(self.iter, None)
+                if self.current is None:
+                    self.comp = (100, 0) # end of file marker. larger than any ID
+                else:
+                    self.comp = (TID[self.current.type_str()], self.current.id)
+            return self.comp
+
+
+    iters = [_CompIter(p) for p in procs]
+
+    nextid = min(i.next(None) for i in iters)
+
+    while nextid[0] < 100:
+        yield (i.val(nextid) for i in iters)
+
+        nextid = min(i.next(nextid) for i in iters)

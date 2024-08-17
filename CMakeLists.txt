@@ -26,7 +26,7 @@ include_directories(SYSTEM ${OSMIUM_INCLUDE_DIRS} ${PROTOZERO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 if(NOT "${CMAKE_CXX_STANDARD}")
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 endif()
 
 # required for pybind11 < 2.6
@@ -60,9 +60,8 @@ function(set_module_output module outdir)
     endforeach()
 endfunction()
 
-set(PYOSMIUM_MODULES geom index io)
-
-foreach(PYMOD geom index io)
+# Modules without any Python code and just one source file.
+foreach(PYMOD geom index io area)
     pybind11_add_module(${PYMOD} lib/${PYMOD}.cc)
     set_module_output(${PYMOD} osmium)
     target_link_libraries(${PYMOD} PRIVATE ${OSMIUM_LIBRARIES})
@@ -71,34 +70,41 @@ foreach(PYMOD geom index io)
     endif()
 endforeach()
 
-pybind11_add_module(_osm lib/osm.cc)
-set_module_output(_osm osmium/osm)
+# Modules where additional Python code is in src (C++-part will be private).
+foreach(PYMOD osm replication)
+    pybind11_add_module(_${PYMOD} lib/${PYMOD}.cc)
+    set_module_output(_${PYMOD} osmium/${PYMOD})
+    target_link_libraries(_${PYMOD} PRIVATE ${OSMIUM_LIBRARIES})
+    if(APPLE)
+        set_target_properties(_${PYMOD} PROPERTIES CXX_VISIBILITY_PRESET "default")
+    endif()
+endforeach()
+
+# Modules with multiple source files.
 pybind11_add_module(_osmium
                     lib/osmium.cc
                     lib/merge_input_reader.cc
                     lib/node_location_handler.cc
                     lib/simple_writer.cc
-                    lib/write_handler.cc
-                    lib/file_iterator.cc)
+                    lib/file_iterator.cc
+                    lib/id_tracker.cc)
 set_module_output(_osmium osmium)
-pybind11_add_module(_replication lib/replication.cc)
-set_module_output(_replication osmium/replication)
-pybind11_add_module(_area lib/area.cc)
-set_module_output(_area osmium/area)
-pybind11_add_module(_filter
+target_link_libraries(_osmium PRIVATE ${OSMIUM_LIBRARIES})
+
+pybind11_add_module(filter
                     lib/filter.cc
                     lib/empty_tag_filter.cc
-                    lib/key_filter.cc)
-set_module_output(_filter osmium/filter)
-
-target_link_libraries(_osmium PRIVATE ${OSMIUM_LIBRARIES})
-target_link_libraries(_replication PRIVATE ${OSMIUM_LIBRARIES})
-target_link_libraries(_area PRIVATE ${OSMIUM_LIBRARIES})
-target_link_libraries(_filter PRIVATE ${OSMIUM_LIBRARIES})
+                    lib/key_filter.cc
+                    lib/tag_filter.cc
+                    lib/id_filter.cc
+                    lib/entity_filter.cc
+                    lib/geo_interface_filter.cc)
+set_module_output(filter osmium)
+target_link_libraries(filter PRIVATE ${OSMIUM_LIBRARIES})
 
 # workaround for https://github.com/pybind/pybind11/issues/1272
 if(APPLE)
     set_target_properties(_osmium PROPERTIES CXX_VISIBILITY_PRESET "default")
-    set_target_properties(_osm PROPERTIES CXX_VISIBILITY_PRESET "default")
+    set_target_properties(filter PROPERTIES CXX_VISIBILITY_PRESET "default")
 endif()
 

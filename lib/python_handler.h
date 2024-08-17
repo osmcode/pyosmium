@@ -15,104 +15,86 @@
 
 namespace pyosmium {
 
-template <typename T>
-class ObjectGuard {
-    using WardPtr = T*;
-
-    public:
-        ObjectGuard(pybind11::object ward) : m_ward(ward) {}
-
-        ~ObjectGuard() {
-            m_ward.attr("_pyosmium_data").template cast<WardPtr>()->invalidate();
-        }
-
-    private:
-        pybind11::object m_ward;
-};
-
-
 class PythonHandler : public BaseHandler
 {
 public:
     PythonHandler(pybind11::handle handler)
-    : m_handler(std::move(handler))
+    : m_handler(handler)
     {
-        m_enabled = osmium::osm_entity_bits::nothing;
+        m_enabled_for = osmium::osm_entity_bits::nothing;
         if (pybind11::hasattr(m_handler, "node")) {
-            m_enabled |= osmium::osm_entity_bits::node;
+            m_enabled_for |= osmium::osm_entity_bits::node;
         }
         if (pybind11::hasattr(m_handler, "way")) {
-            m_enabled |= osmium::osm_entity_bits::way;
+            m_enabled_for |= osmium::osm_entity_bits::way;
         }
         if (pybind11::hasattr(m_handler, "relation")) {
-            m_enabled |= osmium::osm_entity_bits::relation;
+            m_enabled_for |= osmium::osm_entity_bits::relation;
         }
         if (pybind11::hasattr(m_handler, "area")) {
-            m_enabled |= osmium::osm_entity_bits::area;
+            m_enabled_for |= osmium::osm_entity_bits::area;
         }
         if (pybind11::hasattr(m_handler, "changeset")) {
-            m_enabled |= osmium::osm_entity_bits::changeset;
+            m_enabled_for |= osmium::osm_entity_bits::changeset;
         }
     }
 
 
-    bool node(osmium::Node const *n) override
+    bool node(PyOSMNode &n) override
     {
-        if (m_enabled & osmium::osm_entity_bits::node) {
-            pybind11::gil_scoped_acquire acquire;
-            auto obj = m_type_module.attr("Node")(COSMNode{n});
-            ObjectGuard<COSMNode> guard(obj);
-            m_handler.attr("node")(obj);
-        }
-        return false;
-    }
-
-    bool way(osmium::Way *w) override
-    {
-        if (m_enabled & osmium::osm_entity_bits::way) {
-            pybind11::gil_scoped_acquire acquire;
-            auto obj = m_type_module.attr("Way")(COSMWay{w});
-            ObjectGuard<COSMWay> guard(obj);
-            m_handler.attr("way")(obj);
+        if (m_enabled_for & osmium::osm_entity_bits::node) {
+            auto ret = m_handler.attr("node")(n.get_or_create_python_object());
+            if (pybind11::isinstance<pybind11::bool_>(ret) && ret.cast<bool>()) {
+                return true;
+            }
         }
         return false;
     }
 
-    bool relation(osmium::Relation const *r) override
+    bool way(PyOSMWay &w) override
     {
-        if (m_enabled & osmium::osm_entity_bits::relation) {
-            pybind11::gil_scoped_acquire acquire;
-            auto obj = m_type_module.attr("Relation")(COSMRelation{r});
-            ObjectGuard<COSMRelation> guard(obj);
-            m_handler.attr("relation")(obj);
+        if (m_enabled_for & osmium::osm_entity_bits::way) {
+            auto ret = m_handler.attr("way")(w.get_or_create_python_object());
+            if (pybind11::isinstance<pybind11::bool_>(ret) && ret.cast<bool>()) {
+                return true;
+            }
         }
         return false;
     }
 
-    bool changeset(osmium::Changeset const *c) override
+    bool relation(PyOSMRelation &r) override
     {
-        if (m_enabled & osmium::osm_entity_bits::changeset) {
-            pybind11::gil_scoped_acquire acquire;
-            auto obj = m_type_module.attr("Changeset")(COSMChangeset{c});
-            ObjectGuard<COSMChangeset> guard(obj);
-            m_handler.attr("changeset")(obj);
+        if (m_enabled_for & osmium::osm_entity_bits::relation) {
+            auto ret = m_handler.attr("relation")(r.get_or_create_python_object());
+            if (pybind11::isinstance<pybind11::bool_>(ret) && ret.cast<bool>()) {
+                return true;
+            }
         }
         return false;
     }
 
-    bool area(osmium::Area const *a) override
+    bool changeset(PyOSMChangeset &c) override
     {
-        if (m_enabled & osmium::osm_entity_bits::area) {
-            pybind11::gil_scoped_acquire acquire;
-            auto obj = m_type_module.attr("Area")(COSMArea{a});
-            ObjectGuard<COSMArea> guard(obj);
-            m_handler.attr("area")(obj);
+        if (m_enabled_for & osmium::osm_entity_bits::changeset) {
+            auto ret = m_handler.attr("changeset")(c.get_or_create_python_object());
+            if (pybind11::isinstance<pybind11::bool_>(ret) && ret.cast<bool>()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool area(PyOSMArea &a) override
+    {
+        if (m_enabled_for & osmium::osm_entity_bits::area) {
+            auto ret = m_handler.attr("area")(a.get_or_create_python_object());
+            if (pybind11::isinstance<pybind11::bool_>(ret) && ret.cast<bool>()) {
+                return true;
+            }
         }
         return false;
     }
 private:
-    osmium::osm_entity_bits::type m_enabled;
-    pybind11::object m_type_module = pybind11::module_::import("osmium.osm.types");
     pybind11::handle m_handler;
 };
 

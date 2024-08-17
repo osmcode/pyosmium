@@ -16,18 +16,22 @@
 
 #include "cast.h"
 #include "osm_base_objects.h"
+#include "base_handler.h"
 
 namespace py = pybind11;
 
 namespace {
 
-class SimpleWriter
+class SimpleWriter : public pyosmium::BaseHandler
 {
     enum { BUFFER_WRAP = 4096 };
 
 public:
-    SimpleWriter(const char* filename, size_t bufsz=4096*1024, osmium::io::Header header=osmium::io::Header())
-    : writer(filename, header),
+    SimpleWriter(const char* filename, size_t bufsz, osmium::io::Header const *header,
+                 bool overwrite, const std::string &filetype)
+    : writer(osmium::io::File(filename, filetype),
+             header ? *header : osmium::io::Header(),
+             overwrite ? osmium::io::overwrite::allow : osmium::io::overwrite::no),
       buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
              osmium::memory::Buffer::auto_grow::yes),
       buffer_size(buffer.capacity()) // same rounding to BUFFER_WRAP
@@ -35,6 +39,34 @@ public:
 
     virtual ~SimpleWriter()
     { close(); }
+
+
+    bool node(pyosmium::PyOSMNode &o) override
+    {
+        buffer.add_item(*(o.get()));
+        flush_buffer();
+        return false;
+    }
+
+    bool way(pyosmium::PyOSMWay &o) override
+    {
+        buffer.add_item(*(o.get()));
+        flush_buffer();
+        return false;
+    }
+
+    bool relation(pyosmium::PyOSMRelation &o) override
+    {
+        buffer.add_item(*(o.get()));
+        flush_buffer();
+        return false;
+    }
+
+    void flush() override
+    {
+        flush_buffer(true);
+    }
+
 
     void add_node(py::object o)
     {
@@ -283,11 +315,11 @@ private:
         return osmium::Location{l[0].cast<double>(), l[1].cast<double>()};
     }
 
-    void flush_buffer()
+    void flush_buffer(bool force = false)
     {
         buffer.commit();
 
-        if (buffer.committed() > buffer_size - BUFFER_WRAP) {
+        if (force || buffer.committed() > buffer_size - BUFFER_WRAP) {
             osmium::memory::Buffer new_buffer(buffer_size, osmium::memory::Buffer::auto_grow::yes);
             using std::swap;
             swap(buffer, new_buffer);
@@ -306,7 +338,7 @@ namespace pyosmium {
 
 void init_simple_writer(pybind11::module &m)
 {
-    py::class_<SimpleWriter>(m, "SimpleWriter",
+    py::class_<SimpleWriter, BaseHandler>(m, "SimpleWriter",
         "The most generic class to write osmium objects into a file. The writer "
         "takes a file name as its mandatory parameter. The file must not yet "
         "exist. The file type to output is determined from the file extension. "
@@ -314,10 +346,16 @@ void init_simple_writer(pybind11::module &m)
         "output data in an internal memory buffer before writing it on disk. This "
         "parameter allows changing the default buffer size of 4MB. Larger buffers "
         "are normally better but you should be aware that there are normally multiple "
-        "buffers in use during the write process.")
-        .def(py::init<const char*, unsigned long, osmium::io::Header>())
-        .def(py::init<const char*, unsigned long>())
-        .def(py::init<const char*>())
+        "buffers in use during the write process.\n\n"
+        "The writer will not overwrite existing files by default. Set `overwrite` "
+        "to True to allow overwriting.\n\n"
+        "The SimpleWriter can also functions as a handler and will write out "
+        "all node, ways and relations, it receives.")
+        .def(py::init<const char*, unsigned long, osmium::io::Header const *, bool, const std::string&>(),
+             py::arg("filename"), py::arg("bufsz") = 4096*1024,
+             py::arg("header") = nullptr,
+             py::arg("overwrite") = false,
+             py::arg("filetype") = "")
         .def("add_node", &SimpleWriter::add_node, py::arg("node"),
              "Add a new node to the file. The node may be an ``osmium.osm.Node`` object, "
              "an ``osmium.osm.mutable.Node`` object or any other Python object that "
@@ -330,11 +368,26 @@ void init_simple_writer(pybind11::module &m)
              "Add a new relation to the file. The relation may be an "
              "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Relation`` "
              "object or any other Python object that implements the same attributes.")
+        .def("add", [](SimpleWriter &self, py::object const &o) {
+                           if (py::isinstance<pyosmium::COSMNode>(o) || py::hasattr(o, "location")) {
+                               self.add_node(o);
+                           } else if (py::isinstance<pyosmium::COSMWay>(o) || py::hasattr(o, "nodes")) {
+                               self.add_way(o);
+                           } else if (py::isinstance<pyosmium::COSMRelation>(o) || py::hasattr(o, "members")) {
+                               self.add_relation(o);
+                           } else {
+                               throw py::type_error("Need node, way or relation object.");
+                           }
+                    },
+             "Add a new object to the file. The function will try to determine "
+             "the kind of object automatically.")
         .def("close", &SimpleWriter::close,
              "Flush the remaining buffers and close the writer. While it is not "
              "strictly necessary to call this function explicitly, it is still "
              "strongly recommended to close the writer as soon as possible, so "
              "that the buffer memory can be freed.")
+        .def("__enter__", [](py::object const &self) { return self; })
+        .def("__exit__", [](SimpleWriter &self, py::args args) { self.close(); })
     ;
 }
 

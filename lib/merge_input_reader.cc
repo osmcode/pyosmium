@@ -15,9 +15,6 @@
 #include <osmium/io/any_input.hpp>
 #include <osmium/io/any_output.hpp>
 #include <osmium/io/output_iterator.hpp>
-#include <osmium/handler.hpp>
-#include <osmium/handler/node_locations_for_ways.hpp>
-#include <osmium/index/map/all.hpp>
 #include <osmium/object_pointer_collection.hpp>
 #include <osmium/visitor.hpp>
 
@@ -60,13 +57,29 @@ namespace {
 class MergeInputReader
 {
 public:
-    void apply(py::args args, std::string const &idx, bool simplify)
+    void apply_internal(py::args args, bool simplify)
     {
         pyosmium::HandlerChain handler{args};
-        if (idx.empty())
-            apply_without_location(handler, simplify);
-        else
-            apply_with_location(handler, idx, simplify);
+        if (simplify) {
+            objects.sort(osmium::object_order_type_id_reverse_version());
+            osmium::item_type prev_type = osmium::item_type::undefined;
+            osmium::object_id_type prev_id = 0;
+            for (auto &item: objects) {
+                if (item.type() != prev_type || item.id() != prev_id) {
+                    prev_type = item.type();
+                    prev_id = item.id();
+                    pyosmium::apply_item(item, handler);
+                }
+            }
+        } else {
+            objects.sort(osmium::object_order_type_id_version());
+            for (auto &obj : objects) {
+                pyosmium::apply_item(obj, handler);
+            }
+        }
+
+        objects = osmium::ObjectPointerCollection();
+        changes.clear();
     }
 
     void apply_to_reader(osmium::io::Reader &reader, osmium::io::Writer &writer,
@@ -128,59 +141,6 @@ public:
     }
 
 private:
-    void apply_without_location(pyosmium::HandlerChain& handler, bool simplify)
-    {
-        if (simplify) {
-            objects.sort(osmium::object_order_type_id_reverse_version());
-            osmium::item_type prev_type = osmium::item_type::undefined;
-            osmium::object_id_type prev_id = 0;
-            for (auto &item: objects) {
-                if (item.type() != prev_type || item.id() != prev_id) {
-                    prev_type = item.type();
-                    prev_id = item.id();
-                    osmium::apply_item(item, handler);
-                }
-            }
-        } else {
-            objects.sort(osmium::object_order_type_id_version());
-            osmium::apply(objects.begin(), objects.end(), handler);
-        }
-
-        objects = osmium::ObjectPointerCollection();
-        changes.clear();
-    }
-
-    void apply_with_location(pyosmium::HandlerChain& handler, std::string const &idx,
-                             bool simplify)
-    {
-        using Index_fab =
-            osmium::index::MapFactory<osmium::unsigned_object_id_type, osmium::Location>;
-        using Index_type =
-            osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>;
-        auto index = Index_fab::instance().create_map(idx);
-        osmium::handler::NodeLocationsForWays<Index_type> location_handler(*index);
-        location_handler.ignore_errors();
-
-        if (simplify) {
-            objects.sort(osmium::object_order_type_id_reverse_version());
-            osmium::item_type prev_type = osmium::item_type::undefined;
-            osmium::object_id_type prev_id = 0;
-            for (auto &item: objects) {
-                if (item.type() != prev_type || item.id() != prev_id) {
-                    prev_type = item.type();
-                    prev_id = item.id();
-                    osmium::apply_item(item, location_handler, handler);
-                }
-            }
-        } else {
-            objects.sort(osmium::object_order_type_id_version());
-            osmium::apply(objects.begin(), objects.end(), location_handler, handler);
-        }
-
-        objects = osmium::ObjectPointerCollection();
-        changes.clear();
-    }
-
     size_t internal_add(osmium::io::File change_file)
     {
         size_t sz = 0;
@@ -209,19 +169,8 @@ void init_merge_input_reader(py::module &m)
         "Collects data from multiple input files, sorts and optionally "
         "deduplicates the data before applying it to a handler.")
         .def(py::init<>())
-        .def("apply", &MergeInputReader::apply,
-             py::arg("idx")="", py::arg("simplify")=true,
-             "Apply collected data to a handler. The data will be sorted first. "
-             "If `simplify` is true (default) then duplicates will be eliminated "
-             "and only the newest version of each object kept. If `idx` is given "
-             "a node location cache with the given type will be created and "
-             "applied when creating the ways. Note that a diff file normally does "
-             "not contain all node locations to reconstruct changed ways. If the "
-             "full way geometries are needed, create a persistent node location "
-             "cache during initial import of the area and reuse it when processing "
-             "diffs. After the data "
-             "has been applied the buffer of the MergeInputReader is empty and "
-             "new data can be added for the next round of application.")
+        .def("_apply_internal", &MergeInputReader::apply_internal,
+             py::arg("simplify")=true)
         .def("apply_to_reader", &MergeInputReader::apply_to_reader,
              py::arg("reader"), py::arg("writer"), py::arg("with_history")=false,
              "Apply the collected data to data from the given `reader` and write "

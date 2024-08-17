@@ -26,24 +26,26 @@ class AreaManagerSecondPassHandlerBase : public pyosmium::BaseHandler
 public:
     AreaManagerSecondPassHandlerBase(MpManager *mp_manager)
     : m_mp_manager(mp_manager)
-    {}
-
-
-    bool node(osmium::Node const *n) override
     {
-        m_mp_manager->handle_node(*n);
+        m_enabled_for = osmium::osm_entity_bits::nwr;
+    }
+
+
+    bool node(pyosmium::PyOSMNode &n) override
+    {
+        m_mp_manager->handle_node(*(n.get()));
         return false;
     }
 
-    bool way(osmium::Way *w) override
+    bool way(pyosmium::PyOSMWay &w) override
     {
-        m_mp_manager->handle_way(*w);
+        m_mp_manager->handle_way(*(w.get()));
         return false;
     }
 
-    bool relation(osmium::Relation const *r) override
+    bool relation(pyosmium::PyOSMRelation &r) override
     {
-        m_mp_manager->handle_relation(*r);
+        m_mp_manager->handle_relation(*(r.get()));
         return false;
     }
 
@@ -63,8 +65,12 @@ public:
     AreaManagerSecondPassHandler(MpManager *mp_manager, py::args args)
     : AreaManagerSecondPassHandlerBase(mp_manager), m_args(args), m_handlers(m_args)
     {
-        m_mp_manager->set_callback([this](osmium::memory::Buffer &&ab)
-                                          { osmium::apply(ab, this->m_handlers); });
+        m_mp_manager->set_callback([this](osmium::memory::Buffer &&buffer) {
+        for (auto &obj : buffer.select<osmium::Area>()) {
+                pyosmium::PyOSMArea area{&obj};
+                this->m_handlers.area(area);
+            }
+        });
     }
 
 private:
@@ -96,9 +102,9 @@ public:
     pyosmium::BaseHandler *first_pass_handler() { return this; }
 
     // first-pass-handler
-    bool relation(osmium::Relation const *r) override
+    bool relation(pyosmium::PyOSMRelation &r) override
     {
-        m_mp_manager.relation(*r);
+        m_mp_manager.relation(*(r.get()));
         return false;
     }
 
@@ -121,7 +127,7 @@ private:
 
 } // namespace
 
-PYBIND11_MODULE(_area, m)
+PYBIND11_MODULE(area, m)
 {
     py::class_<AreaManagerSecondPassHandler, pyosmium::BaseHandler>(m,
                 "AreaManagerSecondPassHandler");

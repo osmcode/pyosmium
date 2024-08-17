@@ -8,35 +8,41 @@
 #ifndef PYOSMIUM_BASE_HANDLER_HPP
 #define PYOSMIUM_BASE_HANDLER_HPP
 
-#include <osmium/handler.hpp>
+#include <osmium/osm/entity.hpp>
+#include <osmium/io/reader.hpp>
+
+#include "osm_base_objects.h"
 
 namespace pyosmium {
 
-class BaseHandler : public osmium::handler::Handler
+class BaseHandler
 {
 public:
     virtual ~BaseHandler() = default;
-
-    // work around pybind's bad copy policy
-    // (see https://github.com/pybind/pybind11/issues/1241)
-    void node(const osmium::Node &o) { node(&o); }
-    void way(osmium::Way &o) { way(&o); }
-    void relation(const osmium::Relation &o) { relation(&o); }
-    void changeset(const osmium::Changeset &o) { changeset(&o); }
-    void area(const osmium::Area &o) { area(&o); }
 
     // Actual handler functions.
     // All object handlers return a boolean which indicates if
     // processing is finished (true) or should be continued with the next
     // handler (false).
-    virtual bool node(const osmium::Node*) { return false; }
-    virtual bool way(osmium::Way *) { return false; }
-    virtual bool relation(const osmium::Relation*) { return false; }
-    virtual bool changeset(const osmium::Changeset*) { return false; }
-    virtual bool area(const osmium::Area*)  { return false; }
+    virtual bool node(PyOSMNode &) { return false; }
+    virtual bool way(PyOSMWay &) { return false; }
+    virtual bool relation(PyOSMRelation &) { return false; }
+    virtual bool area(PyOSMArea &)  { return false; }
+    virtual bool changeset(PyOSMChangeset &) { return false; }
 
     virtual void flush() {}
+
+    bool is_enabled_for(osmium::osm_entity_bits::type types) const
+    {
+        return types & m_enabled_for;
+    }
+
+protected:
+    osmium::osm_entity_bits::type m_enabled_for = osmium::osm_entity_bits::all;
 };
+
+void apply(osmium::io::Reader &reader, BaseHandler &handler);
+void apply_item(osmium::OSMEntity &item, BaseHandler &handler);
 
 } // namespace
 

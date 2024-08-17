@@ -12,14 +12,12 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(_filter, m) {
-    py::class_<pyosmium::BaseFilter, pyosmium::BaseHandler>(m, "BaseFilter")
-        .def("enable_for", &pyosmium::BaseFilter::enable_for,
-             py::arg("entities"),
-             "Set the OSM types this filter should be used for.")
-    ;
-
+PYBIND11_MODULE(filter, m) {
     pyosmium::init_empty_tag_filter(m);
     pyosmium::init_key_filter(m);
+    pyosmium::init_tag_filter(m);
+    pyosmium::init_entity_filter(m);
+    pyosmium::init_id_filter(m);
+    pyosmium::init_geo_interface_filter(m);
 };
 
