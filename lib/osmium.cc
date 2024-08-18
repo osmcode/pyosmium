@@ -107,7 +107,10 @@ PYBIND11_MODULE(_osmium, m) {
           py::arg("filename"),
           "Apply a chain of handlers.");
 
-    py::class_<pyosmium::BaseHandler>(m, "BaseHandler");
+    py::class_<pyosmium::BaseHandler>(m, "BaseHandler",
+             "Base class for all handlers in pyosmium. Any class inheriting "
+             "from this class can be used in functions that require a "
+             "handler-like object.");
     py::class_<pyosmium::BaseFilter, pyosmium::BaseHandler>(m, "BaseFilter")
         .def("enable_for", &pyosmium::BaseFilter::enable_for,
              py::arg("entities"),

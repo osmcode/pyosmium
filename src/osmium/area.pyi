@@ -5,7 +5,8 @@
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 
-from . import BaseHandler, HandlerLike, BufferIterator
+from . import BaseHandler, BufferIterator
+from ._osmium import HandlerLike
 
 class AreaManagerSecondPassHandler(BaseHandler): ...
 
