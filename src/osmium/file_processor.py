@@ -12,15 +12,27 @@ from osmium.index import LocationTable
 from osmium.osm.types import OSMEntity
 
 class FileProcessor:
-    """ A generator that emits OSM objects read from a file.
+    """ A processor that reads an OSM file in a streaming fashion,
+        optionally pre-filters the data, enhances it with geometry information,
+        returning the data via an iterator.
     """
 
-    def __init__(self, filename: Union[osmium.io.File, osmium.io.FileBuffer, str, Path],
+    def __init__(self, indata: Union[osmium.io.File, osmium.io.FileBuffer, str, Path],
                  entities: osmium.osm.osm_entity_bits=osmium.osm.ALL) -> None:
-        if isinstance(filename, (osmium.io.File, osmium.io.FileBuffer)):
-            self._file = filename
-        elif isinstance(filename, (str, Path)):
-            self._file = osmium.io.File(str(filename))
+        """ Initialise a new file processor for the given input source _indata_.
+            This may either be a filename, an instance of [File](IO.md#osmium.io.File)
+            or buffered data in form of a [FileBuffer](IO.md#osmium.io.FileBuffer).
+
+            The types of objects which will be read from the file can be
+            restricted with the _entities_ parameter. The data will be skipped
+            directly at the source file and will never be passed to any filters
+            including the location and area processors. You usually should not
+            be restricting objects, when using those.
+            """
+        if isinstance(indata, (osmium.io.File, osmium.io.FileBuffer)):
+            self._file = indata
+        elif isinstance(indata, (str, Path)):
+            self._file = osmium.io.File(str(indata))
         else:
             raise TypeError("File must be an osmium.io.File, osmium.io.FileBuffer, str or Path")
         self._entities = entities
@@ -32,20 +44,35 @@ class FileProcessor:
 
     @property
     def header(self) -> osmium.io.Header:
-        """ Return the header information for the file to be read.
+        """ (read-only) [Header](IO.md#osmium.io.Header) information
+            for the file to be read.
         """
         return osmium.io.Reader(self._file, osmium.osm.NOTHING).header()
 
     @property
     def node_location_storage(self) -> Optional[LocationTable]:
-        """ Return the node location cache, if enabled.
+        """ Node location cache currently in use, if enabled.
             This can be used to manually look up locations of nodes.
+            Be aware that the nodes must have been read before you
+            can do a lookup via the location storage.
         """
         return self._node_store
 
     def with_locations(self, storage: str='flex_mem') -> 'FileProcessor':
-        """ Enable caching of node locations. This is necessary in order
-            to get geometries for ways and relations.
+        """ Enable caching of node locations. The file processor will keep
+            the coordinates of all nodes that are read from the file in
+            memory and automatically enhance the node list of ways with
+            the coordinates from the cache. This information can then be
+            used to create geometries for ways. The node location cache can
+            also be directly queried through the [node_location_storage]() property.
+
+            The _storage_ parameter can be used to change the type of cache
+            used to store the coordinates. The default 'flex_mem' is good for
+            small to medium-sized files. For large files you may need to
+            switch to a disk-storage based implementation because the cache
+            can become quite large. See the section on
+            [location storage in the user manual](../user_manual/03-Working-with-Geometries.ipynb#location-storage)
+            for more information.
         """
         if not (self._entities & osmium.osm.NODE):
             raise RuntimeError('Nodes not read from file. Cannot enable location cache.')
@@ -66,16 +93,14 @@ class FileProcessor:
             Optionally one or more filters can be passed. These filters
             will be applied in the first pass, when relation candidates
             for areas are selected.
-
             Calling this function multiple times causes more filters to
             be added to the filter chain.
 
-            Automatically enables location caching, if it was not yet set.
-            It uses the default location cache type. To use a different
-            cache type, you need to call with_locations() explicity.
-
-            Area processing requires that the file is read twice. This
-            happens transparently.
+            Calling this function automatically enables location caching
+            if it was not enabled yet using the default storage type.
+            To use a different storage type, call `with_locations()` explicity
+            with the approriate _storage_ parameter before calling this
+            function.
         """
         if self._area_handler is None:
             self._area_handler = osmium.area.AreaManager()
@@ -85,23 +110,43 @@ class FileProcessor:
         return self
 
     def with_filter(self, filt: 'osmium._osmium.HandlerLike') -> 'FileProcessor':
-        """ Add a filter function that is called before an object is
-            returned in the iterator. Filters are applied sequentially
-            in the order they were added.
+        """ Add a filter function to the processors filter chain.
+            Filters are called for each prcoessed object in the order they
+            have been installed. Only when the object passes all the
+            filter functions will it be handed to the iterator.
+
+            Note that any handler-like object can be installed as a filter.
+            A non-filtering handler simply works like an all-pass filter.
         """
         self._filters.append(filt)
         return self
 
 
     def handler_for_filtered(self, handler: 'osmium._osmium.HandlerLike') -> 'FileProcessor':
-        """ Set a handler to be called on all objects that have been
-            filtered out and are not presented to the iterator loop.
+        """ Set a fallback handler for object that have been filtered out.
+
+            Any object that does not pass the filter chain installed with
+            `with_filter()` will be passed to this handler. This can be useful
+            when the entire contents of a file should be passed to a writer
+            and only some of the objects need to be processed specially
+            in the iterator body.
         """
         self._filtered_handler = handler
         return self
 
     def __iter__(self) -> Iterator[OSMEntity]:
-        """ Return the iterator over the file.
+        """ Create a new iterator for the file processor. It is possible to
+            create mulitple iterators from the same processor and even run
+            them in parallel. However, you must not change the properties
+            of the file processor while a iterator is in progress of reading
+            a file.
+
+            When area processing is enabled, then the input data needs to
+            be read twice. The first pass reads the relations, while the
+            second pass reads the whole file. The iterator will do this
+            transparantly for the user. However, be aware that the first
+            pass of reading may take a while for large files, so that the
+            iterator might block before the first object is returned.
         """
         handlers: List['osmium._osmium.HandlerLike'] = []
 

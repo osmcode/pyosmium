@@ -82,48 +82,38 @@ PYBIND11_MODULE(_osmium, m) {
     });
 
     m.def("apply", &pyosmium::apply,
-          py::arg("reader"), py::arg("handler"),
-          "Apply a single handler.");
+          py::arg("reader"), py::arg("handler"));
     m.def("apply", [](osmium::io::Reader &rd, py::args args)
                      {
                          pyosmium::HandlerChain handler{args};
                          pyosmium::apply(rd, handler);
                      },
-          py::arg("reader"),
-          "Apply a chain of handlers.");
+          py::arg("reader"));
     m.def("apply", [](std::string fn, pyosmium::BaseHandler &h)
                    {
                        osmium::io::Reader rd{fn};
                        pyosmium::apply(rd, h);
                    },
-          py::arg("filename"), py::arg("handler"),
-          "Apply a single handler.");
+          py::arg("filename"), py::arg("handler"));
     m.def("apply", [](std::string fn, py::args args)
                      {
                          pyosmium::HandlerChain handler{args};
                          osmium::io::Reader rd{fn};
                          pyosmium::apply(rd, handler);
                      },
-          py::arg("filename"),
-          "Apply a chain of handlers.");
+          py::arg("filename"));
 
-    py::class_<pyosmium::BaseHandler>(m, "BaseHandler",
-             "Base class for all handlers in pyosmium. Any class inheriting "
-             "from this class can be used in functions that require a "
-             "handler-like object.");
+    py::class_<pyosmium::BaseHandler>(m, "BaseHandler");
     py::class_<pyosmium::BaseFilter, pyosmium::BaseHandler>(m, "BaseFilter")
         .def("enable_for", &pyosmium::BaseFilter::enable_for,
-             py::arg("entities"),
-             "Set the OSM types this filter should be used for.")
+             py::arg("entities"))
     ;
 
-    py::class_<pyosmium::BufferIterator>(m, "BufferIterator",
-    "Iterator interface for reading from a queue of buffers.")
+    py::class_<pyosmium::BufferIterator>(m, "BufferIterator")
     .def(py::init<py::args>())
     .def("__bool__", [](pyosmium::BufferIterator const &it) { return !it.empty(); })
     .def("__iter__", [](py::object const &self) { return self; })
-    .def("__next__", &pyosmium::BufferIterator::next,
-         "Get the next OSM object from the buffer or raise an StopIteration.")
+    .def("__next__", &pyosmium::BufferIterator::next)
     ;
 
     pyosmium::init_merge_input_reader(m);

@@ -338,36 +338,15 @@ namespace pyosmium {
 
 void init_simple_writer(pybind11::module &m)
 {
-    py::class_<SimpleWriter, BaseHandler>(m, "SimpleWriter",
-        "The most generic class to write osmium objects into a file. The writer "
-        "takes a file name as its mandatory parameter. The file must not yet "
-        "exist. The file type to output is determined from the file extension. "
-        "The second (optional) parameter is the buffer size. osmium caches the "
-        "output data in an internal memory buffer before writing it on disk. This "
-        "parameter allows changing the default buffer size of 4MB. Larger buffers "
-        "are normally better but you should be aware that there are normally multiple "
-        "buffers in use during the write process.\n\n"
-        "The writer will not overwrite existing files by default. Set `overwrite` "
-        "to True to allow overwriting.\n\n"
-        "The SimpleWriter can also functions as a handler and will write out "
-        "all node, ways and relations, it receives.")
+    py::class_<SimpleWriter, BaseHandler>(m, "SimpleWriter")
         .def(py::init<const char*, unsigned long, osmium::io::Header const *, bool, const std::string&>(),
              py::arg("filename"), py::arg("bufsz") = 4096*1024,
              py::arg("header") = nullptr,
              py::arg("overwrite") = false,
              py::arg("filetype") = "")
-        .def("add_node", &SimpleWriter::add_node, py::arg("node"),
-             "Add a new node to the file. The node may be an ``osmium.osm.Node`` object, "
-             "an ``osmium.osm.mutable.Node`` object or any other Python object that "
-             "implements the same attributes.")
-        .def("add_way", &SimpleWriter::add_way, py::arg("way"),
-             "Add a new way to the file. The way may be an ``osmium.osm.Way`` object, "
-             "an ``osmium.osm.mutable.Way`` object or any other Python object that "
-             "implements the same attributes.")
-        .def("add_relation", &SimpleWriter::add_relation, py::arg("relation"),
-             "Add a new relation to the file. The relation may be an "
-             "``osmium.osm.Relation`` object, an ``osmium.osm.mutable.Relation`` "
-             "object or any other Python object that implements the same attributes.")
+        .def("add_node", &SimpleWriter::add_node, py::arg("node"))
+        .def("add_way", &SimpleWriter::add_way, py::arg("way"))
+        .def("add_relation", &SimpleWriter::add_relation, py::arg("relation"))
         .def("add", [](SimpleWriter &self, py::object const &o) {
                            if (py::isinstance<pyosmium::COSMNode>(o) || py::hasattr(o, "location")) {
                                self.add_node(o);
@@ -378,14 +357,8 @@ void init_simple_writer(pybind11::module &m)
                            } else {
                                throw py::type_error("Need node, way or relation object.");
                            }
-                    },
-             "Add a new object to the file. The function will try to determine "
-             "the kind of object automatically.")
-        .def("close", &SimpleWriter::close,
-             "Flush the remaining buffers and close the writer. While it is not "
-             "strictly necessary to call this function explicitly, it is still "
-             "strongly recommended to close the writer as soon as possible, so "
-             "that the buffer memory can be freed.")
+                    })
+        .def("close", &SimpleWriter::close)
         .def("__enter__", [](py::object const &self) { return self; })
         .def("__exit__", [](SimpleWriter &self, py::args args) { self.close(); })
     ;

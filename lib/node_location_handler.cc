@@ -67,9 +67,7 @@ void init_node_location_handler(py::module &m)
         .def("ignore_errors", &NodeLocationsForWays::ignore_errors)
         .def_property("apply_nodes_to_ways",
                      &NodeLocationsForWays::get_apply_nodes_to_ways,
-                     &NodeLocationsForWays::set_apply_nodes_to_ways,
-                     "When set to false, locations are only collected "
-                     "and not automatically applied to way nodes.")
+                     &NodeLocationsForWays::set_apply_nodes_to_ways)
     ;
 
 }

@@ -60,18 +60,6 @@ class WriteHandler(SimpleWriter):
 
 
 def _merge_apply(self: MergeInputReader, *handlers: 'HandlerLike', idx: str = '', simplify: bool = True) -> None:
-    """ Apply collected data to a handler. The data will be sorted first.
-        If `simplify` is true (default) then duplicates will be eliminated
-        and only the newest version of each object kept. If `idx` is given
-        a node location cache with the given type will be created and
-        applied when creating the ways. Note that a diff file normally does
-        not contain all node locations to reconstruct changed ways. If the
-        full way geometries are needed, create a persistent node location
-        cache during initial import of the area and reuse it when processing
-        diffs. After the data
-        has been applied the buffer of the MergeInputReader is empty and
-        new data can be added for the next round of application.
-    """
     if idx:
         lh = NodeLocationsForWays(create_map(idx))
         lh.ignore_errors()

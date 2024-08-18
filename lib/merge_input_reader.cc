@@ -165,30 +165,16 @@ namespace pyosmium {
 
 void init_merge_input_reader(py::module &m)
 {
-    py::class_<MergeInputReader>(m, "MergeInputReader",
-        "Collects data from multiple input files, sorts and optionally "
-        "deduplicates the data before applying it to a handler.")
+    py::class_<MergeInputReader>(m, "MergeInputReader")
         .def(py::init<>())
         .def("_apply_internal", &MergeInputReader::apply_internal,
              py::arg("simplify")=true)
         .def("apply_to_reader", &MergeInputReader::apply_to_reader,
-             py::arg("reader"), py::arg("writer"), py::arg("with_history")=false,
-             "Apply the collected data to data from the given `reader` and write "
-             "the result to `writer`. This function can be used to merge the diff "
-             "data together with other OSM data (for example when updating a "
-             "planet file. If `with_history` is true, then the collected data will "
-             "be applied verbatim without removing duplicates. This is important "
-             "when using OSM history files as input.")
+             py::arg("reader"), py::arg("writer"), py::arg("with_history")=false)
         .def("add_file", &MergeInputReader::add_file,
-             py::arg("file"),
-             "Add data from a file to the internal cache. The file type will be "
-             "determined from the file extension.")
+             py::arg("file"))
         .def("add_buffer", &MergeInputReader::add_buffer,
-             py::arg("buffer"), py::arg("format"),
-             "Add data from a byte buffer. The format of the input data must "
-             "be given in the `format` argument as a string. The data will be "
-             "copied into internal buffers, so that the input buffer can be "
-             "safely discarded after the function has been called.")
+             py::arg("buffer"), py::arg("format"))
     ;
 };
 

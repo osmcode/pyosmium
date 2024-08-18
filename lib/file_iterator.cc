@@ -139,8 +139,7 @@ namespace pyosmium {
 
 void init_osm_file_iterator(py::module &m)
 {
-    py::class_<OsmFileIterator>(m, "OsmFileIterator",
-        "Iterator interface for reading an OSM file.")
+    py::class_<OsmFileIterator>(m, "OsmFileIterator")
         .def(py::init<osmium::io::Reader *, py::args>(),
              py::keep_alive<0, 1>())
         .def("set_filtered_handler", &OsmFileIterator::set_filtered_handler,
@@ -148,8 +147,7 @@ void init_osm_file_iterator(py::module &m)
         .def("set_filtered_handler", &OsmFileIterator::set_filtered_python_handler,
              py::keep_alive<0, 1>())
         .def("__iter__", [](py::object const &self) { return self; })
-        .def("__next__", &OsmFileIterator::next,
-             "Get the next OSM object from the file or raise a StopIteration.")
+        .def("__next__", &OsmFileIterator::next)
         ;
 }
 
