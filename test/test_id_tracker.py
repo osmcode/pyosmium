@@ -201,3 +201,15 @@ r10 Mn100@,w90@,r2@
         assert_tracker_content(ids, nodes=(1, 99), ways=(12,), rels=[2])
     elif depth == 1:
         assert_tracker_content(ids, nodes=(1, 99), ways=(12,), rels=[2, 10])
+
+
+def test_clear_node_id_set():
+    ids = o.IdTracker()
+    for i in range (1000, 1003):
+        ids.add_node(i)
+
+    assert len(ids.node_ids()) == 3
+
+    ids.node_ids().clear()
+
+    assert len(ids.node_ids()) == 0

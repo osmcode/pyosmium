@@ -14,7 +14,7 @@ from .io import Reader, Writer, Header
 
 StrPath = Union[str, 'os.PathLike[str]']
 
-# Placeholder for more narrow type defintion to come
+# Placeholder for more narrow type definition to come
 HandlerLike = object
 
 class InvalidLocationError(Exception):
@@ -39,7 +39,7 @@ class BaseFilter(BaseHandler):
     """
     def enable_for(self, entities: osm_entity_bits) -> None:
         """ Set the OSM types this filter should be applied to. If
-            an object has a type for wich the filter is not enabled,
+            an object has a type for which the filter is not enabled,
             the filter will be skipped completely. Or to put it in
             different words: every object for which the filter is not
             enabled, passes the filter automatically.
@@ -82,7 +82,7 @@ class MergeInputReader:
     def add_buffer(self, buffer: Union[ByteString, str], format: str) -> int:
         """ Add input data from a buffer to the reader. The buffer may
             be any data which follows the Python buffer protocol. The
-            manadatory _format_ parameter describes the format of the data.
+            mandatory _format_ parameter describes the format of the data.
 
             The data will be copied into internal buffers, so that the input
             buffer can be safely discarded after the function has been called.
@@ -121,7 +121,7 @@ class SimpleWriter:
 
         The writer writes out the objects in the order it receives them.
         It is the responsibility of the caller to ensure to follow the
-        [ordering conventions](../user_manual/01-First-Steps.ipynb#the-order-of-osm-files)
+        [ordering conventions][the-order-of-osm-files]
         for OSM files.
 
         The SimpleWriter should normally used as a context manager. If you
@@ -145,19 +145,19 @@ class SimpleWriter:
         """
     def add_node(self, node: object) -> None:
         """ Add a new node to the file. The node may be a
-            [Node](Dataclasses.md#osmium.osm.Node] object or its mutable
+            [Node][osmium.osm.Node] object or its mutable
             variant or any other Python object that implements the same
             attributes.
         """
     def add_relation(self, relation: object) -> None:
         """ Add a new relation to the file. The relation may be a
-            [Relation](Dataclasses.md#osmium.osm.Relation] object or its mutable
+            [Relation][osmium.osm.Relation] object or its mutable
             variant or any other Python object that implements the same
             attributes.
         """
     def add_way(self, way: object) -> None:
         """ Add a new way to the file. The way may be a
-            [Way](Dataclasses.md#osmium.osm.Way] object or its mutable
+            [Way][osmium.osm.Way] object or its mutable
             variant or any other Python object that implements the same
             attributes.
         """
@@ -188,7 +188,7 @@ class NodeLocationsForWays:
     def apply_nodes_to_ways(self, value: bool) -> None:...
 
     def __init__(self, locations: LocationTable) -> None:
-        """ Intiate a new handler using the given location table _locations_
+        """ Initiate a new handler using the given location table _locations_
             to cache the node coordinates.
         """
     def ignore_errors(self) -> None:
@@ -225,24 +225,126 @@ class IdTrackerContainsFilter(BaseFilter): ...
 
 
 class IdTracker:
-    def __init__(self) -> None: ...
-    def add_node(self, node: int) -> None: ...
-    def add_relation(self, relation: int) -> None: ...
-    def add_way(self, way: int) -> None: ...
-    def add_references(self, obj: object) -> None: ...
-    def contains_any_references(self, obj: object) -> bool: ...
-    def complete_backward_references(self, filename: str, relation_depth: int = ...) -> None: ...
-    def complete_forward_references(self, filename: str, relation_depth: int = ...) -> None: ...
-    def id_filter(self) -> IdTrackerIdFilter: ...
-    def contains_filter(self) -> IdTrackerContainsFilter: ...
-    def node_ids(self) -> IdSet: ...
-    def way_ids(self) -> IdSet: ...
-    def relation_ids(self) -> IdSet: ...
+    """ Class to keep track of node, way and relation IDs.
+
+        Ids can be added to the to the tracker in various ways: by
+        adding IDs directly, by adding the IDs of referenced IDs in an
+        OSM object or by extracting the referenced IDs from an input file.
+
+        The tracker can then be used as a filter to select objects based
+        on whether they are contained in the tracker's ID lists.
+    """
+    def __init__(self) -> None:
+        """ Initialise a new empty tracker.
+        """
+    def add_node(self, node: int) -> None:
+        """ Add the given node ID to the tracker.
+        """
+    def add_relation(self, relation: int) -> None:
+        """ Add the given relation ID to the tracker.
+        """
+    def add_way(self, way: int) -> None:
+        """ Add the given way ID to the tracker.
+        """
+    def add_references(self, obj: object) -> None:
+        """ Add all IDs referenced by the input object _obj_.
+
+            The function will track the IDs of node lists from
+            [Way][osmium.osm.Way] objects or Python
+            objects with a `nodes` attribute, which must be a sequence of ints.
+            It also tracks the IDs of relation members from
+            [Relation][osmium.osm.Relation] objects
+            or Python objects with a `members` attribute with an
+            equivalent content. Input objects that do not fall into
+            any of these categories are silently ignored.
+        """
+    def contains_any_references(self, obj: object) -> bool:
+        """ Check if the given input object _obj_ contains any references
+            to IDs tracked by this tracker.
+
+            The function will check the IDs of node lists from
+            [Way][osmium.osm.Way] objects or Python
+            objects with a `nodes` attribute, which must be a sequence of ints.
+            It also tracks the IDs of relation members from
+            [Relation][osmium.osm.Relation] objects
+            or Python objects with a `members` attribute with an
+            equivalent content. All other object kinds will return
+            `False`.
+        """
+    def complete_backward_references(self, filename: str, relation_depth: int = ...) -> None:
+        """ Make the IDs in the tracker reference-complete by adding
+            all referenced IDs for objects whose IDs are already tracked.
+
+            The function scans through the reference file `filename`, finds
+            all the objects this tracker references and applies `add_references()`
+            to them. The reference file is expected to be
+            [sorted][the-order-of-osm-files].
+
+            The _relation_depth_ parameter controls how nested relations are
+            handled. When set to 0 then only way and node references of
+            relations that are already tracked are completed. If the parameter
+            is larger than 0, the function will make at a maximum
+            _relation_depth_ passes through the reference file, to find
+            nested relation. That means, that nested relations with a nesting
+            depth up to _relation_depth_ are guaranteed to be included.
+            Relations that are nested more deeply, may or may not appear.
+        """
+    def complete_forward_references(self, filename: str, relation_depth: int = ...) -> None:
+        """ Add to the tracker all IDs of object that reference any ID already
+            tracked.
+
+            The function scans through the reference file `filename`,
+            checks all objects in the file with the `contains_any_references()`
+            function and adds the object ID to the tracker if the check
+            is positive.
+
+            The _relation_depth_ parameter controls how nested relations are
+            handled. When set to a value smaller than 0, then relations will
+            no be added at all to the tracker. When set to 0, then only
+            relations are added that reference a node or way already in the
+            tracker. When set to a strictly positive value, then nested
+            relations are tacken into account as well. The function will
+            make at a maximum _relation_depth_ passes to complete relations
+            with relation members.
+        """
+    def id_filter(self) -> IdTrackerIdFilter:
+        """ Return a filter object which lets all nodes, ways and relations
+            pass that are being tracked in this tracker.
+
+            You may change the tracker while the filter is in use. Such
+            a change is then immediately reflected in the filter.
+
+            The filter has no effect on areas and changesets.
+        """
+    def contains_filter(self) -> IdTrackerContainsFilter:
+        """ Return a filter object that lets all ways and relations pass
+            which reference any of the object IDs tracked by this tracker.
+
+            You may change the tracker while the filter is in use. Such
+            a change is then immediately reflected in the filter.
+
+            The filter has no effect on nodes, areas and changesets.
+        """
+    def node_ids(self) -> IdSet:
+        """ Return a view of the set of node ids. The returned object is
+            mutable. You may call operations like `unset()` and `clear()`
+            on it, which then have a direct effect on the tracker.
+        """
+    def way_ids(self) -> IdSet:
+        """ Return a view of the set of way ids.The returned object is
+            mutable. You may call operations like `unset()` and `clear()`
+            on it, which then have a direct effect on the tracker.
+        """
+    def relation_ids(self) -> IdSet:
+        """ Return a view of the set of relation ids. The returned object is
+            mutable. You may call operations like `unset()` and `clear()`
+            on it, which then have a direct effect on the tracker.
+        """
 
 def apply(reader: Union[Reader | str], *handlers: HandlerLike) -> None:
     """ Apply a chain of handlers to the given input source. The input
-        source may be given either as a [Reader](IO.md#osmium.io.Reader) or
-        as a simple file name. If one of the handler is a
-        [filter](osmium.BaseFilter), then processing of the object will
-        be stopped if it does not pass the filter.
+        source may be given either as a [osmium.io.Reader][] or
+        as a simple file name. If one of the handlers is a
+        [filter][osmium.BaseFilter], then processing of the
+        object will be stopped if it does not pass the filter.
     """

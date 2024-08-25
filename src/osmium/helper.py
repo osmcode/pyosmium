@@ -25,7 +25,8 @@ def make_simple_handler(node: HandlerFunc[Node] = None,
                         relation: HandlerFunc[Relation] = None,
                         area: HandlerFunc[Area] = None,
                         changeset: HandlerFunc[Changeset] = None) -> SimpleHandler:
-    """ Convenience function that creates a `SimpleHandler` from a set of
+    """ _(deprecated)_ Convenience function that creates a
+        [SimpleHandler](Handler-Processing.md#osmium.SimpleHandler) from a set of
         callback functions. Each of the parameters takes an optional callable
         that must expect a single positional parameter with the object being
         processed.
