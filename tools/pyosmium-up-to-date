@@ -98,7 +98,7 @@ def update_from_custom_server(url, seq, ts, options):
             ts = ts.timestamp
 
         if not options.force_update:
-            cmpdate = dt.datetime.utcnow() - dt.timedelta(days=90)
+            cmpdate = dt.datetime.now(dt.UTC) - dt.timedelta(days=90)
             cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
             if ts < cmpdate:
                 log.error(
@@ -182,7 +182,7 @@ def compute_start_point(options):
 
 def get_arg_parser(from_main=False):
     def h(s):
-        return re.sub("\s\s+" , " ", s)
+        return re.sub(r'\s\s+' , " ", s)
 
     parser = ArgumentParser(description=__doc__,
                             usage=None if from_main else 'pyosmium-up-to-date [options] <osm file>',
