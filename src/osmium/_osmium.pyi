@@ -121,7 +121,7 @@ class SimpleWriter:
 
         The writer writes out the objects in the order it receives them.
         It is the responsibility of the caller to ensure to follow the
-        [ordering conventions][the-order-of-osm-files]
+        [ordering conventions][order-in-osm-files]
         for OSM files.
 
         The SimpleWriter should normally used as a context manager. If you
@@ -278,7 +278,7 @@ class IdTracker:
             The function scans through the reference file `filename`, finds
             all the objects this tracker references and applies `add_references()`
             to them. The reference file is expected to be
-            [sorted][the-order-of-osm-files].
+            [sorted][order-in-osm-files].
 
             The _relation_depth_ parameter controls how nested relations are
             handled. When set to 0 then only way and node references of

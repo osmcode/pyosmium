@@ -21,27 +21,29 @@ class BackReferenceWriter:
         is closed, it writes the final file, mixing together the referenced
         objects from the original file and the written data.
 
-        `outfile` is the name of the output file to write. The file must
-        not yet exist unless `overwrite` is set to True.
-
-        `ref_src` is the OSM input file, where to take the reference objects
-        from. This is usually the same file the data to be written is taken
-        from.
-
-        The writer will by default remove all tags from referenced objects,
-        so that they do not appear as stray objects in the file. Set
-        `remove_tags` to False to keep the tags.
-
-        The writer will not complete nested relations by default. If you
-        need nested relations, set `relation_depth` to the minimum depth
-        to which relations shall be completed.
-
         The writer should usually be used as a context manager.
     """
 
     def __init__(self, outfile: str, ref_src: str,
                  overwrite: bool=False, remove_tags: bool=True,
                  relation_depth: int = 0):
+        """ Create a new writer.
+
+            `outfile` is the name of the output file to write. The file must
+            not yet exist unless `overwrite` is set to True.
+
+            `ref_src` is the OSM input file, where to take the reference objects
+            from. This is usually the same file the data to be written is taken
+            from.
+
+            The writer will by default remove all tags from referenced objects,
+            so that they do not appear as stray objects in the file. Set
+            `remove_tags` to False to keep the tags.
+
+            The writer will not complete nested relations by default. If you
+            need nested relations, set `relation_depth` to the minimum depth
+            to which relations shall be completed.
+        """
         self.outfile = outfile
         self.tmpdir = TemporaryDirectory()
         self.writer = SimpleWriter(str(Path(self.tmpdir.name, 'back_writer.osm.pbf')))
