@@ -15,7 +15,7 @@ from osmium.file_processor import FileProcessor, zip_processors
 class ForwardReferenceWriter:
     """ Writer that adds forward-referenced objects optionally also making
         the final file reference complete. An object is a forward reference
-        when directly or indirectly references one of the objects originally
+        when it directly or indirectly needs one of the objects originally
         written out.
 
         The collected data is first written into a temporary file, When the
