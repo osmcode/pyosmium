@@ -67,7 +67,7 @@ class TagIterator:
 class TagList(Iterable[Tag]):
     """ A fixed list of tags. The list is exported as an unmutable,
         dictionary-like object where the keys are tag strings and the
-        items are :py:class:`osmium.osm.Tag`.
+        items are [Tags][osmium.osm.Tag].
     """
 
     def __init__(self, parent: 'cosm.TagContainerProtocol') -> None:
@@ -160,7 +160,7 @@ class NodeRef:
 
 class NodeRefList:
     """ A list of node references, implemented as
-        an immutable sequence of :py:class:`osmium.osm.NodeRef`. This class
+        an immutable sequence of [osmium.osm.NodeRef][]. This class
         is normally not used directly, use one of its subclasses instead.
     """
 
@@ -182,8 +182,8 @@ class NodeRefList:
     def ends_have_same_location(self) -> bool:
         """ True if the start and end node of the way are at the same location. "
             Expects that the coordinates of the way nodes have been loaded
-            (see :py:func:`osmium.SimpleHandler.apply_buffer` and
-            :py:func:`osmium.SimpleHandler.apply_file`).
+            ([SimpleHandler apply functions][osmium.SimpleHandler] and
+            [`FileProcessor.with_locations()`][osmium.FileProcessor.with_locations]).
             If the locations are not present then the function returns always true.
         """
         return self._list.ends_have_same_location(self._pyosmium_data)
@@ -214,18 +214,18 @@ class NodeRefList:
 
 class WayNodeList(NodeRefList):
     """ List of nodes in a way.
-        For its members see :py:class:`osmium.osm.NodeRefList`.
+        For its members see [`osmium.osm.NodeRefList`][].
     """
 
 
 class OuterRing(NodeRefList):
     """List of nodes in an outer ring.
-       For its members see :py:class:`osmium.osm.NodeRefList`.
+       For its members see [`osmium.osm.NodeRefList`][].
     """
 
 class InnerRing(NodeRefList):
     """ List of nodes in an inner ring. "
-        For its members see :py:class:`osmium.osm.NodeRefList`.
+        For its members see [`osmium.osm.NodeRefList`][].
     """
 
 class RelationMember:
@@ -272,7 +272,7 @@ class MemberIterator:
 
 class RelationMemberList:
     """ An immutable  sequence of relation members
-        ":py:class:`osmium.osm.RelationMember`.
+        [`osmium.osm.RelationMember`][].
     """
 
     def __init__(self, parent: 'cosm.COSMRelation') -> None:
@@ -361,7 +361,7 @@ class OSMObject(Generic[T_obj]):
     @property
     def tags(self) -> TagList:
         """ (read-only) List of tags describing the object.
-            See :py:class:`osmium.osm.TagList`.
+            See [`osmium.osm.TagList`][].
         """
         return self._tags
 
@@ -429,7 +429,7 @@ class Node(OSMObject['cosm.COSMNode']):
     @property
     def location(self) -> 'osmium.osm.Location':
         """ The geographic coordinates of the node.
-            See :py:class:`osmium.osm.Location`.
+            See [`osmium.osm.Location`][].
         """
         if self._location is None:
             self._location = self._pyosmium_data.location()
@@ -489,7 +489,7 @@ class Way(OSMObject['cosm.COSMWay']):
     @property
     def nodes(self) -> WayNodeList:
         """ (read-only) Ordered list of nodes.
-            See :py:class:`osmium.osm.WayNodeList`.
+            See [`osmium.osm.WayNodeList`][].
         """
         if self._nodes is None:
             self._nodes = WayNodeList(self._pyosmium_data, self._pyosmium_data.nodes())
@@ -510,8 +510,8 @@ class Way(OSMObject['cosm.COSMWay']):
     def ends_have_same_location(self) -> bool:
         """ True if the start and end node of the way are at the same location.
             Expects that the coordinates of the way nodes have been loaded
-            (see :py:func:`osmium.SimpleHandler.apply_buffer` and
-            :py:func:`osmium.SimpleHandler.apply_file`).
+            (see [SimpleHandler apply functions][osmium.SimpleHandler] and
+            [`FileProcessor.with_locations()`][osmium.FileProcessor.with_locations])
             If the locations are not present then the function returns always true.
         """
         return self._pyosmium_data.ends_have_same_location()
@@ -555,7 +555,7 @@ class Relation(OSMObject['cosm.COSMRelation']):
     @property
     def members(self) -> RelationMemberList:
         """(read-only) Ordered list of relation members.
-           See :py:class:`osmium.osm.RelationMemberList`.
+           See [`osmium.osm.RelationMemberList`][].
         """
         return self._members
 
@@ -735,7 +735,7 @@ class Changeset:
     @property
     def tags(self) -> TagList:
         """ (read-only) List of tags describing the object.
-            See :py:class:`osmium.osm.TagList`.
+            See [`osmium.osm.TagList`][].
         """
         return self._tags
 

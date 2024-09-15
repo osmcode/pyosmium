@@ -4,6 +4,5 @@ include CMakeLists.txt
 include cmake/*.cmake
 include lib/*.h
 include lib/*.cc
-include doc/*.rst
 include examples/*py
 include test/*py

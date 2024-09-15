@@ -1,0 +1,93 @@
+site_name: Pyosmium
+theme:
+    font: false
+    name: material
+    features:
+        - navigation.tabs
+        - navigation.tabs.sticky
+        - toc.integrate
+    plugins:
+        - privacy
+copyright: Copyright &copy; Sarah Hoffmann
+repo_url: https://github.com/osmcode/pyosmium
+nav:
+    - index.md
+    - 'User Manual':
+      - 'user_manual.md'
+      - 'user_manual/01-First-Steps.md'
+      - 'user_manual/02-Extracting-Object-Data.md'
+      - 'user_manual/03-Working-with-Geometries.md'
+      - 'user_manual/04-Working-with-Filters.md'
+      - 'user_manual/05-Working-with-Handlers.md'
+      - 'user_manual/06-Writing-Data.md'
+      - 'user_manual/07-Input-Formats-And-Other-Sources.md'
+      - 'user_manual/08-Working-With-Change-Files.md'
+      - 'user_manual/09-Working-With-History-Files.md'
+      - 'user_manual/10-Replication-Tools.md'
+
+    - 'Cookbooks':
+      - 'cookbooks.md'
+      - 'cookbooks/Enhance-Tags.ipynb'
+      - 'cookbooks/Filtering-Data-By-Tags.ipynb'
+      - 'cookbooks/Filter-Data-By-Geometry.ipynb'
+      - 'cookbooks/Adding-Node-Infos-To-Boundaries.ipynb'
+      - 'cookbooks/Adding-Route-Info-To-Ways.ipynb'
+      - 'cookbooks/Visualizing-Data-With-Geopandas.ipynb'
+    - 'Reference':
+      - reference.md
+      - OSM Data Containers: 'reference/Dataclasses.md'
+      - Iterative Data Reading: 'reference/File-Processing.md'
+      - Handlers and Handler Functions: 'reference/Handler-Processing.md'
+      - Filters: 'reference/Filters.md'
+      - Data Writers: 'reference/Data-Writers.md'
+      - IO Classes: 'reference/IO.md'
+      - Geometry Processing: 'reference/Geometry-Functions.md'
+      - Area Building: 'reference/Area.md'
+      - Indexes: 'reference/Indexes.md'
+      - Exceptions: 'reference/Exceptions.md'
+
+exclude_docs: |
+    .*.swp
+markdown_extensions:
+    - pymdownx.highlight:
+        line_spans: __span
+        pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - admonition
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+        alternate_style: true
+    - pymdownx.emoji:
+        emoji_index: !!python/name:material.extensions.emoji.twemoji
+        emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - def_list
+    - attr_list
+    - tables
+    - footnotes
+    - toc:
+        toc_depth: 3
+        permalink: 🔗
+extra_css:
+    - css/mkdocstrings.css
+    - css/extra.css
+plugins:
+    - search
+    - autorefs
+#    - mkdocs-jupyter
+    - mkdocstrings:
+        default_handler: python
+        handlers:
+          python:
+            options:
+              allow_inspection: false
+              heading_level: 3
+              show_source: False
+              show_bases: True
+              show_root_heading: True
+              show_signature_annotations: True
+              show_symbol_type_heading: True
+              annotations_path: full
+              filters:
+                - "!^_"
+                - "__init__"

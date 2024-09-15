@@ -1,0 +1,11 @@
+n1 x45.0 y13.0
+n2 x45.0001 y13.0
+n3 x45.0001 y13.0001
+n4 x45.0 y13.0001 Tentrance=yes
+n11 x45.00001 y13.00001
+n12 x45.00005 y13.00001
+n13 x45.00005 y13.00005
+n14 x45.00001 y13.00005
+w1 Nn1,n2,n3,n4,n1 Tamenity=restaurant
+w2 Nn11,n12,n13,n14,n11
+r1 Mw1@,w2@ Ttype=multipolygon,building=yes
