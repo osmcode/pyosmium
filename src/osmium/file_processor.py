@@ -71,7 +71,7 @@ class FileProcessor:
             small to medium-sized files. For large files you may need to
             switch to a disk-storage based implementation because the cache
             can become quite large. See the section on
-            [location storage in the user manual](../user_manual/03-Working-with-Geometries.ipynb#location-storage)
+            [location storage in the user manual][location-storage]
             for more information.
         """
         if not (self._entities & osmium.osm.NODE):
