@@ -12,7 +12,8 @@ from helpers import IDCollector
 @pytest.mark.parametrize('init', [None, 1])
 def test_file_processor_bad_init(init):
     with pytest.raises(TypeError):
-        o.FileProcessor(init)
+        for obj in o.FileProcessor(init):
+            pass
 
 def test_simple_generator(opl_buffer):
     count = 0

@@ -19,6 +19,32 @@ def _run_file(fn):
         o.apply(rd, NullHandler())
 
 
+@pytest.mark.parametrize('as_string', [True, False])
+def test_file_simple(tmp_path, as_string):
+    fn = tmp_path / 'text.opl'
+    fn.write_text('n1')
+
+    if as_string:
+        fn = str(fn)
+
+    for n in o.FileProcessor(o.io.File(fn)):
+        assert n.is_node()
+        assert n.id == 1
+
+
+@pytest.mark.parametrize('as_string', [True, False])
+def test_file_with_format(tmp_path, as_string):
+    fn = tmp_path / 'text.txt'
+    fn.write_text('n1')
+
+    if as_string:
+        fn = str(fn)
+
+    for n in o.FileProcessor(o.io.File(fn, 'opl')):
+        assert n.is_node()
+        assert n.id == 1
+
+
 def test_node_only(test_data):
     _run_file(test_data('n1'))
 
@@ -51,7 +77,8 @@ def test_broken_timestamp(test_data):
             o.apply(rd, NullHandler())
 
 
-def test_file_header(tmp_path):
+@pytest.mark.parametrize('as_string', [True, False])
+def test_file_header(tmp_path, as_string):
     fn = tmp_path / 'empty.xml'
     fn.write_text("""<?xml version='1.0' encoding='UTF-8'?>
     <osm version="0.6" generator="test-pyosmium" timestamp="2014-08-26T20:22:02Z">
@@ -59,7 +86,10 @@ def test_file_header(tmp_path):
     </osm>
     """)
 
-    with o.io.Reader(str(fn)) as rd:
+    if as_string:
+        fn = str(fn)
+
+    with o.io.Reader(fn) as rd:
         h = rd.header()
         assert not h.has_multiple_object_versions
         assert h.box().valid()

@@ -5,10 +5,11 @@
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from typing import Iterable, Iterator, Tuple, Any, Union, Optional, List
-from pathlib import Path
+import os
 
 import osmium
 from osmium.index import LocationTable
+from osmium.io import File, FileBuffer
 from osmium.osm.types import OSMEntity
 
 class FileProcessor:
@@ -17,7 +18,7 @@ class FileProcessor:
         returning the data via an iterator.
     """
 
-    def __init__(self, indata: Union[osmium.io.File, osmium.io.FileBuffer, str, Path],
+    def __init__(self, indata: Union[File, FileBuffer, str, 'os.PathLike[str]'],
                  entities: osmium.osm.osm_entity_bits=osmium.osm.ALL) -> None:
         """ Initialise a new file processor for the given input source _indata_.
             This may either be a filename, an instance of [File](IO.md#osmium.io.File)
@@ -29,12 +30,7 @@ class FileProcessor:
             including the location and area processors. You usually should not
             be restricting objects, when using those.
             """
-        if isinstance(indata, (osmium.io.File, osmium.io.FileBuffer)):
-            self._file = indata
-        elif isinstance(indata, (str, Path)):
-            self._file = osmium.io.File(str(indata))
-        else:
-            raise TypeError("File must be an osmium.io.File, osmium.io.FileBuffer, str or Path")
+        self._file = indata
         self._entities = entities
         self._node_store: Optional[LocationTable] = None
         self._area_handler: Optional[osmium.area.AreaManager] = None

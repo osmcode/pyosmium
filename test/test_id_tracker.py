@@ -154,16 +154,20 @@ def test_contains_references_not_in_relation(opl_buffer):
     for obj in o.FileProcessor(opl_buffer('r3 Mn12@,n45@')):
         assert not ids.contains_any_references(obj)
 
-
-@pytest.mark.parametrize('depth', range(3))
-def test_complete_backward_references(tmp_path, depth):
-    data_file = tmp_path / 'test.opl'
-    data_file.write_text("""\
+REF_SRC = """\
 w12 Nn1,n2
 w90 Nn10,n11
 r2 Mn99@
 r10 Mn100@,w90@,r2@
-""")
+"""
+
+@pytest.mark.parametrize('depth', range(3))
+def test_complete_backward_references(tmp_path, depth):
+    if depth == 0:
+        data_file = o.io.FileBuffer(REF_SRC.encode('utf-8'), 'opl')
+    else:
+        data_file = tmp_path / 'test.opl'
+        data_file.write_text(REF_SRC)
 
     ids = o.IdTracker()
     ids.add_way(12)
@@ -181,13 +185,11 @@ r10 Mn100@,w90@,r2@
 
 @pytest.mark.parametrize('depth', range(-1, 2))
 def test_complete_forward_references(tmp_path, depth):
-    data_file = tmp_path / 'test.opl'
-    data_file.write_text("""\
-w12 Nn1,n2
-w90 Nn10,n11
-r2 Mn99@
-r10 Mn100@,w90@,r2@
-""")
+    if depth == 0:
+        data_file = o.io.FileBuffer(REF_SRC.encode('utf-8'), 'opl')
+    else:
+        data_file = tmp_path / 'test.opl'
+        data_file.write_text(REF_SRC)
 
     ids = o.IdTracker()
     ids.add_node(1)

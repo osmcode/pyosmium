@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8.0)
 project(pyosmium VERSION 3.6.0)
 
 option(WITH_LZ4 "Build with lz4 support for PBF files" ON)
@@ -41,7 +41,7 @@ message(STATUS "Building in C++${CMAKE_CXX_STANDARD} mode")
 if(PYBIND11_PREFIX)
     add_subdirectory(${PYBIND11_PREFIX} contrib/pybind11)
 else()
-    find_package(pybind11 2.2 REQUIRED)
+    find_package(pybind11 2.7 REQUIRED)
 endif()
 
 find_package(Boost 1.41 REQUIRED COMPONENTS)

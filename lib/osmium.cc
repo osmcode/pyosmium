@@ -5,9 +5,8 @@
  * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
-#include <vector>
-
 #include <pybind11/pybind11.h>
+#include <pybind11/stl/filesystem.h>
 
 #include <osmium/osm.hpp>
 #include <osmium/handler.hpp>
@@ -21,6 +20,9 @@
 #include "python_handler.h"
 #include "handler_chain.h"
 #include "buffer_iterator.h"
+
+#include <vector>
+#include <filesystem>
 
 namespace py = pybind11;
 
@@ -96,6 +98,32 @@ PYBIND11_MODULE(_osmium, m) {
                    },
           py::arg("filename"), py::arg("handler"));
     m.def("apply", [](std::string fn, py::args args)
+                     {
+                         pyosmium::HandlerChain handler{args};
+                         osmium::io::Reader rd{fn};
+                         pyosmium::apply(rd, handler);
+                     },
+          py::arg("filename"));
+    m.def("apply", [](std::filesystem::path const &fn, pyosmium::BaseHandler &h)
+                   {
+                       osmium::io::Reader rd{fn};
+                       pyosmium::apply(rd, h);
+                   },
+          py::arg("filename"), py::arg("handler"));
+    m.def("apply", [](std::filesystem::path const &fn, py::args args)
+                     {
+                         pyosmium::HandlerChain handler{args};
+                         osmium::io::Reader rd{fn};
+                         pyosmium::apply(rd, handler);
+                     },
+          py::arg("filename"));
+    m.def("apply", [](osmium::io::File fn, pyosmium::BaseHandler &h)
+                   {
+                       osmium::io::Reader rd{fn};
+                       pyosmium::apply(rd, h);
+                   },
+          py::arg("filename"), py::arg("handler"));
+    m.def("apply", [](osmium::io::File fn, py::args args)
                      {
                          pyosmium::HandlerChain handler{args};
                          osmium::io::Reader rd{fn};

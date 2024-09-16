@@ -10,9 +10,7 @@ import os
 from .osm import osm_entity_bits
 from .osm.types import OSMEntity
 from .index import LocationTable, IdSet
-from .io import Reader, Writer, Header
-
-StrPath = Union[str, 'os.PathLike[str]']
+from .io import Reader, Writer, Header, File, FileBuffer
 
 # Placeholder for more narrow type definition to come
 HandlerLike = object
@@ -128,14 +126,23 @@ class SimpleWriter:
         don't use it in a `with` context, don't forget to call `close()`,
         when writing is finished.
     """
-    def __init__(self, filename: str, bufsz: int= ...,
+    def __init__(self, file: Union[str, 'os.PathLike[str]', File],
+                 bufsz: int= ...,
                  header: Optional[Header]= ..., overwrite: bool= ...,
                  filetype: str= ...) -> None:
-        """ Initiate a new writer for the file _filename_. The writer will
+        """ Initiate a new writer for the given file. The writer will
             refuse to overwrite an already existing file unless _overwrite_
-            is explicitly set to `True`. The file type is usually determined
-            from the file extension. It can also be set explicitly with the
-            _filetype_ parameter.
+            is explicitly set to `True`.
+
+            The file type is usually determined from the file extension.
+            If you want to explicitly set the filetype (for example, when
+            writing to standard output '-'), then use a File object.
+            Using the _filetype_ parameter to set the file type is deprecated
+            and only works when the file is a string.
+
+            The _header_ parameter can be used to set a custom header in
+            the output file. What kind of information can be written into
+            the file header depends on the file type.
 
             The optional parameter _bufsz_ sets the size of the buffers used
             for collecting the data before they are written out. The default
@@ -271,7 +278,8 @@ class IdTracker:
             equivalent content. All other object kinds will return
             `False`.
         """
-    def complete_backward_references(self, filename: str, relation_depth: int = ...) -> None:
+    def complete_backward_references(self, filename: Union[str, 'os.PathLike[str]', File, FileBuffer],
+                                     relation_depth: int = ...) -> None:
         """ Make the IDs in the tracker reference-complete by adding
             all referenced IDs for objects whose IDs are already tracked.
 
@@ -289,7 +297,8 @@ class IdTracker:
             depth up to _relation_depth_ are guaranteed to be included.
             Relations that are nested more deeply, may or may not appear.
         """
-    def complete_forward_references(self, filename: str, relation_depth: int = ...) -> None:
+    def complete_forward_references(self, filename: Union[str, 'os.PathLike[str]', File, FileBuffer],
+                                    relation_depth: int = ...) -> None:
         """ Add to the tracker all IDs of object that reference any ID already
             tracked.
 
@@ -341,10 +350,11 @@ class IdTracker:
             on it, which then have a direct effect on the tracker.
         """
 
-def apply(reader: Union[Reader | str], *handlers: HandlerLike) -> None:
+def apply(reader: Union[Reader, str, 'os.PathLike[str]', File, FileBuffer],
+          *handlers: HandlerLike) -> None:
     """ Apply a chain of handlers to the given input source. The input
-        source may be given either as a [osmium.io.Reader][] or
-        as a simple file name. If one of the handlers is a
+        source may be a [osmium.io.Reader][], a file or a file buffer.
+        If one of the handlers is a
         [filter][osmium.BaseFilter], then processing of the
-        object will be stopped if it does not pass the filter.
+        object will be stopped when it does not pass the filter.
     """

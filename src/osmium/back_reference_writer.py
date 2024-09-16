@@ -4,11 +4,13 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Any
+from typing import Any, Union
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import os
 
 from osmium._osmium import SimpleWriter
+from osmium.io import File, FileBuffer
 from osmium.file_processor import FileProcessor, zip_processors
 from osmium import IdTracker
 
@@ -24,7 +26,8 @@ class BackReferenceWriter:
         The writer should usually be used as a context manager.
     """
 
-    def __init__(self, outfile: str, ref_src: str,
+    def __init__(self, outfile: Union[str, 'os.PathLike[str]', File],
+                 ref_src: Union[str, 'os.PathLike[str]', File, FileBuffer],
                  overwrite: bool=False, remove_tags: bool=True,
                  relation_depth: int = 0):
         """ Create a new writer.

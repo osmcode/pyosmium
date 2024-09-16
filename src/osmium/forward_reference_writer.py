@@ -4,12 +4,14 @@
 #
 # Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import os
 
 from osmium._osmium import SimpleWriter
 from osmium import IdTracker
+from osmium.io import File, FileBuffer
 from osmium.file_processor import FileProcessor, zip_processors
 
 class ForwardReferenceWriter:
@@ -25,7 +27,8 @@ class ForwardReferenceWriter:
         The writer should usually be used as a context manager.
     """
 
-    def __init__(self, outfile: str, ref_src: str,
+    def __init__(self, outfile: Union[str, 'os.PathLike[str]', File],
+                 ref_src: Union[str, 'os.PathLike[str]', File, FileBuffer],
                  overwrite: bool=False, back_references: bool=True,
                  remove_tags: bool=True, forward_relation_depth: int=0,
                  backward_relation_depth: int=1) -> None:
@@ -119,7 +122,7 @@ class ForwardReferenceWriter:
                 self.id_tracker.complete_backward_references(self.ref_src,
                                                              relation_depth=self.backward_relation_depth)
 
-            fp1 = FileProcessor(str(Path(self.tmpdir.name, 'forward_writer.osm.pbf')))
+            fp1 = FileProcessor(Path(self.tmpdir.name, 'forward_writer.osm.pbf'))
             fp2 = FileProcessor(self.ref_src).with_filter(self.id_tracker.id_filter())
 
 

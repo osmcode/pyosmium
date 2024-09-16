@@ -6,6 +6,7 @@
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
+#include <pybind11/stl/filesystem.h>
 
 #include <osmium/osm.hpp>
 #include <osmium/io/any_output.hpp>
@@ -17,6 +18,8 @@
 #include "cast.h"
 #include "osm_base_objects.h"
 #include "base_handler.h"
+
+#include <filesystem>
 
 namespace py = pybind11;
 
@@ -31,6 +34,15 @@ public:
                  bool overwrite, const std::string &filetype)
     : writer(osmium::io::File(filename, filetype),
              header ? *header : osmium::io::Header(),
+             overwrite ? osmium::io::overwrite::allow : osmium::io::overwrite::no),
+      buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
+             osmium::memory::Buffer::auto_grow::yes),
+      buffer_size(buffer.capacity()) // same rounding to BUFFER_WRAP
+    {}
+
+    SimpleWriter(osmium::io::File file, size_t bufsz, osmium::io::Header const *header,
+                 bool overwrite)
+    : writer(file, header ? *header : osmium::io::Header(),
              overwrite ? osmium::io::overwrite::allow : osmium::io::overwrite::no),
       buffer(bufsz < 2 * BUFFER_WRAP ? 2 * BUFFER_WRAP : bufsz,
              osmium::memory::Buffer::auto_grow::yes),
@@ -344,6 +356,17 @@ void init_simple_writer(pybind11::module &m)
              py::arg("header") = nullptr,
              py::arg("overwrite") = false,
              py::arg("filetype") = "")
+        .def(py::init<>([] (std::filesystem::path const &file, unsigned long bufsz,
+                            osmium::io::Header const *header, bool overwrite) {
+                 return new SimpleWriter(file.c_str(), bufsz, header, overwrite, "");
+             }),
+             py::arg("filename"), py::arg("bufsz") = 4096*1024,
+             py::arg("header") = nullptr,
+             py::arg("overwrite") = false)
+        .def(py::init<osmium::io::File, unsigned long, osmium::io::Header const *, bool>(),
+             py::arg("filename"), py::arg("bufsz") = 4096*1024,
+             py::arg("header") = nullptr,
+             py::arg("overwrite") = false)
         .def("add_node", &SimpleWriter::add_node, py::arg("node"))
         .def("add_way", &SimpleWriter::add_way, py::arg("way"))
         .def("add_relation", &SimpleWriter::add_relation, py::arg("relation"))

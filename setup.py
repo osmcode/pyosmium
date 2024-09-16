@@ -80,11 +80,6 @@ class CMakeBuild(build_ext):
             raise RuntimeError("CMake must be installed to build the following extensions: " +
                                ", ".join(e.name for e in self.extensions))
 
-        if platform.system() == "Windows":
-            cmake_version = Version(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < Version('3.1.0'):
-                raise RuntimeError("CMake >= 3.1.0 is required on Windows")
-
         for ext in self.extensions:
             self.build_extension(ext)
 
@@ -138,8 +133,8 @@ class CMakeBuild(build_ext):
 
 versions = get_versions()
 
-if sys.version_info < (3,6):
-    raise RuntimeError("Python 3.6 or larger required.")
+if sys.version_info < (3,7):
+    raise RuntimeError("Python 3.7 or larger required.")
 
 with open('README.rst', 'r') as descfile:
     long_description = descfile.read()
@@ -159,13 +154,16 @@ setup(
     license='BSD',
     scripts=['tools/pyosmium-get-changes', 'tools/pyosmium-up-to-date'],
     classifiers = [
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: C++",
         ],
@@ -176,7 +174,7 @@ setup(
     package_data = { 'osmium': ['py.typed', '*.pyi',
                                 'replication/_replication.pyi',
                                 'osm/_osm.pyi']},
-    python_requires = ">=3.6",
+    python_requires = ">=3.7",
     install_requires = ['requests'],
     extras_require = {
         'tests': ['pytest', 'pytest-httpserver', 'werkzeug'],

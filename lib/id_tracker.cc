@@ -6,6 +6,7 @@
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
+#include <pybind11/stl/filesystem.h>
 
 #include <osmium/osm.hpp>
 #include <osmium/io/any_input.hpp>
@@ -14,6 +15,8 @@
 
 #include "base_filter.h"
 #include "osmium_module.h"
+
+#include <filesystem>
 
 namespace py = pybind11;
 
@@ -95,7 +98,7 @@ public:
     }
 
 
-    void complete_backward_references(std::string const &file, int relation_depth)
+    void complete_backward_references(osmium::io::File file, int relation_depth)
     {
         // first pass: relations
         while (relation_depth > 0 && !m_ids.relations().empty()) {
@@ -136,7 +139,7 @@ public:
     }
 
 
-    void complete_forward_references(std::string const &file, int relation_depth)
+    void complete_forward_references(osmium::io::File file, int relation_depth)
     {
         // standard pass: find directly referenced ways and relations
         {
@@ -290,14 +293,28 @@ void init_id_tracker(pybind11::module &m)
         .def("add_relation", [](IdTracker &self, IdType id) { self.relation_ids().set(id); })
         .def("add_references", &IdTracker::add_references)
         .def("contains_any_references", &IdTracker::contains_any_references)
+        .def("complete_backward_references", &IdTracker::complete_backward_references,
+             py::arg("fname"), py::arg("relation_depth") = 0)
         .def("complete_backward_references",
-             [](IdTracker &self, py::object const &fname, int relation_depth) {
-                self.complete_backward_references(py::str(fname), relation_depth);
+             [](IdTracker &self, char const *fname, int relation_depth) {
+                self.complete_backward_references(osmium::io::File{fname}, relation_depth);
+             },
+             py::arg("fname"), py::arg("relation_depth") = 0)
+        .def("complete_backward_references",
+             [](IdTracker &self, std::filesystem::path const &fname, int relation_depth) {
+                self.complete_backward_references(osmium::io::File{fname}, relation_depth);
+             },
+             py::arg("fname"), py::arg("relation_depth") = 0)
+        .def("complete_forward_references", &IdTracker::complete_forward_references,
+             py::arg("fname"), py::arg("relation_depth") = 0)
+        .def("complete_forward_references",
+             [](IdTracker &self, char const *fname, int relation_depth) {
+                self.complete_forward_references(osmium::io::File{fname}, relation_depth);
              },
              py::arg("fname"), py::arg("relation_depth") = 0)
         .def("complete_forward_references",
-             [](IdTracker &self, py::object const &fname, int relation_depth) {
-                self.complete_forward_references(py::str(fname), relation_depth);
+             [](IdTracker &self, std::filesystem::path const &fname, int relation_depth) {
+                self.complete_forward_references(osmium::io::File{fname.c_str()}, relation_depth);
              },
              py::arg("fname"), py::arg("relation_depth") = 0)
         .def("id_filter",

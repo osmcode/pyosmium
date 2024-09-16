@@ -307,7 +307,7 @@ def test_catch_errors_in_add_node(tmp_path, final_item):
 def test_catch_errors_in_add_way(tmp_path, final_item):
     test_file = tmp_path / 'test.opl'
 
-    with o.SimpleWriter(str(test_file), 4000) as writer:
+    with o.SimpleWriter(test_file, 4000) as writer:
         writer.add_way(o.osm.mutable.Way(id=123, nodes=[1, 2, 3]))
         with pytest.raises(TypeError):
             writer.add_way(o.osm.mutable.Way(id=124, nodes=34))
@@ -362,3 +362,11 @@ def test_do_overwrite(tmp_path):
 
     with o.SimpleWriter(filename=str(test_file), overwrite=True) as writer:
         pass
+
+
+
+def test_write_to_file(tmp_path):
+    test_file = tmp_path / 'test.txt'
+
+    with o.SimpleWriter(o.io.File(test_file, 'opl'), bufsz=4000) as writer:
+        writer.add_node(o.osm.mutable.Node(id=123))
