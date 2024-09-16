@@ -106,14 +106,14 @@ PYBIND11_MODULE(_osmium, m) {
           py::arg("filename"));
     m.def("apply", [](std::filesystem::path const &fn, pyosmium::BaseHandler &h)
                    {
-                       osmium::io::Reader rd{fn};
+                       osmium::io::Reader rd{fn.string()};
                        pyosmium::apply(rd, h);
                    },
           py::arg("filename"), py::arg("handler"));
     m.def("apply", [](std::filesystem::path const &fn, py::args args)
                      {
                          pyosmium::HandlerChain handler{args};
-                         osmium::io::Reader rd{fn};
+                         osmium::io::Reader rd{fn.string()};
                          pyosmium::apply(rd, handler);
                      },
           py::arg("filename"));

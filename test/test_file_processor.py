@@ -241,7 +241,7 @@ def test_filtered_handler_basehandler(opl_buffer, tmp_path):
 
     ids = IDCollector()
 
-    o.apply(str(testf), ids)
+    o.apply(testf, ids)
 
     assert ids.nodes == [3]
     assert ids.ways == [2]

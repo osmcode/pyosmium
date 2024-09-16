@@ -358,7 +358,7 @@ void init_simple_writer(pybind11::module &m)
              py::arg("filetype") = "")
         .def(py::init<>([] (std::filesystem::path const &file, unsigned long bufsz,
                             osmium::io::Header const *header, bool overwrite) {
-                 return new SimpleWriter(file.c_str(), bufsz, header, overwrite, "");
+                 return new SimpleWriter(file.string().c_str(), bufsz, header, overwrite, "");
              }),
              py::arg("filename"), py::arg("bufsz") = 4096*1024,
              py::arg("header") = nullptr,

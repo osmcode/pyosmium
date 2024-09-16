@@ -31,10 +31,10 @@ PYBIND11_MODULE(io, m)
         .def(py::init<std::string>())
         .def(py::init<std::string, std::string>())
         .def(py::init<>([] (std::filesystem::path const &file) {
-                 return new osmium::io::File(file.c_str());
+                 return new osmium::io::File(file.string());
              }))
         .def(py::init<>([] (std::filesystem::path const &file, const char *format) {
-                 return new osmium::io::File(file.c_str(), format);
+                 return new osmium::io::File(file.string(), format);
              }))
         .def_property("has_multiple_object_versions",
                       &osmium::io::File::has_multiple_object_versions,
@@ -78,10 +78,10 @@ PYBIND11_MODULE(io, m)
         .def(py::init<std::string>())
         .def(py::init<std::string, osmium::osm_entity_bits::type>())
         .def(py::init<>([] (std::filesystem::path const &file) {
-                 return new osmium::io::Reader(file.c_str());
+                 return new osmium::io::Reader(file.string());
              }))
         .def(py::init<>([] (std::filesystem::path const &file, osmium::osm_entity_bits::type etype) {
-                 return new osmium::io::Reader(file.c_str(), etype);
+                 return new osmium::io::Reader(file.string(), etype);
              }))
         .def(py::init<osmium::io::File>(),
              py::keep_alive<1, 2>())
@@ -97,7 +97,7 @@ PYBIND11_MODULE(io, m)
     py::class_<osmium::io::Writer>(m, "Writer")
         .def(py::init<std::string>())
         .def(py::init<>([] (std::filesystem::path const &file) {
-                 return new osmium::io::Writer(file.c_str());
+                 return new osmium::io::Writer(file.string());
              }))
         .def(py::init<osmium::io::File>())
         .def(py::init<std::string, osmium::io::Header>())
