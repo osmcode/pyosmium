@@ -109,15 +109,19 @@ jobs:
 
             - name: Install osmium
               run: |
-                pip install osmium*${PYVER/./}*.whl
+                pip install virtualenv
+                virtualenv osmium-test
+                WHEEL=`ls osmium*${PYVER/./}*.whl`
+                ./osmium-test/bin/pip install ${WHEEL}[tests]
               shell: bash
               env:
                 PYVER: ${{ matrix.python-version }}
 
-            - uses: ./.github/actions/run-tests
+            - name: Run tests
+              run: ./osmium-test/bin/pytest test
+              shell: bash
 
-
-    build-ubuntu:
+    build-platform:
         runs-on: ${{ matrix.platform }}
 
         strategy:
@@ -193,7 +197,7 @@ jobs:
               if: ${{ matrix.flavour == 'linux' }}
 
             - name: Install packages
-              run: brew install boost geos lz4
+              run: brew install boost geos
               shell: bash
               if: ${{ matrix.flavour == 'macos' }}
 
@@ -345,9 +349,14 @@ jobs:
 
             - name: Install osmium
               run: |
-                pip install osmium*${PYVER/./}*.whl
+                pip install virtualenv
+                virtualenv osmium-test
+                WHEEL=`ls osmium*${PYVER/./}*.whl`
+                ./osmium-test/Scripts/pip install ${WHEEL}[tests]
               shell: bash
               env:
                 PYVER: ${{ matrix.python-version }}
 
-            - uses: ./.github/actions/run-tests
+            - name: Run tests
+              run: ./osmium-test/Scripts/pytest test
+              shell: bash

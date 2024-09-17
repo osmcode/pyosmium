@@ -177,7 +177,7 @@ setup(
     python_requires = ">=3.7",
     install_requires = ['requests'],
     extras_require = {
-        'tests': ['pytest', 'pytest-httpserver', 'werkzeug'],
+        'tests': ['pytest', 'pytest-httpserver', 'werkzeug', 'shapely'],
     },
     cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
     zip_safe=False,
