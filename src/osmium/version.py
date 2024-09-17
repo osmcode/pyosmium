@@ -18,4 +18,4 @@ libosmium_version = '2.20.0'
 # protozero version shipped with the Pip release
 protozero_version = '1.7.1'
 # pybind11 version shipped with the Pip release
-pybind11_version = '2.11.1'
+pybind11_version = '2.13.6'
