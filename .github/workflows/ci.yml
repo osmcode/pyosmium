@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
     build-default:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
 
         steps:
             - uses: actions/checkout@v4
@@ -87,7 +87,7 @@ jobs:
                   path: dist
 
     test-default:
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-22.04
         needs: build-default
 
         strategy:
@@ -139,16 +139,16 @@ jobs:
                       deps: release
                       flavour: linux
                     - compiler: gcc
-                      cc: gcc-12
-                      cxx: g++-12
-                      platform: ubuntu-22.04
+                      cc: gcc-14
+                      cxx: g++-14
+                      platform: ubuntu-24.04
                       python: "3.12"
                       deps: develop
                       flavour: linux
                     - compiler: clang
-                      cc: clang-14
-                      cxx: clang++-14
-                      platform: ubuntu-22.04
+                      cc: clang-18
+                      cxx: clang++-18
+                      platform: ubuntu-24.04
                       python: "3.12"
                       deps: develop
                       flavour: linux
