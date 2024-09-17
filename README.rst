@@ -24,7 +24,7 @@ development packages for these libraries. On Debian/Ubuntu do::
                        libexpat1-dev zlib1g-dev libbz2-dev
 
 
-Python >= 3.6 is supported. Pypy is known not to work.
+Python >= 3.7 is supported. Pypy is known not to work.
 
 Documentation
 =============
@@ -34,12 +34,11 @@ The documentation for the latest release is available at
 
 If you find bugs or have feature requests, please report those in the
 `Github issue tracker`_. For general questions about using pyosmium you
-can contanct the `OSM development mailing list`_ or ask on `OSM help`_.
+can contanct the `OSM forum`_.
 
 .. _osmcode.org: http://docs.osmcode.org/pyosmium/latest
 .. _Github issue tracker: https://github.com/osmcode/pyosmium/issues/
-.. _OSM development mailing list: https://lists.openstreetmap.org/listinfo/dev
-.. _OSM help: https://help.openstreetmap.org/
+.. _OSM forum: https://community.openstreetmap.org/
 
 Examples
 ========

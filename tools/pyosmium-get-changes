@@ -116,17 +116,15 @@ def write_end_sequence(fname, seqid):
             fd.write(str(seqid))
 
 def get_arg_parser(from_main=False):
-    def h(s):
-        return re.sub(r'\s\s+' , " ", s)
-
-    parser = ArgumentParser(description=__doc__,
+    parser = ArgumentParser(prog='pyosmium-get-changes',
+                            description=__doc__,
                             usage=None if from_main else 'pyosmium-get-changes [options]',
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='count', default=0,
                         help='Increase verbosity (can be used multiple times)')
     parser.add_argument('-o', '--outfile', dest='outfile',
-                        help=h("""Name of diff output file. If omitted, only the
-                              sequence ID will be printed where updates would start."""))
+                        help='Name of diff output file. If omitted, only the '
+                             'sequence ID will be printed where updates would start.')
     parser.add_argument('--format', dest='outformat', metavar='FORMAT',
                         help="Format the data should be saved in.")
     parser.add_argument('--server', action='store', dest='server_url',
@@ -134,8 +132,8 @@ def get_arg_parser(from_main=False):
     parser.add_argument('--diff-type', action='store', dest='server_diff_type',
                         help='File format used by the replication server (default: osc.gz)')
     parser.add_argument('--cookie', dest='cookie',
-                        help="""Netscape-style cookie jar file to read cookies from
-                              and where received cookies will be written to.""")
+                        help='Netscape-style cookie jar file to read cookies from '
+                             'and where received cookies will be written to.')
     parser.add_argument('-s', '--size', dest='outsize', type=int, default=100,
                         help='Maximum data to load in MB (default: 100MB).')
     group = parser.add_mutually_exclusive_group()
@@ -148,15 +146,15 @@ def get_arg_parser(from_main=False):
     group.add_argument('-O', '--start-osm-data', dest='start_file', metavar='OSMFILE',
                        help='start at the date of the newest OSM object in the file')
     parser.add_argument('-f', '--sequence-file', dest='seq_file',
-                       help=h("""Sequence file. If the file exists, then updates
-                               will start after the id given in the file. At the
-                               end of the process, the last sequence ID contained
-                               in the diff is written."""))
+                       help='Sequence file. If the file exists, then updates '
+                            'will start after the id given in the file. At the '
+                            'end of the process, the last sequence ID contained '
+                            'in the diff is written.')
     parser.add_argument('--ignore-osmosis-headers', dest='ignore_headers',
                         action='store_true',
-                        help=h("""When determining the start from an OSM file,
-                                ignore potential replication information in the
-                                header and search for the newest OSM object."""))
+                        help='When determining the start from an OSM file, '
+                             'ignore potential replication information in the '
+                             'header and search for the newest OSM object.')
     parser.add_argument('-d', '--no-deduplicate', action='store_false', dest='simplify',
                         help='Do not deduplicate diffs.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,

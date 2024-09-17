@@ -8,7 +8,7 @@ manner.
 
 ## Installation
 
-Pyosmium works with Python >= 3.6. Pypy is known to not work.
+Pyosmium works with Python >= 3.7. Pypy is known to not work.
 
 ### Using Pip
 
@@ -36,14 +36,15 @@ pyosmium has the following dependencies:
  * [libosmium](https://github.com/osmcode/libosmium) >= 2.16.0
  * [protozero](https://github.com/mapbox/protozero)
  * [cmake](https://cmake.org/)
- * [Pybind11](https://github.com/pybind/pybind11) >= 2.2
+ * [Pybind11](https://github.com/pybind/pybind11) >= 2.7
  * [expat](https://libexpat.github.io/)
  * [libz](https://www.zlib.net/)
  * [libbz2](https://www.sourceware.org/bzip2/)
  * [Boost](https://www.boost.org/) variant and iterator >= 1.41
  * [Python Requests](https://docs.python-requests.org/en/master/)
  * Python setuptools
- * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
+ * [Requests](https://requests.readthedocs.io)
+ * a C++17-compatible compiler (Clang 7+, GCC 8+)
 
 ### Compiling from Source
 
@@ -76,7 +77,7 @@ run:
 
 To compile and install the bindings, run
 
-    pip install [--user] .
+    pip install .
 
 
 ## Examples
@@ -102,20 +103,28 @@ The test suite can be run with:
 
 ## Documentation
 
-To build the documentation you need [Sphinx](http://sphinx-doc.org/)
-and the [autoprogram extension](https://pythonhosted.org/sphinxcontrib-autoprogram/)
-On Debian/Ubuntu install `python-sphinx sphinxcontrib-autoprogram`
-or `python3-sphinx python3-sphinxcontrib.autoprogram`.
+To build the documentation you need [mkdocs](https://www.mkdocs.org/)
+with the [mkdocstrings extension](https://mkdocstrings.github.io/)
+and the [material theme](https://squidfunk.github.io/mkdocs-material/).
+On Debian/Ubuntu install
 
-First compile the bindings as described above and then run:
+    sudo apt-get install mkdocs mkdocstrings mkdocstrings-python-handlers\
+                         mkdocs-material mkdocs-material-extensions
 
-    cd doc
-    make html
+To build the documentation run:
+
+    mkdocs build
+
+or to few it locally, you can use:
+
+    mkdocs serve
 
 For building the man pages for the tools run:
 
-    cd doc
+    cd docs
     make man
+
+The man pages can be found in docs/man.
 
 ## Bugs and Questions
 

@@ -10,6 +10,7 @@ theme:
         - privacy
 copyright: Copyright &copy; Sarah Hoffmann
 repo_url: https://github.com/osmcode/pyosmium
+site_url: https://osmcode.org/pyosmium/
 nav:
     - index.md
     - 'User Manual':
@@ -71,14 +72,16 @@ markdown_extensions:
 extra_css:
     - css/mkdocstrings.css
     - css/extra.css
+site_dir: site-html
 plugins:
     - search
     - autorefs
-#    - mkdocs-jupyter
+    - mkdocs-jupyter
     - mkdocstrings:
         default_handler: python
         handlers:
           python:
+            paths: [src]
             options:
               allow_inspection: false
               heading_level: 3

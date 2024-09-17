@@ -25,8 +25,8 @@ because the size limit has been reached or there was a network error which
 could not be resolved). Any other error results in a return code larger than 1.
 The output file is guaranteed to be unmodified in that case.
 
-Some OSM data sources require a cookie to be sent with the HTTP requests. 
-Pyosmium-up-to-date does not fetch the cookie from these services for you.
+Some OSM data sources require a cookie to be sent with the HTTP requests.
+pyosmium-up-to-date does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
 cookies to the server and will save received cookies to the jar file.
 """
@@ -181,46 +181,48 @@ def compute_start_point(options):
     return url, seq, ts
 
 def get_arg_parser(from_main=False):
-    def h(s):
-        return re.sub(r'\s\s+' , " ", s)
 
-    parser = ArgumentParser(description=__doc__,
+    parser = ArgumentParser(prog='pyosmium-up-to-date',
+                            description=__doc__,
                             usage=None if from_main else 'pyosmium-up-to-date [options] <osm file>',
                             formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('-v', dest='loglevel', action='count', default=0,
-                        help='Increase verbosity (can be used multiple times)')
+                        help='Increase verbosity (can be used multiple times).')
     parser.add_argument('infile', metavar='<osm file>', help="OSM file to update")
     parser.add_argument('-o', '--outfile', dest='outfile',
-                        help=h("""Name output of file. If missing, the input file
-                                will be overwritten."""))
+                        help='Name output of file. If missing, the input file '
+                             'will be overwritten.')
     parser.add_argument('--format', dest='outformat', metavar='FORMAT',
-                        help="Format the data should be saved in.")
+                        help='Format the data should be saved in. '
+                             'Usually determined from file name.')
     parser.add_argument('--server', action='store', dest='server_url',
-            help=h("""Base URL of the replication server. Default:
-                    'https://planet.osm.org/replication/hour/'
-                    (hourly diffs from osm.org)."""))
+                        help='Base URL of the replication server. Default: '
+                             'https://planet.osm.org/replication/hour/ '
+                             '(hourly diffs from osm.org)')
     parser.add_argument('-s', '--size', dest='outsize', metavar='SIZE', type=int, default=1024,
-                        help='Maximum size of change to apply at once in MB. Default: 1GB.')
+                        help='Maximum size of change to apply at once in MB. Default: 1GB')
     parser.add_argument('--tmpdir', dest='tmpdir',
-            help='Directory to use for temporary files. Default: directory of input file')
+                        help='Directory to use for temporary files. '
+                             'Usually the directory of input file is used.')
     parser.add_argument('--ignore-osmosis-headers', dest='ignore_headers',
                         action='store_true',
-                        help=h("""Ignore potential replication information in the
-                                header of the input file and search for the
-                                newest OSM object in the file instead."""))
+                        help='Ignore potential replication information in the '
+                             'header of the input file and search for the '
+                             'newest OSM object in the file instead.')
     parser.add_argument('-b', '--wind-back', dest='wind_back', type=int, default=60,
-                        help=h("""Number of minutes to start downloading before
-                                the newest addition to input data. (Ignored when
-                                the file contains a sequence ID.) Default: 60."""))
+                        help='Number of minutes to start downloading before '
+                             'the newest addition to input data. (Ignored when '
+                             'the file contains a sequence ID.) Default: 60')
     parser.add_argument('--force-update-of-old-planet', action='store_true',
                         dest='force_update',
                         help="Apply update even if the input data is really old.")
     parser.add_argument('--cookie', dest='cookie',
-                        help="""Netscape-style cookie jar file to read cookies from and where
-                              received cookies will be written to.""")
+                        help='Netscape-style cookie jar file to read cookies from and where '
+                            'received cookies will be written to.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
-    parser.add_argument('--version', action='version', version='pyosmium ' + pyosmium_release)
+    parser.add_argument('--version', action='version',
+                        version='pyosmium ' + pyosmium_release)
 
     return parser
 
