@@ -16,11 +16,10 @@ from pathlib import Path
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.sdist import sdist as orig_sdist
-from packaging.version import Version
 
 BASEDIR = os.path.split(os.path.abspath(__file__))[0]
 
-class Pyosmium_sdist(orig_sdist):
+class PyosmiumSDist(orig_sdist):
 
     contrib = (
         ('libosmium', 'https://github.com/osmcode/libosmium/archive/v{}.tar.gz'),
@@ -133,52 +132,9 @@ class CMakeBuild(build_ext):
 
 versions = get_versions()
 
-if sys.version_info < (3,7):
-    raise RuntimeError("Python 3.7 or larger required.")
-
-with open('README.rst', 'r') as descfile:
-    long_description = descfile.read()
-
 setup(
-    name='osmium',
-    version=versions['pyosmium_release'],
-    description='Python bindings for libosmium, the data processing library for OSM data',
-    long_description=long_description,
-    author='Sarah Hoffmann',
-    author_email='lonvia@denofr.de',
-    maintainer='Sarah Hoffmann',
-    maintainer_email='lonvia@denofr.de',
-    download_url='https://github.com/osmcode/pyosmium',
-    url='https://osmcode.org/pyosmium',
-    keywords=["OSM", "OpenStreetMap", "Osmium"],
-    license='BSD',
     scripts=['tools/pyosmium-get-changes', 'tools/pyosmium-up-to-date'],
-    classifiers = [
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
-        "Programming Language :: Python :: 3.13",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Programming Language :: C++",
-        ],
-
     ext_modules=[CMakeExtension('cmake_example')],
-    packages = ['osmium', 'osmium/osm', 'osmium/replication'],
-    package_dir = {'' : 'src'},
-    package_data = { 'osmium': ['py.typed', '*.pyi',
-                                'replication/_replication.pyi',
-                                'osm/_osm.pyi']},
-    python_requires = ">=3.7",
-    install_requires = ['requests'],
-    extras_require = {
-        'tests': ['pytest', 'pytest-httpserver', 'werkzeug', 'shapely'],
-    },
-    cmdclass=dict(build_ext=CMakeBuild, sdist=Pyosmium_sdist),
+    cmdclass=dict(build_ext=CMakeBuild, sdist=PyosmiumSDist),
     zip_safe=False,
 )

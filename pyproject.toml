@@ -1,3 +1,71 @@
 [build-system]
-requires = ["packaging", "setuptools"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "osmium"
+description = "Python bindings for libosmium, the data processing library for OSM data"
+readme = "README.rst"
+requires-python = ">=3.7"
+license = {text = 'BSD-2-Clause'}
+authors = [
+    {name = "Sarah Hoffmann", email = "lonvia@denofr.de"}
+    ]
+maintainers = [
+    {name = "Sarah Hoffmann", email = "lonvia@denofr.de"}
+    ]
+keywords = ["OSM", "OpenStreetMap", "Osmium"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: C++",
+    ]
+dependencies = [
+    "requests"
+    ]
+
+dynamic = ["version"]
+
+[tool.setuptools]
+packages = [
+    "osmium",
+    "osmium.osm",
+    "osmium.replication"
+    ]
+package-dir = {"" = "src"}
+
+
+[project.urls]
+Homepage = "https://osmcode.org/pyosmium"
+Documentation = "https://docs.osmcode.org/pyosmium/latest/"
+Repository = "https://github.com/osmcode/pyosmium"
+Issues = "https://github.com/osmcode/pyosmium/issues"
+
+[project.optional-dependencies]
+tests = [
+    'pytest',
+    'pytest-httpserver',
+    'werkzeug',
+    'shapely'
+    ]
+docs = [
+    'mkdocs',
+    'mkdocs-material',
+    'mkdocstrings',
+    'mkdocstrings-python',
+    'mkdocs-autorefs',
+    'mkdocs-gen-files',
+    'mkdocs-jupyter',
+    'argparse-manpage '
+    ]
+
+[tool.setuptools.dynamic]
+version = {attr = "osmium.version.pyosmium_release"}
