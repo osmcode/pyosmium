@@ -6,3 +6,4 @@ osmium.egg-info
 .ycm_extra_conf.py
 .ipynb_checkpoints
 docs/data/out
+docs/man
