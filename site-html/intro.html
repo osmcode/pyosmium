@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Basic Usage &#8212; Pyosmium 3.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pyosmium Reference" href="reference.html" />
+    <link rel="prev" title="Welcome to Pyosmium’s documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="reference.html" title="Pyosmium Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Pyosmium’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Basic Usage</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="basic-usage">
+<h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading">¶</a></h1>
+<p>The following chapter gives a practical introduction on how to use Pyosmium.
+It is assumed that you already have a basic knowledge about the
+<a class="reference external" href="http://wiki.openstreetmap.org/wiki/Elements">OSM data model</a>.</p>
+<p>For a more detailed introduction into the design of the osmium library, the
+reader is referred to the <a class="reference external" href="http://osmcode.org/osmium-concepts/">osmium documentation</a>.</p>
+<section id="reading-osm-data">
+<h2>Reading OSM Data<a class="headerlink" href="#reading-osm-data" title="Permalink to this heading">¶</a></h2>
+<section id="using-handler-classes">
+<h3>Using Handler Classes<a class="headerlink" href="#using-handler-classes" title="Permalink to this heading">¶</a></h3>
+<p>OSM file parsing by osmium is built around the concept of handlers. A handler
+is a class with a set of callback functions. Each function processes exactly
+one type of object as it is read from the file.</p>
+<p>Let’s start with a very simple handler that counts the nodes in the
+input file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">osmium</span>
+
+<span class="k">class</span> <span class="nc">CounterHandler</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>A handler first of all needs to inherit from one of the handler classes.
+At the moment this is always <a class="reference internal" href="ref_osmium.html#osmium.SimpleHandler" title="osmium.SimpleHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.SimpleHandler</span></code></a>. Then it
+needs to implement functions for each object type it wants to process. In
+our case it is exactly one function <cite>node()</cite>. All other potential callbacks
+can be safely ignored.</p>
+<p>Now the handler needs to be applied to an OSM file. The easiest way to
+accomplish that is to call the <a class="reference internal" href="ref_osmium.html#osmium.SimpleHandler.apply_file" title="osmium.SimpleHandler.apply_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_file()</span></code></a>
+convenience function, which in its simplest form only requires the file name
+as a parameter. The main routine of the node counting application
+therefore looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">CounterHandler</span><span class="p">()</span>
+
+    <span class="n">h</span><span class="o">.</span><span class="n">apply_file</span><span class="p">(</span><span class="s2">&quot;test.osm.pbf&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of nodes: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">h</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That already finishes our node counting program.</p>
+</section>
+<section id="inspecting-the-osm-objects">
+<h3>Inspecting the OSM objects<a class="headerlink" href="#inspecting-the-osm-objects" title="Permalink to this heading">¶</a></h3>
+<p>Counting nodes is actually boring because it completely ignores the
+content of the nodes. So let’s change the handler to only count hotels
+(normally tagged with <code class="docutils literal notranslate"><span class="pre">tourism=hotel</span></code>). They may be tagged as nodes, ways
+or relations, so handler functions for all three types need to be implemented:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">osmium</span>
+
+<span class="k">class</span> <span class="nc">HotelCounterHandler</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HotelCounterHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">count_hotel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tourism&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;hotel&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count_hotel</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">way</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count_hotel</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count_hotel</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A reference to the object is always given as the only parameter to the
+handler functions. The objects have some common methods and attributes,
+listed in <a class="reference internal" href="ref_osm.html#osmium.osm.OSMObject" title="osmium.osm.OSMObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.OSMObject</span></code></a>, and some that are specific to
+each type. As all objects have tags, it is possible to reuse the same
+implementation for all types. The main function remains the same.</p>
+</section>
+<section id="collecting-data-from-an-osm-file">
+<span id="intro-copying-data-from-object"></span><h3>Collecting data from an OSM file<a class="headerlink" href="#collecting-data-from-an-osm-file" title="Permalink to this heading">¶</a></h3>
+<p>Let’s say that we do not only want to count the hotels in the file but
+we want to print their names in alphabetical order. For simplicity, lets
+restrict outself to nodes tagged as hotels. A naive implementation
+might want to simply collect all hotels and then print their names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">HotelHandler</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HotelHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hotels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tourism&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;hotel&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hotels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>       <span class="c1"># THIS IS WRONG!</span>
+
+
+<span class="n">h</span> <span class="o">=</span> <span class="n">HotelHandler</span><span class="p">()</span>
+<span class="n">h</span><span class="o">.</span><span class="n">apply_file</span><span class="p">(</span><span class="n">some_file</span><span class="p">)</span>
+
+<span class="n">hotel_names</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">hotels</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hotels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">hotel_names</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>If you try to execute this, then Python will raise a Runtime error:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">RuntimeError</span><span class="p">:</span> <span class="n">Illegal</span> <span class="n">access</span> <span class="n">to</span> <span class="n">OSM</span> <span class="nb">object</span>
+</pre></div>
+</div>
+<p>the moment, you try to access to <code class="docutils literal notranslate"><span class="pre">tags</span></code> attribute.</p>
+<p>The object references that are handed to the handler are only temporary.
+Osmium reads the object from the file, gives them to the handler function
+and then discards them to free the memory. If you keep a reference
+after the handler function returns, it points to invalid memory. Pyosmium
+checks on every access if the memory is still valid and raises the runtime
+error above if you try to access the object outside the callback. If you
+want to keep data for later use <em>the data must be copied out</em>.</p>
+<p>For the example, with the list of hotels, we only need to keep the name
+of each hotel. So a correct implementation is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">HotelHandler</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HotelHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hotels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tourism&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;hotel&#39;</span> <span class="ow">and</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hotels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+
+
+<span class="n">h</span> <span class="o">=</span> <span class="n">HotelHandler</span><span class="p">()</span>
+<span class="n">h</span><span class="o">.</span><span class="n">apply_file</span><span class="p">(</span><span class="n">some_file</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">hotels</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Not only the object itself is a temporary reference. Also the tags, node and
+member lists must be copied when they need to be stored. As a general rule,
+it is good practise to store as little information as possible. In the example
+above, we could have stored the tags of all objects and then done the filtering
+later but that would need much more memory.</p>
+</section>
+<section id="handling-geometries">
+<h3>Handling Geometries<a class="headerlink" href="#handling-geometries" title="Permalink to this heading">¶</a></h3>
+<p>Because of the way that OSM data is structured, osmium needs to internally
+cache node geometries, when the handler wants to process the geometries of
+ways and areas. The <code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_file()</span></code> method cannot
+deduce by itself if this cache is needed. Therefore locations need to be
+explicitly enabled by setting the locations parameter to True:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">h</span><span class="o">.</span><span class="n">apply_file</span><span class="p">(</span><span class="s2">&quot;test.osm.pbf&quot;</span><span class="p">,</span> <span class="n">locations</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="s1">&#39;flex_mem&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The third parameter <cite>idx</cite> is optional and states what kind of cache
+osmium is supposed to use. The default <cite>flex_mem</cite> is a good
+choice for most uses. If you plan to process large amount of data (e.g.
+Europe or planet) and are tight on RAM then <cite>dense_mmap_array</cite> may be
+better suited. This kind of index is able to temporarily store data on disk.
+However, it does not work on MacOS and Windows.</p>
+<p>If you want the cache to be persistent across invocations, you
+can use <cite>dense_file_array</cite> giving an additional file location for the
+cache like that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">h</span><span class="o">.</span><span class="n">apply_file</span><span class="p">(</span><span class="s2">&quot;test.osm.pbf&quot;</span><span class="p">,</span> <span class="n">locations</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="s1">&#39;dense_file_array,example.nodecache&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <cite>example.nodecache</cite> is the name of the cache file. For more details
+on the different kind of indexes, see the <a class="reference external" href="http://osmcode.org/osmium-concepts/#indexes">Index section in the Osmium Manual</a>.</p>
+</section>
+<section id="interfacing-with-shapely">
+<h3>Interfacing with Shapely<a class="headerlink" href="#interfacing-with-shapely" title="Permalink to this heading">¶</a></h3>
+<p>Pyosmium is a library for processing OSM files and therefore offers almost
+no functionality for processing geometries further. There are other libraries
+for that purpose. To interface with these libraries you can simply convert the
+osmium geometries into WKB or WKT format and import the result. The following
+example uses the libgeos wrapper <a class="reference external" href="http://toblerity.org/shapely/index.html">Shapely</a> to compute the total way length:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">osmium</span>
+<span class="kn">import</span> <span class="nn">shapely.wkb</span> <span class="k">as</span> <span class="nn">wkblib</span>
+
+<span class="c1"># A global factory that creates WKB from a osmium geometry</span>
+<span class="n">wkbfab</span> <span class="o">=</span> <span class="n">osmium</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">WKBFactory</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">WayLenHandler</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">way</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+        <span class="n">wkb</span> <span class="o">=</span> <span class="n">wkbfab</span><span class="o">.</span><span class="n">create_linestring</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">wkblib</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">wkb</span><span class="p">,</span> <span class="nb">hex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Length is computed in WGS84 projection, which is practically meaningless.</span>
+        <span class="c1"># Lets pretend we didn&#39;t notice, it is an example after all.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">length</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">WayLenHandler</span><span class="p">()</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">apply_file</span><span class="p">(</span><span class="s2">&quot;test.osm.pbf&quot;</span><span class="p">,</span> <span class="n">locations</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total length: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">h</span><span class="o">.</span><span class="n">total</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="writing-osm-data">
+<h2>Writing OSM Data<a class="headerlink" href="#writing-osm-data" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference internal" href="ref_osmium.html#osmium.SimpleWriter" title="osmium.SimpleWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.SimpleWriter</span></code></a> is the main class that takes care of
+writing out OSM data to a file. The file name must be given when the
+writer is constructed. Its suffix determines the format of the data.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">writer</span> <span class="o">=</span> <span class="n">osmium</span><span class="o">.</span><span class="n">SimpleWriter</span><span class="p">(</span><span class="s1">&#39;nodes.osm.bz2&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>opens a new writer for a packed OSM XML file. Objects can be written
+by using one of the writers <code class="docutils literal notranslate"><span class="pre">add_*</span></code> functions.</p>
+<p>A simple handler, that only writes out all the nodes from the input
+file into our new <code class="docutils literal notranslate"><span class="pre">nodes.osm.bz2</span></code> file would look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">osmium</span>
+
+<span class="k">class</span> <span class="nc">NodeWriter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">writer</span><span class="p">):</span>
+        <span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">writer</span>
+
+    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This example shows that an unmodified object can be written out directly
+to the writer. Normally, however, you want to modify some data. The native
+osmium OSM types are immutable and cannot be changed directly. Therefore
+you have to create a copy that can be changed. The <code class="docutils literal notranslate"><span class="pre">node</span></code>, <code class="docutils literal notranslate"><span class="pre">way</span></code> and <code class="docutils literal notranslate"><span class="pre">relation</span></code>
+objects offer a convenient <code class="docutils literal notranslate"><span class="pre">replace()</span></code> function to achieve exactly that.
+The function makes a copy and at the same time replaces all attributes where
+new values are given as parameters to the function.</p>
+<p>Let’s say you want to
+remove all the user names from your nodes before saving them to the new
+file (maybe to save some space), then the <code class="docutils literal notranslate"><span class="pre">node()</span></code> handler callback above
+needs to be changed like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NodeWriter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">SimpleHandler</span><span class="p">):</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">replace()</span></code> creates a new instance of an <code class="docutils literal notranslate"><span class="pre">osmium.osm.mutable</span></code> object. These
+classes are python implementations of the native object types in <code class="docutils literal notranslate"><span class="pre">osmium.osm</span></code>.
+They have exactly the same attributes but they are mutable.</p>
+<p>A writer is able to process the mutable datatypes just like the native osmium
+types. In fact, a writer is able to process any python object. It just expects
+suitably named attributes and will simply assume sensible default values for
+attributes that are missing.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is important to understand that <code class="docutils literal notranslate"><span class="pre">replace()</span></code> only makes a shallow copy
+of the object. Tag, node and member lists are still native osmium objects.
+Normally this is what you want because the writer is much faster writing
+these native objects than pythonized copies. However, it means that you
+cannot use <code class="docutils literal notranslate"><span class="pre">replace()</span></code> to create a copy of the object that can be kept
+after the handler callback has finished.</p>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Basic Usage</a><ul>
+<li><a class="reference internal" href="#reading-osm-data">Reading OSM Data</a><ul>
+<li><a class="reference internal" href="#using-handler-classes">Using Handler Classes</a></li>
+<li><a class="reference internal" href="#inspecting-the-osm-objects">Inspecting the OSM objects</a></li>
+<li><a class="reference internal" href="#collecting-data-from-an-osm-file">Collecting data from an OSM file</a></li>
+<li><a class="reference internal" href="#handling-geometries">Handling Geometries</a></li>
+<li><a class="reference internal" href="#interfacing-with-shapely">Interfacing with Shapely</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-osm-data">Writing OSM Data</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Welcome to Pyosmium’s documentation!</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="reference.html"
+                          title="next chapter">Pyosmium Reference</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/intro.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="reference.html" title="Pyosmium Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Pyosmium’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Basic Usage</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

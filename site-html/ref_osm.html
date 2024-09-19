@@ -1,0 +1,865 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>osm - Basic Datatypes &#8212; Pyosmium 3.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="io - Data In- and Output" href="ref_io.html" />
+    <link rel="prev" title="osmium - Processing OSM files" href="ref_osmium.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ref_io.html" title="io - Data In- and Output"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ref_osmium.html" title="osmium - Processing OSM files"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">osm</span></code> - Basic Datatypes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="osm-basic-datatypes">
+<h1><code class="docutils literal notranslate"><span class="pre">osm</span></code> - Basic Datatypes<a class="headerlink" href="#osm-basic-datatypes" title="Permalink to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">osm</span></code> submodule contains definitions of the basic data types used
+throughout the library.</p>
+<section id="native-osm-objects">
+<h2>Native OSM Objects<a class="headerlink" href="#native-osm-objects" title="Permalink to this heading">¶</a></h2>
+<p>Native OSM object classes are lightwight wrappers around the osmium OSM
+data classes. They are immutable and generally bound to the lifetime of
+the buffer they are saved in.</p>
+<p>There are five classes representing the basic OSM entities.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">OSMObject</span></span><a class="headerlink" href="#osmium.osm.OSMObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the base class for all OSM entity classes below and contains
+all common attributes.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#osmium.osm.TagList" title="osmium.osm.types.TagList"><span class="pre">TagList</span></a></em><a class="headerlink" href="#osmium.osm.OSMObject.tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) List of tags describing the object. See <a class="reference internal" href="#osmium.osm.TagList" title="osmium.osm.TagList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.TagList</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.OSMObject.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) OSM id of the object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.deleted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#osmium.osm.OSMObject.deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) True if the object is no longer visible.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.visible">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">visible</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#osmium.osm.OSMObject.visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) True if the object is visible.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.OSMObject.version" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Version number of the object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.changeset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">changeset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.OSMObject.changeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Id of changeset where this version of the object was created.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.uid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.OSMObject.uid" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Id of the user that created this version
+of the object. Only this ID uniquely identifies users.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#osmium.osm.OSMObject.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Date when this version has been created,
+returned as a <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#osmium.osm.OSMObject.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Name of the user that created this version.
+Be aware that user names can change, so that the same
+user ID may appear with different names and vice versa.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.positive_id">
+<span class="sig-name descname"><span class="pre">positive_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#osmium.osm.OSMObject.positive_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the absolute value of the id of this object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.OSMObject.user_is_anonymous">
+<span class="sig-name descname"><span class="pre">user_is_anonymous</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.OSMObject.user_is_anonymous" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the user is anonymous. If true, the uid does not uniquely
+identify a single user but only the group of all anonymous users
+in general.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Node">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cnode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.COSMNode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a single OSM node. It inherits all properties from OSMObjects
+and adds a single extra attribute: the location.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Node.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#osmium.osm.mutable.Node" title="osmium.osm.mutable.Node"><span class="pre">Node</span></a></span></span><a class="headerlink" href="#osmium.osm.Node.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a mutable node replacing the properties given in the
+named parameters. The properties may be any of the properties
+of OSMObject or Node.</p>
+<p>Note that this function only creates a shallow copy per default.
+It is still bound to the scope of the original object.
+To create a full copy use:
+<code class="docutils literal notranslate"><span class="pre">node.replace(tags=dict(node.tags))</span></code></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Node.location">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">location</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#osmium.osm.Location" title="osmium.osm._osm.Location"><span class="pre">Location</span></a></em><a class="headerlink" href="#osmium.osm.Node.location" title="Permalink to this definition">¶</a></dt>
+<dd><p>The geographic coordinates of the node.
+See <a class="reference internal" href="#osmium.osm.Location" title="osmium.osm.Location"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Location</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Way">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Way</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cway</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.COSMWay</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.Way" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents an OSM way. It inherits the attributes from OSMObject and
+adds an ordered list of nodes that describes the way.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Way.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#osmium.osm.mutable.Way" title="osmium.osm.mutable.Way"><span class="pre">Way</span></a></span></span><a class="headerlink" href="#osmium.osm.Way.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a mutable way replacing the properties given in the
+named parameters. The properties may be any of the properties
+of OSMObject or Way.</p>
+<p>Note that this function only creates a shallow copy per default.
+It is still bound to the scope of the original object.
+To create a full copy use:
+<code class="docutils literal notranslate"><span class="pre">way.replace(tags=dict(way.tags),</span> <span class="pre">nodes=list(way.nodes))</span></code></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Way.nodes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nodes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#osmium.osm.WayNodeList" title="osmium.osm.types.WayNodeList"><span class="pre">WayNodeList</span></a></em><a class="headerlink" href="#osmium.osm.Way.nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Ordered list of nodes.
+See <a class="reference internal" href="#osmium.osm.WayNodeList" title="osmium.osm.WayNodeList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.WayNodeList</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Way.is_closed">
+<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Way.is_closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the start and end node are the same (synonym for
+<code class="docutils literal notranslate"><span class="pre">ends_have_same_id</span></code>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Way.ends_have_same_id">
+<span class="sig-name descname"><span class="pre">ends_have_same_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Way.ends_have_same_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the start and end node are exactly the same.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Way.ends_have_same_location">
+<span class="sig-name descname"><span class="pre">ends_have_same_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Way.ends_have_same_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the start and end node of the way are at the same location.
+Expects that the coordinates of the way nodes have been loaded
+(see <a class="reference internal" href="ref_osmium.html#osmium.SimpleHandler.apply_buffer" title="osmium.SimpleHandler.apply_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">osmium.SimpleHandler.apply_buffer()</span></code></a> and
+<a class="reference internal" href="ref_osmium.html#osmium.SimpleHandler.apply_file" title="osmium.SimpleHandler.apply_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">osmium.SimpleHandler.apply_file()</span></code></a>).
+If the locations are not present then the function returns always true.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Relation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crelation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.COSMRelation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.Relation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a OSM relation. It inherits the attributes from OSMObject
+and adds an ordered list of members.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.Relation.members">
+<span class="sig-name descname"><span class="pre">members</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#osmium.osm.RelationMemberList" title="osmium.osm.types.RelationMemberList"><span class="pre">RelationMemberList</span></a></em><a class="headerlink" href="#osmium.osm.Relation.members" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Ordered list of relation members.
+See <a class="reference internal" href="#osmium.osm.RelationMemberList" title="osmium.osm.RelationMemberList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.RelationMemberList</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Relation.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#osmium.osm.mutable.Relation" title="osmium.osm.mutable.Relation"><span class="pre">Relation</span></a></span></span><a class="headerlink" href="#osmium.osm.Relation.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a mutable relation replacing the properties given in the
+named parameters. The properties may be any of the properties
+of OSMObject or Relation.</p>
+<p>Note that this function only creates a shallow copy per default.
+It is still bound to the scope of the original object.
+To create a full copy use:
+<code class="docutils literal notranslate"><span class="pre">rel.replace(tags=dict(rel.tags),</span> <span class="pre">members=list(rel.members))</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Area">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carea</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.COSMArea</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.Area" title="Permalink to this definition">¶</a></dt>
+<dd><p>Areas are a special kind of meta-object representing a polygon.
+They can either be derived from closed ways or from relations
+that represent multipolygons. They also inherit the attributes
+of OSMObjects and in addition contain polygon geometries. Areas have
+their own unique id space. This is computed as the OSM id times 2
+and for relations 1 is added.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Area.from_way">
+<span class="sig-name descname"><span class="pre">from_way</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Area.from_way" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if the area was created from a way, false if it was
+created from a relation of multipolygon type.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Area.orig_id">
+<span class="sig-name descname"><span class="pre">orig_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#osmium.osm.Area.orig_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the original OSM id of this object. Note that this is not
+necessarily unique because the object might be a way or relation
+which have an overlapping id space.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Area.is_multipolygon">
+<span class="sig-name descname"><span class="pre">is_multipolygon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Area.is_multipolygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if this area is a true multipolygon, i.e. it consists
+of multiple outer rings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Area.num_rings">
+<span class="sig-name descname"><span class="pre">num_rings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#osmium.osm.Area.num_rings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a tuple with the number of outer rings and inner rings.</p>
+<p>This function goes through all rings to count them.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Area.outer_rings">
+<span class="sig-name descname"><span class="pre">outer_rings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">OuterRingIterator</span></span></span><a class="headerlink" href="#osmium.osm.Area.outer_rings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterator over all outer rings of the multipolygon.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Area.inner_rings">
+<span class="sig-name descname"><span class="pre">inner_rings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oring</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.osm.OuterRing" title="osmium.osm.types.OuterRing"><span class="pre">OuterRing</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">InnerRingIterator</span></span></span><a class="headerlink" href="#osmium.osm.Area.inner_rings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterator over all inner rings of the multipolygon.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Changeset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Changeset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">carea</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.COSMChangeset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.Changeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A changeset description.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#osmium.osm.TagList" title="osmium.osm.types.TagList"><span class="pre">TagList</span></a></em><a class="headerlink" href="#osmium.osm.Changeset.tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.Changeset.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Unique ID of the changeset.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.uid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.Changeset.uid" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) User ID of the changeset creator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.created_at">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#osmium.osm.Changeset.created_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Timestamp when the changeset was first opened.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.closed_at">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">closed_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#osmium.osm.Changeset.closed_at" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Timestamp when the changeset was finalized. May be
+<code class="docutils literal notranslate"><span class="pre">None</span></code> when the changeset is still open.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.open">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">open</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#osmium.osm.Changeset.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) True when the changeset is still open.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.num_changes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_changes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.Changeset.num_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) The total number of objects changed in this Changeset.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#osmium.osm.Changeset.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Name of the user that created the changeset.
+Be aware that user names can change, so that the same
+user ID may appear with different names and vice versa.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.bounds">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bounds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#osmium.osm.Box" title="osmium.osm._osm.Box"><span class="pre">Box</span></a></em><a class="headerlink" href="#osmium.osm.Changeset.bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) The bounding box of the area that was edited.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Changeset.user_is_anonymous">
+<span class="sig-name descname"><span class="pre">user_is_anonymous</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Changeset.user_is_anonymous" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the user anonymous. If true, the uid does not uniquely
+identify a single user but only the group of all anonymous users
+in general.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="mutable-osm-objects">
+<span id="mutable-objects"></span><h2>Mutable OSM Objects<a class="headerlink" href="#mutable-osm-objects" title="Permalink to this heading">¶</a></h2>
+<p>The objects in <code class="docutils literal notranslate"><span class="pre">osmium.osm.mutable</span></code> are Python versions of the native OSM
+objects that can be modified. You can use these classes as a base class for
+your own objects or to modify objects read from a file.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.mutable.OSMObject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.mutable.</span></span><span class="sig-name descname"><span class="pre">OSMObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">OSMObjectLike</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visible</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">changeset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">TagSequence</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.mutable.OSMObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mutable version of <code class="docutils literal notranslate"><span class="pre">osmium.osm.OSMObject</span></code>. It exposes the following
+attributes <code class="docutils literal notranslate"><span class="pre">id</span></code>, <code class="docutils literal notranslate"><span class="pre">version</span></code>, <code class="docutils literal notranslate"><span class="pre">visible</span></code>, <code class="docutils literal notranslate"><span class="pre">changeset</span></code>, <code class="docutils literal notranslate"><span class="pre">timestamp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">uid</span></code> and <code class="docutils literal notranslate"><span class="pre">tags</span></code>. Timestamps may be strings or datetime objects.
+Tags can be an osmium.osm.TagList, a dict-like object
+or a list of tuples, where each tuple contains a (key value) string pair.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">base</span></code> parameter is given in the constructor, then the object
+will be initialised first from the attributes of this base object.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.mutable.Node">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.mutable.</span></span><span class="sig-name descname"><span class="pre">Node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">NodeLike</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">LocationLike</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.mutable.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mutable version of <code class="docutils literal notranslate"><span class="pre">osmium.osm.Node</span></code>. It inherits all attributes
+from osmium.osm.mutable.OSMObject and adds a <cite>location</cite> attribute. This
+may either be an <cite>osmium.osm.Location</cite> or a tuple of lon/lat coordinates.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.mutable.Way">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.mutable.</span></span><span class="sig-name descname"><span class="pre">Way</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">WayLike</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">NodeSequence</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.mutable.Way" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mutable version of <code class="docutils literal notranslate"><span class="pre">osmium.osm.Way</span></code>. It inherits all attributes
+from osmium.osm.mutable.OSMObject and adds a <cite>nodes</cite> attribute. This may
+either be and <code class="docutils literal notranslate"><span class="pre">osmium.osm.NodeList</span></code> or a list consisting of
+<code class="docutils literal notranslate"><span class="pre">osmium.osm.NodeRef</span></code> or simple node ids.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.mutable.Relation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.mutable.</span></span><span class="sig-name descname"><span class="pre">Relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">RelationLike</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">members</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">MemberSequence</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.mutable.Relation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mutable version of <code class="docutils literal notranslate"><span class="pre">osmium.osm.Relation</span></code>. It inherits all attributes
+from osmium.osm.mutable.OSMObject and adds a <cite>members</cite> attribute. This
+may either be an <code class="docutils literal notranslate"><span class="pre">osmium.osm.RelationMemberList</span></code> or a list consisting
+of <code class="docutils literal notranslate"><span class="pre">osmium.osm.RelationMember</span></code> or tuples of (type, id, role). The
+member type should be a single character ‘n’, ‘w’ or ‘r’.</p>
+</dd></dl>
+
+</section>
+<section id="node-reference-lists">
+<h2>Node Reference Lists<a class="headerlink" href="#node-reference-lists" title="Permalink to this heading">¶</a></h2>
+<p>Line geometries in OSM are simply a sequence of nodes. To simplify processing
+osmium returns such node sequences using a special datatype that contains a
+reference to the node id and also the location geometry. The latter is only
+valid if the node locations have been cached by a location handler.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.NodeRef">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">NodeRef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.osm.Location" title="osmium.osm._osm.Location"><span class="pre">Location</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.NodeRef" title="Permalink to this definition">¶</a></dt>
+<dd><p>A reference to a OSM node that also caches the nodes location.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.NodeRef.x">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.NodeRef.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) X coordinate (longitude) as a fixed-point integer.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.NodeRef.y">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">y</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.NodeRef.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Y coordinate (latitude) as a fixed-point integer.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.NodeRef.lat">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#osmium.osm.NodeRef.lat" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Latitude (y coordinate) as floating point number.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.NodeRef.lon">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#osmium.osm.NodeRef.lon" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Longitude (x coordinate) as floating point number.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.NodeRefList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">NodeRefList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.BufferProxyProtocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.NodeRefList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.NodeRefList" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of node references, implemented as
+an immutable sequence of <a class="reference internal" href="#osmium.osm.NodeRef" title="osmium.osm.NodeRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.NodeRef</span></code></a>. This class
+is normally not used directly, use one of its subclasses instead.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.NodeRefList.is_closed">
+<span class="sig-name descname"><span class="pre">is_closed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.NodeRefList.is_closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the start and end node are the same (synonym for
+<code class="docutils literal notranslate"><span class="pre">ends_have_same_id</span></code>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.NodeRefList.ends_have_same_id">
+<span class="sig-name descname"><span class="pre">ends_have_same_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.NodeRefList.ends_have_same_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the start and end node are exactly the same.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.NodeRefList.ends_have_same_location">
+<span class="sig-name descname"><span class="pre">ends_have_same_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.NodeRefList.ends_have_same_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the start and end node of the way are at the same location. ”
+Expects that the coordinates of the way nodes have been loaded
+(see <a class="reference internal" href="ref_osmium.html#osmium.SimpleHandler.apply_buffer" title="osmium.SimpleHandler.apply_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">osmium.SimpleHandler.apply_buffer()</span></code></a> and
+<a class="reference internal" href="ref_osmium.html#osmium.SimpleHandler.apply_file" title="osmium.SimpleHandler.apply_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">osmium.SimpleHandler.apply_file()</span></code></a>).
+If the locations are not present then the function returns always true.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.WayNodeList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">WayNodeList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.BufferProxyProtocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.NodeRefList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.WayNodeList" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of nodes in a way.
+For its members see <a class="reference internal" href="#osmium.osm.NodeRefList" title="osmium.osm.NodeRefList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.NodeRefList</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.OuterRing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">OuterRing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.BufferProxyProtocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.NodeRefList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.OuterRing" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of nodes in an outer ring.
+For its members see <a class="reference internal" href="#osmium.osm.NodeRefList" title="osmium.osm.NodeRefList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.NodeRefList</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.InnerRing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">InnerRing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.BufferProxyProtocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.NodeRefList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.InnerRing" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of nodes in an inner ring. ”
+For its members see <a class="reference internal" href="#osmium.osm.NodeRefList" title="osmium.osm.NodeRefList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.NodeRefList</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="relation-member-lists">
+<h2>Relation member lists<a class="headerlink" href="#relation-member-lists" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.RelationMember">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">RelationMember</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.RelationMember" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single member of a relation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.RelationMember.ref">
+<span class="sig-name descname"><span class="pre">ref</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#osmium.osm.RelationMember.ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>OSM ID of the object. Only unique within the type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.RelationMember.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#osmium.osm.RelationMember.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type of object referenced, a node, way or relation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.RelationMember.role">
+<span class="sig-name descname"><span class="pre">role</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#osmium.osm.RelationMember.role" title="Permalink to this definition">¶</a></dt>
+<dd><p>The role of the member within the relation, a free-text string.
+If no role is set then the string is empty.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.RelationMemberList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">RelationMemberList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.COSMRelation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.RelationMemberList" title="Permalink to this definition">¶</a></dt>
+<dd><p>An immutable  sequence of relation members
+“<a class="reference internal" href="#osmium.osm.RelationMember" title="osmium.osm.RelationMember"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.RelationMember</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="tag-lists">
+<h2>Tag lists<a class="headerlink" href="#tag-lists" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Tag">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.Tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>A single OSM tag.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.Tag.k">
+<span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#osmium.osm.Tag.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tag key</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="osmium.osm.Tag.v">
+<span class="sig-name descname"><span class="pre">v</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#osmium.osm.Tag.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tag value</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.TagList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">TagList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">cosm.TagContainerProtocol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.TagList" title="Permalink to this definition">¶</a></dt>
+<dd><p>A fixed list of tags. The list is exported as an unmutable,
+dictionary-like object where the keys are tag strings and the
+items are <a class="reference internal" href="#osmium.osm.Tag" title="osmium.osm.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Tag</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.TagList.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#osmium.osm.TagList.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value for the given key. or ‘value’ if the key
+does not exist in the list.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="geometry-attributes">
+<h2>Geometry Attributes<a class="headerlink" href="#geometry-attributes" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Box">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Box</span></span><a class="headerlink" href="#osmium.osm.Box" title="Permalink to this definition">¶</a></dt>
+<dd><p>A bounding box around a geographic area. It is defined by an <a class="reference internal" href="#osmium.osm.Location" title="osmium.osm.Location"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Location</span></code></a> for the bottem-left corner and an <code class="docutils literal notranslate"><span class="pre">osmium.osm.Location</span></code> for the top-right corner. Those locations may  be invalid in which case the box is considered invalid, too.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Box.bottom_left">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bottom_left</span></span><a class="headerlink" href="#osmium.osm.Box.bottom_left" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Bottom-left corner of the bounding box.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Box.contains">
+<span class="sig-name descname"><span class="pre">contains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">osmium.osm._osm.Box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location:</span> <span class="pre">osmium::Location</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Box.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the given location is inside the box.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Box.extend">
+<span class="sig-name descname"><span class="pre">extend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.osm.Box.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>extend(self: osmium.osm._osm.Box, location: osmium::Location) -&gt; osmium.osm._osm.Box</p></li>
+</ol>
+<p>Extend the box to include the given location. If the location is invalid the box remains unchanged. If the box is invalid, it will contain only the location after the operation. Returns a reference to itself.</p>
+<ol class="arabic simple" start="2">
+<li><p>extend(self: osmium.osm._osm.Box, box: osmium.osm._osm.Box) -&gt; osmium.osm._osm.Box</p></li>
+</ol>
+<p>Extend the box to include the given box. If the box to be added is invalid the input box remains unchanged. If the input box is invalid, it will become equal to the box that was added. Returns a reference to itself.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Box.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.osm.Box" title="osmium.osm._osm.Box"><span class="pre">osmium.osm._osm.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#osmium.osm.Box.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the size in square degrees.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Box.top_right">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">top_right</span></span><a class="headerlink" href="#osmium.osm.Box.top_right" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Top-right corner of the bounding box.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Box.valid">
+<span class="sig-name descname"><span class="pre">valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.osm.Box" title="osmium.osm._osm.Box"><span class="pre">osmium.osm._osm.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Box.valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the box coordinates are defined and with the usual bounds.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.osm.Location">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.osm.</span></span><span class="sig-name descname"><span class="pre">Location</span></span><a class="headerlink" href="#osmium.osm.Location" title="Permalink to this definition">¶</a></dt>
+<dd><p>A geographic coordinate in WGS84 projection. A location doesn’t necessarily have to be valid.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Location.lat">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lat</span></span><a class="headerlink" href="#osmium.osm.Location.lat" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Latitude (y coordinate) as floating point number.Raises an <code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.InvalidLocationError</span></code> when the location is invalid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Location.lat_without_check">
+<span class="sig-name descname"><span class="pre">lat_without_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.osm.Location" title="osmium.osm._osm.Location"><span class="pre">osmium.osm._osm.Location</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#osmium.osm.Location.lat_without_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return latitude (y coordinate) without checking if the location is valid.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Location.lon">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lon</span></span><a class="headerlink" href="#osmium.osm.Location.lon" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Longitude (x coordinate) as floating point number.Raises an <code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.InvalidLocationError</span></code> when the location is invalid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Location.lon_without_check">
+<span class="sig-name descname"><span class="pre">lon_without_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.osm.Location" title="osmium.osm._osm.Location"><span class="pre">osmium.osm._osm.Location</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#osmium.osm.Location.lon_without_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return longitude (x coordinate) without checking if the location is valid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.osm.Location.valid">
+<span class="sig-name descname"><span class="pre">valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.osm.Location" title="osmium.osm._osm.Location"><span class="pre">osmium.osm._osm.Location</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.osm.Location.valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the location is a valid WGS84 coordinate, i.e. that it is within the usual bounds.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Location.x">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#osmium.osm.Location.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) X coordinate (longitude) as a fixed-point integer.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.osm.Location.y">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#osmium.osm.Location.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) Y coordinate (latitude) as a fixed-point integer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">osm</span></code> - Basic Datatypes</a><ul>
+<li><a class="reference internal" href="#native-osm-objects">Native OSM Objects</a><ul>
+<li><a class="reference internal" href="#osmium.osm.OSMObject"><code class="docutils literal notranslate"><span class="pre">OSMObject</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.tags"><code class="docutils literal notranslate"><span class="pre">OSMObject.tags</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.id"><code class="docutils literal notranslate"><span class="pre">OSMObject.id</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.deleted"><code class="docutils literal notranslate"><span class="pre">OSMObject.deleted</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.visible"><code class="docutils literal notranslate"><span class="pre">OSMObject.visible</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.version"><code class="docutils literal notranslate"><span class="pre">OSMObject.version</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.changeset"><code class="docutils literal notranslate"><span class="pre">OSMObject.changeset</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.uid"><code class="docutils literal notranslate"><span class="pre">OSMObject.uid</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.timestamp"><code class="docutils literal notranslate"><span class="pre">OSMObject.timestamp</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.user"><code class="docutils literal notranslate"><span class="pre">OSMObject.user</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.positive_id"><code class="docutils literal notranslate"><span class="pre">OSMObject.positive_id()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OSMObject.user_is_anonymous"><code class="docutils literal notranslate"><span class="pre">OSMObject.user_is_anonymous()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.Node"><code class="docutils literal notranslate"><span class="pre">Node</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Node.replace"><code class="docutils literal notranslate"><span class="pre">Node.replace()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Node.location"><code class="docutils literal notranslate"><span class="pre">Node.location</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.Way"><code class="docutils literal notranslate"><span class="pre">Way</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Way.replace"><code class="docutils literal notranslate"><span class="pre">Way.replace()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Way.nodes"><code class="docutils literal notranslate"><span class="pre">Way.nodes</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Way.is_closed"><code class="docutils literal notranslate"><span class="pre">Way.is_closed()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Way.ends_have_same_id"><code class="docutils literal notranslate"><span class="pre">Way.ends_have_same_id()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Way.ends_have_same_location"><code class="docutils literal notranslate"><span class="pre">Way.ends_have_same_location()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.Relation"><code class="docutils literal notranslate"><span class="pre">Relation</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Relation.members"><code class="docutils literal notranslate"><span class="pre">Relation.members</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Relation.replace"><code class="docutils literal notranslate"><span class="pre">Relation.replace()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.Area"><code class="docutils literal notranslate"><span class="pre">Area</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Area.from_way"><code class="docutils literal notranslate"><span class="pre">Area.from_way()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Area.orig_id"><code class="docutils literal notranslate"><span class="pre">Area.orig_id()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Area.is_multipolygon"><code class="docutils literal notranslate"><span class="pre">Area.is_multipolygon()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Area.num_rings"><code class="docutils literal notranslate"><span class="pre">Area.num_rings()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Area.outer_rings"><code class="docutils literal notranslate"><span class="pre">Area.outer_rings()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Area.inner_rings"><code class="docutils literal notranslate"><span class="pre">Area.inner_rings()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.Changeset"><code class="docutils literal notranslate"><span class="pre">Changeset</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Changeset.tags"><code class="docutils literal notranslate"><span class="pre">Changeset.tags</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.id"><code class="docutils literal notranslate"><span class="pre">Changeset.id</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.uid"><code class="docutils literal notranslate"><span class="pre">Changeset.uid</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.created_at"><code class="docutils literal notranslate"><span class="pre">Changeset.created_at</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.closed_at"><code class="docutils literal notranslate"><span class="pre">Changeset.closed_at</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.open"><code class="docutils literal notranslate"><span class="pre">Changeset.open</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.num_changes"><code class="docutils literal notranslate"><span class="pre">Changeset.num_changes</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.user"><code class="docutils literal notranslate"><span class="pre">Changeset.user</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.bounds"><code class="docutils literal notranslate"><span class="pre">Changeset.bounds</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Changeset.user_is_anonymous"><code class="docutils literal notranslate"><span class="pre">Changeset.user_is_anonymous()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mutable-osm-objects">Mutable OSM Objects</a><ul>
+<li><a class="reference internal" href="#osmium.osm.mutable.OSMObject"><code class="docutils literal notranslate"><span class="pre">OSMObject</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.mutable.Node"><code class="docutils literal notranslate"><span class="pre">Node</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.mutable.Way"><code class="docutils literal notranslate"><span class="pre">Way</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.mutable.Relation"><code class="docutils literal notranslate"><span class="pre">Relation</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#node-reference-lists">Node Reference Lists</a><ul>
+<li><a class="reference internal" href="#osmium.osm.NodeRef"><code class="docutils literal notranslate"><span class="pre">NodeRef</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.NodeRef.x"><code class="docutils literal notranslate"><span class="pre">NodeRef.x</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.NodeRef.y"><code class="docutils literal notranslate"><span class="pre">NodeRef.y</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.NodeRef.lat"><code class="docutils literal notranslate"><span class="pre">NodeRef.lat</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.NodeRef.lon"><code class="docutils literal notranslate"><span class="pre">NodeRef.lon</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.NodeRefList"><code class="docutils literal notranslate"><span class="pre">NodeRefList</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.NodeRefList.is_closed"><code class="docutils literal notranslate"><span class="pre">NodeRefList.is_closed()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.NodeRefList.ends_have_same_id"><code class="docutils literal notranslate"><span class="pre">NodeRefList.ends_have_same_id()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.NodeRefList.ends_have_same_location"><code class="docutils literal notranslate"><span class="pre">NodeRefList.ends_have_same_location()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.WayNodeList"><code class="docutils literal notranslate"><span class="pre">WayNodeList</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.OuterRing"><code class="docutils literal notranslate"><span class="pre">OuterRing</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.InnerRing"><code class="docutils literal notranslate"><span class="pre">InnerRing</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#relation-member-lists">Relation member lists</a><ul>
+<li><a class="reference internal" href="#osmium.osm.RelationMember"><code class="docutils literal notranslate"><span class="pre">RelationMember</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.RelationMember.ref"><code class="docutils literal notranslate"><span class="pre">RelationMember.ref</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.RelationMember.type"><code class="docutils literal notranslate"><span class="pre">RelationMember.type</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.RelationMember.role"><code class="docutils literal notranslate"><span class="pre">RelationMember.role</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.RelationMemberList"><code class="docutils literal notranslate"><span class="pre">RelationMemberList</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tag-lists">Tag lists</a><ul>
+<li><a class="reference internal" href="#osmium.osm.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Tag.k"><code class="docutils literal notranslate"><span class="pre">Tag.k</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Tag.v"><code class="docutils literal notranslate"><span class="pre">Tag.v</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.TagList"><code class="docutils literal notranslate"><span class="pre">TagList</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.TagList.get"><code class="docutils literal notranslate"><span class="pre">TagList.get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geometry-attributes">Geometry Attributes</a><ul>
+<li><a class="reference internal" href="#osmium.osm.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Box.bottom_left"><code class="docutils literal notranslate"><span class="pre">Box.bottom_left</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Box.contains"><code class="docutils literal notranslate"><span class="pre">Box.contains()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Box.extend"><code class="docutils literal notranslate"><span class="pre">Box.extend()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Box.size"><code class="docutils literal notranslate"><span class="pre">Box.size()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Box.top_right"><code class="docutils literal notranslate"><span class="pre">Box.top_right</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Box.valid"><code class="docutils literal notranslate"><span class="pre">Box.valid()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.osm.Location"><code class="docutils literal notranslate"><span class="pre">Location</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.osm.Location.lat"><code class="docutils literal notranslate"><span class="pre">Location.lat</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Location.lat_without_check"><code class="docutils literal notranslate"><span class="pre">Location.lat_without_check()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Location.lon"><code class="docutils literal notranslate"><span class="pre">Location.lon</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Location.lon_without_check"><code class="docutils literal notranslate"><span class="pre">Location.lon_without_check()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Location.valid"><code class="docutils literal notranslate"><span class="pre">Location.valid()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Location.x"><code class="docutils literal notranslate"><span class="pre">Location.x</span></code></a></li>
+<li><a class="reference internal" href="#osmium.osm.Location.y"><code class="docutils literal notranslate"><span class="pre">Location.y</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="ref_osmium.html"
+                          title="previous chapter"><code class="docutils literal notranslate"><span class="pre">osmium</span></code> - Processing OSM files</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="ref_io.html"
+                          title="next chapter"><code class="docutils literal notranslate"><span class="pre">io</span></code> - Data In- and Output</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ref_osm.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ref_io.html" title="io - Data In- and Output"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ref_osmium.html" title="osmium - Processing OSM files"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">osm</span></code> - Basic Datatypes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Updating OpenStreetMap data from change files &#8212; Pyosmium 3.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pyosmium-get-changes - Downloading OSM change files" href="tools_get_changes.html" />
+    <link rel="prev" title="Pyosmium Tools" href="tools.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tools_get_changes.html" title="pyosmium-get-changes - Downloading OSM change files"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Pyosmium Tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tools.html" accesskey="U">Pyosmium Tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Updating OpenStreetMap data from change files</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="updating-openstreetmap-data-from-change-files">
+<h1>Updating OpenStreetMap data from change files<a class="headerlink" href="#updating-openstreetmap-data-from-change-files" title="Permalink to this heading">¶</a></h1>
+<p>OpenStreetMap is a database that is constantly extended and updated. When you
+download the planet or an extract of it, you only get a snapshot of the
+database at a given point in time. To keep up-to-date with the development
+of OSM, you either need to download a new snapshot or you can update your
+existing data from change files published along with the planet file.
+Pyosmium ships with two tools that help you to process change files:
+<cite>pyosmium-get-changes</cite> and <cite>pyosmium-up-to-date</cite>.</p>
+<p>This section explains the basics of OSM change files and how to use Pyosmium’s
+tools to keep your data up to date.</p>
+<section id="about-change-files">
+<h2>About change files<a class="headerlink" href="#about-change-files" title="Permalink to this heading">¶</a></h2>
+<p>Regular <a class="reference external" href="https://wiki.openstreetmap.org/wiki/Planet.osm/diffs">change files</a>
+are published for the planet and also by some extract services. These
+change files are special OSM data files containing all changes to the database
+in a regular interval. Change files are not referentially complete. That means
+that they only contain OSM objects that have changed but not necessarily
+all the objects that are referenced by the changed objects. The result is
+that change file are rarely useful on their own. But they can be used
+to update an existing snapshot of OSM data.</p>
+</section>
+<section id="getting-change-files">
+<h2>Getting change files<a class="headerlink" href="#getting-change-files" title="Permalink to this heading">¶</a></h2>
+<p>There are multiple sources for OSM change files available:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://planet.openstreetmap.org/replication">https://planet.openstreetmap.org/replication</a> is the official source
+for planet-wide updates. There are change files for
+minutely, hourly and daily intervals available.</p></li>
+<li><p><a class="reference external" href="https://download.geofabrik.de">Geofabrik</a> offers daily change files
+for all its updates. See the extract page for a link to the replication URL.
+Note that change files go only about 3 months back. Older files are deleted.</p></li>
+<li><p>download.openstreetmap.fr offers
+<a class="reference external" href="https://download.openstreetmap.fr/replication/">minutely change files</a>
+for all its <a class="reference external" href="https://download.openstreetmap.fr/extracts/">extracts</a>.</p></li>
+</ul>
+</div></blockquote>
+<p>For other services also check out the list of providers on the
+<a class="reference external" href="https://wiki.openstreetmap.org/wiki/Planet.osm">OSM wiki</a>.</p>
+</section>
+<section id="updating-a-planet-or-extract">
+<h2>Updating a planet or extract<a class="headerlink" href="#updating-a-planet-or-extract" title="Permalink to this heading">¶</a></h2>
+<p>If you have downloaded the planet or an extract with a replication service,
+then updating your OSM file can be as easy as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyosmium</span><span class="o">-</span><span class="n">up</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">date</span> <span class="o">&lt;</span><span class="n">osmfile</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">pbf</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This finds the right replication source and file to start with, downloads
+changes and updates the given file with the data. You can repeat this command
+whenever you want to have newer data. The command automatically picks up at
+the same point where it left off after the previous update.</p>
+<section id="choosing-the-replication-source">
+<h3>Choosing the replication source<a class="headerlink" href="#choosing-the-replication-source" title="Permalink to this heading">¶</a></h3>
+<p>OSM files in PBF format are able to save the replication source and the
+current status on their own. If you want to switch the replication source
+or have a file that does not have the information, you need to bootstrap
+the update process and manually point <cite>pyosmium-up-to-date</cite> to the right
+service:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyosmium</span><span class="o">-</span><span class="n">up</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">date</span> <span class="o">--</span><span class="n">ignore</span><span class="o">-</span><span class="n">osmosis</span><span class="o">-</span><span class="n">headers</span> <span class="o">--</span><span class="n">server</span> <span class="o">&lt;</span><span class="n">replication</span> <span class="n">URL</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">osmfile</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">pbf</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><cite>pyosmium-up-to-date</cite> automatically finds the right sequence ID to use
+by looking at the age of the data in your OSM file. It updates the file
+and stores the new replication source in the file. The additional parameters
+are then not necessary anymore for subsequent updates.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>Always use the PBF format to store your data. Other format do not support
+to save the replication information. pyosmium-up-to-date is still able to
+update these kind of files if you manually point to the replication server
+but the process is always more costly because it needs to find the right
+starting point for updates first.</p>
+</div>
+</section>
+<section id="updating-larger-amounts-of-data">
+<h3>Updating larger amounts of data<a class="headerlink" href="#updating-larger-amounts-of-data" title="Permalink to this heading">¶</a></h3>
+<p>When used without any parameters, pyosmium downloads at a maximum about
+1GB of changes. That corresponds to about 3 days of planet-wide changes.
+You can increase the amount using the additional <cite>–size</cite> parameter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyosmium</span><span class="o">-</span><span class="n">up</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">date</span> <span class="o">--</span><span class="n">size</span><span class="o">=</span><span class="mi">10000</span> <span class="n">planet</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">pbf</span>
+</pre></div>
+</div>
+<p>This would download about 10GB or 30 days of change data. If your OSM data file is
+older than that, downloading the full file anew is likely going to be faster.</p>
+<p><cite>pyosmium-up-to-date</cite> uses return codes to signal if it has downloaded all
+available updates. A return code of 0 means that it has downloaded and
+applied all available data. A return code of 1 indicates that it has applied
+some updates but more are available.</p>
+<p>A minimal script that updates a file until it is really up-to-date with the
+replcaition source would look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>status=1  # we wnat more data
+while [ $status -eq 1 ]; do
+  pyosmium-up-to-date planet.osm.pbf
+  # save the return code
+  status=$?
+done
+</pre></div>
+</div>
+</section>
+</section>
+<section id="creating-change-files-for-updating-databases">
+<h2>Creating change files for updating databases<a class="headerlink" href="#creating-change-files-for-updating-databases" title="Permalink to this heading">¶</a></h2>
+<p>There are quite a few tools that can import OSM data into databases, for
+example osm2pgsql, imposm or Nominatim. These tools often can use change files
+to keep their database up-to-date. pyosmium can be used to create the appropriate
+change files. This is slightly more involved than updating a file.</p>
+<section id="preparing-the-state-file">
+<h3>Preparing the state file<a class="headerlink" href="#preparing-the-state-file" title="Permalink to this heading">¶</a></h3>
+<p>Before downloading the updates, you need to find out, with which sequence
+number to start. The easiest way to remember your current status is to save
+the number in a file. Pyosmium can then read and update the file for you.</p>
+<section id="method-1-starting-from-the-import-file">
+<h4>Method 1: Starting from the import file<a class="headerlink" href="#method-1-starting-from-the-import-file" title="Permalink to this heading">¶</a></h4>
+<p>If you still have the OSM file you used to set up your database, then
+create a state file as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyosmium</span><span class="o">-</span><span class="n">get</span><span class="o">-</span><span class="n">changes</span> <span class="o">-</span><span class="n">O</span> <span class="o">&lt;</span><span class="n">osmfile</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">pbf</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">f</span> <span class="n">sequence</span><span class="o">.</span><span class="n">state</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+<p>Note that there is no output file yet. This creates a new file <cite>sequence.state</cite>
+with the sequence ID where updates should start and prints the URL of the
+replication service to use.</p>
+</section>
+<section id="method-2-starting-from-a-date">
+<h4>Method 2: Starting from a date<a class="headerlink" href="#method-2-starting-from-a-date" title="Permalink to this heading">¶</a></h4>
+<p>If you do not have the original OSM file anymore, then a good strategy is to
+look for the date of the newest node in the database to find the snapshot date
+of your database. Find the highest node ID, then look up the date for version 1
+on the OSM website. For example the date for node 2367234 can be found at
+<a class="reference external" href="https://www.openstreetmap.org/api/0.6/node/23672341/1">https://www.openstreetmap.org/api/0.6/node/23672341/1</a> Find and copy the
+<cite>timestamp</cite> field. Then create a state file using this date:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyosmium</span><span class="o">-</span><span class="n">get</span><span class="o">-</span><span class="n">changes</span> <span class="o">-</span><span class="n">D</span> <span class="mi">2007</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="n">T14</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">21</span><span class="n">Z</span> <span class="o">-</span><span class="n">f</span> <span class="n">sequence</span><span class="o">.</span><span class="n">state</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+<p>Also here, this creates a new file <cite>sequence.state</cite> with the sequence ID where
+updates should start and prints the URL of the replication service to use.</p>
+</section>
+</section>
+<section id="creating-a-change-file">
+<h3>Creating a change file<a class="headerlink" href="#creating-a-change-file" title="Permalink to this heading">¶</a></h3>
+<p>Now you can create change files using the state:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyosmium</span><span class="o">-</span><span class="n">get</span><span class="o">-</span><span class="n">changes</span> <span class="o">--</span><span class="n">server</span> <span class="o">&lt;</span><span class="n">replication</span> <span class="n">server</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">f</span> <span class="n">sequence</span><span class="o">.</span><span class="n">state</span> <span class="o">-</span><span class="n">o</span> <span class="n">newchange</span><span class="o">.</span><span class="n">osc</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+<p>This downloads the latest changes from the server, saves them in the file
+<cite>newchange.osc.gz</cite> and updates your state file. <cite>&lt;replication server&gt;</cite> is the
+URL that was printed, when you set up the state file. The parameter can be
+omitted when you use minutely change files from openstreetmap.org.
+This simplifies multiple edits of the same element into the final change. If you want to
+retain the full version history specify <cite>–no-deduplicate</cite>.</p>
+<p><cite>pyosmium-get-changes</cite> loads only about 100MB worth of updates at once (about
+8 hours of planet updates). If you want more, then add a <cite>–size</cite> parameter.</p>
+</section>
+<section id="continuously-updating-a-database">
+<h3>Continuously updating a database<a class="headerlink" href="#continuously-updating-a-database" title="Permalink to this heading">¶</a></h3>
+<p><cite>pyosmium-get-changes</cite> emits special return codes that can be used to set
+up a script that continuously fetches updates and applies them to a
+database. The important error codes are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>0 - changes successfully downloaded and new change file created</p></li>
+<li><p>3 - no new changes are available from the server</p></li>
+</ul>
+</div></blockquote>
+<p>All other error codes indicate fatal errors.</p>
+<p>A simple shell script can look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>while true; do
+  # pyosmium-get-changes would not overwrite an existing changes file
+  rm -f newchange.osc.gz
+  # get the next batch of changes
+  pyosmium-get-changes -f sequence.state -o newchange.osc.gz
+  # save the return code
+  status=$?
+
+  if [ $status -eq 0 ]; then
+    # apply newchange.osc.gz here
+    ....
+  elif [ $status -eq 3 ]; then
+    # No new data, so sleep for a bit
+    sleep 60
+  else
+    echo &quot;Fatal error, stopping updates.&quot;
+    exit $status
+done
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Updating OpenStreetMap data from change files</a><ul>
+<li><a class="reference internal" href="#about-change-files">About change files</a></li>
+<li><a class="reference internal" href="#getting-change-files">Getting change files</a></li>
+<li><a class="reference internal" href="#updating-a-planet-or-extract">Updating a planet or extract</a><ul>
+<li><a class="reference internal" href="#choosing-the-replication-source">Choosing the replication source</a></li>
+<li><a class="reference internal" href="#updating-larger-amounts-of-data">Updating larger amounts of data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-change-files-for-updating-databases">Creating change files for updating databases</a><ul>
+<li><a class="reference internal" href="#preparing-the-state-file">Preparing the state file</a><ul>
+<li><a class="reference internal" href="#method-1-starting-from-the-import-file">Method 1: Starting from the import file</a></li>
+<li><a class="reference internal" href="#method-2-starting-from-a-date">Method 2: Starting from a date</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-a-change-file">Creating a change file</a></li>
+<li><a class="reference internal" href="#continuously-updating-a-database">Continuously updating a database</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="tools.html"
+                          title="previous chapter">Pyosmium Tools</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tools_get_changes.html"
+                          title="next chapter">pyosmium-get-changes - Downloading OSM change files</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/updating_osm_data.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tools_get_changes.html" title="pyosmium-get-changes - Downloading OSM change files"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Pyosmium Tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tools.html" >Pyosmium Tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Updating OpenStreetMap data from change files</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

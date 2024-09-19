@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>io - Data In- and Output &#8212; Pyosmium 3.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="index - Data Stores" href="ref_index.html" />
+    <link rel="prev" title="osm - Basic Datatypes" href="ref_osm.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ref_index.html" title="index - Data Stores"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ref_osm.html" title="osm - Basic Datatypes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">io</span></code> - Data In- and Output</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="io-data-in-and-output">
+<h1><code class="docutils literal notranslate"><span class="pre">io</span></code> - Data In- and Output<a class="headerlink" href="#io-data-in-and-output" title="Permalink to this heading">¶</a></h1>
+<p>This module exposes the generic file reader.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.io.Reader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.io.</span></span><span class="sig-name descname"><span class="pre">Reader</span></span><a class="headerlink" href="#osmium.io.Reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class that reads OSM data from a file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.io.Reader.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.io.Reader" title="osmium.io.Reader"><span class="pre">osmium.io.Reader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.io.Reader.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close any open file handles. The reader is unusable afterwards.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.io.Reader.eof">
+<span class="sig-name descname"><span class="pre">eof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.io.Reader" title="osmium.io.Reader"><span class="pre">osmium.io.Reader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#osmium.io.Reader.eof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the end of file has been reached.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.io.Reader.header">
+<span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.io.Reader" title="osmium.io.Reader"><span class="pre">osmium.io.Reader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#osmium.io.Header" title="osmium.io.Header"><span class="pre">osmium.io.Header</span></a></span></span><a class="headerlink" href="#osmium.io.Reader.header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the header with file information, see <a class="reference internal" href="#osmium.io.Header" title="osmium.io.Header"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.io.Header</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.io.Header">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.io.</span></span><span class="sig-name descname"><span class="pre">Header</span></span><a class="headerlink" href="#osmium.io.Header" title="Permalink to this definition">¶</a></dt>
+<dd><p>File header with global information about the file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.io.Header.add_box">
+<span class="sig-name descname"><span class="pre">add_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.io.Header" title="osmium.io.Header"><span class="pre">osmium.io.Header</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">box</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ref_osm.html#osmium.osm.Box" title="osmium.osm._osm.Box"><span class="pre">osmium.osm._osm.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#osmium.io.Header" title="osmium.io.Header"><span class="pre">osmium.io.Header</span></a></span></span><a class="headerlink" href="#osmium.io.Header.add_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the given bounding box to the list of bounding boxes in the  header.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.io.Header.box">
+<span class="sig-name descname"><span class="pre">box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.io.Header" title="osmium.io.Header"><span class="pre">osmium.io.Header</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ref_osm.html#osmium.osm.Box" title="osmium.osm._osm.Box"><span class="pre">osmium.osm._osm.Box</span></a></span></span><a class="headerlink" href="#osmium.io.Header.box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the bounding box of the data in the file or an invalid box if the information is not available.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.io.Header.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.io.Header" title="osmium.io.Header"><span class="pre">osmium.io.Header</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#osmium.io.Header.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of header option ‘key’ or default value if there is no header option with that name. The default cannot be None.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.io.Header.has_multiple_object_versions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_multiple_object_versions</span></span><a class="headerlink" href="#osmium.io.Header.has_multiple_object_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if there may be more than one version of the same object in the file. This happens normally only in history files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.io.Header.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.io.Header" title="osmium.io.Header"><span class="pre">osmium.io.Header</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.io.Header.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the value of header option ‘key’.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">io</span></code> - Data In- and Output</a><ul>
+<li><a class="reference internal" href="#osmium.io.Reader"><code class="docutils literal notranslate"><span class="pre">Reader</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.io.Reader.close"><code class="docutils literal notranslate"><span class="pre">Reader.close()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.io.Reader.eof"><code class="docutils literal notranslate"><span class="pre">Reader.eof()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.io.Reader.header"><code class="docutils literal notranslate"><span class="pre">Reader.header()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.io.Header"><code class="docutils literal notranslate"><span class="pre">Header</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.io.Header.add_box"><code class="docutils literal notranslate"><span class="pre">Header.add_box()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.io.Header.box"><code class="docutils literal notranslate"><span class="pre">Header.box()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.io.Header.get"><code class="docutils literal notranslate"><span class="pre">Header.get()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.io.Header.has_multiple_object_versions"><code class="docutils literal notranslate"><span class="pre">Header.has_multiple_object_versions</span></code></a></li>
+<li><a class="reference internal" href="#osmium.io.Header.set"><code class="docutils literal notranslate"><span class="pre">Header.set()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="ref_osm.html"
+                          title="previous chapter"><code class="docutils literal notranslate"><span class="pre">osm</span></code> - Basic Datatypes</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="ref_index.html"
+                          title="next chapter"><code class="docutils literal notranslate"><span class="pre">index</span></code> - Data Stores</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ref_io.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ref_index.html" title="index - Data Stores"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ref_osm.html" title="osm - Basic Datatypes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.6.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">io</span></code> - Data In- and Output</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>
