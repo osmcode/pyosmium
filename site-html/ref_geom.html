@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>geom - Geometry Helper Functions &#8212; Pyosmium 3.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="replication - Handling Updates of OSM Data" href="ref_replication.html" />
+    <link rel="prev" title="index - Data Stores" href="ref_index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ref_replication.html" title="replication - Handling Updates of OSM Data"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ref_index.html" title="index - Data Stores"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">geom</span></code> - Geometry Helper Functions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="geom-geometry-helper-functions">
+<h1><code class="docutils literal notranslate"><span class="pre">geom</span></code> - Geometry Helper Functions<a class="headerlink" href="#geom-geometry-helper-functions" title="Permalink to this heading">¶</a></h1>
+<p>This module provides various helper functions for geometry handling.
+Note: remember to apply a location handler before in order to use these geometry utilities on node locations.</p>
+<section id="geometry-factories">
+<h2>Geometry Factories<a class="headerlink" href="#geometry-factories" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.geom.WKBFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.geom.</span></span><span class="sig-name descname"><span class="pre">WKBFactory</span></span><a class="headerlink" href="#osmium.geom.WKBFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory that creates WKB from osmium geometries.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.WKBFactory.create_linestring">
+<span class="sig-name descname"><span class="pre">create_linestring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.geom.WKBFactory.create_linestring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>create_linestring(self: osmium.geom.WKBFactory, list: osmium.osm._osm.WayNodeList, use_nodes: osmium.geom.use_nodes = &lt;use_nodes.UNIQUE: 1&gt;, direction: osmium.geom.direction = &lt;direction.FORWARD: 0&gt;) -&gt; str</p></li>
+</ol>
+<p>Create a LineString geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.WayNodeList" title="osmium.osm.WayNodeList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.WayNodeList</span></code></a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>create_linestring(self: osmium.geom.WKBFactory, way: osmium.osm._osm.Way, use_nodes: osmium.geom.use_nodes = &lt;use_nodes.UNIQUE: 1&gt;, direction: osmium.geom.direction = &lt;direction.FORWARD: 0&gt;) -&gt; str</p></li>
+</ol>
+<p>Create a LineString geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Way" title="osmium.osm.Way"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Way</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.WKBFactory.create_multipolygon">
+<span class="sig-name descname"><span class="pre">create_multipolygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.geom.WKBFactory" title="osmium.geom.WKBFactory"><span class="pre">osmium.geom.WKBFactory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ref_osm.html#osmium.osm.Area" title="osmium.osm._osm.Area"><span class="pre">osmium.osm._osm.Area</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#osmium.geom.WKBFactory.create_multipolygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MultiPolygon geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Area" title="osmium.osm.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Area</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.WKBFactory.create_point">
+<span class="sig-name descname"><span class="pre">create_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.geom.WKBFactory.create_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>create_point(self: osmium.geom.WKBFactory, location: osmium.osm._osm.Location) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Location" title="osmium.osm.Location"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Location</span></code></a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>create_point(self: osmium.geom.WKBFactory, node: osmium.osm._osm.Node) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Node" title="osmium.osm.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Node</span></code></a>.</p>
+<ol class="arabic simple" start="3">
+<li><p>create_point(self: osmium.geom.WKBFactory, ref: osmium.osm._osm.NodeRef) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.NodeRef" title="osmium.osm.NodeRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.NodeRef</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.geom.WKBFactory.epsg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epsg</span></span><a class="headerlink" href="#osmium.geom.WKBFactory.epsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) EPSG number of the output geometry.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.geom.WKBFactory.proj_string">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">proj_string</span></span><a class="headerlink" href="#osmium.geom.WKBFactory.proj_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) projection string of the output geometry.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.geom.WKTFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.geom.</span></span><span class="sig-name descname"><span class="pre">WKTFactory</span></span><a class="headerlink" href="#osmium.geom.WKTFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory that creates WKT from osmium geometries.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.WKTFactory.create_linestring">
+<span class="sig-name descname"><span class="pre">create_linestring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.geom.WKTFactory.create_linestring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>create_linestring(self: osmium.geom.WKTFactory, list: osmium.osm._osm.WayNodeList, use_nodes: osmium.geom.use_nodes = &lt;use_nodes.UNIQUE: 1&gt;, direction: osmium.geom.direction = &lt;direction.FORWARD: 0&gt;) -&gt; str</p></li>
+</ol>
+<p>Create a LineString geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.WayNodeList" title="osmium.osm.WayNodeList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.WayNodeList</span></code></a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>create_linestring(self: osmium.geom.WKTFactory, way: osmium.osm._osm.Way, use_nodes: osmium.geom.use_nodes = &lt;use_nodes.UNIQUE: 1&gt;, direction: osmium.geom.direction = &lt;direction.FORWARD: 0&gt;) -&gt; str</p></li>
+</ol>
+<p>Create a LineString geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Way" title="osmium.osm.Way"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Way</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.WKTFactory.create_multipolygon">
+<span class="sig-name descname"><span class="pre">create_multipolygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.geom.WKTFactory" title="osmium.geom.WKTFactory"><span class="pre">osmium.geom.WKTFactory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ref_osm.html#osmium.osm.Area" title="osmium.osm._osm.Area"><span class="pre">osmium.osm._osm.Area</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#osmium.geom.WKTFactory.create_multipolygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MultiPolygon geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Area" title="osmium.osm.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Area</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.WKTFactory.create_point">
+<span class="sig-name descname"><span class="pre">create_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.geom.WKTFactory.create_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>create_point(self: osmium.geom.WKTFactory, location: osmium.osm._osm.Location) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Location" title="osmium.osm.Location"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Location</span></code></a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>create_point(self: osmium.geom.WKTFactory, node: osmium.osm._osm.Node) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Node" title="osmium.osm.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Node</span></code></a>.</p>
+<ol class="arabic simple" start="3">
+<li><p>create_point(self: osmium.geom.WKTFactory, ref: osmium.osm._osm.NodeRef) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.NodeRef" title="osmium.osm.NodeRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.NodeRef</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.geom.WKTFactory.epsg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epsg</span></span><a class="headerlink" href="#osmium.geom.WKTFactory.epsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) EPSG number of the output geometry.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.geom.WKTFactory.proj_string">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">proj_string</span></span><a class="headerlink" href="#osmium.geom.WKTFactory.proj_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) projection string of the output geometry.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.geom.GeoJSONFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.geom.</span></span><span class="sig-name descname"><span class="pre">GeoJSONFactory</span></span><a class="headerlink" href="#osmium.geom.GeoJSONFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory that creates GeoJSON geometries from osmium geometries.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.GeoJSONFactory.create_linestring">
+<span class="sig-name descname"><span class="pre">create_linestring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.geom.GeoJSONFactory.create_linestring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>create_linestring(self: osmium.geom.GeoJSONFactory, list: osmium.osm._osm.WayNodeList, use_nodes: osmium.geom.use_nodes = &lt;use_nodes.UNIQUE: 1&gt;, direction: osmium.geom.direction = &lt;direction.FORWARD: 0&gt;) -&gt; str</p></li>
+</ol>
+<p>Create a LineString geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.WayNodeList" title="osmium.osm.WayNodeList"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.WayNodeList</span></code></a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>create_linestring(self: osmium.geom.GeoJSONFactory, way: osmium.osm._osm.Way, use_nodes: osmium.geom.use_nodes = &lt;use_nodes.UNIQUE: 1&gt;, direction: osmium.geom.direction = &lt;direction.FORWARD: 0&gt;) -&gt; str</p></li>
+</ol>
+<p>Create a LineString geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Way" title="osmium.osm.Way"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Way</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.GeoJSONFactory.create_multipolygon">
+<span class="sig-name descname"><span class="pre">create_multipolygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.geom.GeoJSONFactory" title="osmium.geom.GeoJSONFactory"><span class="pre">osmium.geom.GeoJSONFactory</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ref_osm.html#osmium.osm.Area" title="osmium.osm._osm.Area"><span class="pre">osmium.osm._osm.Area</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#osmium.geom.GeoJSONFactory.create_multipolygon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MultiPolygon geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Area" title="osmium.osm.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Area</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.geom.GeoJSONFactory.create_point">
+<span class="sig-name descname"><span class="pre">create_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.geom.GeoJSONFactory.create_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>create_point(self: osmium.geom.GeoJSONFactory, location: osmium.osm._osm.Location) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Location" title="osmium.osm.Location"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Location</span></code></a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>create_point(self: osmium.geom.GeoJSONFactory, node: osmium.osm._osm.Node) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.Node" title="osmium.osm.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.Node</span></code></a>.</p>
+<ol class="arabic simple" start="3">
+<li><p>create_point(self: osmium.geom.GeoJSONFactory, ref: osmium.osm._osm.NodeRef) -&gt; str</p></li>
+</ol>
+<p>Create a point geometry from a <a class="reference internal" href="ref_osm.html#osmium.osm.NodeRef" title="osmium.osm.NodeRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">osmium.osm.NodeRef</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.geom.GeoJSONFactory.epsg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epsg</span></span><a class="headerlink" href="#osmium.geom.GeoJSONFactory.epsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) EPSG number of the output geometry.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="osmium.geom.GeoJSONFactory.proj_string">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">proj_string</span></span><a class="headerlink" href="#osmium.geom.GeoJSONFactory.proj_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>(read-only) projection string of the output geometry.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="other-functions">
+<h2>Other Functions<a class="headerlink" href="#other-functions" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="osmium.geom.haversine_distance">
+<span class="sig-prename descclassname"><span class="pre">osmium.geom.</span></span><span class="sig-name descname"><span class="pre">haversine_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ref_osm.html#osmium.osm.WayNodeList" title="osmium.osm._osm.WayNodeList"><span class="pre">osmium.osm._osm.WayNodeList</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#osmium.geom.haversine_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the distance using the Haversine algorithm which takes the curvature of earth into account. If a <code class="xref py py-class docutils literal notranslate"><span class="pre">WayNodeList</span></code> is given as a parameter the total length of the way in meters is computed.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">geom</span></code> - Geometry Helper Functions</a><ul>
+<li><a class="reference internal" href="#geometry-factories">Geometry Factories</a><ul>
+<li><a class="reference internal" href="#osmium.geom.WKBFactory"><code class="docutils literal notranslate"><span class="pre">WKBFactory</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.geom.WKBFactory.create_linestring"><code class="docutils literal notranslate"><span class="pre">WKBFactory.create_linestring()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKBFactory.create_multipolygon"><code class="docutils literal notranslate"><span class="pre">WKBFactory.create_multipolygon()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKBFactory.create_point"><code class="docutils literal notranslate"><span class="pre">WKBFactory.create_point()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKBFactory.epsg"><code class="docutils literal notranslate"><span class="pre">WKBFactory.epsg</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKBFactory.proj_string"><code class="docutils literal notranslate"><span class="pre">WKBFactory.proj_string</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.geom.WKTFactory"><code class="docutils literal notranslate"><span class="pre">WKTFactory</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.geom.WKTFactory.create_linestring"><code class="docutils literal notranslate"><span class="pre">WKTFactory.create_linestring()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKTFactory.create_multipolygon"><code class="docutils literal notranslate"><span class="pre">WKTFactory.create_multipolygon()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKTFactory.create_point"><code class="docutils literal notranslate"><span class="pre">WKTFactory.create_point()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKTFactory.epsg"><code class="docutils literal notranslate"><span class="pre">WKTFactory.epsg</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.WKTFactory.proj_string"><code class="docutils literal notranslate"><span class="pre">WKTFactory.proj_string</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#osmium.geom.GeoJSONFactory"><code class="docutils literal notranslate"><span class="pre">GeoJSONFactory</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.geom.GeoJSONFactory.create_linestring"><code class="docutils literal notranslate"><span class="pre">GeoJSONFactory.create_linestring()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.GeoJSONFactory.create_multipolygon"><code class="docutils literal notranslate"><span class="pre">GeoJSONFactory.create_multipolygon()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.GeoJSONFactory.create_point"><code class="docutils literal notranslate"><span class="pre">GeoJSONFactory.create_point()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.GeoJSONFactory.epsg"><code class="docutils literal notranslate"><span class="pre">GeoJSONFactory.epsg</span></code></a></li>
+<li><a class="reference internal" href="#osmium.geom.GeoJSONFactory.proj_string"><code class="docutils literal notranslate"><span class="pre">GeoJSONFactory.proj_string</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-functions">Other Functions</a><ul>
+<li><a class="reference internal" href="#osmium.geom.haversine_distance"><code class="docutils literal notranslate"><span class="pre">haversine_distance()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="ref_index.html"
+                          title="previous chapter"><code class="docutils literal notranslate"><span class="pre">index</span></code> - Data Stores</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="ref_replication.html"
+                          title="next chapter"><code class="docutils literal notranslate"><span class="pre">replication</span></code> - Handling Updates of OSM Data</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ref_geom.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ref_replication.html" title="replication - Handling Updates of OSM Data"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ref_index.html" title="index - Data Stores"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">geom</span></code> - Geometry Helper Functions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>
