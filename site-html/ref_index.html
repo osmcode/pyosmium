@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>index - Data Stores &#8212; Pyosmium 3.7.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="geom - Geometry Helper Functions" href="ref_geom.html" />
+    <link rel="prev" title="io - Data In- and Output" href="ref_io.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ref_geom.html" title="geom - Geometry Helper Functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ref_io.html" title="io - Data In- and Output"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">index</span></code> - Data Stores</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="index-data-stores">
+<h1><code class="docutils literal notranslate"><span class="pre">index</span></code> - Data Stores<a class="headerlink" href="#index-data-stores" title="Permalink to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">index</span></code> submodule provides efficient storage containers for
+preprocessed OSM data.</p>
+<section id="node-location-storage">
+<h2>Node Location Storage<a class="headerlink" href="#node-location-storage" title="Permalink to this heading">¶</a></h2>
+<p>Node location can be cached in a <code class="docutils literal notranslate"><span class="pre">LocationTable</span></code>. There are different
+implementations available which should be choosen according to the size of
+data and whether or not the cache should be permanent. See the Osmium manual
+for a detailed explaination. The compiled in types can be listed with the
+<code class="docutils literal notranslate"><span class="pre">map_types</span></code> function, new stores can be created with <code class="docutils literal notranslate"><span class="pre">create_map</span></code>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="osmium.index.map_types">
+<span class="sig-prename descclassname"><span class="pre">osmium.index.</span></span><span class="sig-name descname"><span class="pre">map_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#osmium.index.map_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of strings with valid types for the location table.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="osmium.index.create_map">
+<span class="sig-prename descclassname"><span class="pre">osmium.index.</span></span><span class="sig-name descname"><span class="pre">create_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#osmium.index.LocationTable" title="osmium.index.LocationTable"><span class="pre">osmium.index.LocationTable</span></a></span></span><a class="headerlink" href="#osmium.index.create_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new location store. The string parameter takes the type and, where required, additional arguments separated by comma. For example, to create an array cache backed by a file <code class="docutils literal notranslate"><span class="pre">foo.store</span></code>, the map_type should be <code class="docutils literal notranslate"><span class="pre">dense_file_array,foo.store</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.index.LocationTable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.index.</span></span><span class="sig-name descname"><span class="pre">LocationTable</span></span><a class="headerlink" href="#osmium.index.LocationTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A map from a node ID to a location object. This implementation works only with positive node IDs.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.index.LocationTable.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.index.LocationTable" title="osmium.index.LocationTable"><span class="pre">osmium.index.LocationTable</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.index.LocationTable.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all entries from the location table.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.index.LocationTable.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.index.LocationTable" title="osmium.index.LocationTable"><span class="pre">osmium.index.LocationTable</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ref_osm.html#osmium.osm.Location" title="osmium.osm._osm.Location"><span class="pre">osmium.osm._osm.Location</span></a></span></span><a class="headerlink" href="#osmium.index.LocationTable.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the location for a given id.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.index.LocationTable.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.index.LocationTable" title="osmium.index.LocationTable"><span class="pre">osmium.index.LocationTable</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ref_osm.html#osmium.osm.Location" title="osmium.osm._osm.Location"><span class="pre">osmium.osm._osm.Location</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.index.LocationTable.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the location for a given node id.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.index.LocationTable.used_memory">
+<span class="sig-name descname"><span class="pre">used_memory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.index.LocationTable" title="osmium.index.LocationTable"><span class="pre">osmium.index.LocationTable</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#osmium.index.LocationTable.used_memory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the size (in bytes) currently allocated by this location table.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">index</span></code> - Data Stores</a><ul>
+<li><a class="reference internal" href="#node-location-storage">Node Location Storage</a><ul>
+<li><a class="reference internal" href="#osmium.index.map_types"><code class="docutils literal notranslate"><span class="pre">map_types()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.index.create_map"><code class="docutils literal notranslate"><span class="pre">create_map()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.index.LocationTable"><code class="docutils literal notranslate"><span class="pre">LocationTable</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.index.LocationTable.clear"><code class="docutils literal notranslate"><span class="pre">LocationTable.clear()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.index.LocationTable.get"><code class="docutils literal notranslate"><span class="pre">LocationTable.get()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.index.LocationTable.set"><code class="docutils literal notranslate"><span class="pre">LocationTable.set()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.index.LocationTable.used_memory"><code class="docutils literal notranslate"><span class="pre">LocationTable.used_memory()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="ref_io.html"
+                          title="previous chapter"><code class="docutils literal notranslate"><span class="pre">io</span></code> - Data In- and Output</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="ref_geom.html"
+                          title="next chapter"><code class="docutils literal notranslate"><span class="pre">geom</span></code> - Geometry Helper Functions</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ref_index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ref_geom.html" title="geom - Geometry Helper Functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ref_io.html" title="io - Data In- and Output"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">index</span></code> - Data Stores</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pyosmium-up-to-date - Bringing OSM files up-to-date &#8212; Pyosmium 3.7.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Troubleshooting" href="troubleshooting.html" />
+    <link rel="prev" title="pyosmium-get-changes - Downloading OSM change files" href="tools_get_changes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="troubleshooting.html" title="Troubleshooting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tools_get_changes.html" title="pyosmium-get-changes - Downloading OSM change files"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tools.html" accesskey="U">Pyosmium Tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyosmium-up-to-date - Bringing OSM files up-to-date</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pyosmium-up-to-date-bringing-osm-files-up-to-date">
+<h1>pyosmium-up-to-date - Bringing OSM files up-to-date<a class="headerlink" href="#pyosmium-up-to-date-bringing-osm-files-up-to-date" title="Permalink to this heading">¶</a></h1>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<section id="pyosmium-up-to-date-py">
+<h3>pyosmium-up-to-date.py<a class="headerlink" href="#pyosmium-up-to-date-py" title="Permalink to this heading">¶</a></h3>
+<p>Update an OSM file with changes from a OSM replication server.</p>
+<p>Diffs are downloaded and kept in memory. To avoid running out of memory,
+the maximum size of diffs that can be downloaded at once is limited
+to 1 GB per default. This corresponds to approximately 3 days of update.
+The limit can be changed with the –size parameter. However, you should
+take into account that processing the files requires additional memory
+(about 1GB more).</p>
+<p>The starting time is automatically determined from the data in the file.
+For PBF files, it is also possible to read and write the replication
+information from the osmosis headers. That means that after the first update,
+subsequent calls to pyosmium-up-to-date will continue the updates from the same
+server exactly where they have left of.</p>
+<p>This program can update normal OSM data files as well as OSM history files.
+It detects automatically on what type of file it is called.</p>
+<p>The program returns 0, if updates have been successfully applied up to
+the newest data or no new data was available. It returns 1, if some updates
+have been applied but there is still data available on the server (either
+because the size limit has been reached or there was a network error which
+could not be resolved). Any other error results in a return code larger than 1.
+The output file is guaranteed to be unmodified in that case.</p>
+<p>Some OSM data sources require a cookie to be sent with the HTTP requests. 
+Pyosmium-up-to-date does not fetch the cookie from these services for you.
+However, it can read cookies from a Netscape-style cookie jar file, send these
+cookies to the server and will save received cookies to the jar file.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: pyosmium-up-to-date [options] &lt;osm file&gt;</span>
+</pre></div>
+</div>
+<dl class="std option">
+<dt class="sig sig-object std">
+<span class="sig-name descname"><span class="pre">&lt;osm</span> <span class="pre">file&gt;</span></span></dt>
+<dd><p>OSM file to update</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-h">
+<span id="cmdoption-pyosmium-up-to-date-py-h"></span><span id="cmdoption-pyosmium-up-to-date.py-help"></span><span id="cmdoption-pyosmium-up-to-date-py-help"></span><span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-v">
+<span id="cmdoption-pyosmium-up-to-date-py-v"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increase verbosity (can be used multiple times)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-o">
+<span id="cmdoption-pyosmium-up-to-date-py-o"></span><span id="cmdoption-pyosmium-up-to-date.py-outfile"></span><span id="cmdoption-pyosmium-up-to-date-py-outfile"></span><span class="sig-name descname"><span class="pre">-o</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outfile&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--outfile</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outfile&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-o" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name output of file. If missing, the input file will be overwritten.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-format">
+<span id="cmdoption-pyosmium-up-to-date-py-format"></span><span class="sig-name descname"><span class="pre">--format</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;format&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format the data should be saved in.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-server">
+<span id="cmdoption-pyosmium-up-to-date-py-server"></span><span class="sig-name descname"><span class="pre">--server</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;server_url&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base URL of the replication server. Default: ‘<a class="reference external" href="https://planet.osm.org/replication/hour/">https://planet.osm.org/replication/hour/</a>’ (hourly diffs from osm.org).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-s">
+<span id="cmdoption-pyosmium-up-to-date-py-s"></span><span id="cmdoption-pyosmium-up-to-date.py-size"></span><span id="cmdoption-pyosmium-up-to-date-py-size"></span><span class="sig-name descname"><span class="pre">-s</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;size&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;size&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum size of change to apply at once in MB. Default: 1GB.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-tmpdir">
+<span id="cmdoption-pyosmium-up-to-date-py-tmpdir"></span><span class="sig-name descname"><span class="pre">--tmpdir</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;tmpdir&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-tmpdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory to use for temporary files. Default: directory of input file</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-ignore-osmosis-headers">
+<span id="cmdoption-pyosmium-up-to-date-py-ignore-osmosis-headers"></span><span class="sig-name descname"><span class="pre">--ignore-osmosis-headers</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-ignore-osmosis-headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ignore potential replication information in the header of the input file and search for the newest OSM object in the file instead.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-b">
+<span id="cmdoption-pyosmium-up-to-date-py-b"></span><span id="cmdoption-pyosmium-up-to-date.py-wind-back"></span><span id="cmdoption-pyosmium-up-to-date-py-wind-back"></span><span class="sig-name descname"><span class="pre">-b</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wind_back&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--wind-back</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;wind_back&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of minutes to start downloading before the newest addition to input data. (Ignored when the file contains a sequence ID.) Default: 60.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-force-update-of-old-planet">
+<span id="cmdoption-pyosmium-up-to-date-py-force-update-of-old-planet"></span><span class="sig-name descname"><span class="pre">--force-update-of-old-planet</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-force-update-of-old-planet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply update even if the input data is really old.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-cookie">
+<span id="cmdoption-pyosmium-up-to-date-py-cookie"></span><span class="sig-name descname"><span class="pre">--cookie</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cookie&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Netscape-style cookie jar file to read cookies from and where   
+                              received cookies will be written to.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-socket-timeout">
+<span id="cmdoption-pyosmium-up-to-date-py-socket-timeout"></span><span class="sig-name descname"><span class="pre">--socket-timeout</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;socket_timeout&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-socket-timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set timeout for file downloads.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-up-to-date.py-version">
+<span id="cmdoption-pyosmium-up-to-date-py-version"></span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-up-to-date.py-version" title="Permalink to this definition">¶</a></dt>
+<dd><p>show program’s version number and exit</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">pyosmium-up-to-date - Bringing OSM files up-to-date</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#pyosmium-up-to-date-py">pyosmium-up-to-date.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="tools_get_changes.html"
+                          title="previous chapter">pyosmium-get-changes - Downloading OSM change files</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="troubleshooting.html"
+                          title="next chapter">Troubleshooting</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tools_uptodate.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="troubleshooting.html" title="Troubleshooting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tools_get_changes.html" title="pyosmium-get-changes - Downloading OSM change files"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tools.html" >Pyosmium Tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyosmium-up-to-date - Bringing OSM files up-to-date</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

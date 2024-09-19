@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>osmium - Processing OSM files &#8212; Pyosmium 3.7.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="osm - Basic Datatypes" href="ref_osm.html" />
+    <link rel="prev" title="Pyosmium Reference" href="reference.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ref_osm.html" title="osm - Basic Datatypes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Pyosmium Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">osmium</span></code> - Processing OSM files</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="osmium-processing-osm-files">
+<h1><code class="docutils literal notranslate"><span class="pre">osmium</span></code> - Processing OSM files<a class="headerlink" href="#osmium-processing-osm-files" title="Permalink to this heading">¶</a></h1>
+<p>Osmium processes files by reading data from a file and applying them
+to a processing chain. Pyosmium offers a simplified wrapper to this
+interface with the <code class="docutils literal notranslate"><span class="pre">SimpleHandler</span></code> class from which an OSM file processor
+can easily be derived.</p>
+<p>For more fine grained control of the processing chain, the more basic
+functions and processors are exported as well in this module.</p>
+<section id="input-handlers">
+<h2>Input Handlers<a class="headerlink" href="#input-handlers" title="Permalink to this heading">¶</a></h2>
+<p>An input handler provides the base class for writing custom
+data processors. They take input data, usually from a file, and forward
+it to handler functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.SimpleHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.</span></span><span class="sig-name descname"><span class="pre">SimpleHandler</span></span><a class="headerlink" href="#osmium.SimpleHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>The most generic of OSM data handlers. Derive your data processor from this class and implement callbacks for each object type you are interested in. The following data types are recognised: 
+<cite>node</cite>, <cite>way</cite>, <cite>relation</cite>, <cite>area</cite> and <cite>changeset</cite>.
+A callback takes exactly one parameter which is the object. Note that all objects that are handed into the handler are only readable and are only valid until the end of the callback is reached. Any data that should be retained must be copied into other data structures.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.SimpleHandler.apply_buffer">
+<span class="sig-name descname"><span class="pre">apply_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.SimpleHandler" title="osmium._osmium.SimpleHandler"><span class="pre">osmium._osmium.SimpleHandler</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'flex_mem'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.SimpleHandler.apply_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the handler to a string buffer. The buffer must be a
+byte string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.SimpleHandler.apply_file">
+<span class="sig-name descname"><span class="pre">apply_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.SimpleHandler" title="osmium._osmium.SimpleHandler"><span class="pre">osmium._osmium.SimpleHandler</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'flex_mem'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.SimpleHandler.apply_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the handler to the given file. If locations is true, then
+a location handler will be applied before, which saves the node
+positions. In that case, the type of this position index can be
+further selected in idx. If an area callback is implemented, then
+the file will be scanned twice and a location handler and a
+handler for assembling multipolygons and areas from ways will
+be executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="simplewriter">
+<h2>SimpleWriter<a class="headerlink" href="#simplewriter" title="Permalink to this heading">¶</a></h2>
+<p>The writer class can be used to create an OSM file. The writer is able to
+handle native <code class="docutils literal notranslate"><span class="pre">osmium.osm</span></code> objects as well as any Python object that
+exposes the same attributes. It is not necessary to implement the full
+list of attributes as any missing attributes will be replaced with a
+sensible default value when writing. See <a class="reference internal" href="ref_osm.html#mutable-objects"><span class="std std-ref">Mutable OSM Objects</span></a>
+for a detailed discussion of the data formats understood for each attribute.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Writers are considerably faster in handling native osmium data types than
+Python objects. You should therefore avoid converting objects whereever
+possible. This is not only true for the OSM data types like Node, Way and
+Relation but also for tag lists, node lists and member lists.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.SimpleWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.</span></span><span class="sig-name descname"><span class="pre">SimpleWriter</span></span><a class="headerlink" href="#osmium.SimpleWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>The most generic class to write osmium objects into a file. The writer takes a file name as its mandatory parameter. The file must not yet exist. The file type to output is determined from the file extension. The second (optional) parameter is the buffer size. osmium caches the output data in an internal memory buffer before writing it on disk. This parameter allows changing the default buffer size of 4MB. Larger buffers are normally better but you should be aware that there are normally multiple buffers in use during the write process.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.SimpleWriter.add_node">
+<span class="sig-name descname"><span class="pre">add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.SimpleWriter" title="osmium._osmium.SimpleWriter"><span class="pre">osmium._osmium.SimpleWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.SimpleWriter.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new node to the file. The node may be an <code class="docutils literal notranslate"><span class="pre">osmium.osm.Node</span></code> object, an <code class="docutils literal notranslate"><span class="pre">osmium.osm.mutable.Node</span></code> object or any other Python object that implements the same attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.SimpleWriter.add_relation">
+<span class="sig-name descname"><span class="pre">add_relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.SimpleWriter" title="osmium._osmium.SimpleWriter"><span class="pre">osmium._osmium.SimpleWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.SimpleWriter.add_relation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new relation to the file. The relation may be an <code class="docutils literal notranslate"><span class="pre">osmium.osm.Relation</span></code> object, an <code class="docutils literal notranslate"><span class="pre">osmium.osm.mutable.Relation</span></code> object or any other Python object that implements the same attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.SimpleWriter.add_way">
+<span class="sig-name descname"><span class="pre">add_way</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.SimpleWriter" title="osmium._osmium.SimpleWriter"><span class="pre">osmium._osmium.SimpleWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">way</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.SimpleWriter.add_way" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new way to the file. The way may be an <code class="docutils literal notranslate"><span class="pre">osmium.osm.Way</span></code> object, an <code class="docutils literal notranslate"><span class="pre">osmium.osm.mutable.Way</span></code> object or any other Python object that implements the same attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.SimpleWriter.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#osmium.SimpleWriter" title="osmium._osmium.SimpleWriter"><span class="pre">osmium._osmium.SimpleWriter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.SimpleWriter.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flush the remaining buffers and close the writer. While it is not strictly necessary to call this function explicitly, it is still strongly recommended to close the writer as soon as possible, so that the buffer memory can be freed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="low-level-functions-and-classes">
+<h2>Low-level Functions and Classes<a class="headerlink" href="#low-level-functions-and-classes" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="osmium.apply">
+<span class="sig-prename descclassname"><span class="pre">osmium.</span></span><span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>apply(reader: osmium::io::Reader, handler: BaseHandler) -&gt; None</p></li>
+</ol>
+<p>Apply a chain of handlers.</p>
+<ol class="arabic simple" start="2">
+<li><p>apply(reader: osmium::io::Reader, node_handler: osmium._osmium.NodeLocationsForWays) -&gt; None</p></li>
+</ol>
+<p>Apply a chain of handlers.</p>
+<ol class="arabic simple" start="3">
+<li><p>apply(reader: osmium::io::Reader, node_handler: osmium._osmium.NodeLocationsForWays, handler: BaseHandler) -&gt; None</p></li>
+</ol>
+<p>Apply a chain of handlers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="osmium.make_simple_handler">
+<span class="sig-prename descclassname"><span class="pre">osmium.</span></span><span class="sig-name descname"><span class="pre">make_simple_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ref_osm.html#osmium.osm.Node" title="osmium.osm.types.Node"><span class="pre">Node</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">way</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ref_osm.html#osmium.osm.Way" title="osmium.osm.types.Way"><span class="pre">Way</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ref_osm.html#osmium.osm.Relation" title="osmium.osm.types.Relation"><span class="pre">Relation</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ref_osm.html#osmium.osm.Area" title="osmium.osm.types.Area"><span class="pre">Area</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">changeset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ref_osm.html#osmium.osm.Changeset" title="osmium.osm.types.Changeset"><span class="pre">Changeset</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#osmium.SimpleHandler" title="osmium._osmium.SimpleHandler"><span class="pre">SimpleHandler</span></a></span></span><a class="headerlink" href="#osmium.make_simple_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function that creates a <cite>SimpleHandler</cite> from a set of
+callback functions. Each of the parameters takes an optional callable
+that must expect a single positional parameter with the object being
+processed.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">osmium</span></code> - Processing OSM files</a><ul>
+<li><a class="reference internal" href="#input-handlers">Input Handlers</a><ul>
+<li><a class="reference internal" href="#osmium.SimpleHandler"><code class="docutils literal notranslate"><span class="pre">SimpleHandler</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.SimpleHandler.apply_buffer"><code class="docutils literal notranslate"><span class="pre">SimpleHandler.apply_buffer()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.SimpleHandler.apply_file"><code class="docutils literal notranslate"><span class="pre">SimpleHandler.apply_file()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simplewriter">SimpleWriter</a><ul>
+<li><a class="reference internal" href="#osmium.SimpleWriter"><code class="docutils literal notranslate"><span class="pre">SimpleWriter</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.SimpleWriter.add_node"><code class="docutils literal notranslate"><span class="pre">SimpleWriter.add_node()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.SimpleWriter.add_relation"><code class="docutils literal notranslate"><span class="pre">SimpleWriter.add_relation()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.SimpleWriter.add_way"><code class="docutils literal notranslate"><span class="pre">SimpleWriter.add_way()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.SimpleWriter.close"><code class="docutils literal notranslate"><span class="pre">SimpleWriter.close()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#low-level-functions-and-classes">Low-level Functions and Classes</a><ul>
+<li><a class="reference internal" href="#osmium.apply"><code class="docutils literal notranslate"><span class="pre">apply()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.make_simple_handler"><code class="docutils literal notranslate"><span class="pre">make_simple_handler()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="reference.html"
+                          title="previous chapter">Pyosmium Reference</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="ref_osm.html"
+                          title="next chapter"><code class="docutils literal notranslate"><span class="pre">osm</span></code> - Basic Datatypes</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ref_osmium.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ref_osm.html" title="osm - Basic Datatypes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Pyosmium Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">osmium</span></code> - Processing OSM files</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

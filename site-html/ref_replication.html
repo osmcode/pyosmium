@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>replication - Handling Updates of OSM Data &#8212; Pyosmium 3.7.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pyosmium Tools" href="tools.html" />
+    <link rel="prev" title="geom - Geometry Helper Functions" href="ref_geom.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Pyosmium Tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ref_geom.html" title="geom - Geometry Helper Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">replication</span></code> - Handling Updates of OSM Data</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="replication-handling-updates-of-osm-data">
+<h1><code class="docutils literal notranslate"><span class="pre">replication</span></code> - Handling Updates of OSM Data<a class="headerlink" href="#replication-handling-updates-of-osm-data" title="Permalink to this heading">¶</a></h1>
+<p>Replication servers provide regular updates of OSM data. This module
+provides helper functions to access the servers and download and
+apply updates.</p>
+<section id="replication-server-class">
+<h2>Replication Server Class<a class="headerlink" href="#replication-server-class" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">osmium.replication.server.</span></span><span class="sig-name descname"><span class="pre">ReplicationServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'osc.gz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#osmium.replication.server.ReplicationServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a connection to a  server that publishes replication data.
+Replication change files allow to keep local OSM data up-to-date without
+downloading the full dataset again.</p>
+<p><cite>url</cite> contains the base URL of the replication service. This is the
+directory that contains the state file with the current state. If the
+replication service serves something other than osc.gz files, set
+the <cite>diff_type</cite> to the given file suffix.</p>
+<p>ReplicationServer may be used as a context manager. In this case, it
+internally keeps a connection to the server making downloads faster.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close any open connection to the replication server.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.set_request_parameter">
+<span class="sig-name descname"><span class="pre">set_request_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.set_request_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a parameter which will be handed to the requests library
+when calling <cite>requests.get()</cite>. This
+may be used to set custom headers, timeouts and similar parameters.
+See the <a class="reference external" href="https://requests.readthedocs.io/en/latest/api/?highlight=get#requests.request">requests documentation</a>
+for possible parameters. Per default, a timeout of 60 sec is set
+and streaming download enabled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.make_request">
+<span class="sig-name descname"><span class="pre">make_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Request</span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.make_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.open_url">
+<span class="sig-name descname"><span class="pre">open_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.open_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a resource from the given URL and return a byte sequence
+of the content.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.collect_diffs">
+<span class="sig-name descname"><span class="pre">collect_diffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DownloadResult</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.collect_diffs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MergeInputReader and download diffs starting with sequence
+id <cite>start_id</cite> into it. <cite>max_size</cite>
+restricts the number of diffs that are downloaded. The download
+stops as soon as either a diff cannot be downloaded or the
+unpacked data in memory exceeds <cite>max_size</cite> kB.</p>
+<p>If some data was downloaded, returns a namedtuple with three fields:
+<cite>id</cite> contains the sequence id of the last downloaded diff, <cite>reader</cite>
+contains the MergeInputReader with the data and <cite>newest</cite> is a
+sequence id of the most recent diff available.</p>
+<p>Returns None if there was an error during download or no new
+data was available.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.apply_diffs">
+<span class="sig-name descname"><span class="pre">apply_diffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseHandler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.apply_diffs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download diffs starting with sequence id <cite>start_id</cite>, merge them
+together and then apply them to handler <cite>handler</cite>. <cite>max_size</cite>
+restricts the number of diffs that are downloaded. The download
+stops as soon as either a diff cannot be downloaded or the
+unpacked data in memory exceeds <cite>max_size</cite> kB.</p>
+<p>If <cite>idx</cite> is set, a location cache will be created and applied to
+the way nodes. You should be aware that diff files usually do not
+contain the complete set of nodes when a way is modified. That means
+that you cannot just create a new location cache, apply it to a diff
+and expect to get complete way geometries back. Instead you need to
+do an initial data import using a persistent location cache to
+obtain a full set of node locations and then reuse this location
+cache here when applying diffs.</p>
+<p>Diffs may contain multiple versions of the same object when it was
+changed multiple times during the period covered by the diff. If
+<cite>simplify</cite> is set to False then all versions are returned. If it
+is True (the default) then only the most recent version will be
+sent to the handler.</p>
+<p>The function returns the sequence id of the last diff that was
+downloaded or None if the download failed completely.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.apply_diffs_to_file">
+<span class="sig-name descname"><span class="pre">apply_diffs_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_replication_header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outformat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.apply_diffs_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download diffs starting with sequence id <cite>start_id</cite>, merge them
+with the data from the OSM file named <cite>infile</cite> and write the result
+into a file with the name <cite>outfile</cite>. The output file must not yet
+exist.</p>
+<p><cite>max_size</cite> restricts the number of diffs that are downloaded. The
+download stops as soon as either a diff cannot be downloaded or the
+unpacked data in memory exceeds <cite>max_size</cite> kB.</p>
+<p>If <cite>set_replication_header</cite> is true then the URL of the replication
+server and the sequence id and timestamp of the last diff applied
+will be written into the <cite>writer</cite>. Note that this currently works
+only for the PBF format.</p>
+<p><cite>extra_headers</cite> is a dict with additional header fields to be set.
+Most notably, the ‘generator’ can be set this way.</p>
+<p><cite>outformat</cite> sets the format of the output file. If None, the format
+is determined from the file name.</p>
+<p>The function returns a tuple of last downloaded sequence id and
+newest available sequence id if new data has been written or None
+if no data was available or the download failed completely.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.timestamp_to_sequence">
+<span class="sig-name descname"><span class="pre">timestamp_to_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balanced_search</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.timestamp_to_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the sequence number of the replication file that contains the
+given timestamp. The search algorithm is optimised for replication
+servers that publish updates in regular intervals. For servers
+with irregular change file publication dates ‘balanced_search`
+should be set to true so that a standard binary search for the
+sequence will be used. The default is good for all known
+OSM replication services.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.get_state_info">
+<span class="sig-name descname"><span class="pre">get_state_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">OsmosisState</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.get_state_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads and returns the state information for the given
+sequence. If the download is successful, a namedtuple with
+<cite>sequence</cite> and <cite>timestamp</cite> is returned, otherwise the function
+returns <cite>None</cite>. <cite>retries</cite> sets the number of times the download
+is retried when pyosmium detects a truncated state file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.get_diff_block">
+<span class="sig-name descname"><span class="pre">get_diff_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.get_diff_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads the diff with the given sequence number and returns
+it as a byte sequence. Throws an <code class="code docutils literal notranslate"><span class="pre">requests.HTTPError</span></code>
+if the file cannot be downloaded.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.get_state_url">
+<span class="sig-name descname"><span class="pre">get_state_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.get_state_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the URL of the state.txt files for a given sequence id.</p>
+<p>If seq is <cite>None</cite> the URL for the latest state info is returned,
+i.e. the state file in the root directory of the replication
+service.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="osmium.replication.server.ReplicationServer.get_diff_url">
+<span class="sig-name descname"><span class="pre">get_diff_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#osmium.replication.server.ReplicationServer.get_diff_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the URL to the diff file for the given sequence id.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">replication</span></code> - Handling Updates of OSM Data</a><ul>
+<li><a class="reference internal" href="#replication-server-class">Replication Server Class</a><ul>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer"><code class="docutils literal notranslate"><span class="pre">ReplicationServer</span></code></a><ul>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.close"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.close()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.set_request_parameter"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.set_request_parameter()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.make_request"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.make_request()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.open_url"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.open_url()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.collect_diffs"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.collect_diffs()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.apply_diffs"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.apply_diffs()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.apply_diffs_to_file"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.apply_diffs_to_file()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.timestamp_to_sequence"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.timestamp_to_sequence()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.get_state_info"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.get_state_info()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.get_diff_block"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.get_diff_block()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.get_state_url"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.get_state_url()</span></code></a></li>
+<li><a class="reference internal" href="#osmium.replication.server.ReplicationServer.get_diff_url"><code class="docutils literal notranslate"><span class="pre">ReplicationServer.get_diff_url()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="ref_geom.html"
+                          title="previous chapter"><code class="docutils literal notranslate"><span class="pre">geom</span></code> - Geometry Helper Functions</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tools.html"
+                          title="next chapter">Pyosmium Tools</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ref_replication.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Pyosmium Tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ref_geom.html" title="geom - Geometry Helper Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Pyosmium Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><code class="docutils literal notranslate"><span class="pre">replication</span></code> - Handling Updates of OSM Data</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pyosmium-get-changes - Downloading OSM change files &#8212; Pyosmium 3.7.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pyosmium-up-to-date - Bringing OSM files up-to-date" href="tools_uptodate.html" />
+    <link rel="prev" title="Updating OpenStreetMap data from change files" href="updating_osm_data.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tools_uptodate.html" title="pyosmium-up-to-date - Bringing OSM files up-to-date"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="updating_osm_data.html" title="Updating OpenStreetMap data from change files"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tools.html" accesskey="U">Pyosmium Tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyosmium-get-changes - Downloading OSM change files</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pyosmium-get-changes-downloading-osm-change-files">
+<h1>pyosmium-get-changes - Downloading OSM change files<a class="headerlink" href="#pyosmium-get-changes-downloading-osm-change-files" title="Permalink to this heading">¶</a></h1>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<section id="pyosmium-get-changes-py">
+<h3>pyosmium-get-changes.py<a class="headerlink" href="#pyosmium-get-changes-py" title="Permalink to this heading">¶</a></h3>
+<p>Fetch diffs from an OSM planet server.</p>
+<p>The starting point of the diff must be given either as a sequence ID or a date
+or can be computed from an OSM file. If no output file is given, the program
+will just print the initial sequence ID it would use (or save it in a file, if
+requested) and exit. This can be used to bootstrap the update process.</p>
+<p>The program tries to download until the latest change on the server is found
+or the maximum requested diff size is reached. Note that diffs are kept in
+memory during download.</p>
+<p>On success, the program will print a single number to stdout, the sequence
+number where to continue updates in the next run. This output can also be
+written to (and later read from) a file.</p>
+<p><em>Note:</em> you may pipe the diff also to standard output using ‘-o -’. Then
+the sequence number will not be printed. You must write it to a file in that
+case.</p>
+<p>Some OSM data sources require a cookie to be sent with the HTTP requests.
+pyosmium-get-changes does not fetch the cookie from these services for you.
+However, it can read cookies from a Netscape-style cookie jar file, send these
+cookies to the server and will save received cookies to the jar file.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: pyosmium-get-changes [options]</span>
+</pre></div>
+</div>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-h">
+<span id="cmdoption-pyosmium-get-changes-py-h"></span><span id="cmdoption-pyosmium-get-changes.py-help"></span><span id="cmdoption-pyosmium-get-changes-py-help"></span><span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-v">
+<span id="cmdoption-pyosmium-get-changes-py-v"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increase verbosity (can be used multiple times)</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-o">
+<span id="cmdoption-pyosmium-get-changes-py-o"></span><span id="cmdoption-pyosmium-get-changes.py-outfile"></span><span id="cmdoption-pyosmium-get-changes-py-outfile"></span><span class="sig-name descname"><span class="pre">-o</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outfile&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--outfile</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outfile&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-o" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of diff output file. If omitted, only the sequence ID will be printed where updates would start.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-format">
+<span id="cmdoption-pyosmium-get-changes-py-format"></span><span class="sig-name descname"><span class="pre">--format</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;format&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format the data should be saved in.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-server">
+<span id="cmdoption-pyosmium-get-changes-py-server"></span><span class="sig-name descname"><span class="pre">--server</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;server_url&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base URL of the replication server</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-cookie">
+<span id="cmdoption-pyosmium-get-changes-py-cookie"></span><span class="sig-name descname"><span class="pre">--cookie</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;cookie&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Netscape-style cookie jar file to read cookies from   
+                              and where received cookies will be written to.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-s">
+<span id="cmdoption-pyosmium-get-changes-py-s"></span><span id="cmdoption-pyosmium-get-changes.py-size"></span><span id="cmdoption-pyosmium-get-changes-py-size"></span><span class="sig-name descname"><span class="pre">-s</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outsize&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--size</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outsize&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum data to load in MB (default: 100MB).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-I">
+<span id="cmdoption-pyosmium-get-changes-py-i"></span><span id="cmdoption-pyosmium-get-changes.py-start-id"></span><span id="cmdoption-pyosmium-get-changes-py-start-id"></span><span class="sig-name descname"><span class="pre">-I</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;id&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--start-id</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;id&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-I" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequence ID to start with</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-D">
+<span id="cmdoption-pyosmium-get-changes-py-d"></span><span id="cmdoption-pyosmium-get-changes.py-start-date"></span><span id="cmdoption-pyosmium-get-changes-py-start-date"></span><span class="sig-name descname"><span class="pre">-D</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;date&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--start-date</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;date&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date when to start updates</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-O">
+<span id="cmdoption-pyosmium-get-changes.py-start-osm-data"></span><span id="cmdoption-pyosmium-get-changes-py-start-osm-data"></span><span class="sig-name descname"><span class="pre">-O</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;osmfile&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--start-osm-data</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;osmfile&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-O" title="Permalink to this definition">¶</a></dt>
+<dd><p>start at the date of the newest OSM object in the file</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-f">
+<span id="cmdoption-pyosmium-get-changes-py-f"></span><span id="cmdoption-pyosmium-get-changes.py-sequence-file"></span><span id="cmdoption-pyosmium-get-changes-py-sequence-file"></span><span class="sig-name descname"><span class="pre">-f</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;seq_file&gt;</span></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--sequence-file</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;seq_file&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequence file. If the file exists, then updates will start after the id given in the file. At the end of the process, the last sequence ID contained in the diff is written.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-ignore-osmosis-headers">
+<span id="cmdoption-pyosmium-get-changes-py-ignore-osmosis-headers"></span><span class="sig-name descname"><span class="pre">--ignore-osmosis-headers</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-ignore-osmosis-headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>When determining the start from an OSM file, ignore potential replication information in the header and search for the newest OSM object.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-d">
+<span id="cmdoption-pyosmium-get-changes.py-no-deduplicate"></span><span id="cmdoption-pyosmium-get-changes-py-no-deduplicate"></span><span class="sig-name descname"><span class="pre">-d</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-deduplicate</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do not deduplicate diffs.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-socket-timeout">
+<span id="cmdoption-pyosmium-get-changes-py-socket-timeout"></span><span class="sig-name descname"><span class="pre">--socket-timeout</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;socket_timeout&gt;</span></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-socket-timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set timeout for file downloads.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-pyosmium-get-changes.py-version">
+<span id="cmdoption-pyosmium-get-changes-py-version"></span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-pyosmium-get-changes.py-version" title="Permalink to this definition">¶</a></dt>
+<dd><p>show program’s version number and exit</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">pyosmium-get-changes - Downloading OSM change files</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#pyosmium-get-changes-py">pyosmium-get-changes.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="updating_osm_data.html"
+                          title="previous chapter">Updating OpenStreetMap data from change files</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tools_uptodate.html"
+                          title="next chapter">pyosmium-up-to-date - Bringing OSM files up-to-date</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tools_get_changes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tools_uptodate.html" title="pyosmium-up-to-date - Bringing OSM files up-to-date"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="updating_osm_data.html" title="Updating OpenStreetMap data from change files"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyosmium 3.7.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="tools.html" >Pyosmium Tools</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyosmium-get-changes - Downloading OSM change files</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015-2020, Sarah Hoffmann.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>
