@@ -80,6 +80,18 @@ jobs:
                 python -m build
               shell: bash
 
+            - name: Set up Python 3.13
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13"
+                  allow-prereleases: true
+
+            - name: Build package 3.13
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
               with:
@@ -93,7 +105,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
+                python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12", "3.13"]
 
         steps:
             - uses: actions/checkout@v4
@@ -102,6 +114,7 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python-version }}
+                  allow-prereleases: true
 
             - uses: actions/download-artifact@v4
               with:
@@ -151,14 +164,14 @@ jobs:
                       cc: gcc-14
                       cxx: g++-14
                       platform: ubuntu-24.04
-                      python: "3.12"
+                      python: "3.13"
                       deps: develop
                       flavour: linux
                     - compiler: clang
                       cc: clang-18
                       cxx: clang++-18
                       platform: ubuntu-24.04
-                      python: "3.12"
+                      python: "3.13"
                       deps: develop
                       flavour: linux
                     - compiler: macos-intel
@@ -168,7 +181,7 @@ jobs:
                       flavour: macos
                     - compiler: macos-arm
                       platform: macos-14
-                      python: "3.12"
+                      python: "3.13"
                       deps: develop
                       flavour: macos
 
@@ -194,6 +207,7 @@ jobs:
             - uses: actions/setup-python@v5
               with:
                   python-version: "${{ matrix.python }}"
+                  allow-prereleases: true
 
             - name: Install packages
               run: |
@@ -323,6 +337,20 @@ jobs:
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+            - name: Set up Python 3.13
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13"
+                  allow-prereleases: true
+
+            - name: Build package 3.13
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
             - name: 'Upload Artifact'
               uses: actions/upload-artifact@v4
               with:
@@ -336,7 +364,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+                python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
         env:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
@@ -348,6 +376,7 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python-version }}
+                  allow-prereleases: true
 
             - uses: actions/download-artifact@v4
               with:
