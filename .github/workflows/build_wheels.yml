@@ -7,11 +7,16 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels on ${{ matrix.os }} for ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-20.04, windows-2019, macos-11, macos-14]
+        os: [ubuntu-20.04, windows-2019, macos-13, macos-14]
+        arch: [native]
+        include:
+          - os: ubuntu-20.04
+            arch: aarch64
 
     steps:
       - uses: actions/checkout@v4
@@ -34,22 +39,30 @@ jobs:
           ref: v2.20.0
           path: contrib/libosmium
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        if: ${{ matrix.arch == 'aarch64' }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.17.0
+        uses: pypa/cibuildwheel@v2.21.1
         env:
-           CIBW_ARCHS: native
-           CIBW_SKIP: "pp* *musllinux* cp38-macosx_arm64"
+           CIBW_ARCHS: ${{ matrix.arch }}
+           CIBW_SKIP: "pp* *musllinux* cp37-macosx_* {cp37,cp38}-*linux_aarch64"
            CIBW_TEST_REQUIRES: pytest pytest-httpserver shapely
            CIBW_TEST_REQUIRES_LINUX: urllib3<2.0 pytest pytest-httpserver shapely
            CIBW_TEST_COMMAND: pytest {project}/test
            CIBW_BUILD_FRONTEND: build
-           CIBW_BEFORE_BUILD_LINUX: yum install -y sparsehash-devel expat-devel boost-devel zlib-devel bzip2-devel lz4-devel
-           CIBW_BEFORE_BUILD_MACOS: brew install boost google-sparsehash
+           CIBW_BEFORE_BUILD_LINUX: yum install -y expat-devel boost-devel zlib-devel bzip2-devel lz4-devel
+           CIBW_BEFORE_BUILD_MACOS: brew install boost
            CIBW_BEFORE_BUILD_WINDOWS: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
            CIBW_ENVIRONMENT_WINDOWS: 'CMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"'
+           CIBW_ENVIRONMENT_MACOS: CMAKE_WITH_LZ4=OFF MACOSX_DEPLOYMENT_TARGET=11.0
 
       - uses: actions/upload-artifact@v4
         with:
-          name: pyosmium-wheels-${{ matrix.os }}
+          name: pyosmium-wheels-${{ matrix.os }}-${{ matrix.arch }}
           path: ./wheelhouse/*.whl

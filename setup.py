@@ -125,6 +125,8 @@ class CMakeBuild(build_ext):
         if 'CMAKE_CXX_STANDARD' in env:
             cmake_args += ['-DCMAKE_CXX_STANDARD={}'.format(env['CMAKE_CXX_STANDARD'])]
 
+        cmake_args += [f"-DWITH_LZ4={env.get('CMAKE_WITH_LZ4', 'ON')}"]
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
