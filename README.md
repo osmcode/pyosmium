@@ -96,6 +96,10 @@ the dependencies with:
 
     sudo apt-get install python3-pytest python3-pytest-httpserver
 
+or install them with pip using:
+
+    pip install osmium[tests]
+
 The test suite can be run with:
 
     pytest test
@@ -104,12 +108,13 @@ The test suite can be run with:
 ## Documentation
 
 To build the documentation you need [mkdocs](https://www.mkdocs.org/)
-with the [mkdocstrings extension](https://mkdocstrings.github.io/)
+with the [mkdocstrings](https://mkdocstrings.github.io/)
+and [jupyter](https://github.com/danielfrg/mkdocs-jupyter) extensions
 and the [material theme](https://squidfunk.github.io/mkdocs-material/).
-On Debian/Ubuntu install
 
-    sudo apt-get install mkdocs mkdocstrings mkdocstrings-python-handlers\
-                         mkdocs-material mkdocs-material-extensions
+All necessary packages can be installed via pip:
+
+    pip install osmium[docs]
 
 To build the documentation run:
 
