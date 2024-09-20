@@ -1,0 +1,124 @@
+.TH pyosmium-up-to-date "1" Manual
+.SH NAME
+pyosmium-up-to-date
+.SH SYNOPSIS
+.B pyosmium-up-to-date
+[options] <osm file>
+.SH DESCRIPTION
+Update an OSM file with changes from a OSM replication server.
+.br
+
+.br
+Diffs are downloaded and kept in memory. To avoid running out of memory,
+.br
+the maximum size of diffs that can be downloaded at once is limited
+.br
+to 1 GB per default. This corresponds to approximately 3 days of update.
+.br
+The limit can be changed with the \-\-size parameter. However, you should
+.br
+take into account that processing the files requires additional memory
+.br
+(about 1GB more).
+.br
+
+.br
+The starting time is automatically determined from the data in the file.
+.br
+For PBF files, it is also possible to read and write the replication
+.br
+information from the osmosis headers. That means that after the first update,
+.br
+subsequent calls to pyosmium\-up\-to\-date will continue the updates from the same
+.br
+server exactly where they have left of.
+.br
+
+.br
+This program can update normal OSM data files as well as OSM history files.
+.br
+It detects automatically on what type of file it is called.
+.br
+
+.br
+The program returns 0, if updates have been successfully applied up to
+.br
+the newest data or no new data was available. It returns 1, if some updates
+.br
+have been applied but there is still data available on the server (either
+.br
+because the size limit has been reached or there was a network error which
+.br
+could not be resolved). Any other error results in a return code larger than 1.
+.br
+The output file is guaranteed to be unmodified in that case.
+.br
+
+.br
+Some OSM data sources require a cookie to be sent with the HTTP requests.
+.br
+pyosmium\-up\-to\-date does not fetch the cookie from these services for you.
+.br
+However, it can read cookies from a Netscape\-style cookie jar file, send these
+.br
+cookies to the server and will save received cookies to the jar file.
+.SH OPTIONS
+.TP
+\fB<osm file>\fR
+OSM file to update
+
+.TP
+\fB\-v\fR
+Increase verbosity (can be used multiple times).
+
+.TP
+\fB\-o\fR \fI\,OUTFILE\/\fR, \fB\-\-outfile\fR \fI\,OUTFILE\/\fR
+Name output of file. If missing, the input file will be overwritten.
+
+.TP
+\fB\-\-format\fR FORMAT
+Format the data should be saved in. Usually determined from file name.
+
+.TP
+\fB\-\-server\fR \fI\,SERVER_URL\/\fR
+Base URL of the replication server. Default: https://planet.osm.org/replication/hour/ (hourly diffs from osm.org)
+
+.TP
+\fB\-s\fR SIZE, \fB\-\-size\fR SIZE
+Maximum size of change to apply at once in MB. Default: 1GB
+
+.TP
+\fB\-\-tmpdir\fR \fI\,TMPDIR\/\fR
+Directory to use for temporary files. Usually the directory of input file is used.
+
+.TP
+\fB\-\-ignore\-osmosis\-headers\fR
+Ignore potential replication information in the header of the input file and search for the newest OSM object in the file instead.
+
+.TP
+\fB\-b\fR \fI\,WIND_BACK\/\fR, \fB\-\-wind\-back\fR \fI\,WIND_BACK\/\fR
+Number of minutes to start downloading before the newest addition to input data. (Ignored when the file contains a sequence ID.) Default: 60
+
+.TP
+\fB\-\-force\-update\-of\-old\-planet\fR
+Apply update even if the input data is really old.
+
+.TP
+\fB\-\-cookie\fR \fI\,COOKIE\/\fR
+Netscape\-style cookie jar file to read cookies from and where received cookies will be written to.
+
+.TP
+\fB\-\-socket\-timeout\fR \fI\,SOCKET_TIMEOUT\/\fR
+Set timeout for file downloads.
+
+.TP
+\fB\-\-version\fR
+show program's version number and exit
+
+.SH AUTHORS
+.B pyosmium
+was written by Sarah Hoffmann <lonvia@denofr.de>.
+.SH DISTRIBUTION
+The latest version of pyosmium may be downloaded from
+.UR https://github.com/osmcode/pyosmium/
+.UE

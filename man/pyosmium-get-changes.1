@@ -1,0 +1,121 @@
+.TH pyosmium-get-changes "1" Manual
+.SH NAME
+pyosmium-get-changes
+.SH SYNOPSIS
+.B pyosmium-get-changes
+[options]
+.SH DESCRIPTION
+Fetch diffs from an OSM planet server.
+.br
+
+.br
+The starting point of the diff must be given either as a sequence ID or a date
+.br
+or can be computed from an OSM file. If no output file is given, the program
+.br
+will just print the initial sequence ID it would use (or save it in a file, if
+.br
+requested) and exit. This can be used to bootstrap the update process.
+.br
+
+.br
+The program tries to download until the latest change on the server is found
+.br
+or the maximum requested diff size is reached. Note that diffs are kept in
+.br
+memory during download.
+.br
+
+.br
+On success, the program will print a single number to stdout, the sequence
+.br
+number where to continue updates in the next run. This output can also be
+.br
+written to (and later read from) a file.
+.br
+
+.br
+*Note:* you may pipe the diff also to standard output using '\-o \-'. Then
+.br
+the sequence number will not be printed. You must write it to a file in that
+.br
+case.
+.br
+
+.br
+Some OSM data sources require a cookie to be sent with the HTTP requests.
+.br
+pyosmium\-get\-changes does not fetch the cookie from these services for you.
+.br
+However, it can read cookies from a Netscape\-style cookie jar file, send these
+.br
+cookies to the server and will save received cookies to the jar file.
+.SH OPTIONS
+
+.TP
+\fB\-v\fR
+Increase verbosity (can be used multiple times)
+
+.TP
+\fB\-o\fR \fI\,OUTFILE\/\fR, \fB\-\-outfile\fR \fI\,OUTFILE\/\fR
+Name of diff output file. If omitted, only the sequence ID will be printed where updates would start.
+
+.TP
+\fB\-\-format\fR FORMAT
+Format the data should be saved in.
+
+.TP
+\fB\-\-server\fR \fI\,SERVER_URL\/\fR
+Base URL of the replication server
+
+.TP
+\fB\-\-diff\-type\fR \fI\,SERVER_DIFF_TYPE\/\fR
+File format used by the replication server (default: osc.gz)
+
+.TP
+\fB\-\-cookie\fR \fI\,COOKIE\/\fR
+Netscape\-style cookie jar file to read cookies from and where received cookies will be written to.
+
+.TP
+\fB\-s\fR \fI\,OUTSIZE\/\fR, \fB\-\-size\fR \fI\,OUTSIZE\/\fR
+Maximum data to load in MB (default: 100MB).
+
+.TP
+\fB\-I\fR ID, \fB\-\-start\-id\fR ID
+Sequence ID to start with
+
+.TP
+\fB\-D\fR DATE, \fB\-\-start\-date\fR DATE
+Date when to start updates
+
+.TP
+\fB\-O\fR OSMFILE, \fB\-\-start\-osm\-data\fR OSMFILE
+start at the date of the newest OSM object in the file
+
+.TP
+\fB\-f\fR \fI\,SEQ_FILE\/\fR, \fB\-\-sequence\-file\fR \fI\,SEQ_FILE\/\fR
+Sequence file. If the file exists, then updates will start after the id given in the file. At the end of the process, the last sequence ID contained in the diff is written.
+
+.TP
+\fB\-\-ignore\-osmosis\-headers\fR
+When determining the start from an OSM file, ignore potential replication information in the header and search for the newest OSM object.
+
+.TP
+\fB\-d\fR, \fB\-\-no\-deduplicate\fR
+Do not deduplicate diffs.
+
+.TP
+\fB\-\-socket\-timeout\fR \fI\,SOCKET_TIMEOUT\/\fR
+Set timeout for file downloads.
+
+.TP
+\fB\-\-version\fR
+show program's version number and exit
+
+.SH AUTHORS
+.B pyosmium
+was written by Sarah Hoffmann <lonvia@denofr.de>.
+.SH DISTRIBUTION
+The latest version of pyosmium may be downloaded from
+.UR https://github.com/osmcode/pyosmium/
+.UE
