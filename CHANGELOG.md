@@ -4,6 +4,52 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.0] - 2024-09-20
+
+### Added
+
+- support for Python 3.13
+- iterative processing of OSM files (see FileProcessor)
+- new `flush()` callback for handlers
+- FileBuffer for reading from a Python buffer instead of a file
+- bit operators for entity bit enum
+- filter mode for handlers (return False to stop processing)
+- various C++-implementations of filters (for tags, keys, ids, etc.)
+- convenience functions to determine object types
+- binary wheels for MAcOS and Intel ARM architecture
+- haversine functions for two point
+- direct access to lat/lon for nodes
+- expose osmium's IdSet
+- new IdTracker for efficient tracking of dependent objects
+- new writers for adding forward and backward references to output
+- new parameter for server file type for pyosmium_get_updates
+- new filter to add `__geo_interface__` attribute
+
+### Fixed
+
+- consistently use namespaces everywhere
+- deprecation warnings around utc_now (thanks @mtmail)
+
+### Changed
+
+- SimpleHandler is now a Python class
+- make NodeLocationForWays a generic BaseHandler
+- `apply()` and MergeInputReader can take an arbitrary number of handlers
+- accept Python class as handler, no inheritance from SimpleHandler necessary
+- new minimum requirements: pybind 2.7, Python 3.7, C++17 compatible compiler, cmake 3.8
+- AreaManager is now part of the Python interface
+- consistently allow str, Path, File and FileBuffer, where OSM files are expected
+- objects stay alive through handler chain allowing to carry over extra attributes
+- switch SimpleWriter to use keyword arguments
+- make Reader and SimpleWriter context managers
+- new overwrite parameter for writers
+- remove GIL release, only slows down processing
+- move documentation of C++ interface into pyi files
+- complete rewrite of documentation using mkdocs
+- update pybind to 2.13.6
+- use maximum parallelization when building (thanks @Mathiasdm)
+- move build configuration to pyproject.toml as far as possible
+
 ## [3.7.0] - 2023-11-19
 
 ### Added
