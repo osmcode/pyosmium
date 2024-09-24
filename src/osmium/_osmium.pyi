@@ -111,7 +111,7 @@ class MergeInputReader:
         """
 
 
-class SimpleWriter:
+class SimpleWriter(BaseHandler):
     """ Basic writer for OSM data. The SimpleWriter can write out
         object that are explicitly passed or function as a handler and
         write out all objects it receives. It is also possible to
@@ -182,7 +182,7 @@ class SimpleWriter:
     def __exit__(self, *args: Any) -> None:...
 
 
-class NodeLocationsForWays:
+class NodeLocationsForWays(BaseHandler):
     """ Handler for retriving and caching locations from ways
         and adding them to ways.
     """
