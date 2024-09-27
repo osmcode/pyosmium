@@ -4,6 +4,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.1] - 2024-09-27
+
+### Fixed
+
+- correctly package py.typed file
+- typing: correctly report inheritance of SimpleWriter and NodeLocationsForWays
+
+
 ## [4.0.0] - 2024-09-20
 
 ### Added
@@ -49,6 +57,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - update pybind to 2.13.6
 - use maximum parallelization when building (thanks @Mathiasdm)
 - move build configuration to pyproject.toml as far as possible
+
 
 ## [3.7.0] - 2023-11-19
 
