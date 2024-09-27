@@ -8,7 +8,7 @@ include lib/*.h
 include lib/*.cc
 include examples/*py
 include test/*py
-include src/py.typed
+include src/osmium/py.typed
 recursive-include src *.pyi
 recursive-include docs *md *css
 include docs/cookbooks/*.ipynb
