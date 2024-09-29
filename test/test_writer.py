@@ -5,6 +5,7 @@
 # Copyright (C) 2022 Sarah Hoffmann.
 from contextlib import contextmanager
 from collections import OrderedDict
+from datetime import datetime, timezone, timedelta
 import uuid
 
 import pytest
@@ -54,6 +55,7 @@ class O:
       (O(uid=987), '0 v0 dV c0 t i987 u T'),
       (O(timestamp='2012-04-14T20:58:35Z'), '0 v0 dV c0 t2012-04-14T20:58:35Z i0 u T'),
       (O(timestamp=mkdate(2009, 4, 14, 20, 58, 35)), '0 v0 dV c0 t2009-04-14T20:58:35Z i0 u T'),
+      (O(timestamp=datetime(2009, 4, 14, 20, 58, 35, tzinfo=timezone(timedelta(hours=1)))), '0 v0 dV c0 t2009-04-14T19:58:35Z i0 u T'),
       (O(timestamp='1970-01-01T00:00:01Z'), '0 v0 dV c0 t1970-01-01T00:00:01Z i0 u T')
     ])
 class TestWriteAttributes:

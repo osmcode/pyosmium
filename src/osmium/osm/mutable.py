@@ -19,14 +19,7 @@ if TYPE_CHECKING:
                        Sequence[Union[osmium.osm.RelationMember, Tuple[str, int, str]]]]
 
 class OSMObject:
-    """Mutable version of ``osmium.osm.OSMObject``. It exposes the following
-       attributes ``id``, ``version``, ``visible``, ``changeset``, ``timestamp``,
-       ``uid`` and ``tags``. Timestamps may be strings or datetime objects.
-       Tags can be an osmium.osm.TagList, a dict-like object
-       or a list of tuples, where each tuple contains a (key value) string pair.
-
-       If the ``base`` parameter is given in the constructor, then the object
-       will be initialised first from the attributes of this base object.
+    """ Mutable version of [osmium.osm.OSMObject][].
     """
 
     def __init__(self, base: Optional['OSMObjectLike'] = None,
@@ -34,6 +27,15 @@ class OSMObject:
                  visible: Optional[bool] = None, changeset: Optional[int] = None,
                  timestamp: Optional[datetime] = None, uid: Optional[int] = None,
                  tags: Optional['TagSequence'] = None, user: Optional[str] = None) -> None:
+        """ Initialise an object with the following optional
+            attributes: `id`, `version`, `visible`, `changeset`, `timestamp`,
+            `uid` and `tags`. Timestamps may be strings or datetime objects.
+            Tags can be an osmium.osm.TagList, a dict-like object
+            or a list of tuples, where each tuple contains a (key value) string pair.
+
+            If the `base` parameter is given in the constructor, then the object
+            will be initialised first from the attributes of this base object.
+        """
         if base is None:
             self.id = id
             self.version = version
@@ -55,14 +57,18 @@ class OSMObject:
 
 
 class Node(OSMObject):
-    """The mutable version of ``osmium.osm.Node``. It inherits all attributes
-       from osmium.osm.mutable.OSMObject and adds a `location` attribute. This
-       may either be an `osmium.osm.Location` or a tuple of lon/lat coordinates.
+    """ The mutable version of [osmium.osm.Node][].
     """
 
     def __init__(self, base: Optional[Union['Node', 'osmium.osm.Node']] = None,
                  location: Optional['LocationLike'] = None,
                  **attrs: Any) -> None:
+        """ Initialise a node with all optional attributes
+            from osmium.osm.mutable.OSMObject as well as a `location` attribute.
+            This may either be an [osmium.osm.Location][] or a tuple of
+            lon/lat coordinates.
+
+        """
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
             self.location = location
@@ -71,14 +77,16 @@ class Node(OSMObject):
 
 
 class Way(OSMObject):
-    """The mutable version of ``osmium.osm.Way``. It inherits all attributes
-       from osmium.osm.mutable.OSMObject and adds a `nodes` attribute. This may
-       either be and ``osmium.osm.NodeList`` or a list consisting of
-       ``osmium.osm.NodeRef`` or simple node ids.
+    """ The mutable version of [osmium.osm.Way][].
     """
 
     def __init__(self, base: Optional[Union['Way', 'osmium.osm.Way']] = None,
                  nodes: Optional['NodeSequence'] = None, **attrs: Any) -> None:
+        """ Initialise a way with all optional attributes
+            from osmium.osm.mutable.OSMObject as well as a `nodes` attribute.
+            This may either be an [osmium.osm.NodeRefList][] or a list
+            consisting of [osmium.osm.NodeRef][] or simple node ids.
+        """
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
             self.nodes = nodes
@@ -86,15 +94,18 @@ class Way(OSMObject):
             self.nodes = nodes if nodes is not None else base.nodes
 
 class Relation(OSMObject):
-    """The mutable version of ``osmium.osm.Relation``. It inherits all attributes
-       from osmium.osm.mutable.OSMObject and adds a `members` attribute. This
-       may either be an ``osmium.osm.RelationMemberList`` or a list consisting
-       of ``osmium.osm.RelationMember`` or tuples of (type, id, role). The
-       member type should be a single character 'n', 'w' or 'r'.
+    """ The mutable version of [osmium.osm.Relation][].
     """
 
     def __init__(self, base: Optional[Union['Relation', 'osmium.osm.Relation']] = None,
                  members: Optional['MemberSequence'] = None, **attrs: Any) -> None:
+        """ Initialise a relation with all optional attributes
+            from osmium.osm.mutable.OSMObject as well as a `members` attribute.
+            This may either be an [osmium.osm.RelationMemberList][] or
+            a list consisting of [osmium.osm.RelationMember][] or
+            tuples of (type, id, role). The
+            member type must be a single character 'n', 'w' or 'r'.
+        """
         OSMObject.__init__(self, base=base, **attrs)
         if base is None:
             self.members = members

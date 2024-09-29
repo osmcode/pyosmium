@@ -69,6 +69,59 @@ You can also write data that is not based on OSM input data at all. The write
 functions will accept any Python object that mimics the attributes of a
 node, way or relation.
 
+Here is a simple example that writes out four random points:
+
+!!! example
+    ``` python
+    from random import uniform
+
+    class RandomNode:
+        def __init__(self, name, id):
+            self.id = id
+            self.location = (uniform(-180, 180), uniform(-90, 90))
+            self.tags = {'name': name}
+
+    with osmium.SimpleWriter('points.opl') as writer:
+        for i in range(4):
+            writer.add_node(RandomNode(f"Random {i}", i))
+    ```
+
+The following table gives an overview over the recognised attributes and
+acceptable types. If an attribute is missing, then pyosmium will choose a
+suitable default or leave the attribute out completely from the output if
+that is possible.
+
+| attribute | types |
+|-----------|----------------------------|
+| id        | `int` |
+| version   | `int` (positive non-zero value) |
+| visible   | `bool` |
+| changeset | `int` (positive non-zero value) |
+| timestamp | `str` or `datetime` (will be translated to UTC first) |
+| uid       | `int` |
+| tags      | [osmium.osm.TagList][], a dict-like object or a list of tuples, where each tuple contains a (key, value) string pair |
+| user      | `str` |
+| location  | _(node only)_ [osmium.osm.Location][] or a tuple of lon/lat coordinates |
+| nodes     | _(way only)_ [osmium.osm.NodeRefList][] or a list consisting of either [osmium.osm.NodeRef][]s or simple node ids |
+| members   | _(relation only)_ [osmium.osm.RelationMemberList][] or a list consisting of either [osmium.osm.RelationMember][]s or tuples of `(type, id, role)`. The member type must be a single character 'n', 'w' or 'r'. |
+
+The `osmium.osm.mutable` module offers pure Python-object versions of `Node`,
+`Way` and `Relation` to make the creation of custom objects easier. Any of
+the allowable attributes may be set in the constructor. This makes the
+example for writing random points a bit shorter:
+
+!!! example
+    ``` python
+    from random import uniform
+
+    with osmium.SimpleWriter('points.opl') as writer:
+        for i in range(4):
+            writer.add_node(osmium.osm.mutable.Node(
+                id=i, location = (uniform(-180, 180), uniform(-90, 90)),
+                tags={'name': f"Random {i}"}))
+    ```
+
+
 ## Writer types
 
 pyosmium implements three different writer classes: the basic
