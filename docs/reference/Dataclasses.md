@@ -42,3 +42,10 @@ valid.
 
 ::: osmium.osm.Box
 ::: osmium.osm.Location
+
+## Mutable OSM objects
+
+::: osmium.osm.mutable.OSMObject
+::: osmium.osm.mutable.Node
+::: osmium.osm.mutable.Way
+::: osmium.osm.mutable.Relation
