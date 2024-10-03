@@ -6,4 +6,6 @@
 # For a full list of authors see the git log.
 import datetime
 
-def newest_change_from_file(filename: str) -> datetime.datetime: ...
+def newest_change_from_file(filename: str) -> datetime.datetime:
+    """ Find the data of the most recent change in a file.
+    """

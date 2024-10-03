@@ -7,7 +7,8 @@
 ::: osmium.replication.DownloadResult
 
 
-## Repliction utils
+## Replication utils
 
+::: osmium.replication.newest_change_from_file
 ::: osmium.replication.get_replication_header
 ::: osmium.replication.ReplicationHeader
