@@ -45,6 +45,7 @@ nav:
       - Geometry Processing: 'reference/Geometry-Functions.md'
       - Area Building: 'reference/Area.md'
       - Indexes: 'reference/Indexes.md'
+      - Replication: 'reference/Replication.md'
       - Exceptions: 'reference/Exceptions.md'
 
 exclude_docs: |

@@ -15,9 +15,14 @@ from osmium.osm import NOTHING
 LOG = logging.getLogger('pyosmium')
 
 class ReplicationHeader(NamedTuple):
+    """ Description of a replication state.
+    """
     url: Optional[str]
+    "Base URL of the replication service."
     sequence: Optional[int]
+    "ID of the change file on the server."
     timestamp: Optional[dt.datetime]
+    "Date of latest changes contained in the diff file."
 
 
 def get_replication_header(fname: str) -> ReplicationHeader:
