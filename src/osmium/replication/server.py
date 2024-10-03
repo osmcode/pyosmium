@@ -28,29 +28,41 @@ LOG = logging.getLogger('pyosmium')
 LOG.addHandler(logging.NullHandler())
 
 class OsmosisState(NamedTuple):
+    """ Represents a state file of a replication server.
+    """
     sequence: int
+    "The ID of the replication change on the server."
     timestamp: dt.datetime
+    "Date until when changes are contained in the change file."
 
 class DownloadResult(NamedTuple):
+    """ Downloaded change.
+    """
     id: int
+    "The ID of the latest downloaded replication change on the server."
     reader: MergeInputReader
+    "[osmium.MergeInputReader][] with all downloaded changes."
     newest: int
+    "ID of the newest change available on the server."
 
 class ReplicationServer:
     """ Represents a connection to a  server that publishes replication data.
         Replication change files allow to keep local OSM data up-to-date without
         downloading the full dataset again.
 
-        `url` contains the base URL of the replication service. This is the
-        directory that contains the state file with the current state. If the
-        replication service serves something other than osc.gz files, set
-        the `diff_type` to the given file suffix.
-
         ReplicationServer may be used as a context manager. In this case, it
         internally keeps a connection to the server making downloads faster.
     """
 
     def __init__(self, url: str, diff_type: str = 'osc.gz') -> None:
+        """ Set up the connection to a replication server.
+
+            `url` contains the base URL of the replication service. This is
+            the directory that contains the state file with the current
+            state. If the replication service serves something other
+            than osc.gz files, set the `diff_type` to the given file suffix.
+        """
+
         self.baseurl = url
         self.diff_type = diff_type
         self.extra_request_params: dict[str, Any] = dict(timeout=60, stream=True)
