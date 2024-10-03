@@ -42,6 +42,5 @@ PYBIND11_MODULE(_replication, m)
             reader.close();
 
             return handler.last_change;
-        },
-        "Find the date of the most recent change in a file.");
+        });
 }
