@@ -129,7 +129,7 @@ def get_arg_parser(from_main=False):
                         help="Format the data should be saved in.")
     parser.add_argument('--server', action='store', dest='server_url',
                         help='Base URL of the replication server')
-    parser.add_argument('--diff-type', action='store', dest='server_diff_type',
+    parser.add_argument('--diff-type', action='store', dest='server_diff_type', default='osc.gz',
                         help='File format used by the replication server (default: osc.gz)')
     parser.add_argument('--cookie', dest='cookie',
                         help='Netscape-style cookie jar file to read cookies from '
