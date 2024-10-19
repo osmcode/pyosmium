@@ -4,6 +4,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.2] - 2024-10-19
+
+### Fixed
+
+- set proper default 'osc.gz' for prefixes on replication servers
+
+### Added
+
+- add documentation for writing custom objects and replication module
+
+
 ## [4.0.1] - 2024-09-27
 
 ### Fixed
