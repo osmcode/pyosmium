@@ -18,15 +18,15 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.36">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
     
     
       
-        <title>OSM Data Containers - Pyosmium 4.0.1</title>
+        <title>OSM Data Containers - Pyosmium 4.0.2</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.06209087.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0253249f.min.css">
       
       
 
@@ -80,7 +80,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Pyosmium 4.0.1" class="md-header__button md-logo" aria-label="Pyosmium 4.0.1" data-md-component="logo">
+    <a href="../.." title="Pyosmium 4.0.2" class="md-header__button md-logo" aria-label="Pyosmium 4.0.2" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -94,7 +94,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Pyosmium 4.0.1
+            Pyosmium 4.0.2
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -273,13 +273,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Pyosmium 4.0.1" class="md-nav__button md-logo" aria-label="Pyosmium 4.0.1" data-md-component="logo">
+    <a href="../.." title="Pyosmium 4.0.2" class="md-nav__button md-logo" aria-label="Pyosmium 4.0.2" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    Pyosmium 4.0.1
+    Pyosmium 4.0.2
   </label>
   
     <div class="md-nav__source">
@@ -1152,6 +1152,57 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#mutable-osm-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mutable OSM objects
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mutable OSM objects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#osmium.osm.mutable.OSMObject" class="md-nav__link">
+    <span class="md-ellipsis">
+      OSMObject
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#osmium.osm.mutable.Node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#osmium.osm.mutable.Way" class="md-nav__link">
+    <span class="md-ellipsis">
+      Way
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#osmium.osm.mutable.Relation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Relation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1336,6 +1387,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../Replication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Replication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../Exceptions/" class="md-nav__link">
         
   
@@ -1400,6 +1472,11 @@ valid.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1435,6 +1512,11 @@ valid.</p>
 
         <p>This is the base class for all OSM entity classes below and contains
 all common attributes.</p>
+
+
+
+
+
 
 
 
@@ -1795,6 +1877,11 @@ and adds a single extra attribute: the location.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -1918,6 +2005,11 @@ To create a full copy use:
 
         <p>Represents an OSM way. It inherits the attributes from OSMObject and
 adds an ordered list of nodes that describes the way.</p>
+
+
+
+
+
 
 
 
@@ -2063,6 +2155,11 @@ and adds an ordered list of members.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2148,6 +2245,11 @@ that represent multipolygons. They also inherit the attributes
 of OSMObjects and in addition contain polygon geometries. Areas have
 their own unique id space. This is computed as the OSM id times 2
 and for relations 1 is added.</p>
+
+
+
+
+
 
 
 
@@ -2292,6 +2394,11 @@ which have an overlapping id space.</p>
 
 
         <p>A changeset description.</p>
+
+
+
+
+
 
 
 
@@ -2548,6 +2655,11 @@ in general.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2631,6 +2743,11 @@ items are <a class="autorefs autorefs-internal" href="#osmium.osm.Tag">Tags</a>.
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2683,6 +2800,11 @@ does not exist in the list.</p>
 
 
         <p>A reference to a OSM node that also caches the nodes location.</p>
+
+
+
+
+
 
 
 
@@ -2810,6 +2932,11 @@ is normally not used directly, use one of its subclasses instead.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2906,6 +3033,11 @@ For its members see <a class="autorefs autorefs-internal" href="#osmium.osm.Node
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2942,6 +3074,11 @@ For its members see <a class="autorefs autorefs-internal" href="#osmium.osm.Node
 
         <p>List of nodes in an inner ring. "
 For its members see <a class="autorefs autorefs-internal" href="#osmium.osm.NodeRefList"><code>osmium.osm.NodeRefList</code></a>.</p>
+
+
+
+
+
 
 
 
@@ -2986,6 +3123,11 @@ For its members see <a class="autorefs autorefs-internal" href="#osmium.osm.Node
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -3020,6 +3162,11 @@ For its members see <a class="autorefs autorefs-internal" href="#osmium.osm.Node
 
 
         <p>Single member of a relation.</p>
+
+
+
+
+
 
 
 
@@ -3126,6 +3273,11 @@ If no role is set then the string is empty.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -3157,6 +3309,11 @@ If no role is set then the string is empty.</p>
 
 
     <div class="doc doc-contents first">
+
+
+
+
+
 
 
 
@@ -3197,6 +3354,11 @@ If no role is set then the string is empty.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -3206,6 +3368,266 @@ If no role is set then the string is empty.</p>
 
 
 
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="mutable-osm-objects">Mutable OSM objects<a class="headerlink" href="#mutable-osm-objects" title="Permanent link">🔗</a></h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="osmium.osm.mutable.OSMObject" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>osmium.osm.mutable.OSMObject</code>
+
+
+<a href="#osmium.osm.mutable.OSMObject" class="headerlink" title="Permanent link">🔗</a></h3>
+
+
+    <div class="doc doc-contents first">
+
+
+        <p>Mutable version of <a class="autorefs autorefs-internal" href="#osmium.osm.OSMObject">osmium.osm.OSMObject</a>.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="osmium.osm.mutable.OSMObject.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OSMObjectLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">visible</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">changeset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TagSequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+<a href="#osmium.osm.mutable.OSMObject.__init__" class="headerlink" title="Permanent link">🔗</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialise an object with the following optional
+attributes: <code>id</code>, <code>version</code>, <code>visible</code>, <code>changeset</code>, <code>timestamp</code>,
+<code>uid</code> and <code>tags</code>. Timestamps may be strings or datetime objects.
+Tags can be an osmium.osm.TagList, a dict-like object
+or a list of tuples, where each tuple contains a (key value) string pair.</p>
+<p>If the <code>base</code> parameter is given in the constructor, then the object
+will be initialised first from the attributes of this base object.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="osmium.osm.mutable.Node" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>osmium.osm.mutable.Node</code>
+
+
+<a href="#osmium.osm.mutable.Node" class="headerlink" title="Permanent link">🔗</a></h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code>osmium.<span title="osmium.osm">osm</span>.<span title="osmium.osm.mutable">mutable</span>.<a class="autorefs autorefs-internal" title="osmium.osm.mutable.OSMObject" href="#osmium.osm.mutable.OSMObject">OSMObject</a></code></p>
+
+
+        <p>The mutable version of <a class="autorefs autorefs-internal" href="#osmium.osm.Node">osmium.osm.Node</a>.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="osmium.osm.mutable.Node.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Node</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">Node</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LocationLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+<a href="#osmium.osm.mutable.Node.__init__" class="headerlink" title="Permanent link">🔗</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialise a node with all optional attributes
+from osmium.osm.mutable.OSMObject as well as a <code>location</code> attribute.
+This may either be an <a class="autorefs autorefs-internal" href="#osmium.osm.Location">osmium.osm.Location</a> or a tuple of
+lon/lat coordinates.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="osmium.osm.mutable.Way" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>osmium.osm.mutable.Way</code>
+
+
+<a href="#osmium.osm.mutable.Way" class="headerlink" title="Permanent link">🔗</a></h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code>osmium.<span title="osmium.osm">osm</span>.<span title="osmium.osm.mutable">mutable</span>.<a class="autorefs autorefs-internal" title="osmium.osm.mutable.OSMObject" href="#osmium.osm.mutable.OSMObject">OSMObject</a></code></p>
+
+
+        <p>The mutable version of <a class="autorefs autorefs-internal" href="#osmium.osm.Way">osmium.osm.Way</a>.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="osmium.osm.mutable.Way.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Way</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">Way</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nodes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NodeSequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+<a href="#osmium.osm.mutable.Way.__init__" class="headerlink" title="Permanent link">🔗</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialise a way with all optional attributes
+from osmium.osm.mutable.OSMObject as well as a <code>nodes</code> attribute.
+This may either be an <a class="autorefs autorefs-internal" href="#osmium.osm.NodeRefList">osmium.osm.NodeRefList</a> or a list
+consisting of <a class="autorefs autorefs-internal" href="#osmium.osm.NodeRef">osmium.osm.NodeRef</a> or simple node ids.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="osmium.osm.mutable.Relation" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>osmium.osm.mutable.Relation</code>
+
+
+<a href="#osmium.osm.mutable.Relation" class="headerlink" title="Permanent link">🔗</a></h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code>osmium.<span title="osmium.osm">osm</span>.<span title="osmium.osm.mutable">mutable</span>.<a class="autorefs autorefs-internal" title="osmium.osm.mutable.OSMObject" href="#osmium.osm.mutable.OSMObject">OSMObject</a></code></p>
+
+
+        <p>The mutable version of <a class="autorefs autorefs-internal" href="#osmium.osm.Relation">osmium.osm.Relation</a>.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="osmium.osm.mutable.Relation.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Relation</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">Relation</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">members</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MemberSequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+
+<a href="#osmium.osm.mutable.Relation.__init__" class="headerlink" title="Permanent link">🔗</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialise a relation with all optional attributes
+from osmium.osm.mutable.OSMObject as well as a <code>members</code> attribute.
+This may either be an <a class="autorefs autorefs-internal" href="#osmium.osm.RelationMemberList">osmium.osm.RelationMemberList</a> or
+a list consisting of <a class="autorefs autorefs-internal" href="#osmium.osm.RelationMember">osmium.osm.RelationMember</a> or
+tuples of (type, id, role). The
+member type must be a single character 'n', 'w' or 'r'.</p>
+
+    </div>
+
+</div>
 
 
 
@@ -3267,7 +3689,7 @@ If no role is set then the string is empty.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "toc.integrate"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>

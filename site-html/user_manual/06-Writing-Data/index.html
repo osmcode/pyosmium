@@ -18,15 +18,15 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.36">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
     
     
       
-        <title>Writing Data - Pyosmium 4.0.1</title>
+        <title>Writing Data - Pyosmium 4.0.2</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.06209087.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0253249f.min.css">
       
       
 
@@ -80,7 +80,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Pyosmium 4.0.1" class="md-header__button md-logo" aria-label="Pyosmium 4.0.1" data-md-component="logo">
+    <a href="../.." title="Pyosmium 4.0.2" class="md-header__button md-logo" aria-label="Pyosmium 4.0.2" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -94,7 +94,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Pyosmium 4.0.1
+            Pyosmium 4.0.2
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -273,13 +273,13 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Pyosmium 4.0.1" class="md-nav__button md-logo" aria-label="Pyosmium 4.0.1" data-md-component="logo">
+    <a href="../.." title="Pyosmium 4.0.2" class="md-nav__button md-logo" aria-label="Pyosmium 4.0.2" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    Pyosmium 4.0.1
+    Pyosmium 4.0.2
   </label>
   
     <div class="md-nav__source">
@@ -1126,6 +1126,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/Replication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Replication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/Exceptions/" class="md-nav__link">
         
   
@@ -1223,6 +1244,95 @@ before writing it out again. Use the <code>replace()</code> function to create a
 <p>You can also write data that is not based on OSM input data at all. The write
 functions will accept any Python object that mimics the attributes of a
 node, way or relation.</p>
+<p>Here is a simple example that writes out four random points:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">uniform</span>
+</span><span id="__span-3-2">
+</span><span id="__span-3-3"><span class="k">class</span> <span class="nc">RandomNode</span><span class="p">:</span>
+</span><span id="__span-3-4">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+</span><span id="__span-3-5">        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+</span><span id="__span-3-6">        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="p">(</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">))</span>
+</span><span id="__span-3-7">        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">}</span>
+</span><span id="__span-3-8">
+</span><span id="__span-3-9"><span class="k">with</span> <span class="n">osmium</span><span class="o">.</span><span class="n">SimpleWriter</span><span class="p">(</span><span class="s1">&#39;points.opl&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+</span><span id="__span-3-10">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+</span><span id="__span-3-11">        <span class="n">writer</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">RandomNode</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Random </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+</span></code></pre></div>
+</div>
+<p>The following table gives an overview over the recognised attributes and
+acceptable types. If an attribute is missing, then pyosmium will choose a
+suitable default or leave the attribute out completely from the output if
+that is possible.</p>
+<table>
+<thead>
+<tr>
+<th>attribute</th>
+<th>types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td><code>int</code></td>
+</tr>
+<tr>
+<td>version</td>
+<td><code>int</code> (positive non-zero value)</td>
+</tr>
+<tr>
+<td>visible</td>
+<td><code>bool</code></td>
+</tr>
+<tr>
+<td>changeset</td>
+<td><code>int</code> (positive non-zero value)</td>
+</tr>
+<tr>
+<td>timestamp</td>
+<td><code>str</code> or <code>datetime</code> (will be translated to UTC first)</td>
+</tr>
+<tr>
+<td>uid</td>
+<td><code>int</code></td>
+</tr>
+<tr>
+<td>tags</td>
+<td><a class="autorefs autorefs-internal" href="../../reference/Dataclasses/#osmium.osm.TagList">osmium.osm.TagList</a>, a dict-like object or a list of tuples, where each tuple contains a (key, value) string pair</td>
+</tr>
+<tr>
+<td>user</td>
+<td><code>str</code></td>
+</tr>
+<tr>
+<td>location</td>
+<td><em>(node only)</em> <a class="autorefs autorefs-internal" href="../../reference/Dataclasses/#osmium.osm.Location">osmium.osm.Location</a> or a tuple of lon/lat coordinates</td>
+</tr>
+<tr>
+<td>nodes</td>
+<td><em>(way only)</em> <a class="autorefs autorefs-internal" href="../../reference/Dataclasses/#osmium.osm.NodeRefList">osmium.osm.NodeRefList</a> or a list consisting of either <a class="autorefs autorefs-internal" href="../../reference/Dataclasses/#osmium.osm.NodeRef">osmium.osm.NodeRef</a>s or simple node ids</td>
+</tr>
+<tr>
+<td>members</td>
+<td><em>(relation only)</em> <a class="autorefs autorefs-internal" href="../../reference/Dataclasses/#osmium.osm.RelationMemberList">osmium.osm.RelationMemberList</a> or a list consisting of either <a class="autorefs autorefs-internal" href="../../reference/Dataclasses/#osmium.osm.RelationMember">osmium.osm.RelationMember</a>s or tuples of <code>(type, id, role)</code>. The member type must be a single character 'n', 'w' or 'r'.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>osmium.osm.mutable</code> module offers pure Python-object versions of <code>Node</code>,
+<code>Way</code> and <code>Relation</code> to make the creation of custom objects easier. Any of
+the allowable attributes may be set in the constructor. This makes the
+example for writing random points a bit shorter:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">uniform</span>
+</span><span id="__span-4-2">
+</span><span id="__span-4-3"><span class="k">with</span> <span class="n">osmium</span><span class="o">.</span><span class="n">SimpleWriter</span><span class="p">(</span><span class="s1">&#39;points.opl&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+</span><span id="__span-4-4">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+</span><span id="__span-4-5">        <span class="n">writer</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">mutable</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span>
+</span><span id="__span-4-6">            <span class="nb">id</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="p">(</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">)),</span>
+</span><span id="__span-4-7">            <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Random </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}))</span>
+</span></code></pre></div>
+</div>
 <h2 id="writer-types">Writer types<a class="headerlink" href="#writer-types" title="Permanent link">🔗</a></h2>
 <p>pyosmium implements three different writer classes: the basic
 <a class="autorefs autorefs-internal" href="../../reference/Data-Writers/#osmium.SimpleWriter">SimpleWriter</a> and
@@ -1282,7 +1392,7 @@ the two reference-completing writers
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "toc.integrate"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
     
   </body>
