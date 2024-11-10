@@ -212,8 +212,21 @@ KeyFilter multiple times:
 
 ### TagFilter
 
-This filter works exactly the same as the KeyFilter, only it looks for the
-presence of whole tags (key and value) in the tag list of the object.
+This filter works like KeyFilter, allowing both AND and OR combinations, but
+it requires whole tags (key and value) in the object's tag list.
+Tags are given as two-element tuples.
+
+!!! example
+    ```python
+    print("Objects with 'highway=primary' _or_ 'surface=asphalt' tags:",
+          sum(1 for o in osmium.FileProcessor('../data/liechtenstein.osm.pbf')
+                               .with_filter(osmium.filter.TagFilter(('highway','primary'), ('surface','asphalt')))))
+
+    print("Objects with 'highway=primary' _and_ 'surface=asphalt' tags:",
+          sum(1 for o in osmium.FileProcessor('../data/liechtenstein.osm.pbf')
+                               .with_filter(osmium.filter.TagFilter(('highway','primary')))
+                               .with_filter(osmium.filter.TagFilter(('surface','asphalt')))))
+    ```
 
 ### IdFilter
 
