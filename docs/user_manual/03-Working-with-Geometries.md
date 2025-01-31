@@ -240,8 +240,12 @@ the geometry functions of shapely:
     ```python
     from shapely.geometry import shape
 
+    fp = osmium.FileProcessor('liechtenstein.osm.pbf')\
+               .with_locations().\
+               with_filter(osmium.filter.GeoInterfaceFilter())
+
     total = 0.0
-    for o in osmium.FileProcessor('liechtenstein.osm.pbf').with_locations().with_filter(osmium.GeoHandler()):
+    for o in fp:
         if o.is_way() and 'highway' in o.tags:
             # Shapely has only support for Features starting from version 2.1,
             # so lets cheat a bit here.
