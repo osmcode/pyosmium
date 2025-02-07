@@ -191,5 +191,6 @@ while true; do
   else
     echo "Fatal error, stopping updates."
     exit $status
+  fi
 done
 ```
