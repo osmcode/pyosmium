@@ -41,10 +41,9 @@ pyosmium has the following dependencies:
  * [libz](https://www.zlib.net/)
  * [libbz2](https://www.sourceware.org/bzip2/)
  * [Boost](https://www.boost.org/) variant and iterator >= 1.41
- * [Python Requests](https://docs.python-requests.org/en/master/)
+ * [Python Requests](https://docs.python-requests.org/)
  * Python setuptools
- * [Requests](https://requests.readthedocs.io)
- * a C++17-compatible compiler (Clang 7+, GCC 8+)
+ * a C++17-compatible compiler (Clang 13+, GCC 10+ are supported)
 
 ### Compiling from Source
 

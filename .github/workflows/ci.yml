@@ -149,14 +149,14 @@ jobs:
                     - compiler: gcc-old
                       cc: gcc-10
                       cxx: g++-10
-                      platform: ubuntu-20.04
+                      platform: ubuntu-22.04
                       python: 3.7
                       deps: release
                       flavour: linux
                     - compiler: clang-old
-                      cc: clang-10
-                      cxx: clang++-10
-                      platform: ubuntu-20.04
+                      cc: clang-13
+                      cxx: clang++-13
+                      platform: ubuntu-22.04
                       python: 3.7
                       deps: release
                       flavour: linux
