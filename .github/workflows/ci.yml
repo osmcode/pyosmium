@@ -400,3 +400,4 @@ jobs:
               run: |
                 ./osmium-test/Scripts/pyosmium-get-changes -h
                 ./osmium-test/Scripts/pyosmium-up-to-date -h
+              shell: bash
