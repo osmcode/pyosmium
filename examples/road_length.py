@@ -3,20 +3,20 @@ Compute the total length of highways in an osm file.
 
 Shows how to extract the geometry of a way.
 """
-import osmium as o
+import osmium
 import sys
 
 def main(osmfile):
     total = 0.0
     # As we need the way geometry, the node locations need to be cached.
     # This is enabled with the with_locations() function.
-    for obj in o.FileProcessor(osmfile, o.osm.NODE | o.osm.WAY)\
+    for obj in osmium.FileProcessor(osmfile, osmium.osm.NODE | osmium.osm.WAY)\
                 .with_locations()\
-                .with_filter(o.filter.KeyFilter('highway')):
+                .with_filter(osmium.filter.KeyFilter('highway')):
         if obj.is_way():
             try:
-                total += o.geom.haversine_distance(obj.nodes)
-            except o.InvalidLocationError:
+                total += osmium.geom.haversine_distance(obj.nodes)
+            except osmium.InvalidLocationError:
                 # A location error might occur if the osm file is an extract
                 # where nodes of ways near the boundary are missing.
                 print("WARNING: way %d incomplete. Ignoring." % obj.id)

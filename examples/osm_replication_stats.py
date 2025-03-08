@@ -4,7 +4,7 @@ starting from a given timestamp for a maximum of n hours.
 
 Shows how to detect the different kind of modifications.
 """
-import osmium as o
+import osmium as osmium
 import sys
 import datetime as dt
 import osmium.replication.server as rserv
@@ -30,7 +30,7 @@ class Stats(object):
         print("%s modified: %d" % (prefix, self.modified))
         print("%s deleted: %d" % (prefix, self.deleted))
 
-class FileStatsHandler(o.SimpleHandler):
+class FileStatsHandler(osmium.SimpleHandler):
     def __init__(self):
         super(FileStatsHandler, self).__init__()
         self.nodes = Stats()

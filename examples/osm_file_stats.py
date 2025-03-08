@@ -3,10 +3,10 @@ Simple example that counts the number of objects in an osm file.
 
 Shows how to write a handler for the different types of objects.
 """
-import osmium as o
+import osmium
 import sys
 
-class FileStatsHandler(o.SimpleHandler):
+class FileStatsHandler(osmium.SimpleHandler):
 
     def __init__(self):
         super(FileStatsHandler, self).__init__()

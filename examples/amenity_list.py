@@ -7,13 +7,13 @@ Points and areas will be processed, unclosed ways will be skipped.
 This example shows how geometries from osmium objects can be imported
 into shapely using the WKBFactory.
 """
-import osmium as o
+import osmium
 import sys
 import shapely.wkb as wkblib
 
-wkbfab = o.geom.WKBFactory()
+wkbfab = osmium.geom.WKBFactory()
 
-class AmenityListHandler(o.SimpleHandler):
+class AmenityListHandler(osmium.SimpleHandler):
 
     def print_amenity(self, tags, lon, lat):
         name = tags.get('name', '')
@@ -33,7 +33,7 @@ def main(osmfile):
 
     handler = AmenityListHandler()
 
-    handler.apply_file(osmfile, filters=[o.filter.KeyFilter('amenity')])
+    handler.apply_file(osmfile, filters=[osmium.filter.KeyFilter('amenity')])
 
     return 0
 
