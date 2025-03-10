@@ -12,7 +12,16 @@ jobs:
             - name: Install packages
               run: |
                 sudo apt-get update -y -qq
-                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
+                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev pipx
+                pipx install mypy
+                pipx inject mypy types-requests
+                pipx install flake8
+
+            - name: Lint package
+              run: flake8 src examples
+
+            - name: Typecheck package
+              run: mypy src
 
             - name: Set up Python 3.7
               uses: actions/setup-python@v5
