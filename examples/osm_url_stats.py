@@ -13,7 +13,6 @@ if __name__ == '__main__':
         print("Usage: python osm_url_stats.py <osmfile>")
         sys.exit(-1)
 
-
     data = urlrequest.urlopen(sys.argv[1]).read()
 
     counter = {'n': 0, 'w': 0, 'r': 0}

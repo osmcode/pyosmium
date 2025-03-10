@@ -6,6 +6,7 @@ Shows how to write a handler for the different types of objects.
 import osmium
 import sys
 
+
 class FileStatsHandler(osmium.SimpleHandler):
 
     def __init__(self):
@@ -34,6 +35,7 @@ def main(osmfile):
     print("Relations: %d" % h.rels)
 
     return 0
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

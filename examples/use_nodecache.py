@@ -4,15 +4,18 @@ Iterate over all ways (and ways only) using node cache to obtain geometries
 import osmium
 import sys
 
+
 class WayHandler:
 
     def __init__(self, idx):
         self.idx = idx
 
     def way(self, w):
+        locations = []
         for n in w.nodes:
-            loc = idx.get(n.ref) # note that cache is used here
-        print("%d %s" % (w.id, len(w.nodes)))
+            locations.append(idx.get(n.ref))  # note that cache is used here
+        print(w.id, len(w.nodes), locations)
+
 
 if len(sys.argv) != 3:
     print("Usage: python use_nodecache.py <osm file> <node cache>")

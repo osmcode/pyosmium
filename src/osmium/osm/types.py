@@ -2,9 +2,9 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Sequence, Any, NamedTuple, Callable, Optional, Iterator, \
+from typing import Any, NamedTuple, Callable, Optional, Iterator, \
                    Iterable, TYPE_CHECKING, TypeVar, Generic, Tuple, Union
 import datetime as dt
 
@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     import osmium.osm._osm as cosm
 
 T_obj = TypeVar('T_obj', 'cosm.COSMNode', 'cosm.COSMWay', 'cosm.COSMRelation', 'cosm.COSMArea')
+
 
 def _make_repr(name: str, *attrs: str) -> Callable[[Any], str]:
     fmt_string = f'osmium.osm.{name}('\
@@ -223,15 +224,17 @@ class OuterRing(NodeRefList):
        For its members see [`osmium.osm.NodeRefList`][].
     """
 
+
 class InnerRing(NodeRefList):
     """ List of nodes in an inner ring. "
         For its members see [`osmium.osm.NodeRefList`][].
     """
 
+
 class RelationMember:
     """ Single member of a relation.
     """
-    ref : int
+    ref: int
     "OSM ID of the object. Only unique within the type."
     type: str
     "Type of object referenced, a node, way or relation."
@@ -252,7 +255,8 @@ class RelationMember:
         return f"{self.type}{self.ref:d}"
 
     def __repr__(self) -> str:
-        return f"osmium.osm.RelationMember(ref={self.ref!r}, type={self.type!r}, role={self.role!r})"
+        return f"osmium.osm.RelationMember(ref={self.ref!r}, " \
+            f"type={self.type!r}, role={self.role!r})"
 
 
 class MemberIterator:
@@ -442,7 +446,6 @@ class Node(OSMObject['cosm.COSMNode']):
         """
         return self.location.lat
 
-
     @property
     def lon(self) -> float:
         """ Return longitude of the node.
@@ -457,7 +460,6 @@ class Node(OSMObject['cosm.COSMNode']):
             return f'n{self.id:d}: location={self.location!s} tags={self.tags!s}'
 
         return '<node invalid>'
-
 
     __repr__ = _make_repr('Node', 'id', 'deleted', 'visible', 'version',
                           'changeset', 'uid', 'timestamp', 'user',
@@ -566,7 +568,7 @@ class Relation(OSMObject['cosm.COSMRelation']):
         if self._pyosmium_data.is_valid():
             return f"r{self.id:d}: members={self.members!s}, tags={self.tags!s}"
 
-        return f"<relation invalid>"
+        return '<relation invalid>'
 
     __repr__ = _make_repr('Relation', 'id', 'deleted', 'visible', 'version',
                                       'changeset', 'uid', 'timestamp', 'user',
@@ -635,7 +637,7 @@ class Area(OSMObject['cosm.COSMArea']):
         """
         return self._pyosmium_data.is_multipolygon()
 
-    def num_rings(self) -> Tuple[int,int]:
+    def num_rings(self) -> Tuple[int, int]:
         """ Return a tuple with the number of outer rings and inner rings.
 
             This function goes through all rings to count them.
@@ -659,7 +661,7 @@ class Area(OSMObject['cosm.COSMArea']):
         if self._pyosmium_data.is_valid():
             return f"a{self.id:d}: num_rings={self.num_rings()}, tags={self.tags!s}"
 
-        return f"<area invalid>"
+        return '<area invalid>'
 
     __repr__ = _make_repr('Area', 'id', 'deleted', 'visible', 'version',
                                   'changeset', 'uid', 'timestamp', 'user',
@@ -751,13 +753,14 @@ class Changeset:
 
     def __str__(self) -> str:
         if self._pyosmium_data.is_valid():
-            return f'c{self.id:d}: closed_at={self.closed_at!s}, bounds={self.bounds!s}, tags={self.tags!s}'
+            return f"c{self.id:d}: closed_at={self.closed_at!s}, " \
+                f"bounds={self.bounds!s}, tags={self.tags!s}"
 
-        return f"<changeset invalid>"
+        return '<changeset invalid>'
 
-    __repr__ =  _make_repr('Changeset', 'id', 'uid', 'created_at', 'closed_at',
-                                        'open', 'num_changes', 'bounds', 'user',
-                                        'tags')
+    __repr__ = _make_repr('Changeset', 'id', 'uid', 'created_at', 'closed_at',
+                                       'open', 'num_changes', 'bounds', 'user',
+                                       'tags')
 
 
 OSMEntity = Union[Node, Way, Relation, Area, Changeset]

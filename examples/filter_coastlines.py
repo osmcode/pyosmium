@@ -32,7 +32,8 @@ if __name__ == '__main__':
     way_filter = osmium.filter.KeyFilter('natural').enable_for(osmium.osm.WAY)
 
     # We need nodes and ways in the second pass.
-    for obj in osmium.FileProcessor(sys.argv[1], osmium.osm.WAY | osmium.osm.NODE).with_filter(way_filter):
+    for obj in osmium.FileProcessor(sys.argv[1], osmium.osm.WAY | osmium.osm.NODE) \
+                     .with_filter(way_filter):
         if obj.is_node() and obj.id in nodes:
             # Strip the object of tags along the way
             writer.add_node(obj.replace(tags={}))

@@ -13,6 +13,7 @@ import shapely.wkb as wkblib
 
 wkbfab = osmium.geom.WKBFactory()
 
+
 class AmenityListHandler(osmium.SimpleHandler):
 
     def print_amenity(self, tags, lon, lat):
@@ -36,6 +37,7 @@ def main(osmfile):
     handler.apply_file(osmfile, filters=[osmium.filter.KeyFilter('amenity')])
 
     return 0
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

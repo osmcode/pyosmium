@@ -24,4 +24,3 @@ if __name__ == '__main__':
             writer.add_relation(obj)
 
     writer.close()
-
