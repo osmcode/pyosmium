@@ -10,6 +10,7 @@ import osmium
 
 geojsonfab = osmium.geom.GeoJSONFactory()
 
+
 class GeoJsonWriter(osmium.SimpleHandler):
 
     def __init__(self):
@@ -48,7 +49,8 @@ class GeoJsonWriter(osmium.SimpleHandler):
 def main(osmfile):
     handler = GeoJsonWriter()
 
-    handler.apply_file(osmfile,filters=[osmium.filter.EmptyTagFilter().enable_for(osmium.osm.NODE)])
+    handler.apply_file(osmfile,
+                       filters=[osmium.filter.EmptyTagFilter().enable_for(osmium.osm.NODE)])
     handler.finish()
 
     return 0

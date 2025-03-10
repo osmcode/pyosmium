@@ -4,6 +4,7 @@ Search for pubs in an osm file and list their names.
 import osmium
 import sys
 
+
 def main(osmfile):
     for obj in osmium.FileProcessor(osmfile)\
                      .with_filter(osmium.filter.KeyFilter('amenity'))\
@@ -12,6 +13,7 @@ def main(osmfile):
             print(obj.tags['name'])
 
     return 0
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

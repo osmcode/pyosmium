@@ -6,6 +6,7 @@ It changes all tag values 'yes/no' to '1/0'.
 import osmium
 import sys
 
+
 class BoolNormalizer(osmium.SimpleHandler):
 
     def __init__(self, writer):

@@ -14,6 +14,7 @@ from osmium import IdTracker
 from osmium.io import File, FileBuffer
 from osmium.file_processor import FileProcessor, zip_processors
 
+
 class ForwardReferenceWriter:
     """ Writer that adds forward-referenced objects optionally also making
         the final file reference complete. An object is a forward reference
@@ -29,9 +30,9 @@ class ForwardReferenceWriter:
 
     def __init__(self, outfile: Union[str, 'os.PathLike[str]', File],
                  ref_src: Union[str, 'os.PathLike[str]', File, FileBuffer],
-                 overwrite: bool=False, back_references: bool=True,
-                 remove_tags: bool=True, forward_relation_depth: int=0,
-                 backward_relation_depth: int=1) -> None:
+                 overwrite: bool = False, back_references: bool = True,
+                 remove_tags: bool = True, forward_relation_depth: int = 0,
+                 backward_relation_depth: int = 1) -> None:
         """ Create a new writer.
 
             `outfile` is the name of the output file to write. The file must
@@ -59,10 +60,8 @@ class ForwardReferenceWriter:
         self.forward_relation_depth = forward_relation_depth
         self.backward_relation_depth = backward_relation_depth
 
-
     def __enter__(self) -> 'ForwardReferenceWriter':
         return self
-
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         if exc_type is None:
@@ -70,7 +69,6 @@ class ForwardReferenceWriter:
         else:
             # Exception occured. Do not write out the final file.
             self.writer.close()
-
 
     def add(self, obj: Any) -> None:
         """ Write an arbitrary OSM object. This can be either an
@@ -85,13 +83,11 @@ class ForwardReferenceWriter:
             self.id_tracker.add_relation(obj.id)
         self.writer.add(obj)
 
-
     def add_node(self, n: Any) -> None:
         """ Write out an OSM node.
         """
         self.id_tracker.add_node(n.id)
         self.writer.add_node(n)
-
 
     def add_way(self, w: Any) -> None:
         """ Write out an OSM way.
@@ -99,13 +95,11 @@ class ForwardReferenceWriter:
         self.id_tracker.add_way(w.id)
         self.writer.add_way(w)
 
-
     def add_relation(self, r: Any) -> None:
         """ Write out an OSM relation.
         """
         self.id_tracker.add_relation(r.id)
         self.writer.add_relation(r)
-
 
     def close(self) -> None:
         """ Close the writer and write out the final file.
@@ -116,15 +110,16 @@ class ForwardReferenceWriter:
         if self.tmpdir is not None:
             self.writer.close()
 
-            self.id_tracker.complete_forward_references(self.ref_src,
-                                                        relation_depth=self.forward_relation_depth)
+            self.id_tracker.complete_forward_references(
+                self.ref_src,
+                relation_depth=self.forward_relation_depth)
             if self.back_references:
-                self.id_tracker.complete_backward_references(self.ref_src,
-                                                             relation_depth=self.backward_relation_depth)
+                self.id_tracker.complete_backward_references(
+                    self.ref_src,
+                    relation_depth=self.backward_relation_depth)
 
             fp1 = FileProcessor(Path(self.tmpdir.name, 'forward_writer.osm.pbf'))
             fp2 = FileProcessor(self.ref_src).with_filter(self.id_tracker.id_filter())
-
 
             with SimpleWriter(self.outfile, overwrite=self.overwrite) as writer:
                 for o1, o2 in zip_processors(fp1, fp2):
@@ -135,5 +130,3 @@ class ForwardReferenceWriter:
 
             self.tmpdir.cleanup()
             self.tmpdir = None
-
-

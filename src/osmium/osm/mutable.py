@@ -2,10 +2,11 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from typing import Optional, Union, Any, Mapping, Sequence, Tuple, TYPE_CHECKING
 from datetime import datetime
+
 
 if TYPE_CHECKING:
     import osmium.osm
@@ -16,7 +17,8 @@ if TYPE_CHECKING:
     LocationLike = Union[osmium.osm.Location, Tuple[float, float]]
     NodeSequence = Union[osmium.osm.NodeRefList, Sequence[Union[osmium.osm.NodeRef, int]]]
     MemberSequence = Union[osmium.osm.RelationMemberList,
-                       Sequence[Union[osmium.osm.RelationMember, Tuple[str, int, str]]]]
+                           Sequence[Union[osmium.osm.RelationMember, Tuple[str, int, str]]]]
+
 
 class OSMObject:
     """ Mutable version of [osmium.osm.OSMObject][].
@@ -93,6 +95,7 @@ class Way(OSMObject):
         else:
             self.nodes = nodes if nodes is not None else base.nodes
 
+
 class Relation(OSMObject):
     """ The mutable version of [osmium.osm.Relation][].
     """
@@ -120,6 +123,7 @@ def create_mutable_node(node: Union[Node, 'osmium.osm.Node'], **args: Any) -> No
     """
     return Node(base=node, **args)
 
+
 def create_mutable_way(way: Union[Way, 'osmium.osm.Way'], **args: Any) -> Way:
     """ Create a mutable way replacing the properties given in the
         named parameters. Note that this function only creates a shallow
@@ -127,10 +131,10 @@ def create_mutable_way(way: Union[Way, 'osmium.osm.Way'], **args: Any) -> Way:
     """
     return Way(base=way, **args)
 
+
 def create_mutable_relation(rel: Union[Relation, 'osmium.osm.Relation'], **args: Any) -> Relation:
     """ Create a mutable relation replacing the properties given in the
         named parameters. Note that this function only creates a shallow
         copy which is still bound to the scope of the original object.
     """
     return Relation(base=rel, **args)
-

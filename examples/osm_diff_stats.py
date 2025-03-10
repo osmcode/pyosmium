@@ -7,6 +7,7 @@ use the handler generator function instead of a handler class.
 import osmium
 import sys
 
+
 class Stats:
 
     def __init__(self):
@@ -39,6 +40,7 @@ def main(osmfile):
     stats['r'].outstats("Relations")
 
     return 0
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

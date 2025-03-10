@@ -9,7 +9,8 @@ import sys
 import datetime as dt
 import osmium.replication.server as rserv
 
-class Stats(object):
+
+class Stats:
 
     def __init__(self):
         self.added = 0
@@ -24,11 +25,11 @@ class Stats(object):
         else:
             self.modified += 1
 
-
     def outstats(self, prefix):
         print("%s added: %d" % (prefix, self.added))
         print("%s modified: %d" % (prefix, self.modified))
         print("%s deleted: %d" % (prefix, self.deleted))
+
 
 class FileStatsHandler(osmium.SimpleHandler):
     def __init__(self):
@@ -54,8 +55,7 @@ if __name__ == '__main__':
 
     server_url = sys.argv[1]
     start = dt.datetime.strptime(sys.argv[2], "%Y-%m-%dT%H:%M:%SZ")
-    if sys.version_info >= (3,0):
-        start = start.replace(tzinfo=dt.timezone.utc)
+    start = start.replace(tzinfo=dt.timezone.utc)
     maxkb = min(int(sys.argv[3]), 10 * 1024)
 
     repserv = rserv.ReplicationServer(server_url)

@@ -2,17 +2,17 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2023 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 """ Helper functions for change file handling. """
 from typing import NamedTuple, Optional
 import logging
 import datetime as dt
-from collections import namedtuple
 from osmium.io import Reader as oreader
 from osmium.osm import NOTHING
 
 LOG = logging.getLogger('pyosmium')
+
 
 class ReplicationHeader(NamedTuple):
     """ Description of a replication state.
@@ -72,7 +72,8 @@ def get_replication_header(fname: str) -> ReplicationHeader:
             ts = ts.replace(tzinfo=dt.timezone.utc)
 
         except ValueError:
-            LOG.warning("Date in OSM file header is not in ISO8601 format (e.g. 2015-12-24T08:08Z). Ignored.")
+            LOG.warning("Date in OSM file header is not in ISO8601 format"
+                        "(e.g. 2015-12-24T08:08Z). Ignored.")
             ts = None
     else:
         ts = None
