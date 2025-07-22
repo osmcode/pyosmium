@@ -1,11 +1,13 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2022 Sarah Hoffmann.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 import pytest
 
-import osmium as o
+import osmium
+
 
 def test_waynode_length(simple_handler):
     data = """\
@@ -15,16 +17,18 @@ def test_waynode_length(simple_handler):
            """
 
     lens = {}
+
     def way(w):
         lens[w.id] = len(w.nodes)
 
     simple_handler(data, way=way)
 
-    assert lens == { 593 : 0, 4 : 3, 8 : 4 }
+    assert lens == {593: 0, 4: 3, 8: 4}
 
 
 def test_node_ids(simple_handler):
     refs = []
+
     def way(w):
         refs.extend(n.ref for n in w.nodes)
         assert w.nodes[-2].ref == -34
@@ -45,12 +49,13 @@ def test_missing_location_without_location_handler(simple_handler):
            """
 
     refs = []
+
     def way(w):
         refs.extend(n.ref for n in w.nodes)
         assert not w.nodes[0].location.valid()
-        with pytest.raises(o.InvalidLocationError):
+        with pytest.raises(osmium.InvalidLocationError):
             w.nodes[0].location.lat
-        with pytest.raises(o.InvalidLocationError):
+        with pytest.raises(osmium.InvalidLocationError):
             w.nodes[0].location.lon
 
     simple_handler(data, way=way)
@@ -65,6 +70,7 @@ def test_valid_locations(simple_handler):
            """
 
     locations = []
+
     def way(w):
         assert all(n.location.valid() for n in w.nodes)
         locations.extend((int(10 * n.location.lon), int(10 * n.location.lat))

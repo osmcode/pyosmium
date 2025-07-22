@@ -1,13 +1,14 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann.
-import osmium as o
-
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 import pytest
 
+import osmium
 from helpers import IDCollector
+
 
 @pytest.fixture
 def reader(opl_reader):
@@ -22,10 +23,11 @@ def reader(opl_reader):
                c223
                """)
 
+
 def test_filter_default_config(reader):
     pre = IDCollector()
     post = IDCollector()
-    o.apply(reader, pre, o.filter.EmptyTagFilter(), post)
+    osmium.apply(reader, pre, osmium.filter.EmptyTagFilter(), post)
 
     assert pre.nodes == [1, 2]
     assert post.nodes == [2]
@@ -40,7 +42,9 @@ def test_filter_default_config(reader):
 def test_filter_restrict_entity(reader):
     pre = IDCollector()
     post = IDCollector()
-    o.apply(reader, pre, o.filter.EmptyTagFilter().enable_for(o.osm.WAY | o.osm.RELATION), post)
+    osmium.apply(reader, pre,
+                 osmium.filter.EmptyTagFilter().enable_for(osmium.osm.WAY | osmium.osm.RELATION),
+                 post)
 
     assert pre.nodes == [1, 2]
     assert post.nodes == [1, 2]
@@ -53,10 +57,10 @@ def test_filter_restrict_entity(reader):
 def test_filter_chained(reader):
     pre = IDCollector()
     post = IDCollector()
-    o.apply(reader, pre,
-            o.filter.EmptyTagFilter().enable_for(o.osm.NODE),
-            o.filter.EmptyTagFilter().enable_for(o.osm.WAY),
-            post)
+    osmium.apply(reader, pre,
+                 osmium.filter.EmptyTagFilter().enable_for(osmium.osm.NODE),
+                 osmium.filter.EmptyTagFilter().enable_for(osmium.osm.WAY),
+                 post)
 
     assert pre.nodes == [1, 2]
     assert post.nodes == [2]

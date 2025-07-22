@@ -1,22 +1,23 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 import pytest
-import osmium as o
+import osmium
 
 
 def test_read_node_location_with_handler(opl_reader):
-    idx = o.index.create_map("flex_mem")
-    hdlr = o.NodeLocationsForWays(idx)
+    idx = osmium.index.create_map("flex_mem")
+    hdlr = osmium.NodeLocationsForWays(idx)
 
     data = """\
            n1 x6 y7
            n45 x-3 y0
            """
 
-    o.apply(opl_reader(data), hdlr)
+    osmium.apply(opl_reader(data), hdlr)
 
     assert idx.get(1).lon == pytest.approx(6)
     assert idx.get(1).lat == pytest.approx(7)
@@ -27,10 +28,10 @@ def test_read_node_location_with_handler(opl_reader):
         idx.get(2)
 
 
-@pytest.mark.parametrize('ignore_error', [(True, False)])
+@pytest.mark.parametrize('ignore_error', [True, False])
 def test_apply_node_location_handler(opl_reader, ignore_error):
 
-    hdlr = o.NodeLocationsForWays(o.index.create_map("flex_mem"))
+    hdlr = osmium.NodeLocationsForWays(osmium.index.create_map("flex_mem"))
     if ignore_error:
         hdlr.ignore_errors()
 
@@ -42,9 +43,8 @@ def test_apply_node_location_handler(opl_reader, ignore_error):
         def way(self, w):
             try:
                 self.collect.append((w.id, [(n.lon, n.lat) for n in w.nodes]))
-            except o.InvalidLocationError:
+            except osmium.InvalidLocationError:
                 self.with_error.append(w.id)
-
 
     data = """\
            n1 x6 y7
@@ -58,14 +58,14 @@ def test_apply_node_location_handler(opl_reader, ignore_error):
     tester = WayNodeHandler()
 
     if ignore_error:
-        o.apply(opl_reader(data), hdlr, tester)
+        osmium.apply(opl_reader(data), hdlr, tester)
 
         assert tester.collect == [(3, [(pytest.approx(6), pytest.approx(7)),
-                                      (pytest.approx(6), pytest.approx(7.1))])]
+                                       (pytest.approx(6), pytest.approx(7.1))])]
         assert tester.with_error == [4]
     else:
-        with pytest.raises(osmium.InvalidLocationError):
-            o.apply(opl.reader(data), hdlr, tester)
+        with pytest.raises(KeyError):
+            osmium.apply(opl_reader(data), hdlr, tester)
 
 
 def test_apply_invalid_handler_object(opl_reader):
@@ -74,13 +74,13 @@ def test_apply_invalid_handler_object(opl_reader):
             print('A')
 
     with pytest.raises(TypeError):
-        o.apply(opl_reader("n1 x2 z4"), DummyHandler())
+        osmium.apply(opl_reader("n1 x2 z4"), DummyHandler())
 
 
 def test_mixed_handlers(opl_reader):
     logged = []
 
-    class OldStyle(o.SimpleHandler):
+    class OldStyle(osmium.SimpleHandler):
         def node(self, n):
             logged.append('old')
 
@@ -88,7 +88,7 @@ def test_mixed_handlers(opl_reader):
         def node(self, n):
             logged.append('new')
 
-    o.apply(opl_reader("n1 x0 y0"), NewStyle(), OldStyle(), NewStyle(), OldStyle())
+    osmium.apply(opl_reader("n1 x0 y0"), NewStyle(), OldStyle(), NewStyle(), OldStyle())
 
     assert logged == ['new', 'old', 'new', 'old']
 
@@ -104,6 +104,6 @@ def test_value_propagation(opl_reader):
         def node(self, n):
             logged.append(n.saved)
 
-    o.apply(opl_reader("n1 x0 y0"), FirstHandler(), SecondHandler())
+    osmium.apply(opl_reader("n1 x0 y0"), FirstHandler(), SecondHandler())
 
     assert logged == [45674]

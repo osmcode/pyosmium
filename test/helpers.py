@@ -1,11 +1,19 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
+#
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 """ Provides some helper functions for test.
 """
 from datetime import datetime, timezone
 
 import osmium
 
+
 def mkdate(*args):
     return datetime(*args, tzinfo=timezone.utc)
+
 
 class CountingHandler(osmium.SimpleHandler):
 

@@ -1,10 +1,10 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2022 Sarah Hoffmann.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 
-import osmium as o
 
 def test_member_list_length(simple_handler):
     data = """\
@@ -14,6 +14,7 @@ def test_member_list_length(simple_handler):
            """
 
     rels = {}
+
     def cb(rel):
         rels[rel.id] = len(rel.members)
 

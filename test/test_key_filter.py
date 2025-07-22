@@ -1,23 +1,24 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann.
-import osmium as o
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
+import osmium
 
 import pytest
-
 from helpers import IDCollector
+
 
 def test_filter_no_keys():
     with pytest.raises(TypeError, match="keys to filter"):
-        o.filter.KeyFilter()
+        osmium.filter.KeyFilter()
 
 
 @pytest.mark.parametrize('key', [None, 1, IDCollector(), 'a'.encode('utf-8')])
 def test_filter_bad_argument_types(key):
     with pytest.raises(TypeError, match="must be strings"):
-        o.filter.KeyFilter("foo", key)
+        osmium.filter.KeyFilter("foo", key)
 
 
 @pytest.mark.parametrize('key,nodes,changesets', [('foo', [1], [10]),
@@ -35,7 +36,7 @@ def test_filter_simple(opl_reader, key, nodes, changesets):
 
     post = IDCollector()
 
-    o.apply(opl_reader(data), o.filter.KeyFilter(key), post)
+    osmium.apply(opl_reader(data), osmium.filter.KeyFilter(key), post)
 
     assert post.nodes == nodes
     assert post.changesets == changesets

@@ -1,12 +1,14 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2022 Sarah Hoffmann.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 """
 Tests for all examples.
 """
 from pathlib import Path
+
 
 TEST_DIR = (Path(__file__) / '..').resolve()
 TEST_FILE = TEST_DIR / 'example-test.pbf'
@@ -56,14 +58,14 @@ def test_osm_diff_stats(capsys):
     output = capsys.readouterr().out.splitlines()
 
     assert output == ['Nodes added: 305',
-                     'Nodes modified: 192',
-                     'Nodes deleted: 20',
-                     'Ways added: 31',
-                     'Ways modified: 93',
-                     'Ways deleted: 0',
-                     'Relations added: 0',
-                     'Relations modified: 0',
-                     'Relations deleted: 0']
+                      'Nodes modified: 192',
+                      'Nodes deleted: 20',
+                      'Ways added: 31',
+                      'Ways modified: 93',
+                      'Ways deleted: 0',
+                      'Relations added: 0',
+                      'Relations modified: 0',
+                      'Relations deleted: 0']
 
 
 def test_osm_file_stats(capsys):

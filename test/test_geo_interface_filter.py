@@ -2,17 +2,17 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import pytest
 
-import osmium as o
-
+import osmium
 from helpers import IDCollector
 
+
 def test_node_geometry(opl_buffer):
-    fp = o.FileProcessor(opl_buffer("n23 x3 y4"))\
-          .with_filter(o.filter.GeoInterfaceFilter())
+    fp = osmium.FileProcessor(opl_buffer("n23 x3 y4"))\
+          .with_filter(osmium.filter.GeoInterfaceFilter())
 
     for n in fp:
         assert n.__geo_interface__ == \
@@ -31,17 +31,17 @@ def test_way_geometry(opl_buffer):
             w1 Nn1,n2
            """
 
-    fp = o.FileProcessor(opl_buffer(data))\
-          .with_locations()\
-          .with_filter(o.filter.EntityFilter(o.osm.WAY))\
-          .with_filter(o.filter.GeoInterfaceFilter())
+    fp = osmium.FileProcessor(opl_buffer(data))\
+               .with_locations()\
+               .with_filter(osmium.filter.EntityFilter(osmium.osm.WAY))\
+               .with_filter(osmium.filter.GeoInterfaceFilter())
 
     for w in fp:
         assert w.__geo_interface__ == \
-                dict(type='Feature', properties={},
-                    geometry=dict(type='LineString',
-                                  coordinates=[[pytest.approx(0.001), pytest.approx(0)],
-                                               [pytest.approx(0.002), pytest.approx(0)]]))
+            dict(type='Feature', properties={},
+                 geometry=dict(type='LineString',
+                               coordinates=[[pytest.approx(0.001), pytest.approx(0)],
+                                            [pytest.approx(0.002), pytest.approx(0)]]))
         break
     else:
         assert False
@@ -57,20 +57,20 @@ def test_area_geometry(opl_buffer):
             r1 Ttype=multipolygon Mw1@,w2@
            """
 
-    fp = o.FileProcessor(opl_buffer(data))\
-          .with_areas()\
-          .with_filter(o.filter.GeoInterfaceFilter())
+    fp = osmium.FileProcessor(opl_buffer(data))\
+               .with_areas()\
+               .with_filter(osmium.filter.GeoInterfaceFilter())
 
     for r in fp:
         print(r)
         if r.is_area():
             assert r.__geo_interface__ == \
-                    dict(type='Feature', properties={},
-                        geometry=dict(type='MultiPolygon',
-                                      coordinates=[[[[pytest.approx(0.001), pytest.approx(0)],
-                                                     [pytest.approx(0.002), pytest.approx(0)],
-                                                     [pytest.approx(0.001), pytest.approx(0.001)],
-                                                     [pytest.approx(0.001), pytest.approx(0)]]]]))
+                dict(type='Feature', properties={},
+                     geometry=dict(type='MultiPolygon',
+                                   coordinates=[[[[pytest.approx(0.001), pytest.approx(0)],
+                                                  [pytest.approx(0.002), pytest.approx(0)],
+                                                  [pytest.approx(0.001), pytest.approx(0.001)],
+                                                  [pytest.approx(0.001), pytest.approx(0)]]]]))
             break
     else:
         assert False
@@ -80,19 +80,20 @@ def test_area_geometry_without_drop(opl_reader):
     data = """\
             n1 x0.001 y0
             n2 x0.002 y0
-            n3 
+            n3
            """
 
     ids = IDCollector()
-    o.apply(opl_reader(data), o.filter.GeoInterfaceFilter(), ids)
+    osmium.apply(opl_reader(data), osmium.filter.GeoInterfaceFilter(), ids)
 
     assert ids.nodes == [1, 2]
 
     ids = IDCollector()
-    o.apply(opl_reader(data), o.filter.GeoInterfaceFilter(drop_invalid_geometries=False), ids)
+    osmium.apply(opl_reader(data),
+                 osmium.filter.GeoInterfaceFilter(drop_invalid_geometries=False),
+                 ids)
 
     assert ids.nodes == [1, 2, 3]
-
 
 
 def test_property_tag_filter(opl_buffer):
@@ -102,8 +103,8 @@ def test_property_tag_filter(opl_buffer):
            n3 x0.001 y0 Ta=1,c=3
            """
 
-    fp = o.FileProcessor(opl_buffer(data))\
-          .with_filter(o.filter.GeoInterfaceFilter(tags=['a', 'b']))
+    fp = osmium.FileProcessor(opl_buffer(data))\
+               .with_filter(osmium.filter.GeoInterfaceFilter(tags=['a', 'b']))
 
     count = 0
     for obj in fp:
