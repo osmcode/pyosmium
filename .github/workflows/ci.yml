@@ -18,7 +18,7 @@ jobs:
                 pipx install flake8
 
             - name: Lint package
-              run: flake8 src examples
+              run: flake8 src examples test
 
             - name: Typecheck package
               run: mypy src
