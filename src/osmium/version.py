@@ -2,7 +2,7 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 """
 Version information.
@@ -16,6 +16,6 @@ pyosmium_release = '4.0.2'
 # libosmium version shipped with the Pip release
 libosmium_version = '2.20.0'
 # protozero version shipped with the Pip release
-protozero_version = '1.7.1'
+protozero_version = '1.8.1'
 # pybind11 version shipped with the Pip release
-pybind11_version = '2.13.6'
+pybind11_version = '3.0.0'
