@@ -1,17 +1,18 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2022 Sarah Hoffmann.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 import pytest
 
-import osmium as o
 
 @pytest.fixture
 def tag_handler(simple_handler):
 
     def _handle(data, tests):
-        tags = {None: None} # marker that handler hasn't run yet
+        tags = {None: None}  # marker that handler hasn't run yet
+
         def node(n):
             if None in tags:
                 del tags[None]
@@ -46,8 +47,8 @@ def test_empty_taglist_contains(tag_handler):
 
 def test_empty_taglist_get(tag_handler):
     def tests(n):
-        assert None == n.tags.get("foo")
-        assert None == n.tags.get("foo", None)
+        assert n.tags.get("foo") is None
+        assert n.tags.get("foo", None) is None
         assert "fs" == n.tags.get("foo", "fs")
 
     tags = tag_handler("n234 x1 y2", tests)
@@ -73,13 +74,14 @@ def test_taglist_length(simple_handler):
            """
 
     lens = {}
+
     def node(n):
         lens[n.id] = len(n.tags)
         assert n.tags
 
     simple_handler(data, node=node)
 
-    lens = {1 : 1, 2 : 1, 3 : 3}
+    assert lens == {1: 1, 2: 1, 3: 3}
 
 
 def test_taglist_contains(tag_handler):
@@ -112,7 +114,7 @@ def test_taglist_indexop(tag_handler):
     assert tags == {'abba': 'x', '2': 'vvv', 'xx': 'abba'}
 
 
-def test_taglist_indexop(tag_handler):
+def test_taglist_indexop_get(tag_handler):
     def tests(n):
         assert "x" == n.tags.get("abba")
         assert "vvv" == n.tags.get("2", None)

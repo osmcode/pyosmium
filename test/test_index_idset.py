@@ -2,14 +2,13 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-import pytest
+import osmium
 
-import osmium as o
 
 def test_set_unset_empty():
-    ids = o.index.IdSet()
+    ids = osmium.index.IdSet()
     assert ids.empty()
     assert not ids
 
@@ -23,9 +22,9 @@ def test_set_unset_empty():
 
 
 def test_set_get():
-    ids = o.index.IdSet()
+    ids = osmium.index.IdSet()
 
-    for i in (1,100,2):
+    for i in (1, 100, 2):
         ids.set(i)
 
     assert ids.get(100)
@@ -35,11 +34,11 @@ def test_set_get():
 
 
 def test_clear_and_size():
-    ids = o.index.IdSet()
+    ids = osmium.index.IdSet()
 
     assert len(ids) == 0
 
-    for i in (1,100,2):
+    for i in (1, 100, 2):
         ids.set(i)
 
     assert len(ids) == 3

@@ -1,12 +1,13 @@
-# SPDX-License-Identifier: BSD
+# SPDX-License-Identifier: BSD-2-Clause
 #
-# This file is part of Pyosmium.
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2022 Sarah Hoffmann.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 import threading
 
 from helpers import CountingHandler
-import osmium as o
+
 
 def test_threaded_processing():
     """ Process a file in a different thread and make sure that processing
@@ -24,4 +25,4 @@ def test_threaded_processing():
     function_complete.wait(timeout=2)
 
     assert function_complete.is_set()
-    assert c.counts == [1, 0, 0 ,0]
+    assert c.counts == [1, 0, 0, 0]

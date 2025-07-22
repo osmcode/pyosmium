@@ -2,27 +2,30 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import pytest
-import osmium as o
 
+import osmium
 from helpers import IDCollector
+
 
 @pytest.mark.parametrize('init', [None, 1])
 def test_file_processor_bad_init(init):
     with pytest.raises(TypeError):
-        for obj in o.FileProcessor(init):
+        for obj in osmium.FileProcessor(init):
             pass
+
 
 def test_simple_generator(opl_buffer):
     count = 0
-    for obj in o.FileProcessor(opl_buffer('n1 x5 y5')):
+    for obj in osmium.FileProcessor(opl_buffer('n1 x5 y5')):
         assert obj.type_str() == 'n'
         assert obj.id == 1
         count += 1
 
     assert count == 1
+
 
 def test_generator_with_location(opl_buffer):
     data = opl_buffer("""\
@@ -32,7 +35,7 @@ def test_generator_with_location(opl_buffer):
               """)
 
     count = 0
-    for obj in o.FileProcessor(data).with_locations():
+    for obj in osmium.FileProcessor(data).with_locations():
         count += 1
         if obj.type_str() == 'w':
             assert len(obj.nodes) == 2
@@ -41,6 +44,7 @@ def test_generator_with_location(opl_buffer):
             assert [n.location.lat for n in obj.nodes] == [20, 21]
 
     assert count == 3
+
 
 def test_generator_with_areas(opl_buffer):
     data = opl_buffer("""\
@@ -52,7 +56,7 @@ def test_generator_with_areas(opl_buffer):
             """)
 
     count = 0
-    for obj in o.FileProcessor(data).with_areas():
+    for obj in osmium.FileProcessor(data).with_areas():
         if obj.type_str() == 'a':
             count += 1
             assert obj.from_way()
@@ -73,13 +77,14 @@ def test_generator_with_areas_with_filter(opl_buffer):
             """)
 
     count = 0
-    for obj in o.FileProcessor(data)\
-                .with_areas()\
-                .with_filter(o.filter.EntityFilter(o.osm.AREA)):
+    for obj in osmium.FileProcessor(data)\
+                     .with_areas()\
+                     .with_filter(osmium.filter.EntityFilter(osmium.osm.AREA)):
         assert obj.is_area()
         count += 1
 
     assert count == 1
+
 
 def test_generator_with_areas_with_area_filter(opl_buffer):
     data = opl_buffer("""\
@@ -94,9 +99,9 @@ def test_generator_with_areas_with_area_filter(opl_buffer):
             """)
 
     count = 0
-    for obj in o.FileProcessor(data)\
-                .with_areas(o.filter.KeyFilter('building'))\
-                .with_filter(o.filter.EntityFilter(o.osm.AREA)):
+    for obj in osmium.FileProcessor(data)\
+                     .with_areas(osmium.filter.KeyFilter('building'))\
+                     .with_filter(osmium.filter.EntityFilter(osmium.osm.AREA)):
         assert obj.is_area()
         assert obj.id == 3
         count += 1
@@ -111,12 +116,13 @@ def test_generator_with_filter(opl_buffer):
             """)
 
     count = 0
-    for obj in o.FileProcessor(data).with_filter(o.filter.EmptyTagFilter()):
+    for obj in osmium.FileProcessor(data).with_filter(osmium.filter.EmptyTagFilter()):
         count += 1
         assert obj.type_str() == 'n'
         assert obj.id == 11
 
     assert count == 1
+
 
 def test_file_processor_header(tmp_path):
     fn = tmp_path / 'empty.xml'
@@ -126,15 +132,16 @@ def test_file_processor_header(tmp_path):
     </osm>
     """)
 
-    h = o.FileProcessor(fn).header
+    h = osmium.FileProcessor(fn).header
 
     assert not h.has_multiple_object_versions
     assert h.box().valid()
     assert h.box().size() == 64800.0
 
+
 def test_file_processor_access_nodestore(opl_buffer):
-    fp = o.FileProcessor(opl_buffer('n56 x3 y-3'))\
-          .with_locations(o.index.create_map('sparse_mem_map'))
+    fp = osmium.FileProcessor(opl_buffer('n56 x3 y-3'))\
+          .with_locations(osmium.index.create_map('sparse_mem_map'))
 
     for _ in fp:
         pass
@@ -142,9 +149,10 @@ def test_file_processor_access_nodestore(opl_buffer):
     assert fp.node_location_storage.get(56).lat == -3
     assert fp.node_location_storage.get(56).lon == 3
 
+
 def test_file_processor_bad_location_type(opl_buffer):
     with pytest.raises(TypeError, match='LocationTable'):
-        o.FileProcessor(opl_buffer('n56 x3 y-3')).with_locations(67)
+        osmium.FileProcessor(opl_buffer('n56 x3 y-3')).with_locations(67)
 
 
 def test_propagate_data_from_filters(opl_buffer):
@@ -153,14 +161,14 @@ def test_propagate_data_from_filters(opl_buffer):
             n.saved = 'test'
             return False
 
-    fp = o.FileProcessor(opl_buffer('n56 x3 y-3')).with_filter(MyFilter())
+    fp = osmium.FileProcessor(opl_buffer('n56 x3 y-3')).with_filter(MyFilter())
 
     for obj in fp:
         assert obj.saved == 'test'
 
 
 def test_simple_zip(opl_buffer):
-    fp1 = o.FileProcessor(opl_buffer("""\
+    fp1 = osmium.FileProcessor(opl_buffer("""\
             n1
             n3
             n5
@@ -168,7 +176,7 @@ def test_simple_zip(opl_buffer):
             r1 Mw1@
           """))
 
-    fp2 = o.FileProcessor(opl_buffer("""\
+    fp2 = osmium.FileProcessor(opl_buffer("""\
             n2
             n3
             n456
@@ -177,18 +185,18 @@ def test_simple_zip(opl_buffer):
           """))
 
     results = []
-    for o1, o2 in o.zip_processors(fp1, fp2):
+    for o1, o2 in osmium.zip_processors(fp1, fp2):
         results.append(((None if o1 is None else o1.type_str() + str(o1.id)),
                        (None if o2 is None else o2.type_str() + str(o2.id))))
 
     assert results == [('n1', None),
-                      (None, 'n2'),
-                      ('n3', 'n3'),
-                      ('n5', None),
-                      (None, 'n456'),
-                      ('w10', None),
-                      (None, 'w12'),
-                      ('r1', 'r1')]
+                       (None, 'n2'),
+                       ('n3', 'n3'),
+                       ('n5', None),
+                       (None, 'n456'),
+                       ('w10', None),
+                       (None, 'w12'),
+                       ('r1', 'r1')]
 
 
 def test_filtered_handler_python(opl_buffer):
@@ -204,9 +212,9 @@ def test_filtered_handler_python(opl_buffer):
 
     processed = []
 
-    fp = o.FileProcessor(data)\
-            .handler_for_filtered(ids)\
-            .with_filter(o.filter.EmptyTagFilter())
+    fp = osmium.FileProcessor(data)\
+               .handler_for_filtered(ids)\
+               .with_filter(osmium.filter.EmptyTagFilter())
 
     for obj in fp:
         processed.append(f"{obj.type_str()}{obj.id}")
@@ -228,10 +236,10 @@ def test_filtered_handler_basehandler(opl_buffer, tmp_path):
 
     testf = tmp_path / 'test.opl'
 
-    with o.SimpleWriter(str(testf)) as writer:
-        fp = o.FileProcessor(data)\
+    with osmium.SimpleWriter(str(testf)) as writer:
+        fp = osmium.FileProcessor(data)\
                 .handler_for_filtered(writer)\
-                .with_filter(o.filter.EmptyTagFilter())
+                .with_filter(osmium.filter.EmptyTagFilter())
 
         processed = []
         for obj in fp:
@@ -241,9 +249,8 @@ def test_filtered_handler_basehandler(opl_buffer, tmp_path):
 
     ids = IDCollector()
 
-    o.apply(testf, ids)
+    osmium.apply(testf, ids)
 
     assert ids.nodes == [3]
     assert ids.ways == [2]
     assert ids.relations == [4]
-
