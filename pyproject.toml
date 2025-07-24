@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "osmium"
 description = "Python bindings for libosmium, the data processing library for OSM data"
 readme = "README.rst"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = 'BSD-2-Clause'}
 authors = [
     {name = "Sarah Hoffmann", email = "lonvia@denofr.de"}
@@ -19,7 +19,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",

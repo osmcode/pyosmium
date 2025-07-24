@@ -23,17 +23,6 @@ jobs:
             - name: Typecheck package
               run: mypy src
 
-            - name: Set up Python 3.7
-              uses: actions/setup-python@v5
-              with:
-                  python-version: 3.7
-
-            - name: Build package 3.7
-              run: |
-                pip install build wheel
-                python -m build
-              shell: bash
-
             - name: Set up Python 3.8
               uses: actions/setup-python@v5
               with:
@@ -93,7 +82,6 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: "3.13"
-                  allow-prereleases: true
 
             - name: Build package 3.13
               run: |
@@ -114,7 +102,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12", "3.13"]
+                python-version: [3.8, 3.9, "3.10", "3.11", "3.12", "3.13"]
 
         steps:
             - uses: actions/checkout@v4
@@ -159,14 +147,14 @@ jobs:
                       cc: gcc-10
                       cxx: g++-10
                       platform: ubuntu-22.04
-                      python: 3.7
+                      python: 3.8
                       deps: release
                       flavour: linux
                     - compiler: clang-old
                       cc: clang-13
                       cxx: clang++-13
                       platform: ubuntu-22.04
-                      python: 3.7
+                      python: 3.8
                       deps: release
                       flavour: linux
                     - compiler: gcc
@@ -268,19 +256,6 @@ jobs:
               run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
               shell: bash
 
-            - name: Set up Python 3.7
-              uses: actions/setup-python@v5
-              with:
-                  python-version: 3.7
-
-            - name: Build package 3.7
-              run: |
-                pip install build wheel
-                python -m build
-              shell: bash
-              env:
-                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
-
             - name: Set up Python 3.8
               uses: actions/setup-python@v5
               with:
@@ -350,7 +325,6 @@ jobs:
               uses: actions/setup-python@v5
               with:
                   python-version: "3.13"
-                  allow-prereleases: true
 
             - name: Build package 3.13
               run: |
@@ -373,7 +347,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+                python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
         env:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
