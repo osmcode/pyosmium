@@ -8,7 +8,7 @@ manner.
 
 ## Installation
 
-Pyosmium works with Python >= 3.7. Pypy is known to not work.
+Pyosmium works with Python >= 3.8. Pypy is known to not work.
 
 ### Using Pip
 
@@ -40,7 +40,7 @@ pyosmium has the following dependencies:
  * [expat](https://libexpat.github.io/)
  * [libz](https://www.zlib.net/)
  * [libbz2](https://www.sourceware.org/bzip2/)
- * [Boost](https://www.boost.org/) variant and iterator >= 1.41
+ * [Boost](https://www.boost.org/) variant and iterator >= 1.70
  * [Python Requests](https://docs.python-requests.org/)
  * Python setuptools
  * a C++17-compatible compiler (Clang 13+, GCC 10+ are supported)
