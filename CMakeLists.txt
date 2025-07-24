@@ -38,10 +38,10 @@ find_package(Python COMPONENTS Interpreter Development)
 if(PYBIND11_PREFIX)
     add_subdirectory(${PYBIND11_PREFIX} contrib/pybind11)
 else()
-    find_package(pybind11 2.7 REQUIRED)
+    find_package(pybind11 2.9 REQUIRED)
 endif()
 
-find_package(Boost 1.41 REQUIRED COMPONENTS)
+find_package(Boost 1.70 REQUIRED COMPONENTS)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 function(set_module_output module outdir)
