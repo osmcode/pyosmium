@@ -98,7 +98,7 @@ def update_from_custom_server(url, seq, ts, options):
             ts = ts.timestamp
 
         if not options.force_update:
-            cmpdate = dt.datetime.now(dt.UTC) - dt.timedelta(days=90)
+            cmpdate = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=90)
             cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
             if ts < cmpdate:
                 log.error(
