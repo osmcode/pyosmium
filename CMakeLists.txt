@@ -35,8 +35,15 @@ message(STATUS "Building in C++${CMAKE_CXX_STANDARD} mode")
 
 find_package(Python COMPONENTS Interpreter Development)
 
+# Check for abiflags, so we can check for free-threaded later.
+execute_process(COMMAND ${Python_EXECUTABLE} -c "import sys; print(sys.abiflags, end='')"
+                OUTPUT_VARIABLE PYTHON_ABIFLAGS)
+
 if(PYBIND11_PREFIX)
     add_subdirectory(${PYBIND11_PREFIX} contrib/pybind11)
+elseif(PYTHON_ABIFLAGS STREQUAL "t")
+    message(STATUS "Free-threading Python found. Enabling support (needs pybind11 2.13+).")
+    find_package(pybind11 2.13 REQUIRED)
 else()
     find_package(pybind11 2.9 REQUIRED)
 endif()
