@@ -53,6 +53,7 @@ Issues = "https://github.com/osmcode/pyosmium/issues"
 tests = [
     'pytest',
     'pytest-httpserver',
+    'pytest-run-parallel',
     'werkzeug',
     'shapely'
     ]
