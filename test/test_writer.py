@@ -26,7 +26,7 @@ def test_writer(tmp_path):
         assert filename.read_text().strip() == expected
 
     def _create(expected):
-        filename = tmp_path / (str(uuid.uuid4()) + '.opl')
+        filename = tmp_path / f"{uuid.uuid4()}.opl"
         return _WriteExpect(filename, expected)
 
     return _create
@@ -234,7 +234,7 @@ def test_member_object(test_writer, simple_handler):
 
 
 def test_set_custom_header(tmp_path):
-    fn = str(tmp_path / 'test.xml')
+    fn = tmp_path / f"{uuid.uuid4()}.xml"
     h = osmium.io.Header()
     h.set('generator', 'foo')
     h.add_box(osmium.osm.Box(0.1, -4, 10, 45))
@@ -257,7 +257,7 @@ def test_set_custom_header(tmp_path):
 def test_add_node_after_close(tmp_path, simple_handler):
     node_opl = "n235 v1 dV c0 t i0 u Telephant=yes x98.7 y-3.45"
 
-    filename = tmp_path / (str(uuid.uuid4()) + '.opl')
+    filename = tmp_path / f"{uuid.uuid4()}.opl"
     writer = osmium.SimpleWriter(str(filename), 1024*1024)
     writer.close()
 
@@ -268,7 +268,7 @@ def test_add_node_after_close(tmp_path, simple_handler):
 def test_add_way_after_close(tmp_path, simple_handler):
     node_opl = "w1 Nn1"
 
-    filename = tmp_path / (str(uuid.uuid4()) + '.opl')
+    filename = tmp_path / f"{uuid.uuid4()}.opl"
     writer = osmium.SimpleWriter(str(filename), 1024*1024)
     writer.close()
 
@@ -279,7 +279,7 @@ def test_add_way_after_close(tmp_path, simple_handler):
 def test_add_relation_after_close(tmp_path, simple_handler):
     node_opl = "r54 Mn1@,w3@foo"
 
-    filename = tmp_path / (str(uuid.uuid4()) + '.opl')
+    filename = tmp_path / f"{uuid.uuid4()}.opl"
     writer = osmium.SimpleWriter(str(filename), 1024*1024)
     writer.close()
 
@@ -289,7 +289,7 @@ def test_add_relation_after_close(tmp_path, simple_handler):
 
 @pytest.mark.parametrize("final_item", (True, False))
 def test_catch_errors_in_add_node(tmp_path, final_item):
-    test_file = tmp_path / 'test.opl'
+    test_file = tmp_path / f"{uuid.uuid4()}.opl"
 
     with osmium.SimpleWriter(str(test_file), 4000) as writer:
         writer.add_node(osmium.osm.mutable.Node(id=123))
@@ -309,7 +309,7 @@ def test_catch_errors_in_add_node(tmp_path, final_item):
 
 @pytest.mark.parametrize("final_item", (True, False))
 def test_catch_errors_in_add_way(tmp_path, final_item):
-    test_file = tmp_path / 'test.opl'
+    test_file = tmp_path / f"{uuid.uuid4()}.opl"
 
     with osmium.SimpleWriter(test_file, 4000) as writer:
         writer.add_way(osmium.osm.mutable.Way(id=123, nodes=[1, 2, 3]))
@@ -329,7 +329,7 @@ def test_catch_errors_in_add_way(tmp_path, final_item):
 
 @pytest.mark.parametrize("final_item", (True, False))
 def test_catch_errors_in_add_relation(tmp_path, final_item):
-    test_file = tmp_path / 'test.opl'
+    test_file = tmp_path / f"{uuid.uuid4()}.opl"
 
     with osmium.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
         writer.add_relation(osmium.osm.mutable.Relation(id=123))
@@ -348,7 +348,7 @@ def test_catch_errors_in_add_relation(tmp_path, final_item):
 
 
 def test_do_not_overwrite_by_default(tmp_path):
-    test_file = tmp_path / 'test.opl'
+    test_file = tmp_path / f"{uuid.uuid4()}.opl"
 
     with osmium.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
         writer.add_node(osmium.osm.mutable.Node(id=123))
@@ -359,7 +359,7 @@ def test_do_not_overwrite_by_default(tmp_path):
 
 
 def test_do_overwrite(tmp_path):
-    test_file = tmp_path / 'test.opl'
+    test_file = tmp_path / f"{uuid.uuid4()}.opl"
 
     with osmium.SimpleWriter(filename=str(test_file), bufsz=4000) as writer:
         writer.add_node(osmium.osm.mutable.Node(id=123))
@@ -369,7 +369,7 @@ def test_do_overwrite(tmp_path):
 
 
 def test_write_to_file(tmp_path):
-    test_file = tmp_path / 'test.txt'
+    test_file = tmp_path / f"{uuid.uuid4()}.txt"
 
     with osmium.SimpleWriter(osmium.io.File(test_file, 'opl'), bufsz=4000) as writer:
         writer.add_node(osmium.osm.mutable.Node(id=123))

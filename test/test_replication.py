@@ -7,6 +7,7 @@
 import logging
 import time
 from textwrap import dedent
+import uuid
 
 import pytest
 
@@ -16,6 +17,8 @@ from helpers import mkdate, CountingHandler
 
 import osmium.replication.server as rserv
 import osmium.replication
+
+pytestmark = [pytest.mark.thread_unsafe, pytest.mark.iterations(1)]
 
 
 @pytest.mark.parametrize("inp,outp", [
@@ -45,7 +48,7 @@ def test_get_diff_url(inp, outp):
 
 
 def test_get_newest_change_from_file(tmp_path):
-    fn = tmp_path / 'change.opl'
+    fn = tmp_path / f"{uuid.uuid4()}.opl"
     fn.write_text('n6365 v1 c63965061 t2018-10-29T03:56:07Z i8369524 ux x1 y7')
 
     val = osmium.replication.newest_change_from_file(str(fn))

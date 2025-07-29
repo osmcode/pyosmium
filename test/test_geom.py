@@ -7,11 +7,7 @@
 import json
 
 import pytest
-
-import osmium
 import osmium.geom
-
-wkbfab = osmium.geom.WKBFactory()
 
 
 @pytest.fixture

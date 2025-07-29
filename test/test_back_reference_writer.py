@@ -5,6 +5,7 @@
 # Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import pytest
+import uuid
 
 import osmium
 
@@ -18,7 +19,7 @@ def test_simple_way(test_data, tmp_path):
         id = 34
         nodes = [3, 6, 5]
 
-    outfile = str(tmp_path / 'test.osm')
+    outfile = str(tmp_path / f'{uuid.uuid4()}.osm')
 
     with osmium.BackReferenceWriter(outfile, ref_file) as writer:
         writer.add_way(TestWay())
@@ -33,7 +34,7 @@ def test_simple_way(test_data, tmp_path):
 
 def test_do_not_write_on_exception(test_data, tmp_path):
     ref_file = test_data('\n'.join((f"n{i} x2 y3" for i in range(10))))
-    outfile = tmp_path / 'test.osm'
+    outfile = tmp_path / f'{uuid.uuid4()}.osm'
 
     with pytest.raises(RuntimeError, match="inner error"):
         with osmium.BackReferenceWriter(str(outfile), ref_file):

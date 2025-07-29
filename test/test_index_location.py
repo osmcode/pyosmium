@@ -14,14 +14,10 @@ def test_list_types():
     assert ml
 
 
-@pytest.fixture
-def table():
-    return osmium.index.create_map("flex_mem")
-
-
 @pytest.mark.parametrize('use_get', [True, False])
 @pytest.mark.parametrize('use_set', [True, False])
-def test_set_get(table, use_set, use_get):
+def test_set_get(use_set, use_get):
+    table = osmium.index.create_map("flex_mem")
     if use_set:
         table.set(4, osmium.osm.Location(3.4, -5.6))
     else:
@@ -34,33 +30,39 @@ def test_set_get(table, use_set, use_get):
     assert loc.lat == pytest.approx(-5.6)
 
 
-def test_get_unset(table):
+def test_get_unset():
+    table = osmium.index.create_map("flex_mem")
     with pytest.raises(KeyError):
         table.get(56)
 
 
-def test_array_get_unset(table):
+def test_array_get_unset():
+    table = osmium.index.create_map("flex_mem")
     with pytest.raises(KeyError):
         table[56]
 
 
-def test_set_negative(table):
+def test_set_negative():
+    table = osmium.index.create_map("flex_mem")
     with pytest.raises(TypeError):
         table.set(-4, osmium.osm.Location(3.4, -5.6))
 
 
-def test_array_set_negative(table):
+def test_array_set_negative():
+    table = osmium.index.create_map("flex_mem")
     with pytest.raises(TypeError):
         table[-4] = osmium.osm.Location(3.4, -5.6)
 
 
-def test_used_memory(table):
+def test_used_memory():
+    table = osmium.index.create_map("flex_mem")
     table.set(4, osmium.osm.Location(3.4, -5.6))
 
     assert table.used_memory() > 0
 
 
-def test_clear(table):
+def test_clear():
+    table = osmium.index.create_map("flex_mem")
     table.set(593, osmium.osm.Location(0.35, 45.3))
     table.get(593)
     table.clear()

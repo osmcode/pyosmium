@@ -8,6 +8,7 @@
 """
 from pathlib import Path
 from textwrap import dedent
+import uuid
 
 import pytest
 import osmium.replication.server
@@ -57,13 +58,13 @@ class TestPyosmiumGetChanges:
         assert output == '-1'
 
     def test_init_to_file(self, tmp_path, httpserver):
-        fname = tmp_path / 'db.seq'
+        fname = tmp_path / f"{uuid.uuid4()}.seq"
 
         assert 0 == self.main(httpserver, '-I', '453', '-f', str(fname))
         assert fname.read_text() == '453'
 
     def test_init_from_seq_file(self, tmp_path, httpserver):
-        fname = tmp_path / 'db.seq'
+        fname = tmp_path / f"{uuid.uuid4()}.seq"
         fname.write_text('453')
 
         assert 0 == self.main(httpserver, '-f', str(fname))
@@ -91,7 +92,7 @@ class TestPyosmiumGetChanges:
         assert output == '-1'
 
     def test_get_simple_update(self, tmp_path, httpserver):
-        outfile = tmp_path / 'outfile.opl'
+        outfile = tmp_path / f"{uuid.uuid4()}.opl"
 
         httpserver.expect_request('/state.txt').respond_with_data(dedent("""\
                     sequenceNumber=454

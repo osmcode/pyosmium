@@ -5,6 +5,7 @@
 # Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import pytest
+import uuid
 
 import osmium
 from helpers import CountingHandler
@@ -23,7 +24,7 @@ def _run_file(fn):
 
 @pytest.mark.parametrize('as_string', [True, False])
 def test_file_simple(tmp_path, as_string):
-    fn = tmp_path / 'text.opl'
+    fn = tmp_path / f"{uuid.uuid4()}.opl"
     fn.write_text('n1')
 
     if as_string:
@@ -36,7 +37,7 @@ def test_file_simple(tmp_path, as_string):
 
 @pytest.mark.parametrize('as_string', [True, False])
 def test_file_with_format(tmp_path, as_string):
-    fn = tmp_path / 'text.txt'
+    fn = tmp_path / f"{uuid.uuid4()}.txt"
     fn.write_text('n1')
 
     if as_string:
@@ -81,7 +82,7 @@ def test_broken_timestamp(test_data):
 
 @pytest.mark.parametrize('as_string', [True, False])
 def test_file_header(tmp_path, as_string):
-    fn = tmp_path / 'empty.xml'
+    fn = tmp_path / f"{uuid.uuid4()}.xml"
     fn.write_text("""<?xml version='1.0' encoding='UTF-8'?>
     <osm version="0.6" generator="test-pyosmium" timestamp="2014-08-26T20:22:02Z">
          <bounds minlat="-90" minlon="-180" maxlat="90" maxlon="180"/>
