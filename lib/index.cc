@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -14,7 +14,11 @@
 
 namespace py = pybind11;
 
+#ifdef Py_GIL_DISABLED
+PYBIND11_MODULE(index, m, py::mod_gil_not_used())
+#else
 PYBIND11_MODULE(index, m)
+#endif
 {
     using LocationTable =
         osmium::index::map::Map<osmium::unsigned_object_id_type, osmium::Location>;

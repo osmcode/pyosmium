@@ -12,7 +12,8 @@ from helpers import IDCollector
 
 @pytest.fixture
 def reader(opl_reader):
-    return opl_reader("""\
+    def _mk():
+        return opl_reader("""\
                n1 x1 y1
                n2 x1 y1 Tfoo=bar
                w1 Nn1,n2 Thighway=road
@@ -23,11 +24,13 @@ def reader(opl_reader):
                c223
                """)
 
+    return _mk
+
 
 def test_filter_default_config(reader):
     pre = IDCollector()
     post = IDCollector()
-    osmium.apply(reader, pre, osmium.filter.EmptyTagFilter(), post)
+    osmium.apply(reader(), pre, osmium.filter.EmptyTagFilter(), post)
 
     assert pre.nodes == [1, 2]
     assert post.nodes == [2]
@@ -42,7 +45,7 @@ def test_filter_default_config(reader):
 def test_filter_restrict_entity(reader):
     pre = IDCollector()
     post = IDCollector()
-    osmium.apply(reader, pre,
+    osmium.apply(reader(), pre,
                  osmium.filter.EmptyTagFilter().enable_for(osmium.osm.WAY | osmium.osm.RELATION),
                  post)
 
@@ -57,7 +60,7 @@ def test_filter_restrict_entity(reader):
 def test_filter_chained(reader):
     pre = IDCollector()
     post = IDCollector()
-    osmium.apply(reader, pre,
+    osmium.apply(reader(), pre,
                  osmium.filter.EmptyTagFilter().enable_for(osmium.osm.NODE),
                  osmium.filter.EmptyTagFilter().enable_for(osmium.osm.WAY),
                  post)

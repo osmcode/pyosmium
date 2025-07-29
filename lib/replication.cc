@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -31,7 +31,11 @@ struct LastChangeHandler : public osmium::handler::Handler
 
 } // namespace
 
+#ifdef Py_GIL_DISABLED
+PYBIND11_MODULE(_replication, m, py::mod_gil_not_used())
+#else
 PYBIND11_MODULE(_replication, m)
+#endif
 {
     m.def("newest_change_from_file", [](char const *filename)
         {

@@ -6,6 +6,7 @@
 # For a full list of authors see the git log.
 from pathlib import Path
 
+import pytest
 import osmium
 
 from helpers import CountingHandler
@@ -14,6 +15,7 @@ from helpers import CountingHandler
 TEST_FILE = str((Path(__file__) / '..' / 'example-test.pbf').resolve())
 
 
+@pytest.mark.thread_unsafe
 def test_area_handler():
     area = osmium.area.AreaManager()
 

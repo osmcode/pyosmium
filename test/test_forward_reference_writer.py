@@ -4,6 +4,7 @@
 #
 # Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
+import uuid
 import pytest
 
 import osmium
@@ -32,7 +33,7 @@ class DummyNode:
 
 
 def test_simple_forward_no_back_reference(ref_file, tmp_path):
-    outfile = str(tmp_path / 'test.osm')
+    outfile = tmp_path / f"{uuid.uuid4()}.osm"
 
     with osmium.ForwardReferenceWriter(outfile, ref_file, back_references=False) as writer:
         writer.add_node(DummyNode(2))
@@ -47,7 +48,7 @@ def test_simple_forward_no_back_reference(ref_file, tmp_path):
 
 
 def test_simple_forward_with_back_reference(ref_file, tmp_path):
-    outfile = str(tmp_path / 'test.osm')
+    outfile = str(tmp_path / f"{uuid.uuid4()}.osm")
 
     with osmium.ForwardReferenceWriter(outfile, ref_file) as writer:
         writer.add_node(DummyNode(2))

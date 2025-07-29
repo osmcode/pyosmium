@@ -9,6 +9,8 @@ from pathlib import Path
 import pytest
 import osmium
 
+pytestmark = pytest.mark.iterations(1)
+
 TEST_DIR = (Path(__file__) / '..').resolve()
 
 

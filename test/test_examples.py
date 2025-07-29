@@ -9,6 +9,7 @@ Tests for all examples.
 """
 from pathlib import Path
 
+import pytest
 
 TEST_DIR = (Path(__file__) / '..').resolve()
 TEST_FILE = TEST_DIR / 'example-test.pbf'
@@ -26,6 +27,7 @@ def run_example(name, *args):
 
 
 def test_amenity_list(capsys):
+    pytest.importorskip("shapely")
     assert 0 == run_example("amenity_list", TEST_FILE)
 
     output = capsys.readouterr().out.splitlines()

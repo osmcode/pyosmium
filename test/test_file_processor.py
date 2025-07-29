@@ -5,6 +5,7 @@
 # Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import pytest
+import uuid
 
 import osmium
 from helpers import IDCollector
@@ -125,7 +126,7 @@ def test_generator_with_filter(opl_buffer):
 
 
 def test_file_processor_header(tmp_path):
-    fn = tmp_path / 'empty.xml'
+    fn = tmp_path / f"{uuid.uuid4()}.xml"
     fn.write_text("""<?xml version='1.0' encoding='UTF-8'?>
     <osm version="0.6" generator="test-pyosmium" timestamp="2014-08-26T20:22:02Z">
          <bounds minlat="-90" minlon="-180" maxlat="90" maxlon="180"/>
@@ -234,7 +235,7 @@ def test_filtered_handler_basehandler(opl_buffer, tmp_path):
             r4
             """)
 
-    testf = tmp_path / 'test.opl'
+    testf = tmp_path / f"{uuid.uuid4()}.opl"
 
     with osmium.SimpleWriter(str(testf)) as writer:
         fp = osmium.FileProcessor(data)\

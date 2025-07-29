@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -75,7 +75,11 @@ void make_factory_class(py::module_ &m, char const *name)
 
 } // namespace
 
+#ifdef Py_GIL_DISABLED
+PYBIND11_MODULE(geom, m, py::mod_gil_not_used())
+#else
 PYBIND11_MODULE(geom, m)
+#endif
 {
     py::enum_<og::use_nodes>(m, "use_nodes")
         .value("UNIQUE", og::use_nodes::unique)

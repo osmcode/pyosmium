@@ -89,11 +89,67 @@ jobs:
                 python -m build
               shell: bash
 
+            - name: Set up Python 3.14
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.14"
+                  allow-prereleases: true
+
+            - name: Build package 3.14
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
               with:
                   name: pyosmium-linux-x64-dist
                   path: dist
+
+    build-free-threaded:
+        runs-on: ubuntu-22.04
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install packages
+              run: |
+                sudo apt-get update -y -qq
+                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev pipx
+                pipx install mypy
+                pipx inject mypy types-requests
+                pipx install flake8
+
+            - name: Set up Python 3.13t
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13t"
+
+            - name: Build package 3.13t
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
+            - name: Set up Python 3.14t
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.14t"
+                  allow-prereleases: true
+
+            - name: Build package 3.14t
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: pyosmium-linux-x64-dist-t
+                  path: dist
+
 
     test-default:
         runs-on: ubuntu-22.04
@@ -135,6 +191,78 @@ jobs:
               run: |
                 ./osmium-test/bin/pyosmium-get-changes -h
                 ./osmium-test/bin/pyosmium-up-to-date -h
+
+    test-314:
+        runs-on: ubuntu-22.04
+        needs: build-default
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python 3.14
+              uses: actions/setup-python@v5
+              with:
+                  python-version: 3.14
+                  allow-prereleases: true
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: pyosmium-linux-x64-dist
+
+            - name: Install osmium
+              run: |
+                pip install virtualenv
+                virtualenv osmium-test
+                WHEEL=`ls osmium*314-*.whl`
+                ./osmium-test/bin/pip install ${WHEEL}
+                ./osmium-test/bin/pip install pytest pytest-httpserver pytest-run-parallel
+              shell: bash
+
+            - name: Run tests
+              run: ./osmium-test/bin/pytest test
+              shell: bash
+
+            - name: Check tool availability
+              run: |
+                ./osmium-test/bin/pyosmium-get-changes -h
+                ./osmium-test/bin/pyosmium-up-to-date -h
+
+    test-free-threaded:
+        runs-on: ubuntu-22.04
+        needs: build-free-threaded
+
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ["3.13t", "3.14t"]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  allow-prereleases: true
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: pyosmium-linux-x64-dist-t
+
+            - name: Install osmium
+              run: |
+                pip install virtualenv
+                virtualenv osmium-test
+                WHEEL=`ls osmium*${PYVER/./}-*.whl`
+                ./osmium-test/bin/pip install ${WHEEL}
+                ./osmium-test/bin/pip install pytest pytest-httpserver pytest-run-parallel
+              shell: bash
+              env:
+                PYVER: ${{ matrix.python-version }}
+
+            - name: Run tests
+              run: ./osmium-test/bin/pytest test --parallel-threads 10 --iterations 10
+              shell: bash
 
     build-platform:
         runs-on: ${{ matrix.platform }}
@@ -334,11 +462,82 @@ jobs:
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+            - name: Set up Python 3.14
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.14"
+                  allow-prereleases: true
+
+            - name: Build package 3.14
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
             - name: 'Upload Artifact'
               uses: actions/upload-artifact@v4
               with:
                   name: pyosmium-win64-dist
                   path: dist
+
+    build-windows-free-threaded:
+        runs-on: windows-2022
+
+        env:
+            VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                    C:/vcpkg_binary_cache
+                  key: vcpkg-binary-cache-windows-2022
+
+            - name: Prepare cache
+              run: if [ ! -d C:/vcpkg_binary_cache ]; then mkdir C:/vcpkg_binary_cache; fi
+              shell: bash
+
+            - name: Install packages
+              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
+              shell: bash
+
+            - name: Set up Python 3.13t
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13t"
+
+            - name: Build package 3.13t
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: Set up Python 3.14t
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.14t"
+                  allow-prereleases: true
+
+            - name: Build package 3.14t
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: 'Upload Artifact'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: pyosmium-win64-dist-t
+                  path: dist
+
 
     test-windows:
         runs-on: windows-2022
@@ -347,7 +546,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+                python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 
         env:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
@@ -365,18 +564,89 @@ jobs:
               with:
                   name: pyosmium-win64-dist
 
-            - name: Install osmium
+            - name: Install osmium (with shapely)
               run: |
                 pip install virtualenv
                 virtualenv osmium-test
-                WHEEL=`ls osmium*${PYVER/./}*.whl`
+                WHEEL=`ls osmium*${PYVER/./}-*.whl`
                 ./osmium-test/Scripts/pip install ${WHEEL}[tests]
               shell: bash
               env:
                 PYVER: ${{ matrix.python-version }}
+              if: matrix.python-version != '3.14'
+
+            - name: Install osmium (without shapely)
+              run: |
+                pip install virtualenv
+                virtualenv osmium-test
+                WHEEL=`ls osmium*${PYVER/./}-*.whl`
+                ./osmium-test/Scripts/pip install ${WHEEL}
+                ./osmium-test/Scripts/pip install pytest pytest-httpserver pytest-run-parallel
+              shell: bash
+              env:
+                PYVER: ${{ matrix.python-version }}
+              if: matrix.python-version == '3.14'
 
             - name: Run tests
               run: ./osmium-test/Scripts/pytest test
+              shell: bash
+
+            - name: Check tool availability
+              run: |
+                ./osmium-test/Scripts/pyosmium-get-changes -h
+                ./osmium-test/Scripts/pyosmium-up-to-date -h
+              shell: bash
+
+    test-windows-free-threaded:
+        runs-on: windows-2022
+        needs: build-windows
+
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ["3.13t", "3.14t"]
+
+        env:
+            PYTEST_ADDOPTS: ${{ matrix.test-args }}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ matrix.python-version }}
+                  allow-prereleases: true
+
+            - uses: actions/download-artifact@v4
+              with:
+                  name: pyosmium-win64-dist-t
+
+            - name: Install osmium (with shapely)
+              run: |
+                pip install virtualenv
+                virtualenv osmium-test
+                WHEEL=`ls osmium*${PYVER/./}-*.whl`
+                ./osmium-test/Scripts/pip install ${WHEEL}[tests]
+              shell: bash
+              env:
+                PYVER: ${{ matrix.python-version }}
+              if: matrix.python-version != '3.14t'
+
+            - name: Install osmium (without shapely)
+              run: |
+                pip install virtualenv
+                virtualenv osmium-test
+                WHEEL=`ls osmium*${PYVER/./}-*.whl`
+                ./osmium-test/Scripts/pip install ${WHEEL}
+                ./osmium-test/Scripts/pip install pytest pytest-httpserver pytest-run-parallel
+              shell: bash
+              env:
+                PYVER: ${{ matrix.python-version }}
+              if: matrix.python-version == '3.14t'
+
+            - name: Run tests
+              run: ./osmium-test/Scripts/pytest test --parallel-threads 5 --iterations 5
               shell: bash
 
             - name: Check tool availability

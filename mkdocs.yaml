@@ -47,6 +47,7 @@ nav:
       - Indexes: 'reference/Indexes.md'
       - Replication: 'reference/Replication.md'
       - Exceptions: 'reference/Exceptions.md'
+      - Thread Safety: 'reference/Thread-Safety.md'
 
 exclude_docs: |
     .*.swp

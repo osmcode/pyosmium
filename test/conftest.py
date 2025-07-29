@@ -19,10 +19,10 @@ SRC_DIR = (Path(__file__) / '..' / '..').resolve()
 BUILD_DIR = "build/lib.{}-{}.{}".format(sysconfig.get_platform(),
                                         sys.version_info[0], sys.version_info[1])
 
-
 if not (SRC_DIR / BUILD_DIR).exists():
-    BUILD_DIR = "build/lib.{}-{}".format(sysconfig.get_platform(),
-                                         sys.implementation.cache_tag)
+    BUILD_DIR = "build/lib.{}-{}{}".format(sysconfig.get_platform(),
+                                           sys.implementation.cache_tag,
+                                           getattr(sys, 'abiflags', ''))
 
 if (SRC_DIR / BUILD_DIR).exists():
     sys.path.insert(0, str(SRC_DIR))

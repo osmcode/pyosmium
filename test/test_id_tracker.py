@@ -5,6 +5,7 @@
 # Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import pytest
+import uuid
 
 import osmium
 
@@ -169,7 +170,7 @@ def test_complete_backward_references(tmp_path, depth):
     if depth == 0:
         data_file = osmium.io.FileBuffer(REF_SRC.encode('utf-8'), 'opl')
     else:
-        data_file = tmp_path / 'test.opl'
+        data_file = tmp_path / f"{uuid.uuid4()}.opl"
         data_file.write_text(REF_SRC)
 
     ids = osmium.IdTracker()
@@ -191,7 +192,7 @@ def test_complete_forward_references(tmp_path, depth):
     if depth == 0:
         data_file = osmium.io.FileBuffer(REF_SRC.encode('utf-8'), 'opl')
     else:
-        data_file = tmp_path / 'test.opl'
+        data_file = tmp_path / f"{uuid.uuid4()}.opl"
         data_file.write_text(REF_SRC)
 
     ids = osmium.IdTracker()

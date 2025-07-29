@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 
@@ -127,7 +127,11 @@ private:
 
 } // namespace
 
+#ifdef Py_GIL_DISABLED
+PYBIND11_MODULE(area, m, py::mod_gil_not_used())
+#else
 PYBIND11_MODULE(area, m)
+#endif
 {
     py::class_<AreaManagerSecondPassHandler, pyosmium::BaseHandler>(m,
                 "AreaManagerSecondPassHandler");

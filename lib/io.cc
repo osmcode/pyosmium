@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -25,7 +25,11 @@ class FileBuffer : public osmium::io::File
 } // namespace
 
 
+#ifdef Py_GIL_DISABLED
+PYBIND11_MODULE(io, m, py::mod_gil_not_used())
+#else
 PYBIND11_MODULE(io, m)
+#endif
 {
     py::class_<osmium::io::File>(m, "File")
         .def(py::init<std::string>())

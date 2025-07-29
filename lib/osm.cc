@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -151,8 +151,12 @@ py::class_<COSMObject> make_osm_object_class(py::module_ &m, char const *class_n
 
 } // namespace
 
-
-PYBIND11_MODULE(_osm, m) {
+#ifdef Py_GIL_DISABLED
+PYBIND11_MODULE(_osm, m, py::mod_gil_not_used())
+#else
+PYBIND11_MODULE(_osm, m)
+#endif
+{
     py::enum_<osmium::osm_entity_bits::type>(m, "osm_entity_bits")
         .value("NOTHING", osmium::osm_entity_bits::nothing)
         .value("NODE", osmium::osm_entity_bits::node)
