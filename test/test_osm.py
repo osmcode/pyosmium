@@ -304,14 +304,14 @@ def test_area_from_multipolygon_relation(area_importer, mptype):
                               area=area)
 
 
-def test_changest_attributes(area_importer):
+def test_changeset_attributes(area_importer):
     def changeset(c):
         assert 34 == c.id
         assert 1 == c.uid
         assert not c.user_is_anonymous()
         assert "Steve" == c.user
-        assert mkdate(2005, 4, 9, 19, 54, 13), c.created_at
-        assert mkdate(2005, 4, 9, 20, 54, 39), c.closed_at
+        assert mkdate(2005, 4, 9, 19, 54, 13) == c.created_at
+        assert mkdate(2005, 4, 9, 20, 54, 39) == c.closed_at
         assert not c.open
         assert 2 == c.num_changes
         assert 0 == len(c.tags)
