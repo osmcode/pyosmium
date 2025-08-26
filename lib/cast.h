@@ -2,14 +2,13 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_CAST_H
 #define PYOSMIUM_CAST_H
 
 #include <datetime.h>
-#include <chrono>
 
 #include <pybind11/pybind11.h>
 #include <osmium/osm.hpp>
@@ -44,25 +43,14 @@ namespace pybind11 { namespace detail {
 
         static handle cast(type const &src, return_value_policy, handle)
         {
-            using namespace std::chrono;
             // Lazy initialise the PyDateTime import
             if (!PyDateTimeAPI) { PyDateTime_IMPORT; }
 
             std::time_t tt = src.seconds_since_epoch();
-            std::tm localtime = *std::gmtime(&tt);
-            handle pydate = PyDateTime_FromDateAndTime(localtime.tm_year + 1900,
-                                                       localtime.tm_mon + 1,
-                                                       localtime.tm_mday,
-                                                       localtime.tm_hour,
-                                                       localtime.tm_min,
-                                                       localtime.tm_sec,
-                                                       0);
 
             static auto utc = module::import("datetime").attr("timezone").attr("utc");
-            using namespace literals;
-            handle with_utc = pydate.attr("replace")("tzinfo"_a=utc).inc_ref();
-            pydate.dec_ref();
-            return with_utc;
+
+            return PyDateTime_FromTimestamp(pybind11::make_tuple(tt, utc).ptr());
         }
 
         PYBIND11_TYPE_CASTER(type, _("datetime.datetime"));
