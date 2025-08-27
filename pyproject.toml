@@ -1,9 +1,10 @@
 [build-system]
-requires = ["scikit-build-core", "pybind11"]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.9"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "osmium"
+version = "4.0.2"
 description = "Python bindings for libosmium, the data processing library for OSM data"
 requires-python = ">=3.8"
 
@@ -36,4 +37,39 @@ dependencies = [
     "requests"
     ]
 
-version = "0.1.0"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.15"
+
+[tool.scikit-build.sdist]
+cmake = true
+exclude = ['**']
+include = ['/src/**/*.py',
+           '/src/**/*.pyi',
+           '/test/**/*.py',
+           '/tools/*',
+           '/lib/**/*.cc',
+           '/lib/**/*.h',
+           '/cmake/*',
+           '/docs/*.md',
+           '/docs/*/*.md',
+           '/docs/*/*.css',
+           '/docs/cookbooks/*ipynb',
+           '/docs/Makefile',
+           '/examples/*py',
+           '/mkdocs.yaml',
+           '/pyproject.toml',
+           '/README.*',
+           '/CHANGELOG.md',
+           '/CMakeLists.txt',
+           '/LICENSE.TXT',
+           '/contrib/libosmium/include',
+           '/contrib/libosmium/CMakeLists.txt',
+           '/contrib/libosmium/LICENSE',
+           '/contrib/libosmium/README.md',
+           '/contrib/protozero/include',
+           '/contrib/protozero/CMakeLists.txt',
+           '/contrib/protozero/LICENSE',
+           '/contrib/protozero/README.md',
+           ]
