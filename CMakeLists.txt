@@ -98,5 +98,7 @@ pybind11_add_module(filter
 install(TARGETS filter DESTINATION osmium)
 target_link_libraries(filter PRIVATE ${OSMIUM_LIBRARIES})
 
+configure_file(cmake/version.py.tmpl version.py)
+install(FILES ${PROJECT_BINARY_DIR}/version.py DESTINATION osmium)
 
 endif()

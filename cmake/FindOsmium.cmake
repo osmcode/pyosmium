@@ -281,6 +281,7 @@ find_package_handle_standard_args(Osmium
                                   REQUIRED_VARS OSMIUM_INCLUDE_DIR ${OSMIUM_EXTRA_FIND_VARS}
                                   VERSION_VAR _libosmium_version)
 unset(OSMIUM_EXTRA_FIND_VARS)
+set(OSMIUM_VERSION ${_libosmium_version})
 
 #----------------------------------------------------------------------
 #

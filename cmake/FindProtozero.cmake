@@ -58,6 +58,6 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Protozero
                                   REQUIRED_VARS PROTOZERO_INCLUDE_DIR
                                   VERSION_VAR _version)
-
+SET(PROTOZERO_VERSION ${_version})
 
 #----------------------------------------------------------------------
