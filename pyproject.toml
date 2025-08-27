@@ -37,6 +37,24 @@ dependencies = [
     "requests"
     ]
 
+[project.optional-dependencies]
+tests = [
+    'pytest',
+    'pytest-httpserver',
+    'pytest-run-parallel',
+    'werkzeug',
+    'shapely'
+    ]
+docs = [
+    'mkdocs',
+    'mkdocs-material',
+    'mkdocstrings',
+    'mkdocstrings-python',
+    'mkdocs-autorefs',
+    'mkdocs-gen-files',
+    'mkdocs-jupyter',
+    'argparse-manpage '
+    ]
 
 [tool.scikit-build]
 minimum-version = "build-system.requires"
