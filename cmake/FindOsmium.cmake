@@ -55,19 +55,10 @@
 #
 #----------------------------------------------------------------------
 
-# This is the list of directories where we look for osmium includes.
-set(_osmium_include_path
-        ../libosmium
-        ~/Library/Frameworks
-        /Library/Frameworks
-        /opt/local # DarwinPorts
-        /opt
-)
-
 # Look for the header file.
 find_path(OSMIUM_INCLUDE_DIR osmium/version.hpp
     PATH_SUFFIXES include
-    PATHS ${_osmium_include_path}
+    HINTS $ENV{LIBOSMIUM_PREFIX} ${CMAKE_SOURCE_DIR}/contrib/libosmium
 )
 
 # Check libosmium version number
