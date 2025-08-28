@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Update an OSM file with changes from a OSM replication server.
 
@@ -30,8 +29,6 @@ pyosmium-up-to-date does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
 cookies to the server and will save received cookies to the jar file.
 """
-
-import re
 import sys
 import traceback
 import logging
@@ -48,6 +45,7 @@ from tempfile import mktemp
 import os.path
 
 log = logging.getLogger()
+
 
 def update_from_osm_server(ts, options):
     """Update the OSM file using the official OSM servers at
@@ -121,11 +119,11 @@ def update_from_custom_server(url, seq, ts, options):
             ofname = outfile
 
         try:
-            extra_headers = { 'generator' : 'pyosmium-up-to-date/' + pyosmium_release }
+            extra_headers = {'generator': 'pyosmium-up-to-date/' + pyosmium_release}
             outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
-                                             max_size=options.outsize*1024,
-                                             extra_headers=extra_headers,
-                                             outformat=options.outformat)
+                                              max_size=options.outsize*1024,
+                                              extra_headers=extra_headers,
+                                              outformat=options.outformat)
 
             if outseqs is None:
                 log.info("No new updates found.")
@@ -157,13 +155,12 @@ def compute_start_point(options):
 
     if options.server_url is not None:
         if url is not None and url != options.server_url:
-            log.error(msgfmt("""
+            log.error(msgfmt(f"""
                   You asked to use server URL:
-                    %s
+                    {options.server_url}
                   but the referenced OSM file points to replication server:
-                    %s
-                  If you really mean to overwrite the URL, use --ignore-osmosis-headers."""
-                  % (options.server_url, url)))
+                    {url}
+                  If you really mean to overwrite the URL, use --ignore-osmosis-headers."""))
             exit(2)
         url = options.server_url
 
@@ -179,6 +176,7 @@ def compute_start_point(options):
         ts -= dt.timedelta(minutes=options.wind_back)
 
     return url, seq, ts
+
 
 def get_arg_parser(from_main=False):
 
@@ -218,7 +216,7 @@ def get_arg_parser(from_main=False):
                         help="Apply update even if the input data is really old.")
     parser.add_argument('--cookie', dest='cookie',
                         help='Netscape-style cookie jar file to read cookies from and where '
-                            'received cookies will be written to.')
+                             'received cookies will be written to.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
     parser.add_argument('--version', action='version',
@@ -226,14 +224,8 @@ def get_arg_parser(from_main=False):
 
     return parser
 
-def open_with_cookie(url):
-    return opener.open(url)
 
-if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stderr,
-                        format='%(asctime)s %(levelname)s: %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
-
+def pyosmium_up_to_date(args):
     options = get_arg_parser(from_main=True).parse_args()
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
@@ -241,15 +233,22 @@ if __name__ == '__main__':
         url, seq, ts = compute_start_point(options)
     except RuntimeError as e:
         log.error(str(e))
-        exit(2)
+        return 2
 
     try:
         if url is None:
-            ret = update_from_osm_server(ts, options)
-        else:
-            ret = update_from_custom_server(url, seq, ts, options)
-    except:
-        traceback.print_exc()
-        exit(254)
+            return update_from_osm_server(ts, options)
 
-    exit(ret)
+        return update_from_custom_server(url, seq, ts, options)
+    except Exception:
+        traceback.print_exc()
+
+    return 254
+
+
+def main():
+    logging.basicConfig(stream=sys.stderr,
+                        format='%(asctime)s %(levelname)s: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+
+    return pyosmium_up_to_date(sys.argv[1:])

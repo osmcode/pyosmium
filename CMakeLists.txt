@@ -67,6 +67,9 @@ foreach(PYMOD geom index io area)
     pybind11_add_module(${PYMOD} lib/${PYMOD}.cc)
     target_link_libraries(${PYMOD} PRIVATE ${OSMIUM_LIBRARIES})
     install(TARGETS ${PYMOD} DESTINATION osmium)
+    if(APPLE)
+        set_target_properties(${PYMOD} PROPERTIES CXX_VISIBILITY_PRESET "default")
+    endif()
 endforeach()
 
 # Modules where additional Python code is in src (C++-part will be private).
@@ -74,6 +77,9 @@ foreach(PYMOD osm replication)
     pybind11_add_module(_${PYMOD} lib/${PYMOD}.cc)
     target_link_libraries(_${PYMOD} PRIVATE ${OSMIUM_LIBRARIES})
     install(TARGETS _${PYMOD} DESTINATION osmium/${PYMOD})
+    if(APPLE)
+        set_target_properties(_${PYMOD} PROPERTIES CXX_VISIBILITY_PRESET "default")
+    endif()
 endforeach()
 
 # Modules with multiple source files.
@@ -100,5 +106,12 @@ target_link_libraries(filter PRIVATE ${OSMIUM_LIBRARIES})
 
 configure_file(cmake/version.py.tmpl version.py)
 install(FILES ${PROJECT_BINARY_DIR}/version.py DESTINATION osmium)
+
+# workaround for https://github.com/pybind/pybind11/issues/1272
+if(APPLE)
+    set_target_properties(_osmium PROPERTIES CXX_VISIBILITY_PRESET "default")
+    set_target_properties(filter PROPERTIES CXX_VISIBILITY_PRESET "default")
+endif()
+
 
 endif()

@@ -6,13 +6,12 @@
 # For a full list of authors see the git log.
 """ Tests for the pyosmium-get-changes script.
 """
-from pathlib import Path
 from textwrap import dedent
 import uuid
 
-import pytest
 import osmium.replication.server
 import osmium
+from osmium.tools.pyosmium_get_changes import pyosmium_get_changes
 
 from helpers import IDCollector
 
@@ -24,16 +23,8 @@ except ImportError:
 
 class TestPyosmiumGetChanges:
 
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        self.script = dict()
-
-        filename = Path(__file__, "..", "..", "tools", "pyosmium-get-changes").resolve()
-        with filename.open("rb") as f:
-            exec(compile(f.read(), str(filename), 'exec'), self.script)
-
     def main(self, httpserver, *args):
-        return self.script['main'](['--server', httpserver.url_for('')] + list(args))
+        return pyosmium_get_changes(['--server', httpserver.url_for('')] + list(args))
 
     def test_init_id(self, capsys, httpserver):
         assert 0 == self.main(httpserver, '-I', '453')

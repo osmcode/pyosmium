@@ -56,6 +56,10 @@ docs = [
     'argparse-manpage '
     ]
 
+[project.scripts]
+pyosmium-get-changes = "osmium.tools.pyosmium_get_changes:main"
+pyosmium-up-to-date = "osmium.tools.pyosmium_up_to_date:main"
+
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.15"
@@ -65,8 +69,8 @@ cmake = true
 exclude = ['**']
 include = ['/src/**/*.py',
            '/src/**/*.pyi',
+           '/src/osmium/py.typed',
            '/test/**/*.py',
-           '/tools/*',
            '/lib/**/*.cc',
            '/lib/**/*.h',
            '/cmake/*',

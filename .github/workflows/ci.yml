@@ -268,6 +268,7 @@ jobs:
         runs-on: ${{ matrix.platform }}
 
         strategy:
+            fail-fast: false
             matrix:
                 compiler: [gcc-old, clang-old, gcc, clang, macos-intel, macos-arm]
                 include:
@@ -317,7 +318,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Install prerequisites
+            - name: Clean up build environment
               run: |
                   # Workaround for github/brew problem. Python is already install
                   # on the Github action runner and then homebrew comes along...
@@ -325,39 +326,52 @@ jobs:
                   rm -f /usr/local/bin/2to3* /usr/local/bin/idle3* /usr/local/bin/pydoc3* /usr/local/bin/python3*
               if: ${{ matrix.flavour == 'macos' }}
 
-            - uses: ./.github/actions/install-dependencies
-              with:
-                  version: ${{ matrix.deps }}
+            - name: Install packages
+              run: |
+                sudo apt-get update -y -qq
+                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev virtualenv
+              if: ${{ matrix.flavour == 'linux' }}
+
+            - name: Install packages
+              run: brew install boost geos virtualenv
+              shell: bash
+              if: ${{ matrix.flavour == 'macos' }}
+
+            - name: Setup virtualenv
+              run: |
+                virtualenv venv
+                ./venv/bin/pip install build
+
+            - name: Install package dependencies (develop)
+              run: |
+                  git clone --quiet --depth 1 https://github.com/osmcode/libosmium.git contrib/libosmium
+                  git clone --quiet --depth 1 https://github.com/mapbox/protozero.git contrib/protozero
+                  git clone --quiet https://github.com/pybind/pybind11.git contrib/pybind11
+              shell: bash
+              if: ${{ matrix.deps == 'develop' }}
+
+            - name: Install package dependencies (release)
+              run: |
+                  ./venv/bin/python -m build --sdist
+              shell: bash
+              if: ${{ matrix.deps == 'release' }}
 
             - uses: actions/setup-python@v5
               with:
                   python-version: "${{ matrix.python }}"
                   allow-prereleases: true
 
-            - name: Install packages
-              run: |
-                sudo apt-get update -y -qq
-                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev
-              if: ${{ matrix.flavour == 'linux' }}
-
-            - name: Install packages
-              run: brew install boost geos
-              shell: bash
-              if: ${{ matrix.flavour == 'macos' }}
-
-            - name: Install prerequisites
-              run: |
-                  python -m pip install --upgrade pip
-                  pip install -U pytest pytest-httpserver shapely setuptools requests
-              shell: bash
-
             - name: Build package
-              run: python setup.py build
+              run: |
+                ./venv/bin/python -m build -w
               shell: bash
 
             - name: Run tests
               run: |
-                pytest test
+                WHEEL=`ls dist/osmium*.whl`
+                echo "Installing $WHEEL"
+                ./venv/bin/pip install dist/osmium*whl ${WHEEL}[tests]
+                ./venv/bin/pytest test
               shell: bash
 
 
@@ -476,11 +490,16 @@ jobs:
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+            - name: Repair wheels
+              run: |
+                pip install delvewheel
+                delvewheel repair --add-path C:/vcpkg/installed/x64-windows/bin/ --add-path C:/vcpkg/installed/x64-windows/debug/bin dist/*.whl
+
             - name: 'Upload Artifact'
               uses: actions/upload-artifact@v4
               with:
                   name: pyosmium-win64-dist
-                  path: dist
+                  path: wheelhouse
 
     build-windows-free-threaded:
         runs-on: windows-2022
@@ -502,7 +521,8 @@ jobs:
               shell: bash
 
             - name: Install packages
-              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
+              run: |
+                vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
               shell: bash
 
             - name: Set up Python 3.13t
@@ -532,11 +552,16 @@ jobs:
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+            - name: Repair wheels
+              run: |
+                pip install delvewheel
+                delvewheel repair --add-path C:/vcpkg/installed/x64-windows/bin/ --add-path C:/vcpkg/installed/x64-windows/debug/bin dist/*.whl
+
             - name: 'Upload Artifact'
               uses: actions/upload-artifact@v4
               with:
                   name: pyosmium-win64-dist-t
-                  path: dist
+                  path: wheelhouse
 
 
     test-windows:
@@ -599,7 +624,7 @@ jobs:
 
     test-windows-free-threaded:
         runs-on: windows-2022
-        needs: build-windows
+        needs: build-windows-free-threaded
 
         strategy:
             fail-fast: false
@@ -646,7 +671,8 @@ jobs:
               if: matrix.python-version == '3.14t'
 
             - name: Run tests
-              run: ./osmium-test/Scripts/pytest test --parallel-threads 5 --iterations 5
+              run: |
+                ./osmium-test/Scripts/pytest test --parallel-threads 5 --iterations 5
               shell: bash
 
             - name: Check tool availability
