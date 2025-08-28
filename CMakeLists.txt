@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15...4.0)
+cmake_policy(VERSION 3.15)
 project(osmium LANGUAGES CXX)
 
 option(WITH_LZ4 "Build with lz4 support for PBF files" ON)
@@ -59,7 +60,7 @@ endif()
 
 message(STATUS "Building in C++${CMAKE_CXX_STANDARD} mode")
 
-find_package(Boost 1.55 REQUIRED COMPONENTS)
+find_package(Boost 1.66 REQUIRED COMPONENTS)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # Modules without any Python code and just one source file.
