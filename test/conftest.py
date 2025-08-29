@@ -5,31 +5,11 @@
 # Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from pathlib import Path
-import sys
-import sysconfig
 import uuid
 from textwrap import dedent
 
 import pytest
-
-
-SRC_DIR = (Path(__file__) / '..' / '..').resolve()
-
-
-BUILD_DIR = "build/lib.{}-{}.{}".format(sysconfig.get_platform(),
-                                        sys.version_info[0], sys.version_info[1])
-
-if not (SRC_DIR / BUILD_DIR).exists():
-    BUILD_DIR = "build/lib.{}-{}{}".format(sysconfig.get_platform(),
-                                           sys.implementation.cache_tag,
-                                           getattr(sys, 'abiflags', ''))
-
-if (SRC_DIR / BUILD_DIR).exists():
-    sys.path.insert(0, str(SRC_DIR))
-    sys.path.insert(0, str(SRC_DIR / BUILD_DIR))
-
-
-import osmium  # noqa
+import osmium
 
 
 @pytest.fixture

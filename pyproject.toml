@@ -1,12 +1,13 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core>=0.10", "pybind11>=2.9"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "osmium"
+version = "4.0.2"
 description = "Python bindings for libosmium, the data processing library for OSM data"
-readme = "README.rst"
 requires-python = ">=3.8"
+
 license = {text = 'BSD-2-Clause'}
 authors = [
     {name = "Sarah Hoffmann", email = "lonvia@denofr.de"}
@@ -18,6 +19,7 @@ keywords = ["OSM", "OpenStreetMap", "Osmium"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: GIS",
     "License :: OSI Approved :: BSD License",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -29,27 +31,11 @@ classifiers = [
     "Programming Language :: Python :: Free Threading :: 2 - Beta",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: C++",
+    "Typing :: Typed"
     ]
 dependencies = [
     "requests"
     ]
-
-dynamic = ["version"]
-
-[tool.setuptools]
-packages = [
-    "osmium",
-    "osmium.osm",
-    "osmium.replication"
-    ]
-package-dir = {"" = "src"}
-
-
-[project.urls]
-Homepage = "https://osmcode.org/pyosmium"
-Documentation = "https://docs.osmcode.org/pyosmium/latest/"
-Repository = "https://github.com/osmcode/pyosmium"
-Issues = "https://github.com/osmcode/pyosmium/issues"
 
 [project.optional-dependencies]
 tests = [
@@ -70,5 +56,42 @@ docs = [
     'argparse-manpage '
     ]
 
-[tool.setuptools.dynamic]
-version = {attr = "osmium.version.pyosmium_release"}
+[project.scripts]
+pyosmium-get-changes = "osmium.tools.pyosmium_get_changes:main"
+pyosmium-up-to-date = "osmium.tools.pyosmium_up_to_date:main"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.15"
+
+[tool.scikit-build.sdist]
+cmake = true
+exclude = ['**']
+include = ['/src/**/*.py',
+           '/src/**/*.pyi',
+           '/src/osmium/py.typed',
+           '/test/**/*.py',
+           '/lib/**/*.cc',
+           '/lib/**/*.h',
+           '/cmake/*',
+           '/docs/*.md',
+           '/docs/*/*.md',
+           '/docs/*/*.css',
+           '/docs/cookbooks/*ipynb',
+           '/docs/Makefile',
+           '/examples/*py',
+           '/mkdocs.yaml',
+           '/pyproject.toml',
+           '/README.*',
+           '/CHANGELOG.md',
+           '/CMakeLists.txt',
+           '/LICENSE.TXT',
+           '/contrib/libosmium/include',
+           '/contrib/libosmium/CMakeLists.txt',
+           '/contrib/libosmium/LICENSE',
+           '/contrib/libosmium/README.md',
+           '/contrib/protozero/include',
+           '/contrib/protozero/CMakeLists.txt',
+           '/contrib/protozero/LICENSE',
+           '/contrib/protozero/README.md',
+           ]

@@ -42,41 +42,40 @@ pyosmium has the following dependencies:
  * [libbz2](https://www.sourceware.org/bzip2/)
  * [Boost](https://www.boost.org/) variant and iterator >= 1.70
  * [Python Requests](https://docs.python-requests.org/)
- * Python setuptools
+ * [scikit-build-core](https://scikit-build-core.readthedocs.io)
  * a C++17-compatible compiler (Clang 13+, GCC 10+ are supported)
 
 ### Compiling from Source
 
-Get the latest versions of libosmium, protozero and pybind11 source code. It is
-recommended that you put them in a subdirectory `contrib`. 
+Make sure to install the development packages for expat, libz, libbz2
+and boost.
 
-You can do this by cloning their repositories into that location.
+The appropriate versions for Libosmium and Protozero will be downloaded into
+the `contrib` directory when building the source package:
 
-Following commands should achieve this:
+    python3 -m build -s
 
-```
-mkdir contrib
-cd contrib
-git clone https://github.com/osmcode/libosmium.git
-git clone https://github.com/mapbox/protozero.git
-git clone https://github.com/pybind/pybind11.git
-```
-
-You can also set custom locations with `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
-`PYBIND11_PREFIX` respectively.
-
-To use a custom boost installation, set `BOOST_PREFIX`.
-
-To compile the bindings during development, you can use
-[build](https://pypa-build.readthedocs.io/en/stable/).
-On Debian/Ubuntu-like systems, install `python3-build`, then
-run:
-
-    python3 -m build -w
+Alternatively, provide custom locations for these libraries by setting
+`Libosmium_ROOT` and `Protozero_ROOT`.
 
 To compile and install the bindings, run
 
     pip install .
+
+### Compiling for Development
+
+To compile during development, you can use the experimental
+[Editable install mode](https://scikit-build-core.readthedocs.io/en/latest/configuration/index.html#editable-installs)
+of scikit-build-core:
+
+Create a virtualenv with scikit-build-core and pybind11 preinstalled:
+
+    virtualenv /tmp/dev-venv
+    /tmp/dev-venv/bin/pip install scikit-build-core pybind11
+
+Now compile pyosmium with:
+
+    /tmp/dev-venv/bin/pip --no-build-isolation --config-settings=editable.rebuild=true -Cbuild-dir=/tmp/build -ve.
 
 
 ## Examples
@@ -90,18 +89,18 @@ They are mostly ports of the examples in Libosmium and osmium-contrib.
 There is a small test suite in the test directory. This provides unit
 test for the python bindings, it is not meant to be a test suite for Libosmium.
 
-Testing requires `pytest` and `pytest-httpserver`. On Debian/Ubuntu install
-the dependencies with:
+Testing requires `pytest` and `pytest-httpserver` and optionally
+pytest-run-parallel and shapely. Install those into your dev environment:
 
-    sudo apt-get install python3-pytest python3-pytest-httpserver
-
-or install them with pip using:
-
-    pip install osmium[tests]
+    /tmp/dev-venv/bin/pip install --no-build-isolation --config-settings=editable.rebuild=true -Cbuild-dir=build -ve.[tests]
 
 The test suite can be run with:
 
-    pytest test
+    /tmp/dev-venv/bin/pytest test
+
+To test parallel execution on free-threaded Python, run:
+
+    /tmp/dev-venv/bin/pytest test --parallel-threads 10 --iterations 100
 
 
 ## Documentation
@@ -145,4 +144,5 @@ Pyosmium is available under the BSD 2-Clause License. See LICENSE.TXT.
 
 ## Authors
 
-Sarah Hoffmann (lonvia@denofr.de)
+Sarah Hoffmann (lonvia@denofr.de) and otheres. See commit logs for a full
+list.

@@ -39,7 +39,7 @@
 # find include path
 find_path(PROTOZERO_INCLUDE_DIR protozero/version.hpp
     PATH_SUFFIXES include
-    PATHS ${CMAKE_SOURCE_DIR}/../protozero
+    HINTS $ENV{PROTOZERO_PREFIX} ${CMAKE_SOURCE_DIR}/contrib/protozero
 )
 
 # Check version number
@@ -58,6 +58,6 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Protozero
                                   REQUIRED_VARS PROTOZERO_INCLUDE_DIR
                                   VERSION_VAR _version)
-
+SET(PROTOZERO_VERSION ${_version})
 
 #----------------------------------------------------------------------
