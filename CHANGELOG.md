@@ -4,6 +4,28 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.1.0] - 2025-08-30
+
+### Added
+
+- introduced flake8 linting for Python sources and tests
+- experimental support for free-threaded Python
+- support for Python 3.14
+- binary wheels for Windows ARM architecture
+
+### Fixed
+
+- various errors in the documentation (thanks @ltog, @amandasaurus, @uniform641)
+- make timestamp conversions thread-safe
+
+### Changed
+
+- updated to pybind11 3.0 (drops support for Python 3.7 and CMake < 3.15)
+- replace setuptools build system with scikit-build-core
+- create version.h on the fly during build
+  (now reflects the library versions actually used for building pyosmium)
+- example code modernized (thanks @jake-low)
+
 ## [4.0.2] - 2024-10-19
 
 ### Fixed
@@ -35,8 +57,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - filter mode for handlers (return False to stop processing)
 - various C++-implementations of filters (for tags, keys, ids, etc.)
 - convenience functions to determine object types
-- binary wheels for MAcOS and Intel ARM architecture
-- haversine functions for two point
+- binary wheels for MacOS and Intel ARM architecture
+- haversine functions for two points
 - direct access to lat/lon for nodes
 - expose osmium's IdSet
 - new IdTracker for efficient tracking of dependent objects
