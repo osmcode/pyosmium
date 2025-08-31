@@ -374,6 +374,15 @@ jobs:
                 ./venv/bin/pytest test
               shell: bash
 
+            - name: Build man pages
+              run: |
+                . venv/bin/activate
+                pip install argparse-manpage
+                cd docs
+                make
+                find man/pyosmium-get-changes.1
+                find man/pyosmium-up-to-date.1
+
 
     build-windows:
         runs-on: windows-2022

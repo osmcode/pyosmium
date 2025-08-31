@@ -53,7 +53,7 @@ docs = [
     'mkdocs-autorefs',
     'mkdocs-gen-files',
     'mkdocs-jupyter',
-    'argparse-manpage '
+    'argparse-manpage'
     ]
 
 [project.scripts]
