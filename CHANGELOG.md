@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.1.1] - 2025-08-31
+
+### Fixed
+
+- build command for man pages adapted to new structure (thanks @sebastic)
+
 ## [4.1.0] - 2025-08-30
 
 ### Added
