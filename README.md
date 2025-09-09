@@ -122,12 +122,11 @@ or to few it locally, you can use:
 
     mkdocs serve
 
-For building the man pages for the tools run:
+Pregenerated man pages for the tools are available in `docs/man`. For rebuilding
+the man pages run:
 
     cd docs
     make man
-
-The man pages can be found in docs/man.
 
 ## Bugs and Questions
 
