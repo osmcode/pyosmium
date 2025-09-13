@@ -1,0 +1,34 @@
+/* Indentation. */
+div.doc-contents:not(.first) {
+  padding-left: 25px;
+  border-left: .05rem solid var(--md-typeset-table-color);
+}
+
+h2.doc-heading {
+    background-color: #eee;
+}
+
+h2.doc-heading code {
+    background-color: #eee;
+    font-size: 110%
+}
+
+code.doc-symbol-class::after {
+  content: "class";
+}
+
+code.doc-symbol-attribute::after {
+  content: "➤";
+}
+
+code.doc-symbol-method::after {
+  content: "➤";
+}
+
+.headerlink {
+  filter: grayscale(100%);
+}
+
+.jp-InputArea .jp-InputArea-prompt {
+    display: none !important;
+}
