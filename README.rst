@@ -24,7 +24,7 @@ development packages for these libraries. On Debian/Ubuntu do::
                        libexpat1-dev zlib1g-dev libbz2-dev
 
 
-Python >= 3.7 is supported. Pypy is known not to work.
+Python >= 3.8 is supported. Pypy is known not to work.
 
 Documentation
 =============
@@ -46,6 +46,10 @@ Examples
 The package contains an `example` directory with small examples on how to use
 the library. They are mostly ports of the examples in Libosmium and
 osmium-contrib.
+
+Also check out the `Cookbook section`_ in the documentation.
+
+.. _Cookbook section: https://docs.osmcode.org/pyosmium/latest/cookbooks/
 
 Fineprint
 =========
