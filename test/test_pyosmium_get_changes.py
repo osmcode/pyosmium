@@ -9,6 +9,8 @@
 from textwrap import dedent
 import uuid
 
+import pytest
+
 import osmium.replication.server
 import osmium
 from osmium.tools.pyosmium_get_changes import pyosmium_get_changes
@@ -105,3 +107,31 @@ class TestPyosmiumGetChanges:
         assert ids.nodes == [12, 13]
         assert ids.ways == [2]
         assert ids.relations == []
+
+    @pytest.mark.parametrize('end_id,max_size,actual_end', [(107, None, 107),
+                                                            (None, 1, 108),
+                                                            (105, 1, 105),
+                                                            (110, 1, 108)])
+    def test_apply_diffs_endid(self, tmp_path, httpserver, end_id, max_size, actual_end):
+        outfile = tmp_path / f"{uuid.uuid4()}.opl"
+
+        httpserver.expect_request('/state.txt').respond_with_data("""\
+            sequenceNumber=140
+            timestamp=2017-08-26T11\\:04\\:02Z
+        """)
+        for i in range(100, 141):
+            httpserver.expect_request(f'/000/000/{i}.opl')\
+                      .respond_with_data(f"r{i} M" + ",".join(f"n{i}@" for i in range(1, 6000)))
+
+        params = [httpserver, '--diff-type', 'opl', '-I', '100', '-o', str(outfile)]
+        if end_id is not None:
+            params.extend(('--end-id', str(end_id)))
+        if max_size is not None:
+            params.extend(('-s', str(max_size)))
+
+        assert 0 == self.main(*params)
+
+        ids = IDCollector()
+        osmium.apply(str(outfile), ids)
+
+        assert ids.relations == list(range(101, actual_end + 1))

@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
+#
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 """
 Fetch diffs from an OSM planet server.
 
@@ -23,12 +29,14 @@ pyosmium-get-changes does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
 cookies to the server and will save received cookies to the jar file.
 """
+from typing import Optional, List
 import sys
 import logging
 from textwrap import dedent as msgfmt
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import datetime as dt
+from dataclasses import dataclass
 import http.cookiejar
 
 from osmium.replication import server as rserv
@@ -40,25 +48,34 @@ from osmium import SimpleWriter
 log = logging.getLogger()
 
 
-class ReplicationStart(object):
+@dataclass
+class ReplicationStart:
     """ Represents the point where changeset download should begin.
     """
+    date: Optional[dt.datetime] = None
+    seq_id: Optional[int] = None
+    source: Optional[str] = None
 
-    def __init__(self, date=None, seq_id=None, src=None):
-        self.date = date
-        self.seq_id = seq_id
-        self.source = src
-
-    def get_sequence(self, svr):
+    def get_sequence(self, svr: rserv.ReplicationServer) -> Optional[int]:
         if self.seq_id is not None:
             log.debug("Using given sequence ID %d" % self.seq_id)
             return self.seq_id + 1
 
+        assert self.date is not None
         log.debug("Looking up sequence ID for timestamp %s" % self.date)
         return svr.timestamp_to_sequence(self.date)
 
+    def get_end_sequence(self, svr: rserv.ReplicationServer) -> Optional[int]:
+        if self.seq_id is not None:
+            log.debug("Using end sequence ID %d" % self.seq_id)
+            return self.seq_id
+
+        assert self.date is not None
+        log.debug("Looking up end sequence ID for timestamp %s" % self.date)
+        return svr.timestamp_to_sequence(self.date)
+
     @staticmethod
-    def from_id(idstr):
+    def from_id(idstr: str) -> 'ReplicationStart':
         try:
             seq_id = int(idstr)
         except ValueError:
@@ -70,7 +87,7 @@ class ReplicationStart(object):
         return ReplicationStart(seq_id=seq_id)
 
     @staticmethod
-    def from_date(datestr):
+    def from_date(datestr: str) -> 'ReplicationStart':
         try:
             date = dt.datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%SZ")
             date = date.replace(tzinfo=dt.timezone.utc)
@@ -81,7 +98,7 @@ class ReplicationStart(object):
         return ReplicationStart(date=date)
 
     @staticmethod
-    def from_osm_file(fname, ignore_headers):
+    def from_osm_file(fname: str, ignore_headers: bool) -> 'ReplicationStart':
         if ignore_headers:
             ts = None
             seq = None
@@ -102,10 +119,10 @@ class ReplicationStart(object):
             if ts is None:
                 raise ArgumentTypeError("OSM file does not seem to contain valid data.")
 
-        return ReplicationStart(seq_id=seq, date=ts, src=url)
+        return ReplicationStart(seq_id=seq, date=ts, source=url)
 
 
-def write_end_sequence(fname, seqid):
+def write_end_sequence(fname: str, seqid: int) -> None:
     """Either writes out the sequence file or prints the sequence id to stdout.
     """
     if fname is None:
@@ -115,7 +132,7 @@ def write_end_sequence(fname, seqid):
             fd.write(str(seqid))
 
 
-def get_arg_parser(from_main=False):
+def get_arg_parser(from_main: bool = False) -> ArgumentParser:
     parser = ArgumentParser(prog='pyosmium-get-changes',
                             description=__doc__,
                             usage=None if from_main else 'pyosmium-get-changes [options]',
@@ -134,8 +151,9 @@ def get_arg_parser(from_main=False):
     parser.add_argument('--cookie', dest='cookie',
                         help='Netscape-style cookie jar file to read cookies from '
                              'and where received cookies will be written to.')
-    parser.add_argument('-s', '--size', dest='outsize', type=int, default=100,
-                        help='Maximum data to load in MB (default: 100MB).')
+    parser.add_argument('-s', '--size', dest='outsize', type=int,
+                        help='Maximum data to load in MB '
+                             '(Defaults to 100MB when no end date/ID has been set).')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-I', '--start-id', dest='start',
                        type=ReplicationStart.from_id, metavar='ID',
@@ -145,6 +163,13 @@ def get_arg_parser(from_main=False):
                        help='Date when to start updates')
     group.add_argument('-O', '--start-osm-data', dest='start_file', metavar='OSMFILE',
                        help='start at the date of the newest OSM object in the file')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--end-id', dest='end',
+                       type=ReplicationStart.from_id, metavar='ID',
+                       help='Last sequence ID to download.')
+    group.add_argument('-E', '--end-date', dest='end', metavar='DATE',
+                       type=ReplicationStart.from_date,
+                       help='Do not download diffs later than the given date.')
     parser.add_argument('-f', '--sequence-file', dest='seq_file',
                         help='Sequence file. If the file exists, then updates '
                              'will start after the id given in the file. At the '
@@ -164,7 +189,7 @@ def get_arg_parser(from_main=False):
     return parser
 
 
-def pyosmium_get_changes(args):
+def pyosmium_get_changes(args: List[str]) -> int:
     logging.basicConfig(stream=sys.stderr,
                         format='%(asctime)s %(levelname)s: %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
@@ -223,14 +248,30 @@ def pyosmium_get_changes(args):
             write_end_sequence(options.seq_file, startseq - 1)
             return 0
 
-        log.debug("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
+        log.debug("Starting download at ID %d (max %f MB)"
+                  % (startseq, options.outsize or float('inf')))
         if options.outformat is not None:
             outhandler = SimpleWriter(options.outfile, filetype=options.outformat)
         else:
             outhandler = SimpleWriter(options.outfile)
 
-        endseq = svr.apply_diffs(outhandler, startseq, max_size=options.outsize*1024,
-                                 simplify=options.simplify)
+        if options.outsize is not None:
+            max_size = options.outsize * 1024
+        elif options.end is None:
+            max_size = 100 * 1024
+        else:
+            max_size = None
+
+        if options.end is None:
+            end_id = None
+        else:
+            end_id = options.end.get_end_sequence(svr)
+            if end_id is None:
+                log.error("Cannot find the end date/ID on the server.")
+                return 1
+
+        endseq = svr.apply_diffs(outhandler, startseq, max_size=max_size,
+                                 end_id=end_id, simplify=options.simplify)
         outhandler.close()
 
     # save cookies
@@ -247,7 +288,7 @@ def pyosmium_get_changes(args):
     return 0
 
 
-def main():
+def main() -> int:
     logging.basicConfig(stream=sys.stderr,
                         format='%(asctime)s %(levelname)s: %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
