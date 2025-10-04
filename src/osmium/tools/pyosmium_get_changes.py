@@ -29,97 +29,20 @@ pyosmium-get-changes does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
 cookies to the server and will save received cookies to the jar file.
 """
-from typing import Optional, List
+from typing import List
 import sys
 import logging
 from textwrap import dedent as msgfmt
-
-from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
-import datetime as dt
-from dataclasses import dataclass
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import http.cookiejar
 
-from osmium.replication import server as rserv
-from osmium.replication import newest_change_from_file
-from osmium.replication.utils import get_replication_header
-from osmium.version import pyosmium_release
-from osmium import SimpleWriter
+from ..replication import server as rserv
+from ..version import pyosmium_release
+from .. import SimpleWriter
+from .common import ReplicationStart
+
 
 log = logging.getLogger()
-
-
-@dataclass
-class ReplicationStart:
-    """ Represents the point where changeset download should begin.
-    """
-    date: Optional[dt.datetime] = None
-    seq_id: Optional[int] = None
-    source: Optional[str] = None
-
-    def get_sequence(self, svr: rserv.ReplicationServer) -> Optional[int]:
-        if self.seq_id is not None:
-            log.debug("Using given sequence ID %d" % self.seq_id)
-            return self.seq_id + 1
-
-        assert self.date is not None
-        log.debug("Looking up sequence ID for timestamp %s" % self.date)
-        return svr.timestamp_to_sequence(self.date)
-
-    def get_end_sequence(self, svr: rserv.ReplicationServer) -> Optional[int]:
-        if self.seq_id is not None:
-            log.debug("Using end sequence ID %d" % self.seq_id)
-            return self.seq_id
-
-        assert self.date is not None
-        log.debug("Looking up end sequence ID for timestamp %s" % self.date)
-        return svr.timestamp_to_sequence(self.date)
-
-    @staticmethod
-    def from_id(idstr: str) -> 'ReplicationStart':
-        try:
-            seq_id = int(idstr)
-        except ValueError:
-            raise ArgumentTypeError("Sequence id '%s' is not a number" % idstr)
-
-        if seq_id < -1:
-            raise ArgumentTypeError("Sequence id '%s' is negative" % idstr)
-
-        return ReplicationStart(seq_id=seq_id)
-
-    @staticmethod
-    def from_date(datestr: str) -> 'ReplicationStart':
-        try:
-            date = dt.datetime.strptime(datestr, "%Y-%m-%dT%H:%M:%SZ")
-            date = date.replace(tzinfo=dt.timezone.utc)
-        except ValueError:
-            raise ArgumentTypeError(
-                "Date needs to be in ISO8601 format (e.g. 2015-12-24T08:08:08Z).")
-
-        return ReplicationStart(date=date)
-
-    @staticmethod
-    def from_osm_file(fname: str, ignore_headers: bool) -> 'ReplicationStart':
-        if ignore_headers:
-            ts = None
-            seq = None
-            url = None
-        else:
-            try:
-                (url, seq, ts) = get_replication_header(fname)
-            except RuntimeError as e:
-                raise ArgumentTypeError(e)
-
-        if ts is None and seq is None:
-            log.debug("OSM file has no replication headers. Looking for newest OSM object.")
-            try:
-                ts = newest_change_from_file(fname)
-            except RuntimeError as e:
-                raise ArgumentTypeError(e)
-
-            if ts is None:
-                raise ArgumentTypeError("OSM file does not seem to contain valid data.")
-
-        return ReplicationStart(seq_id=seq, date=ts, source=url)
 
 
 def write_end_sequence(fname: str, seqid: int) -> None:

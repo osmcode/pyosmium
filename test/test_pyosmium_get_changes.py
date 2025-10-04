@@ -11,7 +11,6 @@ import uuid
 
 import pytest
 
-import osmium.replication.server
 import osmium
 from osmium.tools.pyosmium_get_changes import pyosmium_get_changes
 
