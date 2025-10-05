@@ -13,7 +13,7 @@ import pytest
 
 from werkzeug.wrappers import Response
 
-from helpers import mkdate, CountingHandler
+from helpers import mkdate, CountingHandler, IDCollector
 
 import osmium.replication.server as rserv
 import osmium.replication
@@ -221,6 +221,33 @@ def test_apply_diffs_count(httpserver):
         h = CountingHandler()
         assert 100 == svr.apply_diffs(h, 100, 10000)
         assert h.counts == [1, 1, 1, 0]
+
+
+@pytest.mark.parametrize('end_id,max_size, actual_end', [(107, None, 107),
+                                                         (None, 512, 108),
+                                                         (105, 512, 105),
+                                                         (110, 512, 108),
+                                                         (None, None, 115)])
+def test_apply_diffs_endid(httpserver, end_id, max_size, actual_end):
+    httpserver.expect_request('/state.txt').respond_with_data("""\
+        sequenceNumber=140
+        timestamp=2017-08-26T11\\:04\\:02Z
+    """)
+    for i in range(100, 141):
+        httpserver.expect_request(f'/000/000/{i}.opl')\
+                  .respond_with_data(f"r{i} M" + ",".join(f"n{i}@" for i in range(1, 3000)))
+
+    with rserv.ReplicationServer(httpserver.url_for(''), "opl") as svr:
+        res = svr.collect_diffs(101, end_id=end_id, max_size=max_size)
+
+        assert res is not None
+        assert res.id == actual_end
+        assert res.newest == 140
+
+        ids = IDCollector()
+        res.reader.apply(ids)
+
+        assert ids.relations == list(range(101, actual_end + 1))
 
 
 def test_apply_diffs_without_simplify(httpserver):

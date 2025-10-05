@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# This file is part of pyosmium. (https://osmcode.org/pyosmium/)
+#
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# For a full list of authors see the git log.
 """
 Update an OSM file with changes from a OSM replication server.
 
@@ -29,38 +35,42 @@ pyosmium-up-to-date does not fetch the cookie from these services for you.
 However, it can read cookies from a Netscape-style cookie jar file, send these
 cookies to the server and will save received cookies to the jar file.
 """
+from typing import Any, List
 import sys
 import traceback
 import logging
 import http.cookiejar
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import datetime as dt
-from osmium.replication import server as rserv
-from osmium.replication.utils import get_replication_header
-from osmium.replication import newest_change_from_file
-from osmium.version import pyosmium_release
 from textwrap import dedent as msgfmt
 from tempfile import mktemp
 import os.path
 
+from ..replication import server as rserv
+from ..version import pyosmium_release
+from .common import ReplicationStart
+
 log = logging.getLogger()
 
 
-def update_from_osm_server(ts, options):
-    """Update the OSM file using the official OSM servers at
-       https://planet.osm.org/replication. This strategy will attempt
-       to start with daily updates before going down to minutelies.
-       TODO: only updates from hourlies currently implemented.
+def update_from_osm_server(start: ReplicationStart, options: Any) -> int:
+    """ Update the OSM file using the official OSM servers at
+        https://planet.osm.org/replication. This strategy will attempt
+        to start with daily updates before going down to minutelies.
+        TODO: only updates from hourlies currently implemented.
     """
-    return update_from_custom_server("https://planet.osm.org/replication/hour/",
-                                     None, ts, options)
+    start.source = "https://planet.osm.org/replication/hour/"
+    return update_from_custom_server(start, options)
 
 
-def update_from_custom_server(url, seq, ts, options):
-    """Update from a custom URL, simply using the diff sequence as is."""
-    with rserv.ReplicationServer(url, "osc.gz") as svr:
-        log.info("Using replication service at %s", url)
+def update_from_custom_server(start: ReplicationStart, options: Any) -> int:
+    """ Update from a custom URL, simply using the diff sequence as is.
+    """
+    assert start.source
+
+    with rserv.ReplicationServer(start.source, options.server_diff_type) as svr:
+        log.info(f"Using replication service at {start.source}")
 
         svr.set_request_parameter('timeout', options.socket_timeout or None)
 
@@ -73,39 +83,37 @@ def update_from_custom_server(url, seq, ts, options):
         if current is None:
             log.error("Cannot download state information. Is the replication URL correct?")
             return 3
-        log.debug("Server is at sequence %d (%s).", current.sequence, current.timestamp)
+        log.debug(f"Server is at sequence {current.sequence} ({current.timestamp}).")
 
-        if seq is None:
-            log.info("Using timestamp %s as starting point." % ts)
-            startseq = svr.timestamp_to_sequence(ts)
-            if startseq is None:
-                log.error("No starting point found for time %s on server %s"
-                          % (str(ts), url))
-                return 3
-        else:
-            if seq >= current.sequence:
-                log.info("File is already up to date.")
-                return 0
+        if start.seq_id is not None and start.seq_id >= current.sequence:
+            log.info("File is already up to date.")
+            return 0
 
-            log.debug("Using given sequence ID %d" % seq)
-            startseq = seq + 1
-            ts = svr.get_state_info(seq=startseq)
-            if ts is None:
-                log.error("Cannot download state information for ID %d. Is the URL correct?" % seq)
+        startseq = start.get_sequence(svr)
+        if startseq is None:
+            log.error(f"No starting point found for time {start.date} on server {start.source}")
+            return 3
+
+        if start.date is None:
+            start_state = svr.get_state_info(seq=startseq)
+            if start_state is None:
+                log.error(f"Cannot download state information for ID {startseq}. "
+                          'Is the URL correct?')
                 return 3
-            ts = ts.timestamp
+            start.date = start_state.timestamp
 
         if not options.force_update:
             cmpdate = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=90)
             cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
-            if ts < cmpdate:
+            if start.date < cmpdate:
                 log.error(
                   """The OSM file is more than 3 months old. You should download a
                      more recent file instead of updating. If you really want to
                      update the file, use --force-update-of-old-planet.""")
                 return 3
 
-        log.info("Starting download at ID %d (max %d MB)" % (startseq, options.outsize))
+        log.info("Starting download at ID %d (max %f MB)"
+                 % (startseq, options.outsize or float('inf')))
 
         outfile = options.outfile
         infile = options.infile
@@ -118,10 +126,25 @@ def update_from_custom_server(url, seq, ts, options):
         else:
             ofname = outfile
 
+        if options.outsize is not None:
+            max_size = options.outsize * 1024
+        elif options.end is None:
+            max_size = 1024 * 1024
+        else:
+            max_size = None
+
+        if options.end is None:
+            end_id = None
+        else:
+            end_id = options.end.get_end_sequence(svr)
+            if end_id is None:
+                log.error("Cannot find the end date/ID on the server.")
+                return 1
+
         try:
             extra_headers = {'generator': 'pyosmium-up-to-date/' + pyosmium_release}
             outseqs = svr.apply_diffs_to_file(infile, ofname, startseq,
-                                              max_size=options.outsize*1024,
+                                              max_size=max_size, end_id=end_id,
                                               extra_headers=extra_headers,
                                               outformat=options.outformat)
 
@@ -130,7 +153,7 @@ def update_from_custom_server(url, seq, ts, options):
                 return 3
 
             if outfile is None:
-                os.rename(ofname, infile)
+                os.replace(ofname, infile)
         finally:
             if outfile is None:
                 try:
@@ -144,41 +167,35 @@ def update_from_custom_server(url, seq, ts, options):
     if options.cookie:
         cookie_jar.save(options.cookie)
 
-    return 0 if outseqs[1] == outseqs[0] else 1
+    return 0 if (end_id or outseqs[1]) == outseqs[0] else 1
 
 
-def compute_start_point(options):
-    if options.ignore_headers:
-        url, seq, ts = None, None, None
-    else:
-        url, seq, ts = get_replication_header(options.infile)
+def compute_start_point(options: Any) -> ReplicationStart:
+    start = ReplicationStart.from_osm_file(options.infile, options.ignore_headers)
 
     if options.server_url is not None:
-        if url is not None and url != options.server_url:
+        if start.source is not None and start.source != options.server_url:
             log.error(msgfmt(f"""
                   You asked to use server URL:
                     {options.server_url}
                   but the referenced OSM file points to replication server:
-                    {url}
+                    {start.source}
                   If you really mean to overwrite the URL, use --ignore-osmosis-headers."""))
-            exit(2)
-        url = options.server_url
+            raise ArgumentTypeError("Source URL doesn't match replication headers.")
+        if start.source is None:
+            start.source = options.server_url
+            start.seq_id = None
+            if start.date is None:
+                raise ArgumentTypeError("Cannot determine start date for file.")
 
-    if seq is None and ts is None:
-        log.info("No replication information found, scanning for newest OSM object.")
-        ts = newest_change_from_file(options.infile)
+    if start.seq_id is None:
+        assert start.date is not None
+        start.date -= dt.timedelta(minutes=options.wind_back)
 
-        if ts is None:
-            log.error("OSM file does not seem to contain valid data.")
-            exit(2)
-
-    if ts is not None:
-        ts -= dt.timedelta(minutes=options.wind_back)
-
-    return url, seq, ts
+    return start
 
 
-def get_arg_parser(from_main=False):
+def get_arg_parser(from_main: bool = False) -> ArgumentParser:
 
     parser = ArgumentParser(prog='pyosmium-up-to-date',
                             description=__doc__,
@@ -197,8 +214,18 @@ def get_arg_parser(from_main=False):
                         help='Base URL of the replication server. Default: '
                              'https://planet.osm.org/replication/hour/ '
                              '(hourly diffs from osm.org)')
-    parser.add_argument('-s', '--size', dest='outsize', metavar='SIZE', type=int, default=1024,
-                        help='Maximum size of change to apply at once in MB. Default: 1GB')
+    parser.add_argument('--diff-type', action='store', dest='server_diff_type', default='osc.gz',
+                        help='File format used by the replication server (default: osc.gz)')
+    parser.add_argument('-s', '--size', dest='outsize', metavar='SIZE', type=int,
+                        help='Maximum size of change to apply at once in MB. '
+                             'Defaults to 1GB when no end ID or date was given.')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--end-id', dest='end',
+                       type=ReplicationStart.from_id, metavar='ID',
+                       help='Last sequence ID to download.')
+    group.add_argument('-E', '--end-date', dest='end', metavar='DATE',
+                       type=ReplicationStart.from_date,
+                       help='Do not download diffs later than the given date.')
     parser.add_argument('--tmpdir', dest='tmpdir',
                         help='Directory to use for temporary files. '
                              'Usually the directory of input file is used.')
@@ -225,28 +252,28 @@ def get_arg_parser(from_main=False):
     return parser
 
 
-def pyosmium_up_to_date(args):
-    options = get_arg_parser(from_main=True).parse_args()
+def pyosmium_up_to_date(args: List[str]) -> int:
+    options = get_arg_parser(from_main=True).parse_args(args)
     log.setLevel(max(3 - options.loglevel, 0) * 10)
 
     try:
-        url, seq, ts = compute_start_point(options)
+        start = compute_start_point(options)
     except RuntimeError as e:
         log.error(str(e))
         return 2
 
     try:
-        if url is None:
-            return update_from_osm_server(ts, options)
+        if start.source is None:
+            return update_from_osm_server(start, options)
 
-        return update_from_custom_server(url, seq, ts, options)
+        return update_from_custom_server(start, options)
     except Exception:
         traceback.print_exc()
 
     return 254
 
 
-def main():
+def main() -> int:
     logging.basicConfig(stream=sys.stderr,
                         format='%(asctime)s %(levelname)s: %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')

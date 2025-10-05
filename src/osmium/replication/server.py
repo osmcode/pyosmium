@@ -6,7 +6,7 @@
 # For a full list of authors see the git log.
 """ Helper functions to communicate with replication servers.
 """
-from typing import NamedTuple, Optional, Any, Iterator, cast, Mapping, Tuple
+from typing import NamedTuple, Optional, Any, Iterator, cast, Mapping, Tuple, Dict
 import urllib.request as urlrequest
 from urllib.error import URLError
 import datetime as dt
@@ -67,7 +67,7 @@ class ReplicationServer:
 
         self.baseurl = url
         self.diff_type = diff_type
-        self.extra_request_params: dict[str, Any] = dict(timeout=60, stream=True)
+        self.extra_request_params: Dict[str, Any] = dict(timeout=60, stream=True)
         self.session: Optional[requests.Session] = None
         self.retry = Retry(total=3, backoff_factor=0.5, allowed_methods={'GET'},
                            status_forcelist=[408, 429, 500, 502, 503, 504])
@@ -125,12 +125,19 @@ class ReplicationServer:
 
         return _get_url_with_session()
 
-    def collect_diffs(self, start_id: int, max_size: int = 1024) -> Optional[DownloadResult]:
+    def collect_diffs(self, start_id: int, max_size: Optional[int] = None,
+                      end_id: Optional[int] = None) -> Optional[DownloadResult]:
         """ Create a MergeInputReader and download diffs starting with sequence
-            id `start_id` into it. `max_size`
-            restricts the number of diffs that are downloaded. The download
-            stops as soon as either a diff cannot be downloaded or the
-            unpacked data in memory exceeds `max_size` kB.
+            id `start_id` into it. `end_id` optionally gives the highest
+            sequence number to download. `max_size` restricts the number of
+            diffs that are downloaded by size. If neither `end_id` nor
+            `max_size` are given, then download default to stop after 1MB.
+
+            The download stops as soon as
+            1. a diff cannot be downloaded or
+            2. the end_id (inclusive) is reached or
+            3. the unpacked data in memory exceeds `max_size` kB or,
+               when no `end_id` and `max_size` are given, 1024kB.
 
             If some data was downloaded, returns a namedtuple with three fields:
             `id` contains the sequence id of the last downloaded diff, `reader`
@@ -140,19 +147,25 @@ class ReplicationServer:
             Returns None if there was an error during download or no new
             data was available.
         """
-        left_size = max_size * 1024
-        current_id = start_id
-
         # must not read data newer than the published sequence id
         # or we might end up reading partial data
         newest = self.get_state_info()
 
-        if newest is None or current_id > newest.sequence:
+        if newest is None or start_id > newest.sequence:
             return None
+
+        current_id = start_id
+        left_size: Optional[int] = None
+        if max_size is not None:
+            left_size = max_size * 1024
+        elif end_id is None:
+            left_size = 1024 * 1024
 
         rd = MergeInputReader()
 
-        while left_size > 0 and current_id <= newest.sequence:
+        while (left_size is None or left_size > 0) \
+                and (end_id is None or current_id <= end_id) \
+                and current_id <= newest.sequence:
             try:
                 diffdata = self.get_diff_block(current_id)
             except:  # noqa: E722
@@ -163,21 +176,32 @@ class ReplicationServer:
                     return None
                 break
 
-            left_size -= rd.add_buffer(diffdata, self.diff_type)
-            LOG.debug("Downloaded change %d. (%d kB available in download buffer)",
-                      current_id, left_size / 1024)
+            diff_size = rd.add_buffer(diffdata, self.diff_type)
+            if left_size is None:
+                LOG.debug("Downloaded change %d.", current_id)
+            else:
+                left_size -= diff_size
+                LOG.debug("Downloaded change %d. (%d kB available in download buffer)",
+                          current_id, left_size / 1024)
             current_id += 1
 
         return DownloadResult(current_id - 1, rd, newest.sequence)
 
     def apply_diffs(self, handler: BaseHandler, start_id: int,
-                    max_size: int = 1024, idx: str = "",
-                    simplify: bool = True) -> Optional[int]:
+                    max_size: Optional[int] = None,
+                    idx: str = "", simplify: bool = True,
+                    end_id: Optional[int] = None) -> Optional[int]:
         """ Download diffs starting with sequence id `start_id`, merge them
-            together and then apply them to handler `handler`. `max_size`
-            restricts the number of diffs that are downloaded. The download
-            stops as soon as either a diff cannot be downloaded or the
-            unpacked data in memory exceeds `max_size` kB.
+            together and then apply them to handler `handler`. `end_id`
+            optionally gives the highest sequence id to download. `max_size`
+            allows to restrict the amount of diffs that are downloaded.
+            Downloaded diffs are temporarily saved in memory and this parameter
+            ensures that pyosmium doesn't run out of memory. `max_size`
+            is the maximum size in kB this internal buffer may have.
+
+            If neither `end_id` nor `max_size` are given, the download is
+            restricted to a maximum size of 1MB. The download also
+            stops when the most recent diff has been processed.
 
             If `idx` is set, a location cache will be created and applied to
             the way nodes. You should be aware that diff files usually do not
@@ -197,7 +221,7 @@ class ReplicationServer:
             The function returns the sequence id of the last diff that was
             downloaded or None if the download failed completely.
         """
-        diffs = self.collect_diffs(start_id, max_size)
+        diffs = self.collect_diffs(start_id, end_id=end_id, max_size=max_size)
 
         if diffs is None:
             return None
@@ -206,19 +230,26 @@ class ReplicationServer:
 
         return diffs.id
 
-    def apply_diffs_to_file(self, infile: str, outfile: str,
-                            start_id: int, max_size: int = 1024,
+    def apply_diffs_to_file(self, infile: str, outfile: str, start_id: int,
+                            max_size: Optional[int] = None,
                             set_replication_header: bool = True,
                             extra_headers: Optional[Mapping[str, str]] = None,
-                            outformat: Optional[str] = None) -> Optional[Tuple[int, int]]:
+                            outformat: Optional[str] = None,
+                            end_id: Optional[int] = None) -> Optional[Tuple[int, int]]:
         """ Download diffs starting with sequence id `start_id`, merge them
             with the data from the OSM file named `infile` and write the result
             into a file with the name `outfile`. The output file must not yet
             exist.
 
-            `max_size` restricts the number of diffs that are downloaded. The
-            download stops as soon as either a diff cannot be downloaded or the
-            unpacked data in memory exceeds `max_size` kB.
+            `end_id` optionally gives the highest sequence id to download.
+            `max_size` allows to restrict the amount of diffs that are
+            downloaded. Downloaded diffs are saved in memory and this parameter
+            ensures that pyosmium doesn't run out of memory. `max_size`
+            is the maximum size in kB this internal buffer may have.
+
+            If neither `end_id` nor `max_size` are given, the
+            download is restricted to a maximum size of 1MB. The download also
+            stops when the most recent diff has been processed.
 
             If `set_replication_header` is true then the URL of the replication
             server and the sequence id and timestamp of the last diff applied
@@ -235,7 +266,7 @@ class ReplicationServer:
             newest available sequence id if new data has been written or None
             if no data was available or the download failed completely.
         """
-        diffs = self.collect_diffs(start_id, max_size)
+        diffs = self.collect_diffs(start_id, end_id=end_id, max_size=max_size)
 
         if diffs is None:
             return None

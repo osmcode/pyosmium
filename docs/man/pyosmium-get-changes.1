@@ -1,4 +1,4 @@
-.TH PYOSMIUM\-GET\-CHANGES "1" "2025\-09\-09" "pyosmium" "Generated Python Manual"
+.TH PYOSMIUM\-GET\-CHANGES "1" "2025\-10\-05" "pyosmium" "Generated Python Manual"
 .SH NAME
 pyosmium\-get\-changes
 .SH SYNOPSIS
@@ -56,7 +56,7 @@ Netscape\-style cookie jar file to read cookies from and where received cookies 
 
 .TP
 \fB\-s\fR \fI\,OUTSIZE\/\fR, \fB\-\-size\fR \fI\,OUTSIZE\/\fR
-Maximum data to load in MB (default: 100MB).
+Maximum data to load in MB (Defaults to 100MB when no end date/ID has been set).
 
 .TP
 \fB\-I\fR \fI\,ID\/\fR, \fB\-\-start\-id\fR \fI\,ID\/\fR
@@ -69,6 +69,14 @@ Date when to start updates
 .TP
 \fB\-O\fR \fI\,OSMFILE\/\fR, \fB\-\-start\-osm\-data\fR \fI\,OSMFILE\/\fR
 start at the date of the newest OSM object in the file
+
+.TP
+\fB\-\-end\-id\fR \fI\,ID\/\fR
+Last sequence ID to download.
+
+.TP
+\fB\-E\fR \fI\,DATE\/\fR, \fB\-\-end\-date\fR \fI\,DATE\/\fR
+Do not download diffs later than the given date.
 
 .TP
 \fB\-f\fR \fI\,SEQ_FILE\/\fR, \fB\-\-sequence\-file\fR \fI\,SEQ_FILE\/\fR

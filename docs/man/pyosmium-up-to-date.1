@@ -1,4 +1,4 @@
-.TH PYOSMIUM\-UP\-TO\-DATE "1" "2025\-09\-09" "pyosmium" "Generated Python Manual"
+.TH PYOSMIUM\-UP\-TO\-DATE "1" "2025\-10\-05" "pyosmium" "Generated Python Manual"
 .SH NAME
 pyosmium\-up\-to\-date
 .SH SYNOPSIS
@@ -57,8 +57,20 @@ Format the data should be saved in. Usually determined from file name.
 Base URL of the replication server. Default: https://planet.osm.org/replication/hour/ (hourly diffs from osm.org)
 
 .TP
+\fB\-\-diff\-type\fR \fI\,SERVER_DIFF_TYPE\/\fR
+File format used by the replication server (default: osc.gz)
+
+.TP
 \fB\-s\fR \fI\,SIZE\/\fR, \fB\-\-size\fR \fI\,SIZE\/\fR
-Maximum size of change to apply at once in MB. Default: 1GB
+Maximum size of change to apply at once in MB. Defaults to 1GB when no end ID or date was given.
+
+.TP
+\fB\-\-end\-id\fR \fI\,ID\/\fR
+Last sequence ID to download.
+
+.TP
+\fB\-E\fR \fI\,DATE\/\fR, \fB\-\-end\-date\fR \fI\,DATE\/\fR
+Do not download diffs later than the given date.
 
 .TP
 \fB\-\-tmpdir\fR \fI\,TMPDIR\/\fR
