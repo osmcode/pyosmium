@@ -153,7 +153,7 @@ def update_from_custom_server(start: ReplicationStart, options: Any) -> int:
                 return 3
 
             if outfile is None:
-                os.rename(ofname, infile)
+                os.replace(ofname, infile)
         finally:
             if outfile is None:
                 try:
