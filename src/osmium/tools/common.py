@@ -29,6 +29,14 @@ class ReplicationStart:
     def get_sequence(self, svr: ReplicationServer) -> Optional[int]:
         if self.seq_id is not None:
             log.debug("Using given sequence ID %d" % self.seq_id)
+            if self.seq_id > 0:
+                start_state = svr.get_state_info(seq=self.seq_id)
+                if start_state is None:
+                    log.error(
+                        f"Cannot download state information for ID {self.seq_id}."
+                        " Server may not have this diff anymore.")
+                    return None
+                self.date = start_state.timestamp
             return self.seq_id + 1
 
         assert self.date is not None
