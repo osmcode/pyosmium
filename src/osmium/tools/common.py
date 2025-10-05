@@ -33,7 +33,7 @@ class ReplicationStart:
 
         assert self.date is not None
         log.debug("Looking up sequence ID for timestamp %s" % self.date)
-        return svr.timestamp_to_sequence(self.date)
+        return svr.timestamp_to_sequence(self.date, limit_by_oldest_available=True)
 
     def get_end_sequence(self, svr: ReplicationServer) -> Optional[int]:
         if self.seq_id is not None:

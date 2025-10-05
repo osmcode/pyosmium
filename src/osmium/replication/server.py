@@ -305,7 +305,8 @@ class ReplicationServer:
         return (diffs.id, diffs.newest)
 
     def timestamp_to_sequence(self, timestamp: dt.datetime,
-                              balanced_search: bool = False) -> Optional[int]:
+                              balanced_search: bool = False,
+                              limit_by_oldest_available: bool = False) -> Optional[int]:
         """ Get the sequence number of the replication file that contains the
             given timestamp. The search algorithm is optimised for replication
             servers that publish updates in regular intervals. For servers
@@ -313,8 +314,15 @@ class ReplicationServer:
             should be set to true so that a standard binary search for the
             sequence will be used. The default is good for all known
             OSM replication services.
-        """
 
+            When `limit_by_oldest_available` is set, then the function will
+            return None when the server replication does not start at 0 and
+            the given timestamp is older than the oldest available timestamp
+            on the server. Some replication servers do not keep the full
+            history and this flag avoids accidentally trying to download older
+            data. The downside is that the function will never return the
+            oldest available sequence ID when the flag is set.
+        """
         # get the current timestamp from the server
         upper = self.get_state_info()
 
@@ -331,8 +339,10 @@ class ReplicationServer:
             lower = self.get_state_info(lowerid)
 
             if lower is not None and lower.timestamp >= timestamp:
-                if lower.sequence == 0 or lower.sequence + 1 >= upper.sequence:
-                    return lower.sequence
+                if lower.sequence == 0:
+                    return 0
+                if lower.sequence + 1 >= upper.sequence:
+                    return None if limit_by_oldest_available else lower.sequence
                 upper = lower
                 lower = None
                 lowerid = 0

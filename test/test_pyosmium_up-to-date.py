@@ -168,3 +168,9 @@ def test_update_with_enddate(test_data, runner, tmp_path):
     osmium.apply(newfile, ids)
 
     assert ids.relations == list(range(101, 106))
+
+
+def test_change_date_too_old_for_replication_source(test_data, runner):
+    outfile = test_data("n1 v1 t2070-04-05T06:30:00Z")
+
+    assert 3 == runner(outfile)
