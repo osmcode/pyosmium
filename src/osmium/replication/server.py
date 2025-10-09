@@ -144,8 +144,14 @@ class ReplicationServer:
             contains the MergeInputReader with the data and `newest` is a
             sequence id of the most recent diff available.
 
-            Returns None if there was an error during download or no new
-            data was available.
+            Returns None if there was no new data was available.
+
+            If there is an error during the download, then the function will
+            simply return the already downloaded data. If the reported
+            error is a client error (HTTP 4xx) and happens during the download
+            of the first diff, then a ::request.HTTPError:: is raised: this
+            condition is likely to be permanent and the caller should not
+            simply retry without investigating the cause.
         """
         # must not read data newer than the published sequence id
         # or we might end up reading partial data
@@ -168,8 +174,19 @@ class ReplicationServer:
                 and current_id <= newest.sequence:
             try:
                 diffdata = self.get_diff_block(current_id)
-            except:  # noqa: E722
-                LOG.error("Error during diff download. Bailing out.")
+            except requests.RequestException as ex:
+                if start_id == current_id \
+                        and ex.response is not None \
+                        and (ex.response.status_code % 100 == 4):
+                    # If server directly responds with a client error,
+                    # reraise the exception to signal a potentially permanent
+                    # error.
+                    LOG.error("Permanent server error: %s", ex.response)
+                    raise ex
+                # In all other cases, process whatever diffs we have and
+                # encourage a retry.
+                LOG.error("Error during diff download: %s", ex)
+                LOG.error("Bailing out.")
                 diffdata = ''
             if len(diffdata) == 0:
                 if start_id == current_id:
