@@ -94,18 +94,10 @@ def update_from_custom_server(start: ReplicationStart, options: Any) -> int:
             log.error(f"No starting point found for time {start.date} on server {start.source}")
             return 3
 
-        if start.date is None:
-            start_state = svr.get_state_info(seq=startseq)
-            if start_state is None:
-                log.error(f"Cannot download state information for ID {startseq}. "
-                          'Is the URL correct?')
-                return 3
-            start.date = start_state.timestamp
-
         if not options.force_update:
             cmpdate = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=90)
             cmpdate = cmpdate.replace(tzinfo=dt.timezone.utc)
-            if start.date < cmpdate:
+            if start.date is None or start.date < cmpdate:
                 log.error(
                   """The OSM file is more than 3 months old. You should download a
                      more recent file instead of updating. If you really want to

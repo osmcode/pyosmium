@@ -168,3 +168,23 @@ def test_update_with_enddate(test_data, runner, tmp_path):
     osmium.apply(newfile, ids)
 
     assert ids.relations == list(range(101, 106))
+
+
+def test_change_date_too_old_for_replication_source(test_data, runner, caplog):
+    outfile = test_data("n1 v1 t2070-04-05T06:30:00Z")
+
+    assert 3 == runner(outfile)
+    assert 'No starting point found' in caplog.text
+
+
+def test_change_id_too_old_for_replication_source(caplog, tmp_path, runner, replication_server):
+    outfile = tmp_path / f"{uuid.uuid4()}.pbf"
+    h = osmium.io.Header()
+    h.set('osmosis_replication_base_url', replication_server)
+    h.set('osmosis_replication_sequence_number', '98')
+
+    with osmium.SimpleWriter(outfile, 4000, h) as w:
+        w.add_node({'id': 1})
+
+    assert 3 == runner(outfile)
+    assert 'Cannot download state information for ID 98' in caplog.text

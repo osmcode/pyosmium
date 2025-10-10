@@ -144,8 +144,14 @@ class ReplicationServer:
             contains the MergeInputReader with the data and `newest` is a
             sequence id of the most recent diff available.
 
-            Returns None if there was an error during download or no new
-            data was available.
+            Returns None if there was no new data was available.
+
+            If there is an error during the download, then the function will
+            simply return the already downloaded data. If the reported
+            error is a client error (HTTP 4xx) and happens during the download
+            of the first diff, then a ::request.HTTPError:: is raised: this
+            condition is likely to be permanent and the caller should not
+            simply retry without investigating the cause.
         """
         # must not read data newer than the published sequence id
         # or we might end up reading partial data
@@ -168,8 +174,19 @@ class ReplicationServer:
                 and current_id <= newest.sequence:
             try:
                 diffdata = self.get_diff_block(current_id)
-            except:  # noqa: E722
-                LOG.error("Error during diff download. Bailing out.")
+            except requests.RequestException as ex:
+                if start_id == current_id \
+                        and ex.response is not None \
+                        and (ex.response.status_code % 100 == 4):
+                    # If server directly responds with a client error,
+                    # reraise the exception to signal a potentially permanent
+                    # error.
+                    LOG.error("Permanent server error: %s", ex.response)
+                    raise ex
+                # In all other cases, process whatever diffs we have and
+                # encourage a retry.
+                LOG.error("Error during diff download: %s", ex)
+                LOG.error("Bailing out.")
                 diffdata = ''
             if len(diffdata) == 0:
                 if start_id == current_id:
@@ -305,7 +322,8 @@ class ReplicationServer:
         return (diffs.id, diffs.newest)
 
     def timestamp_to_sequence(self, timestamp: dt.datetime,
-                              balanced_search: bool = False) -> Optional[int]:
+                              balanced_search: bool = False,
+                              limit_by_oldest_available: bool = False) -> Optional[int]:
         """ Get the sequence number of the replication file that contains the
             given timestamp. The search algorithm is optimised for replication
             servers that publish updates in regular intervals. For servers
@@ -313,8 +331,15 @@ class ReplicationServer:
             should be set to true so that a standard binary search for the
             sequence will be used. The default is good for all known
             OSM replication services.
-        """
 
+            When `limit_by_oldest_available` is set, then the function will
+            return None when the server replication does not start at 0 and
+            the given timestamp is older than the oldest available timestamp
+            on the server. Some replication servers do not keep the full
+            history and this flag avoids accidentally trying to download older
+            data. The downside is that the function will never return the
+            oldest available sequence ID when the flag is set.
+        """
         # get the current timestamp from the server
         upper = self.get_state_info()
 
@@ -331,8 +356,10 @@ class ReplicationServer:
             lower = self.get_state_info(lowerid)
 
             if lower is not None and lower.timestamp >= timestamp:
-                if lower.sequence == 0 or lower.sequence + 1 >= upper.sequence:
-                    return lower.sequence
+                if lower.sequence == 0:
+                    return 0
+                if lower.sequence + 1 >= upper.sequence:
+                    return None if limit_by_oldest_available else lower.sequence
                 upper = lower
                 lower = None
                 lowerid = 0

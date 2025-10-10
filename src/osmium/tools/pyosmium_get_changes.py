@@ -162,9 +162,16 @@ def pyosmium_get_changes(args: List[str]) -> int:
             cookie_jar.load(options.cookie)
             svr.set_request_parameter('cookies', cookie_jar)
 
+        # Sanity check if server URL is correct and server is responding.
+        current = svr.get_state_info()
+        if current is None:
+            log.error("Cannot download state information. Is the replication URL correct?")
+            return 3
+        log.debug(f"Server is at sequence {current.sequence} ({current.timestamp}).")
+
         startseq = options.start.get_sequence(svr)
         if startseq is None:
-            log.error("Cannot read state file from server. Is the URL correct?")
+            log.error(f"No starting point found for time {options.start.date} on server {url}")
             return 1
 
         if options.outfile is None:
