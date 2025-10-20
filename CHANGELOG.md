@@ -4,6 +4,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.2.0] - 2025-10-21
+
+### Added
+
+- new 'end_id' parameter for diff processing functions
+- new end ID/date parameters for pyosmium tools
+
+### Fixed
+
+- restore packaging of README
+- use replace() instead of rename() to make overwriting planet files on Windows
+
+### Changed
+
+- pre-generate man pages for easier packaging
+- diff processing functions and tools now throw an Error when diffs are
+  requested that are older than then oldest available diff on the server
+- tools now error out, when the first diff download encounters a client
+  error (HTTP 4xx)
+
 ## [4.1.1] - 2025-08-31
 
 ### Fixed
