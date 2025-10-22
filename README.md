@@ -8,7 +8,12 @@ manner.
 
 ## Installation
 
-Pyosmium works with Python >= 3.8. Pypy is known to not work.
+Pyosmium works with Python >= 3.8. Pypy is known to not work. Support for
+free-threading Python is currently in an experimental state.
+
+Compiling and using pyosmium on 32bit architectures still works but is
+not officially supported anymore. There are known issues around working
+with large OSM IDs on 32bit systems.
 
 ### Using Pip
 
@@ -16,8 +21,8 @@ The recommended way to install pyosmium is via pip:
 
     pip install osmium
 
-We provide binary wheels for Linux and Windows 64 for all actively
-maintained Python versions.
+We provide binary wheels for Linux, MacOS and Windows 64bit architectures
+for all actively maintained Python versions.
 
 For other versions, a source wheel is provided. Make sure to install all
 external dependencies first. On Debian/Ubuntu-like systems, the following
@@ -44,6 +49,7 @@ pyosmium has the following dependencies:
  * [Python Requests](https://docs.python-requests.org/)
  * [scikit-build-core](https://scikit-build-core.readthedocs.io)
  * a C++17-compatible compiler (Clang 13+, GCC 10+ are supported)
+
 
 ### Compiling from Source
 
