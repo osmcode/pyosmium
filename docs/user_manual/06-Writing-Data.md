@@ -18,6 +18,18 @@ pyosmium will refuse to overwrite any existing files. Either make sure to
 delete the files before instantiating a writer or use the parameter
 `overwrite=true`.
 
+All writers are [context managers](https://docs.python.org/3/reference/datamodel.html#context-managers) and to ensure that the file is properly closed in the
+end, the recommended  way to use them is in a with statement:
+
+!!! example
+    ```python
+    with osmium.SimpleWriter('my_extra_data.osm.pbf') as writer:
+        # do stuff here
+    ```
+
+When not used inside a with block, then don't forget to call the `close()`
+function explicitly to close the writer.
+
 Once a writer is instantiated, one of the `add*` functions can be used to
 add an OSM object to the file. You can either use one of the
 `add_node/way/relation` functions to force writing a specific type of
@@ -26,9 +38,6 @@ object type. The OSM objects are directly written out in the order in which
 they are given to the writer object. It is your responsibility as a user to
 make sure that the order is correct with respect to the
 [conventions for object order][order-in-osm-files].
-
-After writing all data the writer needs to be closed using the `close()`
-function. It is usually easier to use a writer as a context manager.
 
 Here is a complete example for a script that converts a file from OPL format
 to PBF format:
@@ -129,3 +138,48 @@ pyosmium implements three different writer classes: the basic
 the two reference-completing writers
 [ForwardReferenceWriter][osmium.ForwardReferenceWriter] and
 [BackReferenceWriter][osmium.BackReferenceWriter].
+
+### Writing specific objects only
+
+The [SimpleWriter][osmium.SimpleWriter] creates an OSM data file by directly
+writing out any OSM object that it receives in the chosen format.
+
+
+### Writing reference-complete files
+
+The [BackReferenceWriter][osmium.BackReferenceWriter] will make sure that the
+file that is written out is reference-complete, meaning all objects that are
+directly referenced by the object written are added to the output file as well.
+This is needed when you want to make sure that geometries can be recreated
+from the object in the file.
+
+Creating a file with backward references is a two-stage process: while the
+writer is open, it will write all objects received through one of the `add_*()`
+functions into a temporary file and keeps a record of which objects are needed
+to make the file reference-complete. Once the writer is closed, it collects the
+missing object from a given reference file, merges them with the data from
+the temporary file and writes out the final result.
+
+### Writing files with forward references
+
+The [ForwardReferenceWriter][osmium.ForwardReferenceWriter] completes the
+written objects with forward references. This is particularly useful when
+creating geographic extracts of any kind: one selects the node of interest
+in a particular area and then lets the ForwardReferenceWriter complete the
+ways and relations referring to the nodes.
+
+Files written by the ForwardReferenceWriter are not necessarily
+reference-complete. That is easy to see when considering the example of the
+geographic extract: there may be ways in the area that cross the boundary
+of the area chosen but only the nodes within the area are written out. This
+might be useful in many situations as the way would be simply seem to be cut
+on the area of interest. However, it has the disadvantage that some objects
+will get invalid geometries, especially when they represent areas.
+
+The other thing to consider during forward completion are indirect references.
+When completing relations indirectly referenced through ways or other relations,
+then the resulting file can become big very quickly. For example, a seemingly
+small extract of the city of Strasbourg can suddenly contain not only the
+relations for France and Germany but also electoral boundaries and entire
+timezones. For that reason, when forward-completing relations, it is not
+recommended to use backward completion.
