@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Any, Union
+from typing import Any, Union, Optional
 import os
 from typing_extensions import Buffer
 
@@ -139,20 +139,29 @@ class Reader:
         from the file. Use [apply][osmium.apply] for that purpose.
     """
     def __init__(self, filename: Union[str, 'os.PathLike[str]', FileBuffer, File],
-                 types: osm_entity_bits = ...) -> None:
+                 types: Optional[osm_entity_bits] = None,
+                 thread_pool: Optional[ThreadPool] = None) -> None:
         """ Create a new reader object. The input may either be
             a filename or a [File][osmium.io.File] or
-            [FileBuffer][osmium.io.FileBuffer] object. The _types_ parameter
-            defines which kinds of objects will be read from the input. Any
-            types not present will be skipped completely when reading the
-            file. Depending on the type of input, this can save quite a bit
-            of time. However, be careful to not skip over types that may
-            be referenced by other objects. For example, ways need
+            [FileBuffer][osmium.io.FileBuffer] object. The 'types' parameter
+            defines which kinds of objects will be read from the input. When
+            set, then any types not present will be skipped completely when
+            reading the file. Depending on the type of input, this can save
+            quite a bit of time. However, be careful to not skip over types
+            that may be referenced by other objects. For example, ways need
             nodes in order to compute their geometry.
 
             Readers may be used as a context manager. In that case, the
             `close()` function will be called automatically when the
             reader leaves the scope.
+
+            The reader implicitly creates a private
+            [ThreadPool][osmium.io.ThreadPool] which it
+            uses to parallelize reading from the input. Alternatively you
+            may hand in an externally created thread pool. This may be useful
+            when you create many readers in parallel and want them to share
+            a single thread pool or when you want to customize the size
+            of the thread pool.
         """
 
     def close(self) -> None:
@@ -181,12 +190,25 @@ class Writer:
         for writing data.
     """
     def __init__(self, ffile: Union[str, 'os.PathLike[str]', File],
-                 header: Header = ...) -> None:
+                 header: Optional[Header] = None,
+                 overwrite: bool = False,
+                 thread_pool: Optional[ThreadPool] = None) -> None:
         """ Create a new Writer. The output may either be a simple filename
             or a [File][osmium.io.File] object. A custom [Header][osmium.io.Header]
             object may be given, to customize the global file information that
             is written out. Be aware that not all file formats support writing
             out all header information.
+
+            pyosmium will refuse to overwrite to existing files by default.
+            Set 'overwrite' to True to allow overwriting.
+
+            The writer implicitly creates a private
+            [ThreadPool][osmium.io.ThreadPool] which it may
+            use to parallelize writing to the output. Alternatively you
+            may hand in an externally created thread pool. This may be useful
+            when you create many writers in parallel and want them to share
+            a single thread pool or when you want to customize the size
+            of the thread pool.
         """
 
     def close(self) -> int:

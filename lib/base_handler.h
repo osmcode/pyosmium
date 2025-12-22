@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_BASE_HANDLER_HPP
@@ -41,7 +41,6 @@ protected:
     osmium::osm_entity_bits::type m_enabled_for = osmium::osm_entity_bits::all;
 };
 
-void apply(osmium::io::Reader &reader, BaseHandler &handler);
 void apply_item(osmium::OSMEntity &item, BaseHandler &handler);
 
 } // namespace

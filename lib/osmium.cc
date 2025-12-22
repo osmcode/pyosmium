@@ -20,6 +20,7 @@
 #include "python_handler.h"
 #include "handler_chain.h"
 #include "buffer_iterator.h"
+#include "io.h"
 
 #include <vector>
 #include <filesystem>
@@ -62,14 +63,18 @@ void pyosmium::apply_item(osmium::OSMEntity &obj, pyosmium::BaseHandler &handler
     }
 }
 
-void pyosmium::apply(osmium::io::Reader &reader, pyosmium::BaseHandler &handler)
+namespace {
+
+void pyosmium_apply(pyosmium::PyReader &reader, pyosmium::BaseHandler &handler)
 {
-    while (auto buffer = reader.read()) {
+    while (auto buffer = reader.get()->read()) {
         for (auto &obj : buffer.select<osmium::OSMEntity>()) {
             pyosmium::apply_item(obj, handler);
         }
     }
     handler.flush();
+}
+
 }
 
 #ifdef Py_GIL_DISABLED
@@ -87,52 +92,52 @@ PYBIND11_MODULE(_osmium, m)
         }
     });
 
-    m.def("apply", &pyosmium::apply,
+    m.def("apply", &pyosmium_apply,
           py::arg("reader"), py::arg("handler"));
-    m.def("apply", [](osmium::io::Reader &rd, py::args args)
-                     {
-                         pyosmium::HandlerChain handler{args};
-                         pyosmium::apply(rd, handler);
-                     },
+    m.def("apply", [](pyosmium::PyReader &rd, py::args args)
+                   {
+                       pyosmium::HandlerChain handler{args};
+                       pyosmium_apply(rd, handler);
+                   },
           py::arg("reader"));
     m.def("apply", [](std::string fn, pyosmium::BaseHandler &h)
                    {
-                       osmium::io::Reader rd{fn};
-                       pyosmium::apply(rd, h);
+                       pyosmium::PyReader rd{osmium::io::File(std::move(fn))};
+                       pyosmium_apply(rd, h);
                    },
           py::arg("filename"), py::arg("handler"));
     m.def("apply", [](std::string fn, py::args args)
-                     {
-                         pyosmium::HandlerChain handler{args};
-                         osmium::io::Reader rd{fn};
-                         pyosmium::apply(rd, handler);
-                     },
+                   {
+                       pyosmium::HandlerChain handler{args};
+                       pyosmium::PyReader rd{osmium::io::File(std::move(fn))};
+                       pyosmium_apply(rd, handler);
+                   },
           py::arg("filename"));
     m.def("apply", [](std::filesystem::path const &fn, pyosmium::BaseHandler &h)
                    {
-                       osmium::io::Reader rd{fn.string()};
-                       pyosmium::apply(rd, h);
+                       pyosmium::PyReader rd{osmium::io::File(fn.string())};
+                       pyosmium_apply(rd, h);
                    },
           py::arg("filename"), py::arg("handler"));
     m.def("apply", [](std::filesystem::path const &fn, py::args args)
-                     {
-                         pyosmium::HandlerChain handler{args};
-                         osmium::io::Reader rd{fn.string()};
-                         pyosmium::apply(rd, handler);
-                     },
+                   {
+                       pyosmium::HandlerChain handler{args};
+                       pyosmium::PyReader rd{osmium::io::File(fn.string())};
+                       pyosmium_apply(rd, handler);
+                   },
           py::arg("filename"));
     m.def("apply", [](osmium::io::File fn, pyosmium::BaseHandler &h)
                    {
-                       osmium::io::Reader rd{fn};
-                       pyosmium::apply(rd, h);
+                       pyosmium::PyReader rd{fn};
+                       pyosmium_apply(rd, h);
                    },
           py::arg("filename"), py::arg("handler"));
     m.def("apply", [](osmium::io::File fn, py::args args)
-                     {
-                         pyosmium::HandlerChain handler{args};
-                         osmium::io::Reader rd{fn};
-                         pyosmium::apply(rd, handler);
-                     },
+                   {
+                       pyosmium::HandlerChain handler{args};
+                       pyosmium::PyReader rd{fn};
+                       pyosmium_apply(rd, handler);
+                   },
           py::arg("filename"));
 
     py::class_<pyosmium::BaseHandler>(m, "BaseHandler");
