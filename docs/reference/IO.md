@@ -5,4 +5,4 @@
 ::: osmium.io.Header
 ::: osmium.io.Reader
 ::: osmium.io.Writer
-
+::: osmium.io.ThreadPool

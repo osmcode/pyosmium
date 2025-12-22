@@ -2,7 +2,7 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from typing import Any, Union
 import os
@@ -87,6 +87,50 @@ class Header:
     def set(self, key: str, value: str) -> None:
         """ Set the value of header option _key_ to _value_.
         """
+
+
+class ThreadPool:
+    """ A thread-pool for parallelizing IO operations in pyosmium.
+
+        By default pyosmium manages thread pools for readers and writers
+        transparently using the default settings. For more fine-grained
+        control over the threads created you can instantiate a thread pool
+        explicitly and hand it to Readers, Writers, FileProcessors and
+        some other functions.
+    """
+
+    def __init__(self, num_threads: int = 0, max_queue_size: int = 0) -> None:
+        """ Create a new ThreadPool with the given number of threads and
+            a worker queue with the given maximum size.
+
+            A negative value for 'num_threads' sets the number of cores
+            in the system that should be left unused. The minimum number
+            to use is 1.
+            When 'num_threads' is 0, then pyosmium tries to use the
+            content of OSMIUM_POOL_THREADS environment variable. When it
+            does not exist, -2 is used as the default (use all available
+            cores in the system except two).
+
+            'max_queue_size' is the number of data buffers that should
+            put at maximum in the queue for processing. When set to '0',
+            the size is read from the environment variable
+            OSMIUM_MAX_WORK_QUEUE_SIZE if available. Otherwise the default is 10.
+        """
+
+    @property
+    def num_threads(self) -> int:
+        """ Return the number of threads configured for this pool.
+        """
+
+    def queue_size(self) -> int:
+        """ Return the current size of the worker queue for this pool.
+        """
+
+    def queue_empty(self) -> bool:
+        """ Return true when there is currently no data available in the
+            work queue.
+        """
+
 
 class Reader:
     """ Low-level object for reading data from an OSM file.

@@ -106,3 +106,11 @@ def test_reader_with_filebuffer():
     osmium.apply(rd, handler)
 
     assert handler.counts == [1, 0, 0, 0]
+
+
+def test_thread_pool():
+    pool = osmium.io.ThreadPool(2, 15)
+
+    assert pool.num_threads == 2
+    assert pool.queue_size() == 0
+    assert pool.queue_empty()

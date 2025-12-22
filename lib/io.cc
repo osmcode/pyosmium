@@ -10,6 +10,7 @@
 
 #include <osmium/io/any_input.hpp>
 #include <osmium/io/any_output.hpp>
+#include <osmium/thread/pool.hpp>
 
 #include <filesystem>
 
@@ -108,4 +109,12 @@ PYBIND11_MODULE(io, m)
         .def(py::init<osmium::io::File, osmium::io::Header>())
         .def("close", &osmium::io::Writer::close)
     ;
+
+    py::class_<osmium::thread::Pool>(m, "ThreadPool")
+        .def(py::init<int, std::size_t>(),
+             py::arg("num_threads")=0, py::arg("max_queue_size")=0U)
+        .def_property_readonly("num_threads", &osmium::thread::Pool::num_threads)
+        .def("queue_size", &osmium::thread::Pool::queue_size)
+        .def("queue_empty", &osmium::thread::Pool::queue_empty)
+     ;
 }
