@@ -56,8 +56,8 @@ class WriteHandler(SimpleWriter):
         documentation.
     """
 
-    def __init__(self, filename: str, bufsz: int = 4096*1024, filetype: str = "") -> None:
-        super().__init__(filename, bufsz=bufsz, filetype=filetype)
+    def __init__(self, filename: str, bufsz: int = 4096*1024) -> None:
+        super().__init__(filename, bufsz=bufsz)
 
 
 def _merge_apply(self: MergeInputReader, *handlers: 'HandlerLike',

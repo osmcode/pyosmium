@@ -2,15 +2,15 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
-from typing import Any, Union
+from typing import Any, Union, Optional
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import os
 
 from osmium._osmium import SimpleWriter
-from osmium.io import File, FileBuffer
+from osmium.io import File, FileBuffer, ThreadPool
 from osmium.file_processor import FileProcessor, zip_processors
 from osmium import IdTracker
 
@@ -30,7 +30,7 @@ class BackReferenceWriter:
     def __init__(self, outfile: Union[str, 'os.PathLike[str]', File],
                  ref_src: Union[str, 'os.PathLike[str]', File, FileBuffer],
                  overwrite: bool = False, remove_tags: bool = True,
-                 relation_depth: int = 0):
+                 relation_depth: int = 0, thread_pool: Optional[ThreadPool] = None):
         """ Create a new writer.
 
             `outfile` is the name of the output file to write. The file must
@@ -47,10 +47,17 @@ class BackReferenceWriter:
             The writer will not complete nested relations by default. If you
             need nested relations, set `relation_depth` to the minimum depth
             to which relations shall be completed.
+
+            The writer implicitly creates a private
+            [ThreadPool][osmium.io.ThreadPool] which it
+            uses to parallelize IO operations. Alternatively you
+            may hand in an externally created thread pool.
         """
         self.outfile = outfile
         self.tmpdir = TemporaryDirectory()
-        self.writer = SimpleWriter(str(Path(self.tmpdir.name, 'back_writer.osm.pbf')))
+        self.thread_pool = thread_pool or ThreadPool()
+        self.writer = SimpleWriter(Path(self.tmpdir.name, 'back_writer.osm.pbf'),
+                                   thread_pool=self.thread_pool)
         self.overwrite = overwrite
         self.remove_tags = remove_tags
         self.id_tracker = IdTracker()
@@ -102,10 +109,13 @@ class BackReferenceWriter:
         self.id_tracker.complete_backward_references(self.ref_src,
                                                      relation_depth=self.relation_depth)
 
-        fp1 = FileProcessor(str(Path(self.tmpdir.name, 'back_writer.osm.pbf')))
-        fp2 = FileProcessor(self.ref_src).with_filter(self.id_tracker.id_filter())
+        fp1 = FileProcessor(Path(self.tmpdir.name, 'back_writer.osm.pbf'),
+                            thread_pool=self.thread_pool)
+        fp2 = FileProcessor(self.ref_src, thread_pool=self.thread_pool
+                            ).with_filter(self.id_tracker.id_filter())
 
-        with SimpleWriter(self.outfile, overwrite=self.overwrite) as writer:
+        with SimpleWriter(self.outfile, overwrite=self.overwrite,
+                          thread_pool=self.thread_pool) as writer:
             for o1, o2 in zip_processors(fp1, fp2):
                 if o1:
                     writer.add(o1)

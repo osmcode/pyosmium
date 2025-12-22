@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ._osmium import HandlerLike
 
 from ._osmium import apply, NodeLocationsForWays
-from .io import Reader, File, FileBuffer
+from .io import Reader, File, FileBuffer, ThreadPool
 from .osm import osm_entity_bits
 from .area import AreaManager
 from .index import create_map
@@ -65,16 +65,19 @@ class SimpleHandler:
                      filters: List['HandlerLike'] = []) -> None:
         """Apply the handler to a string buffer. The buffer must be a
            byte string.
+
+           The other parameters have the same meaning as for `apply_file()`.
         """
         self._apply_object(FileBuffer(buffer, format), locations, idx, filters)
 
     def _apply_object(self, obj: Union[str, 'os.PathLike[str]', File, FileBuffer],
                       locations: bool, idx: str,
                       filters: List['HandlerLike']) -> None:
+        thread_pool = ThreadPool()
         entities = self.enabled_for()
         if entities & osm_entity_bits.AREA:
             area = AreaManager()
-            with Reader(obj, osm_entity_bits.RELATION) as rd:
+            with Reader(obj, osm_entity_bits.RELATION, thread_pool=thread_pool) as rd:
                 apply(rd, *filters, area.first_pass_handler())
 
             entities |= osm_entity_bits.OBJECT
@@ -89,5 +92,5 @@ class SimpleHandler:
         else:
             handlers = [*filters, self]
 
-        with Reader(obj, entities) as rd:
+        with Reader(obj, entities, thread_pool=thread_pool) as rd:
             apply(rd, *handlers)
