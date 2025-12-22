@@ -2,14 +2,14 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
 
 #include <vector>
 
-#include <boost/function_output_iterator.hpp>
+#include <boost/iterator/function_output_iterator.hpp>
 
 #include <osmium/osm/object_comparisons.hpp>
 #include <osmium/io/any_input.hpp>
