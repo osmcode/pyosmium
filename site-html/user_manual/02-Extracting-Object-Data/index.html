@@ -1,0 +1,1651 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://osmcode.org/pyosmium/user_manual/02-Extracting-Object-Data/">
+      
+      
+        <link rel="prev" href="../01-First-Steps/">
+      
+      
+        <link rel="next" href="../03-Working-with-Geometries/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>OSM Objects - Pyosmium 4.2.0</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#osm-objects" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Pyosmium 4.2.0" class="md-header__button md-logo" aria-label="Pyosmium 4.2.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pyosmium 4.2.0
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              OSM Objects
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  User Manual
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cookbooks/" class="md-tabs__link">
+          
+  
+  
+  Cookbooks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Pyosmium 4.2.0" class="md-nav__button md-logo" aria-label="Pyosmium 4.2.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Pyosmium 4.2.0
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Manual
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            User Manual
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-First-Steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    First Steps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    OSM Objects
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    OSM Objects
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#determining-the-type-of-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      Determining the Type of Object
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-object-tags" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reading object tags
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-common-meta-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Other common meta information
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#properties-of-osm-object-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Properties of OSM object types
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Properties of OSM object types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Nodes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ways" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ways
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Relations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changeset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changeset
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-Working-with-Geometries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Geometries
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-Working-with-Filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Pre-Filtering Input Data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-Working-with-Handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handler-based Processing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Writing-Data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Writing Data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-Input-Formats-And-Other-Sources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Input Formats and Other Sources
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-Working-With-Change-Files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working With Change Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-Working-With-History-Files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working With History Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-Replication-Tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Replication Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Cookbooks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Cookbooks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Enhance-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Enhancing Tags in an OSM File
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filtering-Data-By-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filtering an OSM File By Tags
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filter-Data-By-Geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filtering by Geometry
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Node-Infos-To-Boundaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding Place Node Information to Boundary Relations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Route-Info-To-Ways/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding Relation Information to Member Ways
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Visualizing-Data-With-Geopandas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Visualising Data With GeoPandas
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Dataclasses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OSM Data Containers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/File-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Iterative Data Reading
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Handler-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers and Handler Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Data-Writers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Writers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IO Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Geometry-Functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Geometry Processing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Area/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Area Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Indexes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Indexes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Replication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Replication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Thread-Safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Thread Safety
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="osm-objects">OSM Objects<a class="headerlink" href="#osm-objects" title="Permanent link">🔗</a></h1>
+<p>This chapter explains more about the different object types that are
+returned in pyosmium and how to access its data.</p>
+<h2 id="determining-the-type-of-object">Determining the Type of Object<a class="headerlink" href="#determining-the-type-of-object" title="Permanent link">🔗</a></h2>
+<p>pyosmium may return five different types of objects. First there are the
+three base types from the OSM data model already
+<a class="autorefs autorefs-internal" title="OSM data model" href="../01-First-Steps/#osm-data-model">introduced in the last chapter</a>:
+nodes, ways and relations. Next there is an <em>area type</em>. It is explained
+in more detail in the <a href="../03-Working-with-Geometries/#areas">Geometry chapter</a>.
+Finally, there is a type for changesets, which contains information about
+edits in the OSM database. It can only appear in special changeset files
+and explained in more detail <a href="#changeset">below</a>.</p>
+<p>The FileProcessor may return any of these objects, when iterating over a file.
+Therefore, a script will usually first need to determine the type of object
+received. There are a couple of ways to do this.</p>
+<h4 id="using-is_-convenience-functions">Using <code>is_*()</code> convenience functions<a class="headerlink" href="#using-is_-convenience-functions" title="Permanent link">🔗</a></h4>
+<p>All object types, except changesets, implement a set of
+<code>is_node</code>/<code>is_way</code>/<code>is_relation</code>/<code>is_area</code> functions, which give a nicely
+readable way of testing for a specific object type.</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Code</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;buildings.opl&#39;</span><span class="p">):</span>
+</span><span id="__span-0-2">    <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">is_relation</span><span class="p">():</span>
+</span><span id="__span-0-3">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found a relation.&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1">Found a relation.
+</span></code></pre></div>
+</div>
+<h4 id="using-the-type-identifier">Using the type identifier<a class="headerlink" href="#using-the-type-identifier" title="Permanent link">🔗</a></h4>
+<p>The <code>type_str()</code> function returns the type of the object as a single
+lower case character. The supported types are:</p>
+<table>
+<thead>
+<tr>
+<th>Character</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>n</strong></td>
+<td>node</td>
+</tr>
+<tr>
+<td><strong>w</strong></td>
+<td>way</td>
+</tr>
+<tr>
+<td><strong>r</strong></td>
+<td>relation</td>
+</tr>
+<tr>
+<td><strong>a</strong></td>
+<td>area</td>
+</tr>
+<tr>
+<td><strong>c</strong></td>
+<td>changeset</td>
+</tr>
+</tbody>
+</table>
+<p>This type string can be useful for printing or when saving data by
+type. It can also be used to test for a specific type. It is particularly
+useful when testing for multiple types:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Code</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/buildings.opl&#39;</span><span class="p">):</span>
+</span><span id="__span-2-2">    <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">type_str</span><span class="p">()</span> <span class="ow">in</span> <span class="s1">&#39;wr&#39;</span><span class="p">:</span>
+</span><span id="__span-2-3">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found a way or relation.&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1">Found a way or relation.
+</span><span id="__span-3-2">Found a way or relation.
+</span><span id="__span-3-3">Found a way or relation.
+</span></code></pre></div>
+</div>
+<h4 id="testing-for-object-type">Testing for object type<a class="headerlink" href="#testing-for-object-type" title="Permanent link">🔗</a></h4>
+<p>Each OSM object type has a <a href="../../reference/Dataclasses/">corresponding Python class</a>.
+You can simply test for this object type:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;buildings.opl&#39;</span><span class="p">):</span>
+</span><span id="__span-4-2">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">Relation</span><span class="p">):</span>
+</span><span id="__span-4-3">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found a relation.&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<h2 id="reading-object-tags">Reading object tags<a class="headerlink" href="#reading-object-tags" title="Permanent link">🔗</a></h2>
+<p>Every object has a list of properties, the tags. They can be accessed through
+the <code>tags</code> property, which provides a simple dictionary-like view of the tags.
+You can use the bracket notation to access a specific tag or use the more
+explicit <code>get()</code> function. Just like for Python dictionaries, an access by
+bracket raises a <code>ValueError</code> when the key you are looking for does not exist,
+while the <code>get()</code> function returns the selected default value.</p>
+<p>The <code>in</code> operation can be used to check for existence of a key:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;buildings.opl&#39;</span><span class="p">):</span>
+</span><span id="__span-5-2">    <span class="c1"># When using the bracket notation, make sure the tag exists.</span>
+</span><span id="__span-5-3">    <span class="k">if</span> <span class="s1">&#39;entrance&#39;</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+</span><span id="__span-5-4">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;entrace =&#39;</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">[</span><span class="s1">&#39;entrance&#39;</span><span class="p">])</span>
+</span><span id="__span-5-5">
+</span><span id="__span-5-6">    <span class="c1"># The get() function never throws.</span>
+</span><span id="__span-5-7">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;building =&#39;</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;building&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;unset&gt;&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>Tags can also be iterated over. The iterator returns <a class="autorefs autorefs-internal" title="            osmium.osm.Tag" href="../../reference/Dataclasses/#osmium.osm.Tag">Tag</a>
+objects. These each hold a key (<code>k</code>) and a value (<code>v</code>) string. A tag is
+itself a Python iterable, so that you can easily iterate through keys and
+values like this:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+</span><span id="__span-6-2">
+</span><span id="__span-6-3"><span class="n">stats</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+</span><span id="__span-6-4">
+</span><span id="__span-6-5"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;buildings.opl&#39;</span><span class="p">):</span>
+</span><span id="__span-6-6">    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+</span><span id="__span-6-7">        <span class="n">stats</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)])</span>
+</span><span id="__span-6-8">
+</span><span id="__span-6-9"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Most common tags:&quot;</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</span></code></pre></div>
+</div>
+<p>As with all data in OSM objects, the tags property is only a view on tags
+of the object. If you want to save the tag list for later use, you must make
+a copy of the list. The most simple way to do this, is to convert the tag
+list into a Python dictionary:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><span class="n">saved_tags</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-7-2">
+</span><span id="__span-7-3"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/buildings.opl&#39;</span><span class="p">):</span>
+</span><span id="__span-7-4">    <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+</span><span id="__span-7-5">        <span class="n">saved_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
+</span><span id="__span-7-6">
+</span><span id="__span-7-7"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved tags:&quot;</span><span class="p">,</span> <span class="n">saved_tags</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<h2 id="other-common-meta-information">Other common meta information<a class="headerlink" href="#other-common-meta-information" title="Permanent link">🔗</a></h2>
+<p>Next to the tags, every OSM object also carries some meta information
+describing its ID, version and information regarding the editor.</p>
+<h2 id="properties-of-osm-object-types">Properties of OSM object types<a class="headerlink" href="#properties-of-osm-object-types" title="Permanent link">🔗</a></h2>
+<h3 id="nodes">Nodes<a class="headerlink" href="#nodes" title="Permanent link">🔗</a></h3>
+<p>The main property of a <a class="autorefs autorefs-internal" title="            osmium.osm.Node" href="../../reference/Dataclasses/#osmium.osm.Node">Node</a> is the <em>location</em>,
+a coordinate in WGS84 projection.
+Latitude and longitude of the node can be accessed either through the
+<code>location</code> property or through the <code>lat</code> and <code>lon</code> shortcuts:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/buildings.opl&#39;</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">NODE</span><span class="p">):</span>
+</span><span id="__span-8-2">    <span class="k">assert</span> <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>OpenStreetMap, and by extension pyosmium, saves latitude and longitude
+internally as a 7-digit fixed-point number. You can access the coordinates
+as fixed-point integers through the <code>x</code> and <code>y</code> properties. There may be rare
+use cases, where using this fixed-point notation is faster and more precise.</p>
+<p>The coordinates returned by the <code>lat</code>/<code>lon</code> accessors are guaranteed to be
+valid. That means that a value is set and is between -180 and 180 degrees
+for longitude and -90 and 90 degrees for latitude. If the file contains
+an invalid coordinate, then pyosmium will throw a <code>ValueError</code>. To access
+the raw unchecked coordinates, use the
+functions <code>location.lat_without_check()</code> and <code>location.lon_without_check()</code>.</p>
+<h3 id="ways">Ways<a class="headerlink" href="#ways" title="Permanent link">🔗</a></h3>
+<p>A <a class="autorefs autorefs-internal" title="            osmium.osm.Way" href="../../reference/Dataclasses/#osmium.osm.Way">Way</a> is essentially an ordered sequence of nodes. This
+sequence can be accessed through the <code>nodes</code> property. An OSM way only
+stores the ID of each node. This can be rather inconvenient when you want
+to work with the geometry of the way, because the coordinates of each
+node need to be looked up. pyosmium therefore exposes a list of
+<a class="autorefs autorefs-internal" title="            osmium.osm.NodeRef" href="../../reference/Dataclasses/#osmium.osm.NodeRef">NodeRefs</a> with the nodes property. Each element in this
+list contains the node ID and optionally the location of the node. The
+next chapter <a href="../03-Working-with-Geometries/">Working with Geometries</a>
+explains in detail, how pyosmium can help to fill the location of the node.</p>
+<h3 id="relations">Relations<a class="headerlink" href="#relations" title="Permanent link">🔗</a></h3>
+<p>A <a class="autorefs autorefs-internal" title="            osmium.osm.Relation" href="../../reference/Dataclasses/#osmium.osm.Relation">Relation</a> is also an ordered sequence. Each sequence
+element can reference an arbitrary OSM object. In addition, each of the
+members can be assigned a <em>role</em>, an arbitrary string that describes the
+function of the member. The OSM data model does not specify what the function
+of a member is and which roles are defined. You need to know what kind
+of relation you are dealing with in order to understand what the members
+are suppose to represent. Over the years, the OSM community has established
+a convention that every relation comes with a <code>type</code> tag, which defines
+the basic kind of the relation. For each type you can refer to the
+Wiki documentation to learn about the meaning of members and roles.
+The most important types currently in use are:</p>
+<ul>
+<li><a href="https://wiki.openstreetmap.org/wiki/Relation:multipolygon">multipolygon</a>
+  describes an area geometry. Pyosmium natively supports creating geometries
+  from this type of relation. See
+  <a href="../03-Working-with-Geometries/">Working with Geometries</a> for more information.</li>
+<li><a href="https://wiki.openstreetmap.org/wiki/Relation:boundary">boundary</a> 
+  is a special form of the multipolygon type. It is used specifically for
+  the various forms of boundaries and define some special roles
+  for associated node objects.</li>
+<li><a href="https://wiki.openstreetmap.org/wiki/Relation:route">route</a> is for
+  collections of ways that make up marked routes for hiking, cycling
+  and other forms of transport.</li>
+<li><a href="https://wiki.openstreetmap.org/wiki/Relation:public_transport">public_transport</a>
+  are a special form of the route relation made for routes of public transport
+  vehicles (trains, buses, trams etc). They add some special member roles
+  for the stops of the vehicles.</li>
+<li><a href="https://wiki.openstreetmap.org/wiki/Relation%3Arestriction">restriction</a>
+  is for street-level routing and describes turn restrictions for vehicles.</li>
+<li><a href="https://wiki.openstreetmap.org/wiki/Relation:associatedStreet">associatedStreet</a>
+  relation types are used in some parts of the world to create a connection
+  between address points and the street they belong to.</li>
+</ul>
+<p>The members of a relation can be accessed through the <code>members</code> property.
+This is a simple list of <a class="autorefs autorefs-internal" title="            osmium.osm.RelationMember" href="../../reference/Dataclasses/#osmium.osm.RelationMember">RelationMember</a> objects.
+They expose the OSM type of the member, its ID and a role string. When no
+role has been set, the <code>role</code> property returns an empty string. Here is an
+example of a simple iteration over all members:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;buildings.opl&#39;</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">RELATION</span><span class="p">):</span>
+</span><span id="__span-9-2">    <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">members</span><span class="p">:</span>
+</span><span id="__span-9-3">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Type: </span><span class="si">{</span><span class="n">member</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">  ID: </span><span class="si">{</span><span class="n">member</span><span class="o">.</span><span class="n">ref</span><span class="si">}</span><span class="s2">  Role: </span><span class="si">{</span><span class="n">member</span><span class="o">.</span><span class="n">role</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>The member property provides only a temporary read-only view of the members.
+If you want to save the list for later processing, you need to make an explicit
+copy like this:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><span class="n">memberlist</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="__span-10-2">
+</span><span id="__span-10-3"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;buildings.opl&#39;</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">RELATION</span><span class="p">):</span>
+</span><span id="__span-10-4">    <span class="n">memberlist</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">m</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">ref</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">role</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">members</span><span class="p">]</span>
+</span><span id="__span-10-5">
+</span><span id="__span-10-6"><span class="nb">print</span><span class="p">(</span><span class="n">memberlist</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p>Always keep in mind that relations can become very large. Some have thousands
+of members. Therefore consider very carefully which members you are actually
+interested when saving members and only keep those that are actually needed later.</p>
+<h3 id="changeset">Changeset<a class="headerlink" href="#changeset" title="Permanent link">🔗</a></h3>
+<p>The <a class="autorefs autorefs-internal" title="            osmium.osm.Changeset" href="../../reference/Dataclasses/#osmium.osm.Changeset">Changeset</a> type is the odd one out among the
+OSM data types. It does not contain actual map data. Instead it is use
+to save meta information about the edits made to the OSM database. You
+normally don't find Changeset objects in a datafile. Changeset information
+is published in separate files.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Sarah Hoffmann
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "toc.integrate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>

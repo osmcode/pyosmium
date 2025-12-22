@@ -1,0 +1,1681 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://osmcode.org/pyosmium/user_manual/04-Working-with-Filters/">
+      
+      
+        <link rel="prev" href="../03-Working-with-Geometries/">
+      
+      
+        <link rel="next" href="../05-Working-with-Handlers/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Pre-Filtering Input Data - Pyosmium 4.2.0</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pre-filtering-input-data" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Pyosmium 4.2.0" class="md-header__button md-logo" aria-label="Pyosmium 4.2.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pyosmium 4.2.0
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Pre-Filtering Input Data
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  User Manual
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cookbooks/" class="md-tabs__link">
+          
+  
+  
+  Cookbooks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Pyosmium 4.2.0" class="md-nav__button md-logo" aria-label="Pyosmium 4.2.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Pyosmium 4.2.0
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Manual
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            User Manual
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-First-Steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    First Steps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-Extracting-Object-Data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OSM Objects
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-Working-with-Geometries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Geometries
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Pre-Filtering Input Data
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Pre-Filtering Input Data
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-filters-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      How filters work
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fallback-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fallback Processing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#built-in-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Built-in Filters
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in Filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emptytagfilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      EmptyTagFilter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entityfilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      EntityFilter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keyfilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      KeyFilter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tagfilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      TagFilter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#idfilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      IdFilter
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-python-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Python Filters
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-Working-with-Handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handler-based Processing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Writing-Data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Writing Data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-Input-Formats-And-Other-Sources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Input Formats and Other Sources
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-Working-With-Change-Files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working With Change Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-Working-With-History-Files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working With History Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-Replication-Tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Replication Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Cookbooks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Cookbooks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Enhance-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Enhancing Tags in an OSM File
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filtering-Data-By-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filtering an OSM File By Tags
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filter-Data-By-Geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filtering by Geometry
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Node-Infos-To-Boundaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding Place Node Information to Boundary Relations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Route-Info-To-Ways/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding Relation Information to Member Ways
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Visualizing-Data-With-Geopandas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Visualising Data With GeoPandas
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Dataclasses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OSM Data Containers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/File-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Iterative Data Reading
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Handler-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers and Handler Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Data-Writers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Writers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IO Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Geometry-Functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Geometry Processing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Area/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Area Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Indexes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Indexes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Replication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Replication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Thread-Safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Thread Safety
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="pre-filtering-input-data">Pre-Filtering Input Data<a class="headerlink" href="#pre-filtering-input-data" title="Permanent link">🔗</a></h1>
+<p>When processing an OSM file, it is often only a very small part of the
+objects the script really needs to see and process. Say, you are interested
+in the road network, then the millions of buildings in the file could easily
+be skipped over. This is the task of filters. They provide a fast and
+performance-efficient way to pre-process or skip over data before it is
+processed within the Python code.</p>
+<h2 id="how-filters-work">How filters work<a class="headerlink" href="#how-filters-work" title="Permanent link">🔗</a></h2>
+<p>Filters can be added to a FileProcessor with the
+<a class="autorefs autorefs-internal" title="            with_filter(filt: osmium._osmium.HandlerLike) -> FileProcessor" href="../../reference/File-Processing/#osmium.FileProcessor.with_filter"><code>with_filter()</code></a> function. An arbitrary
+number of filters can be added to the processor. Simply call the functions
+as many times as needed. The filters will be executed in the order they
+have been added. If any of the filters marks the object for removal,
+the object is immediately dropped and the next object from the file is
+processed.</p>
+<p>Filters can have side effects. That means that a filter may add additional
+attributes to the OSM object it processes and these attributes will
+be visible for subsequent filters and in the Python processing code.
+For example, the GeoInterfaceFilter adds a Python <code>__geo_interface__</code>
+attribute to the object.</p>
+<p>Filters can be restricted to process only certain types of OSM objects.
+If an OSM object doesn't have the right type, the filter will be skipped
+over as if it wasn't defined at all. To restrict the types, call the
+<a class="autorefs autorefs-internal" title="            enable_for(entities: osm_entity_bits) -> None" href="../../reference/#osmium.BaseFilter.enable_for"><code>enable_for()</code></a> function.</p>
+<p>Here is an example of a FileProcessor where only place nodes and
+boundary ways and relations are iterated through:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">fp</span> <span class="o">=</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>\
+</span><span id="__span-0-2">           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">KeyFilter</span><span class="p">(</span><span class="s1">&#39;place&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">enable_for</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">NODE</span><span class="p">))</span>\
+</span><span id="__span-0-3">           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">KeyFilter</span><span class="p">(</span><span class="s1">&#39;boundary&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">enable_for</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">WAY</span> <span class="o">|</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">RELATION</span><span class="p">))</span>
+</span></code></pre></div>
+</div>
+<h2 id="fallback-processing">Fallback Processing<a class="headerlink" href="#fallback-processing" title="Permanent link">🔗</a></h2>
+<p>Once an object has been filtered, the default behaviour of the FileProcessor
+is to simply drop the object. Sometimes it can be useful to do something
+different with the object. For example, when you want to change some tags
+in a file and then write the data out again, then you'd usually want to filter
+out the objects that are not to be modified. However, you wouldn't want
+to drop them completely but write the unmodified object out. For such cases
+it is possible to set a fallback handler for filtered objects using the
+<a class="autorefs autorefs-internal" title="            handler_for_filtered(handler: osmium._osmium.HandlerLike) -> FileProcessor" href="../../reference/File-Processing/#osmium.FileProcessor.handler_for_filtered"><code>handler_for_filtered()</code></a> function.</p>
+<p>The file writer can become a fallback handler for the file processor. The
+<a href="../05-Working-with-Handlers/">next chapter Handlers</a> will show how to write
+a custom handler that can be used in this function.</p>
+<h2 id="built-in-filters">Built-in Filters<a class="headerlink" href="#built-in-filters" title="Permanent link">🔗</a></h2>
+<p>The following section shortly describes the filters that are built into pyosmium.</p>
+<h3 id="emptytagfilter">EmptyTagFilter<a class="headerlink" href="#emptytagfilter" title="Permanent link">🔗</a></h3>
+<p>This filter removes all objects that have no tags at all. Most of the nodes
+in an OSM files fall under this category. So even when you don't want to
+apply any other filters, this one can make a huge difference in processing time:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Code</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<p><div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of objects:&quot;</span><span class="p">,</span>
+</span><span id="__span-1-2">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;liechtenstein.osm.pbf&#39;</span><span class="p">)))</span>
+</span><span id="__span-1-3">
+</span><span id="__span-1-4"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of tagged objects:&quot;</span><span class="p">,</span>
+</span><span id="__span-1-5">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;liechtenstein.osm.pbf&#39;</span><span class="p">)</span>
+</span><span id="__span-1-6">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">EmptyTagFilter</span><span class="p">())))</span>
+</span></code></pre></div>
+=== Output
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1">Total number of objects: 340175
+</span><span id="__span-2-2">Total number of tagged objects: 49645
+</span></code></pre></div></p>
+</div>
+<h3 id="entityfilter">EntityFilter<a class="headerlink" href="#entityfilter" title="Permanent link">🔗</a></h3>
+<p>The Entity filter only lets through objects of the selected type:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Code</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of objects:&quot;</span><span class="p">,</span>
+</span><span id="__span-3-2">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)))</span>
+</span><span id="__span-3-3">
+</span><span id="__span-3-4"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Of which are nodes:&quot;</span><span class="p">,</span>
+</span><span id="__span-3-5">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>
+</span><span id="__span-3-6">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">EntityFilter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">NODE</span><span class="p">))))</span>
+</span></code></pre></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1">Total number of objects: 340175
+</span><span id="__span-4-2">Of which are nodes: 306700
+</span></code></pre></div>
+</div>
+<p>On the surface, the filter is very similar to the entity selector that
+can be passed to the FileProcessor. In fact, it would be much faster to count
+the nodes using the entity selector:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Of which are nodes:&quot;</span><span class="p">,</span>
+</span><span id="__span-5-2">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">NODE</span><span class="p">)))</span>
+</span></code></pre></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1">Of which are nodes: 306700
+</span></code></pre></div>
+</div>
+<p>However, the two implementations use different mechanism to drop the nodes.
+When the entity selector in the FileProcessor is used like in the second
+example, then only the selected entities are read from the file. In our
+example, the file reader would skip over the ways and relations completely.
+When the entity filter is used, then the entities are only dropped when
+they get to the filter. Most importantly, the objects will still be visible
+to any filters applied <em>before</em> the entity filter.</p>
+<p>This can become of some importance when working with geometries. Lets say
+we can to compute the length of all highways in our file. You will remember
+from the last chapter about <a href="../03-Working-with-Geometries/">Working with Geometries</a>
+that it is necessary to enable the location cache in order to be able to
+get the geometries of the road:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:1"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Code</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="__span-7-2">
+</span><span id="__span-7-3"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>\
+</span><span id="__span-7-4">    <span class="o">.</span><span class="n">with_locations</span><span class="p">()</span>\
+</span><span id="__span-7-5">    <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">EntityFilter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">WAY</span><span class="p">)):</span>
+</span><span id="__span-7-6">    <span class="k">if</span> <span class="s1">&#39;highway&#39;</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+</span><span id="__span-7-7">        <span class="n">total</span> <span class="o">+=</span> <span class="n">osmium</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">haversine_distance</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+</span><span id="__span-7-8">
+</span><span id="__span-7-9"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total length of highways is </span><span class="si">{</span><span class="n">total</span><span class="o">/</span><span class="mi">1000</span><span class="si">}</span><span class="s1"> km.&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:1"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1">Total length of highways is 1350.8030544343883 km.
+</span></code></pre></div>
+</div>
+<p>The location cache needs to see all nodes in order to record their locations.
+This would not happen if the file reader skips over the nodes. It is
+therefore imperative to use the entity filter here. In fact, pyosmium will
+refuse to run when nodes are not enabled in a FileProcessor with location
+caching:</p>
+<div class="admonition bug">
+<p class="admonition-title">Bad example</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:1"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Code</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">WAY</span><span class="p">)</span><span class="o">.</span><span class="n">with_locations</span><span class="p">():</span>
+</span><span id="__span-9-2">    <span class="k">if</span> <span class="s1">&#39;highway&#39;</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+</span><span id="__span-9-3">        <span class="n">osmium</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">haversine_distance</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:1"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">Output</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
+</div>
+</div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1">---------------------------------------------------------------------------
+</span><span id="__span-10-2">
+</span><span id="__span-10-3">RuntimeError                              Traceback (most recent call last)
+</span><span id="__span-10-4">
+</span><span id="__span-10-5">Cell In[14], line 1
+</span><span id="__span-10-6">----&gt; 1 for o in osmium.FileProcessor(&#39;../data/liechtenstein.osm.pbf&#39;, osmium.osm.WAY).with_locations():
+</span><span id="__span-10-7">      2     if &#39;highway&#39; in o.tags:
+</span><span id="__span-10-8">      3         osmium.geom.haversine_distance(o.nodes)
+</span><span id="__span-10-9">
+</span><span id="__span-10-10">
+</span><span id="__span-10-11">File ~/osm/dev/pyosmium/build/lib.linux-x86_64-cpython-311/osmium/file_processor.py:46, in FileProcessor.with_locations(self, storage)
+</span><span id="__span-10-12">     42 &quot;&quot;&quot; Enable caching of node locations. This is necessary in order
+</span><span id="__span-10-13">     43     to get geometries for ways and relations.
+</span><span id="__span-10-14">     44 &quot;&quot;&quot;
+</span><span id="__span-10-15">     45 if not (self._entities &amp; osmium.osm.NODE):
+</span><span id="__span-10-16">---&gt; 46     raise RuntimeError(&#39;Nodes not read from file. Cannot enable location cache.&#39;)
+</span><span id="__span-10-17">     47 if isinstance(storage, str):
+</span><span id="__span-10-18">     48     self._node_store = osmium.index.create_map(storage)
+</span><span id="__span-10-19">
+</span><span id="__span-10-20">
+</span><span id="__span-10-21">RuntimeError: Nodes not read from file. Cannot enable location cache.
+</span></code></pre></div>
+</div>
+<h3 id="keyfilter">KeyFilter<a class="headerlink" href="#keyfilter" title="Permanent link">🔗</a></h3>
+<p>This filter only lets pass objects where its list of tags has any of the
+keys given in the arguments of the filter.</p>
+<p>If you want to ensure that all of the keys are present, use the
+KeyFilter multiple times:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objects with &#39;building&#39; _or_ &#39;amenity&#39; key:&quot;</span><span class="p">,</span>
+</span><span id="__span-11-2">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>
+</span><span id="__span-11-3">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">KeyFilter</span><span class="p">(</span><span class="s1">&#39;building&#39;</span><span class="p">,</span> <span class="s1">&#39;amenity&#39;</span><span class="p">))))</span>
+</span><span id="__span-11-4">
+</span><span id="__span-11-5"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objects with &#39;building&#39; _and_ &#39;amenity&#39; key:&quot;</span><span class="p">,</span>
+</span><span id="__span-11-6">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>
+</span><span id="__span-11-7">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">KeyFilter</span><span class="p">(</span><span class="s1">&#39;building&#39;</span><span class="p">))</span>
+</span><span id="__span-11-8">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">KeyFilter</span><span class="p">(</span><span class="s1">&#39;amenity&#39;</span><span class="p">))))</span>
+</span></code></pre></div>
+</div>
+<h3 id="tagfilter">TagFilter<a class="headerlink" href="#tagfilter" title="Permanent link">🔗</a></h3>
+<p>This filter works like KeyFilter, allowing both AND and OR combinations, but
+it requires whole tags (key and value) in the object's tag list.
+Tags are given as two-element tuples.</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objects with &#39;highway=primary&#39; _or_ &#39;surface=asphalt&#39; tags:&quot;</span><span class="p">,</span>
+</span><span id="__span-12-2">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>
+</span><span id="__span-12-3">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">TagFilter</span><span class="p">((</span><span class="s1">&#39;highway&#39;</span><span class="p">,</span><span class="s1">&#39;primary&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;surface&#39;</span><span class="p">,</span><span class="s1">&#39;asphalt&#39;</span><span class="p">)))))</span>
+</span><span id="__span-12-4">
+</span><span id="__span-12-5"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Objects with &#39;highway=primary&#39; _and_ &#39;surface=asphalt&#39; tags:&quot;</span><span class="p">,</span>
+</span><span id="__span-12-6">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>
+</span><span id="__span-12-7">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">TagFilter</span><span class="p">((</span><span class="s1">&#39;highway&#39;</span><span class="p">,</span><span class="s1">&#39;primary&#39;</span><span class="p">)))</span>
+</span><span id="__span-12-8">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">TagFilter</span><span class="p">((</span><span class="s1">&#39;surface&#39;</span><span class="p">,</span><span class="s1">&#39;asphalt&#39;</span><span class="p">)))))</span>
+</span></code></pre></div>
+</div>
+<h3 id="idfilter">IdFilter<a class="headerlink" href="#idfilter" title="Permanent link">🔗</a></h3>
+<p>This filter takes an iterable of numbers and lets only pass objects that
+have an ID that matches the list. This filter is particularly useful when
+doing a two-stage processing, where in the first stage the file is scanned
+for objects that are of interest (for example, members of certain relations)
+and then in the second stage these objects are read from the file. You
+pretty much always want to use this filter in combination with the
+<code>enable_for()</code> function to restrict it to a certain object type.</p>
+<p>In its purest form, the filter could be used to search for a single object
+in a file:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+</div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><span class="n">fp</span> <span class="o">=</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/buildings.opl&#39;</span><span class="p">)</span>\
+</span><span id="__span-13-2">           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">EntityFilter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">osm</span><span class="o">.</span><span class="n">WAY</span><span class="p">))</span>\
+</span><span id="__span-13-3">           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">osmium</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">IdFilter</span><span class="p">([</span><span class="mi">1</span><span class="p">]))</span>
+</span><span id="__span-13-4">
+</span><span id="__span-13-5"><span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">fp</span><span class="p">:</span>
+</span><span id="__span-13-6">    <span class="nb">print</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+</span></code></pre></div>
+<p>However, in practise it is a very expensive way to find a single object.
+Remember that the entire file will be scanned by the FileProcessor just
+to find that one piece of information.</p>
+<h2 id="custom-python-filters">Custom Python Filters<a class="headerlink" href="#custom-python-filters" title="Permanent link">🔗</a></h2>
+<p>It is also possible to define a custom filter in Python. Most of the time
+this is not very useful because calling a filter implemented in Python is
+just as expensive as returning the OSM object to Python and doing the
+processing then. However, it can be useful when the FileProcessor is
+used as an Iterable input to other libraries like GeoPandas.</p>
+<p>A Python filter needs to be implemented as a class that looks exactly
+like a <a href="../05-Working-with-Handlers/">Handler class</a>: for each type that
+should be handled by the filter, implement a callback function
+<code>node()</code>, <code>way()</code>, <code>relation()</code>, <code>area()</code> or <code>changeset()</code>. If a callback
+for a certain type is not implemented, then the object type will automatically
+pass through the filter. The callback function needs to return either 'True',
+when the object should be filtered out, or 'False' when it should pass through.</p>
+<p>Here is a simple example of a filter that filters out all nodes that are older than 2020:</p>
+<div class="admonition example">
+<p class="admonition-title">Example</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+</span><span id="__span-14-2">
+</span><span id="__span-14-3"><span class="k">class</span><span class="w"> </span><span class="nc">DateFilter</span><span class="p">:</span>
+</span><span id="__span-14-4">
+</span><span id="__span-14-5">    <span class="k">def</span><span class="w"> </span><span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+</span><span id="__span-14-6">        <span class="k">return</span> <span class="n">n</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">UTC</span><span class="p">)</span>
+</span><span id="__span-14-7">
+</span><span id="__span-14-8">
+</span><span id="__span-14-9"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of objects:&quot;</span><span class="p">,</span>
+</span><span id="__span-14-10">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)))</span>
+</span><span id="__span-14-11">
+</span><span id="__span-14-12"><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Without nodes older than 2020:&quot;</span><span class="p">,</span>
+</span><span id="__span-14-13">      <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s1">&#39;../data/liechtenstein.osm.pbf&#39;</span><span class="p">)</span>
+</span><span id="__span-14-14">                           <span class="o">.</span><span class="n">with_filter</span><span class="p">(</span><span class="n">DateFilter</span><span class="p">())))</span>
+</span></code></pre></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Sarah Hoffmann
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "toc.integrate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>

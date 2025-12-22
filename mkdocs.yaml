@@ -1,4 +1,4 @@
-site_name: Pyosmium
+site_name: Pyosmium 4.2.0
 theme:
     font: false
     name: material

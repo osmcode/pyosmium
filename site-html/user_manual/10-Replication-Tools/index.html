@@ -1,0 +1,1570 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://osmcode.org/pyosmium/user_manual/10-Replication-Tools/">
+      
+      
+        <link rel="prev" href="../09-Working-With-History-Files/">
+      
+      
+        <link rel="next" href="../../cookbooks/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Replication Tools - Pyosmium 4.2.0</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#replication-tools" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Pyosmium 4.2.0" class="md-header__button md-logo" aria-label="Pyosmium 4.2.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pyosmium 4.2.0
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Replication Tools
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  User Manual
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cookbooks/" class="md-tabs__link">
+          
+  
+  
+  Cookbooks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Pyosmium 4.2.0" class="md-nav__button md-logo" aria-label="Pyosmium 4.2.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Pyosmium 4.2.0
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Manual
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            User Manual
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-First-Steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    First Steps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-Extracting-Object-Data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OSM Objects
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-Working-with-Geometries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Geometries
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-Working-with-Filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Pre-Filtering Input Data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-Working-with-Handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handler-based Processing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Writing-Data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Writing Data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-Input-Formats-And-Other-Sources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Input Formats and Other Sources
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-Working-With-Change-Files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working With Change Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-Working-With-History-Files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working With History Files
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Replication Tools
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Replication Tools
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#about-change-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      About change files
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-change-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Getting change files
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#updating-a-planet-or-extract" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating a planet or extract
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Updating a planet or extract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choosing-the-replication-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      Choosing the replication source
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updating-larger-amounts-of-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating larger amounts of data
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-change-files-for-updating-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating change files for updating databases
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Creating change files for updating databases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#preparing-the-state-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preparing the state file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-change-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a change file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#continuously-updating-a-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      Continuously updating a database
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Cookbooks
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Cookbooks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Enhance-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Enhancing Tags in an OSM File
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filtering-Data-By-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filtering an OSM File By Tags
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filter-Data-By-Geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filtering by Geometry
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Node-Infos-To-Boundaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding Place Node Information to Boundary Relations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Route-Info-To-Ways/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Adding Relation Information to Member Ways
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Visualizing-Data-With-Geopandas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Visualising Data With GeoPandas
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Dataclasses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OSM Data Containers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/File-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Iterative Data Reading
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Handler-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handlers and Handler Functions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Data-Writers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Writers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    IO Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Geometry-Functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Geometry Processing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Area/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Area Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Indexes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Indexes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Replication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Replication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Thread-Safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Thread Safety
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="replication-tools">Replication Tools<a class="headerlink" href="#replication-tools" title="Permanent link">🔗</a></h1>
+<p>OpenStreetMap is a database that is constantly extended and updated. When you
+download the planet or an extract of it, you only get a snapshot of the
+database at a given point in time. To keep up-to-date with the development
+of OSM, you either need to download a new snapshot or you can update your
+existing data from change files published along with the planet file.
+Pyosmium ships with two tools that help you to process change files:
+<code>pyosmium-get-changes</code> and <code>pyosmium-up-to-date</code>.</p>
+<p>This section explains the basics of OSM change files and how to use Pyosmium's
+tools to keep your data up to date.</p>
+<h2 id="about-change-files">About change files<a class="headerlink" href="#about-change-files" title="Permanent link">🔗</a></h2>
+<p>Regular <a href="https://wiki.openstreetmap.org/wiki/Planet.osm/diffs">change files</a>
+are published for the planet and also by some extract services. These
+change files are special OSM data files containing all changes to the database
+in a regular interval. Change files are not referentially complete. That means
+that they only contain OSM objects that have changed but not necessarily
+all the objects that are referenced by the changed objects. Because of
+that change file are rarely useful on their own. But they can be used
+to update an existing snapshot of OSM data.</p>
+<h2 id="getting-change-files">Getting change files<a class="headerlink" href="#getting-change-files" title="Permanent link">🔗</a></h2>
+<p>There are multiple sources for OSM change files available:</p>
+<ul>
+<li>
+<p><a href="https://planet.openstreetmap.org/replication">https://planet.openstreetmap.org/replication</a>
+   is the official source
+   for planet-wide updates. There are change files for
+   minutely, hourly and daily intervals available.</p>
+</li>
+<li>
+<p><a href="https://download.geofabrik.de">Geofabrik</a> offers daily change files
+   for all its updates. See the extract page for a link to the replication URL.
+   Note that change files go only about 3 months back. Older files are deleted.</p>
+</li>
+<li>
+<p>download.openstreetmap.fr offers
+   <a href="https://download.openstreetmap.fr/replication/">minutely change files</a>
+   for all its <a href="https://download.openstreetmap.fr/extracts/">extracts</a>.</p>
+</li>
+</ul>
+<p>For other services also check out the list of providers on the
+<a href="https://wiki.openstreetmap.org/wiki/Planet.osm">OSM wiki</a>.</p>
+<h2 id="updating-a-planet-or-extract">Updating a planet or extract<a class="headerlink" href="#updating-a-planet-or-extract" title="Permanent link">🔗</a></h2>
+<p>If you have downloaded the full planet or obtain a PBF extract file from one of the
+sites which offer a replication service, then updating your OSM file can be as easy as:</p>
+<div class="language-text highlight"><pre><span></span><code>pyosmium-up-to-date &lt;osmfile.osm.pbf&gt;
+</code></pre></div>
+<p>This finds the right replication source and file to start with, downloads
+changes and updates the given file with the data. You can repeat this command
+whenever you want to have newer data. The command automatically picks up at
+the same point where it left off after the previous update.</p>
+<h3 id="choosing-the-replication-source">Choosing the replication source<a class="headerlink" href="#choosing-the-replication-source" title="Permanent link">🔗</a></h3>
+<p>OSM files in PBF format are able to save the replication source and the
+current status on their own. That is why pyosmium-up-to-date is able to
+automatically do the right thing.
+If you want to switch the replication source
+or have a file that does not have replication information, you need to bootstrap
+the update process and manually point <code>pyosmium-up-to-date</code> to the right
+service:</p>
+<div class="language-text highlight"><pre><span></span><code>pyosmium-up-to-date --ignore-osmosis-headers --server &lt;replication URL&gt; &lt;osmfile.osm.pbf&gt;
+</code></pre></div>
+<p><code>pyosmium-up-to-date</code> automatically finds the right sequence ID to use
+by looking at the age of the data in your OSM file. It updates the file
+and stores the new replication source in the file. The additional parameters
+are then not necessary anymore for subsequent updates.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Always use the PBF format to store your data. Other format do not support
+to save the replication information. pyosmium-up-to-date is still able to
+update these kind of files if you manually point to the replication server
+but the process is always more costly because it needs to find the right
+starting point for updates first.</p>
+</div>
+<h3 id="updating-larger-amounts-of-data">Updating larger amounts of data<a class="headerlink" href="#updating-larger-amounts-of-data" title="Permanent link">🔗</a></h3>
+<p>When used without any parameters, pyosmium downloads at a maximum about
+1GB of changes. That corresponds to about 3 days of planet-wide changes.
+You can increase the amount using the additional <code>--size</code> parameter:</p>
+<div class="language-text highlight"><pre><span></span><code>pyosmium-up-to-date --size=10000 planet.osm.pbf
+</code></pre></div>
+<p>This would download about 10GB or 30 days of change data. If your OSM data file is
+older than that, downloading the full file anew is likely going to be faster.</p>
+<p><code>pyosmium-up-to-date</code> uses return codes to signal if it has downloaded all
+available updates. A return code of 0 means that it has downloaded and
+applied all available data. A return code of 1 indicates that it has applied
+some updates but more are available.</p>
+<p>A minimal script that updates a file until it is really up-to-date with the
+replication source would look like this:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><span class="nv">status</span><span class="o">=</span><span class="m">1</span><span class="w">  </span><span class="c1"># we want more data</span>
+</span><span id="__span-0-2"><span class="k">while</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-0-3"><span class="w">    </span>pyosmium-up-to-date<span class="w"> </span>planet.osm.pbf
+</span><span id="__span-0-4"><span class="w">    </span><span class="c1"># save the return code</span>
+</span><span id="__span-0-5"><span class="w">    </span><span class="nv">status</span><span class="o">=</span><span class="nv">$?</span>
+</span><span id="__span-0-6"><span class="k">done</span>
+</span></code></pre></div>
+<h2 id="creating-change-files-for-updating-databases">Creating change files for updating databases<a class="headerlink" href="#creating-change-files-for-updating-databases" title="Permanent link">🔗</a></h2>
+<p>There are quite a few tools that can import OSM data into databases, for
+example osm2pgsql, imposm or Nominatim. These tools often can use change files
+to keep their database up-to-date. pyosmium can be used to create the appropriate
+change files. This is slightly more involved than updating a file.</p>
+<h3 id="preparing-the-state-file">Preparing the state file<a class="headerlink" href="#preparing-the-state-file" title="Permanent link">🔗</a></h3>
+<p>Before downloading the updates, you need to find out with which sequence
+number to start. The easiest way to remember your current status is to save
+the number in a file. pyosmium can then read and update the file for you.</p>
+<h4 id="method-1-starting-from-the-import-file">Method 1: Starting from the import file<a class="headerlink" href="#method-1-starting-from-the-import-file" title="Permanent link">🔗</a></h4>
+<p>If you still have the OSM file you used to set up your database, then
+create a state file as follows:</p>
+<div class="language-text highlight"><pre><span></span><code>pyosmium-get-changes -O &lt;osmfile.osm.pbf&gt; -f sequence.state -v
+</code></pre></div>
+<p>Note that there is no output file yet. This creates a new file <code>sequence.state</code>
+with the sequence ID where updates should start and prints the URL of the
+replication service to use.</p>
+<h4 id="method-2-starting-from-a-date">Method 2: Starting from a date<a class="headerlink" href="#method-2-starting-from-a-date" title="Permanent link">🔗</a></h4>
+<p>If you do not have the original OSM file anymore, then a good strategy is to
+look for the date of the newest node in the database to find the snapshot date
+of your database. Find the highest node ID, then look up the date for version 1
+on the OSM website. For example the date for node 2367234 can be found at
+<a href="https://www.openstreetmap.org/api/0.6/node/23672341/1">https://www.openstreetmap.org/api/0.6/node/23672341/1</a>
+Find and copy the <code>timestamp</code> field. Then create a state file using this date:</p>
+<div class="language-text highlight"><pre><span></span><code>pyosmium-get-changes -D 2007-01-01T14:16:21Z -f sequence.state -v
+</code></pre></div>
+<p>As before, this creates a new file <code>sequence.state</code> with the sequence ID where
+updates should start and prints the URL of the replication service to use.</p>
+<h3 id="creating-a-change-file">Creating a change file<a class="headerlink" href="#creating-a-change-file" title="Permanent link">🔗</a></h3>
+<p>Now you can create change files using the state:</p>
+<div class="language-text highlight"><pre><span></span><code>pyosmium-get-changes --server &lt;replication server&gt; -f sequence.state -o newchange.osc.gz
+</code></pre></div>
+<p>This downloads the latest changes from the server, saves them in the file
+<code>newchange.osc.gz</code> and updates your state file. <code>&lt;replication server&gt;</code> is the
+URL that was printed when you set up the state file. The parameter can be
+omitted when you use minutely change files from openstreetmap.org.
+This simplifies multiple edits of the same element into the final change. If you want to
+retain the full version history specify <code>--no-deduplicate</code>.</p>
+<p><code>pyosmium-get-changes</code> loads only about 100MB worth of updates at once (about
+8 hours of planet updates). If you want more, then add a <code>--size</code> parameter.</p>
+<h3 id="continuously-updating-a-database">Continuously updating a database<a class="headerlink" href="#continuously-updating-a-database" title="Permanent link">🔗</a></h3>
+<p><code>pyosmium-get-changes</code> emits special return codes that can be used to set
+up a script that continuously fetches updates and applies them to a
+database. The important error codes are:</p>
+<ul>
+<li>0 - changes successfully downloaded and new change file created</li>
+<li>3 - no new changes are available from the server</li>
+</ul>
+<p>All other error codes indicate fatal errors.</p>
+<p>A simple shell script can look like this:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-1-2"><span class="w">  </span><span class="c1"># pyosmium-get-changes would not overwrite an existing change file</span>
+</span><span id="__span-1-3"><span class="w">  </span>rm<span class="w"> </span>-f<span class="w"> </span>newchange.osc.gz
+</span><span id="__span-1-4"><span class="w">  </span><span class="c1"># get the next batch of changes</span>
+</span><span id="__span-1-5"><span class="w">  </span>pyosmium-get-changes<span class="w"> </span>-f<span class="w"> </span>sequence.state<span class="w"> </span>-o<span class="w"> </span>newchange.osc.gz
+</span><span id="__span-1-6"><span class="w">  </span><span class="c1"># save the return code</span>
+</span><span id="__span-1-7"><span class="w">  </span><span class="nv">status</span><span class="o">=</span><span class="nv">$?</span>
+</span><span id="__span-1-8">
+</span><span id="__span-1-9"><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-1-10"><span class="w">    </span><span class="c1"># apply newchange.osc.gz here</span>
+</span><span id="__span-1-11"><span class="w">    </span>....
+</span><span id="__span-1-12"><span class="w">  </span><span class="k">elif</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$status</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-1-13"><span class="w">    </span><span class="c1"># No new data, so sleep for a bit</span>
+</span><span id="__span-1-14"><span class="w">    </span>sleep<span class="w"> </span><span class="m">60</span>
+</span><span id="__span-1-15"><span class="w">  </span><span class="k">else</span>
+</span><span id="__span-1-16"><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Fatal error, stopping updates.&quot;</span>
+</span><span id="__span-1-17"><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="nv">$status</span>
+</span><span id="__span-1-18"><span class="w">  </span><span class="k">fi</span>
+</span><span id="__span-1-19"><span class="k">done</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Sarah Hoffmann
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "toc.integrate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>
