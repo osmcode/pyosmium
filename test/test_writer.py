@@ -20,7 +20,7 @@ from helpers import mkdate
 def test_writer(tmp_path):
     @contextmanager
     def _WriteExpect(filename, expected):
-        with osmium.SimpleWriter(str(filename), 1024*1024) as writer:
+        with osmium.SimpleWriter(filename, 1024*1024) as writer:
             yield writer
 
         assert filename.read_text().strip() == expected
@@ -372,4 +372,11 @@ def test_write_to_file(tmp_path):
     test_file = tmp_path / f"{uuid.uuid4()}.txt"
 
     with osmium.SimpleWriter(osmium.io.File(test_file, 'opl'), bufsz=4000) as writer:
+        writer.add_node(osmium.osm.mutable.Node(id=123))
+
+
+def test_write_with_pool(tmp_path):
+    test_file = tmp_path / f"{uuid.uuid4()}.opl"
+
+    with osmium.SimpleWriter(test_file, bufsz=400, thread_pool=osmium.io.ThreadPool()) as writer:
         writer.add_node(osmium.osm.mutable.Node(id=123))
