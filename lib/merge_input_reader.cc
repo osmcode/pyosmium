@@ -17,6 +17,7 @@
 #include <osmium/io/output_iterator.hpp>
 #include <osmium/object_pointer_collection.hpp>
 #include <osmium/visitor.hpp>
+#include <osmium/thread/pool.hpp>
 
 #include "osmium_module.h"
 #include "handler_chain.h"
@@ -145,8 +146,9 @@ private:
     size_t internal_add(osmium::io::File change_file)
     {
         size_t sz = 0;
+        osmium::thread::Pool thread_pool{};
 
-        osmium::io::Reader reader(change_file, osmium::osm_entity_bits::nwr);
+        osmium::io::Reader reader(change_file, osmium::osm_entity_bits::nwr, thread_pool);
         while (osmium::memory::Buffer buffer = reader.read()) {
             osmium::apply(buffer, objects);
             sz += buffer.committed();

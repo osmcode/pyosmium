@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -12,6 +12,7 @@
 #include <osmium/io/any_input.hpp>
 #include <osmium/index/nwr_array.hpp>
 #include <osmium/index/id_set.hpp>
+#include <osmium/thread/pool.hpp>
 
 #include "base_filter.h"
 #include "osmium_module.h"
@@ -100,10 +101,11 @@ public:
 
     void complete_backward_references(osmium::io::File file, int relation_depth)
     {
+        osmium::thread::Pool thread_pool{};
         // first pass: relations
         while (relation_depth > 0 && !m_ids.relations().empty()) {
             bool need_recurse = false;
-            osmium::io::Reader rd{file, osmium::osm_entity_bits::relation};
+            osmium::io::Reader rd{file, osmium::osm_entity_bits::relation, thread_pool};
             while (auto const buffer = rd.read()) {
                 for (auto const &rel: buffer.select<osmium::Relation>()) {
                     if (m_ids.relations().get(rel.id())) {
@@ -125,7 +127,7 @@ public:
 
         // second pass: ways
         if (!m_ids.ways().empty()) {
-            osmium::io::Reader rd{file, osmium::osm_entity_bits::way};
+            osmium::io::Reader rd{file, osmium::osm_entity_bits::way, thread_pool};
             while (auto const buffer = rd.read()) {
                 for (auto const &way: buffer.select<osmium::Way>()) {
                     if (m_ids.ways().get(way.id())) {
@@ -141,13 +143,14 @@ public:
 
     void complete_forward_references(osmium::io::File file, int relation_depth)
     {
+        osmium::thread::Pool thread_pool{};
         // standard pass: find directly referenced ways and relations
         {
             auto entities = osmium::osm_entity_bits::way;
             if (relation_depth >= 0) {
                 entities |= osmium::osm_entity_bits::relation;
             }
-            osmium::io::Reader rd{file, entities};
+            osmium::io::Reader rd{file, entities, thread_pool};
             while (auto const buffer = rd.read()) {
                 for (auto const &object: buffer.select<osmium::OSMObject>()) {
                     if (object.type() == osmium::item_type::way) {
@@ -176,7 +179,7 @@ public:
         // recursive passes: find additional referenced relations
         while (relation_depth > 0 && !m_ids.relations().empty()) {
             bool need_recurse = false;
-            osmium::io::Reader rd{file, osmium::osm_entity_bits::relation};
+            osmium::io::Reader rd{file, osmium::osm_entity_bits::relation, thread_pool};
             while (auto const buffer = rd.read()) {
                 for (auto const &rel: buffer.select<osmium::Relation>()) {
                     if (!m_ids.relations().get(rel.id())) {
