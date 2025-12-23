@@ -6,12 +6,16 @@
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
+#include <pybind11/stl/filesystem.h>
 
 #include <osmium/osm.hpp>
-#include <osmium/io/any_input.hpp>
 #include <osmium/handler.hpp>
 #include <osmium/visitor.hpp>
+
+#include <filesystem>
+
 #include "cast.h"
+#include "io.h"
 
 namespace py = pybind11;
 
@@ -29,6 +33,12 @@ struct LastChangeHandler : public osmium::handler::Handler
     }
 };
 
+osmium::Timestamp newest_change_from_file(pyosmium::PyReader &reader) {
+    LastChangeHandler handler;
+    osmium::apply(*reader.get(), handler);
+    return handler.last_change;
+}
+
 } // namespace
 
 #ifdef Py_GIL_DISABLED
@@ -37,14 +47,18 @@ PYBIND11_MODULE(_replication, m, py::mod_gil_not_used())
 PYBIND11_MODULE(_replication, m)
 #endif
 {
-    m.def("newest_change_from_file", [](char const *filename)
-        {
-            osmium::io::Reader reader(filename, osmium::osm_entity_bits::nwr);
-
-            LastChangeHandler handler;
-            osmium::apply(reader, handler);
-            reader.close();
-
-            return handler.last_change;
-        });
+    m.def("newest_change_from_file", &newest_change_from_file,
+          py::arg("reader"));
+    m.def("newest_change_from_file", [](std::string file) {
+            pyosmium::PyReader reader(osmium::io::File(std::move(file)));
+            return newest_change_from_file(reader);
+          });
+    m.def("newest_change_from_file", [](std::filesystem::path const &file) {
+            pyosmium::PyReader reader(osmium::io::File(file.string()));
+            return newest_change_from_file(reader);
+          });
+    m.def("newest_change_from_file", [](osmium::io::File file) {
+            pyosmium::PyReader reader(std::move(file));
+            return newest_change_from_file(reader);
+          });
 }

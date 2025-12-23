@@ -2,7 +2,7 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from typing import ByteString, Union, Optional, Any
 import os
@@ -10,7 +10,7 @@ import os
 from .osm import osm_entity_bits
 from .osm.types import OSMEntity
 from .index import LocationTable, IdSet
-from .io import Reader, Writer, Header, File, FileBuffer
+from .io import Reader, Writer, Header, File, FileBuffer, ThreadPool
 
 # Placeholder for more narrow type definition to come
 HandlerLike = object
@@ -127,9 +127,9 @@ class SimpleWriter(BaseHandler):
         when writing is finished.
     """
     def __init__(self, file: Union[str, 'os.PathLike[str]', File],
-                 bufsz: int= ...,
-                 header: Optional[Header]= ..., overwrite: bool= ...,
-                 filetype: str= ...) -> None:
+                 bufsz: int=4096*1024,
+                 header: Optional[Header]=None, overwrite: bool=False,
+                 thread_pool: Optional[ThreadPool]=None) -> None:
         """ Initiate a new writer for the given file. The writer will
             refuse to overwrite an already existing file unless _overwrite_
             is explicitly set to `True`.
@@ -137,8 +137,6 @@ class SimpleWriter(BaseHandler):
             The file type is usually determined from the file extension.
             If you want to explicitly set the filetype (for example, when
             writing to standard output '-'), then use a File object.
-            Using the _filetype_ parameter to set the file type is deprecated
-            and only works when the file is a string.
 
             The _header_ parameter can be used to set a custom header in
             the output file. What kind of information can be written into
@@ -149,6 +147,14 @@ class SimpleWriter(BaseHandler):
             size is 4MB. Larger buffers are normally better but you should
             be aware that there are normally multiple buffers in use during
             the write process.
+
+            The writer implicitly creates a private
+            [ThreadPool][osmium.io.ThreadPool] which it may
+            use to parallelize writing to the output. Alternatively you
+            may hand in an externally created thread pool. This may be useful
+            when you create many writers in parallel and want them to share
+            a single thread pool or when you want to customize the size
+            of the thread pool.
         """
     def add_node(self, node: object) -> None:
         """ Add a new node to the file. The node may be a

@@ -9,7 +9,7 @@ import os
 
 import osmium
 from osmium.index import LocationTable
-from osmium.io import File, FileBuffer
+from osmium.io import File, FileBuffer, ThreadPool, Reader
 from osmium.osm.types import OSMEntity
 
 
@@ -20,7 +20,8 @@ class FileProcessor:
     """
 
     def __init__(self, indata: Union[File, FileBuffer, str, 'os.PathLike[str]'],
-                 entities: osmium.osm.osm_entity_bits = osmium.osm.ALL) -> None:
+                 entities: osmium.osm.osm_entity_bits = osmium.osm.ALL,
+                 thread_pool: Optional[ThreadPool] = None) -> None:
         """ Initialise a new file processor for the given input source _indata_.
             This may either be a filename, an instance of [File](IO.md#osmium.io.File)
             or buffered data in form of a [FileBuffer](IO.md#osmium.io.FileBuffer).
@@ -30,6 +31,13 @@ class FileProcessor:
             directly at the source file and will never be passed to any filters
             including the location and area processors. You usually should not
             be restricting objects, when using those.
+
+            By default, pyosmium will create a private thread pool, which is
+            used to parallelize reading of the file. Alternatively you may
+            explicitly create a thread pool and hand it to the FileProcessor.
+            This may be necessary if you plan to run many processors in
+            parallel and want them to share a common thread pool or if you
+            want to change the default settings of the thread pool.
             """
         self._file = indata
         self._entities = entities
@@ -38,13 +46,14 @@ class FileProcessor:
         self._filters: List['osmium._osmium.HandlerLike'] = []
         self._area_filters: List['osmium._osmium.HandlerLike'] = []
         self._filtered_handler: Optional['osmium._osmium.HandlerLike'] = None
+        self._thread_pool = thread_pool or ThreadPool()
 
     @property
     def header(self) -> osmium.io.Header:
         """ (read-only) [Header](IO.md#osmium.io.Header) information
             for the file to be read.
         """
-        return osmium.io.Reader(self._file, osmium.osm.NOTHING).header()
+        return Reader(self._file, osmium.osm.NOTHING, self._thread_pool).header()
 
     @property
     def node_location_storage(self) -> Optional[LocationTable]:
@@ -153,31 +162,28 @@ class FileProcessor:
             handlers.append(lh)
 
         if self._area_handler is None:
-            reader = osmium.io.Reader(self._file, self._entities)
-            it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
-            if self._filtered_handler:
-                it.set_filtered_handler(self._filtered_handler)
-            yield from it
+            with Reader(self._file, self._entities, thread_pool=self._thread_pool) as reader:
+                it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
+                if self._filtered_handler:
+                    it.set_filtered_handler(self._filtered_handler)
+                yield from it
             return
 
         # need areas, do two pass handling
-        rd = osmium.io.Reader(self._file, osmium.osm.RELATION)
-        try:
+        with Reader(self._file, osmium.osm.RELATION, thread_pool=self._thread_pool) as rd:
             osmium.apply(rd, *self._area_filters, self._area_handler.first_pass_handler())
-        finally:
-            rd.close()
 
         buffer_it = osmium.BufferIterator(*self._filters)
         handlers.append(self._area_handler.second_pass_to_buffer(buffer_it))
 
-        reader = osmium.io.Reader(self._file, self._entities)
-        it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
-        if self._filtered_handler:
-            it.set_filtered_handler(self._filtered_handler)
-        for obj in it:
-            yield obj
-            if buffer_it:
-                yield from buffer_it
+        with Reader(self._file, self._entities, thread_pool=self._thread_pool) as reader:
+            it = osmium.OsmFileIterator(reader, *handlers, *self._filters)
+            if self._filtered_handler:
+                it.set_filtered_handler(self._filtered_handler)
+            for obj in it:
+                yield obj
+                if buffer_it:
+                    yield from buffer_it
 
         # catch anything after the final flush
         if buffer_it:

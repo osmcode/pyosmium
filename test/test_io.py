@@ -11,17 +11,6 @@ import osmium
 from helpers import CountingHandler
 
 
-class NullHandler:
-
-    def node(self, n):
-        pass
-
-
-def _run_file(fn):
-    with osmium.io.Reader(fn) as rd:
-        osmium.apply(rd, NullHandler())
-
-
 @pytest.mark.parametrize('as_string', [True, False])
 def test_file_simple(tmp_path, as_string):
     fn = tmp_path / f"{uuid.uuid4()}.opl"
@@ -48,36 +37,12 @@ def test_file_with_format(tmp_path, as_string):
         assert n.id == 1
 
 
-def test_node_only(test_data):
-    _run_file(test_data('n1'))
-
-
-def test_way_only(test_data):
-    _run_file(test_data('w1 Nn1,n2,n3'))
-
-
-def test_relation_only(test_data):
-    _run_file(test_data('r573 Mw1@'))
-
-
-def test_node_with_tags(test_data):
-    _run_file(test_data('n32 Tbar=xx'))
-
-
-def test_way_with_tags(test_data):
-    _run_file(test_data('w5666 Nn1,n2,n3 Tbar=xx'))
-
-
-def test_relation_with_tags(test_data):
-    _run_file(test_data('r573 Mw1@ Tbar=xx'))
-
-
 def test_broken_timestamp(test_data):
     fn = test_data('n1 tx')
 
     with osmium.io.Reader(fn) as rd:
         with pytest.raises(RuntimeError):
-            osmium.apply(rd, NullHandler())
+            osmium.apply(rd, CountingHandler())
 
 
 @pytest.mark.parametrize('as_string', [True, False])
@@ -101,8 +66,43 @@ def test_file_header(tmp_path, as_string):
 
 def test_reader_with_filebuffer():
     rd = osmium.io.Reader(osmium.io.FileBuffer('n1 x4 y1'.encode('utf-8'), 'opl'))
-    handler = CountingHandler()
+    try:
+        handler = CountingHandler()
 
-    osmium.apply(rd, handler)
+        osmium.apply(rd, handler)
 
-    assert handler.counts == [1, 0, 0, 0]
+        assert handler.counts == [1, 0, 0, 0]
+        assert rd.eof()
+    finally:
+        rd.close()
+
+
+def test_reader_with_separate_thread_pool(test_data):
+    with osmium.io.Reader(test_data('n1 x1 y1'), thread_pool=osmium.io.ThreadPool()) as rd:
+        for obj in osmium.OsmFileIterator(rd):
+            assert obj.id == 1
+
+
+@pytest.mark.parametrize("entities,expected", [(osmium.osm.NODE, [2, 0, 0, 0]),
+                                               (osmium.osm.ALL, [2, 1, 1, 0])])
+def test_reader_with_entity_filter(test_data, entities, expected):
+    fn = test_data("""\
+        n1 x1 y2
+        n2 x1 y3
+        w34 Nn1,n2
+        r67 Mw34@
+        """)
+
+    h = CountingHandler()
+    with osmium.io.Reader(fn, entities) as rd:
+        osmium.apply(rd, h)
+
+    assert h.counts == expected
+
+
+def test_thread_pool():
+    pool = osmium.io.ThreadPool(2, 15)
+
+    assert pool.num_threads == 2
+    assert pool.queue_size() == 0
+    assert pool.queue_empty()

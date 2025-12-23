@@ -288,7 +288,8 @@ class ReplicationServer:
         if diffs is None:
             return None
 
-        reader = oio.Reader(infile)
+        thread_pool = oio.ThreadPool()
+        reader = oio.Reader(infile, thread_pool=thread_pool)
         has_history = reader.header().has_multiple_object_versions
 
         h = oio.Header()
@@ -310,7 +311,7 @@ class ReplicationServer:
             of = oio.File(outfile, outformat)
 
         of.has_multiple_object_versions = has_history
-        writer = oio.Writer(of, h)
+        writer = oio.Writer(of, h, thread_pool=thread_pool)
 
         LOG.debug("Merging changes into OSM file.")
 

@@ -48,12 +48,26 @@ def test_get_diff_url(inp, outp):
     assert outp, svr.get_diff_url(inp)
 
 
-def test_get_newest_change_from_file(tmp_path):
+@pytest.mark.parametrize("as_string", [True, False])
+def test_get_newest_change_from_file(tmp_path, as_string):
     fn = tmp_path / f"{uuid.uuid4()}.opl"
     fn.write_text('n6365 v1 c63965061 t2018-10-29T03:56:07Z i8369524 ux x1 y7')
 
-    val = osmium.replication.newest_change_from_file(str(fn))
+    if as_string:
+        fn = str(fn)
+
+    val = osmium.replication.newest_change_from_file(fn)
     assert val == mkdate(2018, 10, 29, 3, 56, 7)
+
+
+def test_get_newest_change_from_reader():
+    fb = osmium.io.FileBuffer(
+        'n6365 v1 t2018-10-29T03:56:07Z x1 y7\n'
+        'n6366 v1 t2018-10-29T04:56:07Z x1 y7\n'.encode('utf-8'), 'opl')
+
+    with osmium.io.Reader(fb, thread_pool=osmium.io.ThreadPool()) as rd:
+        val = osmium.replication.newest_change_from_file(rd)
+        assert val == mkdate(2018, 10, 29, 4, 56, 7)
 
 
 def test_get_state_valid(httpserver):

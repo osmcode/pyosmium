@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -15,6 +15,7 @@
 #include "osm_base_objects.h"
 #include "handler_chain.h"
 #include "python_handler.h"
+#include "io.h"
 
 namespace py = pybind11;
 
@@ -23,8 +24,8 @@ namespace {
 class OsmFileIterator
 {
 public:
-    OsmFileIterator(osmium::io::Reader *reader, py::args args)
-    : m_reader(reader), m_handler(args)
+    OsmFileIterator(pyosmium::PyReader &reader, py::args args)
+    : m_reader(reader.get()), m_handler(args)
     {
         m_buffer = m_reader->read();
 
@@ -140,12 +141,12 @@ namespace pyosmium {
 void init_osm_file_iterator(py::module &m)
 {
     py::class_<OsmFileIterator>(m, "OsmFileIterator")
-        .def(py::init<osmium::io::Reader *, py::args>(),
-             py::keep_alive<0, 1>())
+        .def(py::init<pyosmium::PyReader &, py::args>(),
+             py::keep_alive<1, 2>())
         .def("set_filtered_handler", &OsmFileIterator::set_filtered_handler,
-             py::keep_alive<0, 1>())
+             py::keep_alive<1, 2>())
         .def("set_filtered_handler", &OsmFileIterator::set_filtered_python_handler,
-             py::keep_alive<0, 1>())
+             py::keep_alive<1, 2>())
         .def("__iter__", [](py::object const &self) { return self; })
         .def("__next__", &OsmFileIterator::next)
         ;

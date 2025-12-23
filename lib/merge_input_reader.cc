@@ -2,14 +2,14 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
 
 #include <vector>
 
-#include <boost/function_output_iterator.hpp>
+#include <boost/iterator/function_output_iterator.hpp>
 
 #include <osmium/osm/object_comparisons.hpp>
 #include <osmium/io/any_input.hpp>
@@ -17,9 +17,11 @@
 #include <osmium/io/output_iterator.hpp>
 #include <osmium/object_pointer_collection.hpp>
 #include <osmium/visitor.hpp>
+#include <osmium/thread/pool.hpp>
 
 #include "osmium_module.h"
 #include "handler_chain.h"
+#include "io.h"
 
 namespace py = pybind11;
 
@@ -82,16 +84,16 @@ public:
         changes.clear();
     }
 
-    void apply_to_reader(osmium::io::Reader &reader, osmium::io::Writer &writer,
+    void apply_to_reader(pyosmium::PyReader &reader, pyosmium::PyWriter &writer,
                          bool with_history)
     {
-        auto input = osmium::io::make_input_iterator_range<osmium::OSMObject>(reader);
+        auto input = osmium::io::make_input_iterator_range<osmium::OSMObject>(*reader.get());
         if (with_history) {
             // For history files this is a straightforward sort of the change
             // files followed by a merge with the input file.
             objects.sort(osmium::object_order_type_id_version());
 
-            auto out = osmium::io::make_output_iterator(writer);
+            auto out = osmium::io::make_output_iterator(*writer.get());
             std::set_union(objects.begin(),
                     objects.end(),
                     input.begin(),
@@ -111,7 +113,7 @@ public:
             objects.sort(osmium::object_order_type_id_reverse_version());
 
             auto output_it = boost::make_function_output_iterator(
-                    copy_first_with_id(writer)
+                    copy_first_with_id(*writer.get())
                     );
 
             std::set_union(objects.begin(),
@@ -144,8 +146,9 @@ private:
     size_t internal_add(osmium::io::File change_file)
     {
         size_t sz = 0;
+        osmium::thread::Pool thread_pool{};
 
-        osmium::io::Reader reader(change_file, osmium::osm_entity_bits::nwr);
+        osmium::io::Reader reader(change_file, osmium::osm_entity_bits::nwr, thread_pool);
         while (osmium::memory::Buffer buffer = reader.read()) {
             osmium::apply(buffer, objects);
             sz += buffer.committed();
