@@ -140,7 +140,7 @@ out about the tags. It is also always useful to consult
 different keys and value in actual use.
 
 Tags are common to all OSM objects. After that there are three kinds of
-objects in OSM: nodes, ways and relations.
+object types in OSM: nodes, ways and relations.
 
 ### Nodes
 
@@ -187,7 +187,7 @@ backward references when talking about the dependencies between objects:
 
 * A __forward reference__ means that an object is referenced to by another.
   Nodes appear in ways. Ways appear in relations. And a node may even have
-  an indirect forward reference to a relation through a way it appear in.
+  an indirect forward reference to a relation through a way it appears in.
   Forward references are important when tracking changes. When the location
   of a node changes, then all its forward references have to be reevaluated.
 
@@ -197,6 +197,10 @@ backward references when talking about the dependencies between objects:
   an object: given that only nodes contain location information, we have
   to follow the backward references for ways and relations until we reach
   the nodes.
+
+Closely related to backward references is the concept of __reference
+completeness__. A dataset or file is considered reference complete when
+all backward references can be resolved.
 
 ## Order in OSM files
 
