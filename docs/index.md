@@ -25,14 +25,18 @@ the following additional dependencies need to be available:
  * [libosmium](https://github.com/osmcode/libosmium) >= 2.16.0
  * [protozero](https://github.com/mapbox/protozero)
  * [cmake](https://cmake.org/)
- * [Pybind11](https://github.com/pybind/pybind11) >= 2.2
  * [expat](https://libexpat.github.io/)
  * [libz](https://www.zlib.net/)
  * [libbz2](https://www.sourceware.org/bzip2/)
  * [Boost](https://www.boost.org/) variant and iterator >= 1.41
  * [Python Requests](https://docs.python-requests.org/en/master/)
- * Python setuptools
  * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
+
+The following additional dependencies are automatically installed as part
+of the build process:
+
+ * [scikit-build-core](https://scikit-build-core.readthedocs.io/en/latest/)
+ * [Pybind11](https://github.com/pybind/pybind11)
 
 On Debian/Ubuntu-like systems, the following command installs all required
 packages:
@@ -40,12 +44,12 @@ packages:
     sudo apt-get install python3-dev build-essential cmake libboost-dev \
                          libexpat1-dev zlib1g-dev libbz2-dev
 
-libosmium, protozero and pybind11 are shipped with the source wheel. When
-building from source, you need to download the source code and put it
-in the subdirectory 'contrib'. Alternatively, if you want to put the sources
-somewhere else, point pyosmium to the source code location by setting the
-CMake variables `LIBOSMIUM_PREFIX`, `PROTOZERO_PREFIX` and
-`PYBIND11_PREFIX` respectively.
+Compatible versions of libosmium and protozero are shipped with the source
+wheel. When building from source, you need to download the source code of these
+two libraries and put it in the subdirectory 'contrib'. Alternatively,
+if you already have the sources somewhere else, 
+point pyosmium to the source code location by setting the
+CMake variables `Libosmium_ROOT` and `Protozero_ROOT`.
 
 To compile and install the bindings, run
 

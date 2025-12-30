@@ -14,7 +14,8 @@ Finally, there is a type for changesets, which contains information about
 edits in the OSM database. It can only appear in special changeset files
 and explained in more detail [below](#changeset).
 
-The FileProcessor may return any of these objects, when iterating over a file.
+When iterating over a file, then the FileProcessor may return any of these
+objects.
 Therefore, a script will usually first need to determine the type of object
 received. There are a couple of ways to do this.
 
@@ -83,7 +84,7 @@ You can simply test for this object type:
 ## Reading object tags
 
 Every object has a list of properties, the tags. They can be accessed through
-the `tags` property, which provides a simple dictionary-like view of the tags.
+the `tags` property. It provides a simple dictionary-like view of the tags.
 You can use the bracket notation to access a specific tag or use the more
 explicit `get()` function. Just like for Python dictionaries, an access by
 bracket raises a `ValueError` when the key you are looking for does not exist,
@@ -140,7 +141,23 @@ list into a Python dictionary:
 ## Other common meta information
 
 Next to the tags, every OSM object also carries some meta information
-describing its ID, version and information regarding the editor.
+which all can be accessed through read-only properties.
+
+The most important meta information is the object's ID in the `id` property.
+This is the ID used when objects reference each other.
+
+The other meta fields contain information when and by whom the objet was edited.
+The following table gives a quick overview over these fields:
+
+| Property  | Description |
+|-----------|--------------------------|
+| version   | Version of the object. A newly created object starts with version 1. |
+| deleted   | A boolean property stating if the object should be used or ignored. Only relevant for [change](08-Working-With-Change-Files.md) and [history](09-Working-With-History-Files.md) files. |
+| changeset | The ID of the change set this object was created with. A change set contains a set of edits that have been uploaded by an editor in a single session. |
+| timestamp | UTC time at which the object was created, or more precisely, added to the database. |
+| uid       | The ID of the user who created this version of the object. User IDs are univocal and prepetual. |
+| user      | The name of the user who created this version of the object. This is the name the user had when the object was created. User names may be changed over time. The same name in different objects doesn't necessarily reference the same user. |
+
 
 ## Properties of OSM object types
 

@@ -55,7 +55,7 @@ The special file name `-` can be used to read from standard input or
 write to standard output.
 
 When reading data, use a `File` object to specify the file format. With
-the SimpleReader, you need to use the parameter `filetype`.
+the SimpleWriter, you need to use the parameter `filetype`.
 
 !!! example
     This code snipped dumps all ids of your input file to the console.
