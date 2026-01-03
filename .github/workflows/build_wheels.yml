@@ -44,10 +44,10 @@ jobs:
            CIBW_TEST_REQUIRES: pytest pytest-httpserver
            CIBW_TEST_COMMAND: pytest {project}/test
            CIBW_BUILD_FRONTEND: build
-           CIBW_BEFORE_BUILD_LINUX: yum install -y expat-devel boost-devel zlib-devel bzip2-devel lz4-devel
-           CIBW_BEFORE_BUILD_MACOS: brew install boost
+           CIBW_BEFORE_BUILD_LINUX: yum install -y expat-devel zlib-devel bzip2-devel lz4-devel
+           CIBW_BEFORE_BUILD_MACOS: brew install
            CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=11.0 SKBUILD_CMAKE_ARGS=-DWITH_LZ4=OFF
-           CIBW_BEFORE_BUILD_WINDOWS: vcpkg install bzip2 expat zlib boost-variant boost-iterator lz4
+           CIBW_BEFORE_BUILD_WINDOWS: vcpkg install bzip2 expat zlib lz4
            CIBW_ENVIRONMENT_WINDOWS: 'CMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"'
            CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: 'pipx run delvewheel repair --add-path ${{ matrix.vcpkg }}/bin/ --add-path ${{ matrix.vcpkg }}/debug/bin -w {dest_dir} {wheel}'
 
