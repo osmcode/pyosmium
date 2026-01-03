@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15...4.0)
+cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
 project(osmium LANGUAGES CXX)
 
