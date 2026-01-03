@@ -17,11 +17,10 @@ pyosmium can be installed with pip:
 
 The Pypi source package already comes bundled with a matching version of
 libosmium, protozero and pybind11. Pyosmium additionally depends on
-expat, libz, libbz2 and Boost variant and iterator. You need to install
+expat, libz and libbz2. You need to install
 development packages for these libraries. On Debian/Ubuntu do::
 
-    sudo apt-get install build-essential cmake libboost-dev \
-                       libexpat1-dev zlib1g-dev libbz2-dev
+    sudo apt-get install build-essential cmake libexpat1-dev zlib1g-dev libbz2-dev
 
 
 Python >= 3.8 is supported. Pypy is known not to work.

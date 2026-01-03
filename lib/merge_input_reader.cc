@@ -2,14 +2,13 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
 
 #include <vector>
-
-#include <boost/iterator/function_output_iterator.hpp>
+#include <iterator>
 
 #include <osmium/osm/object_comparisons.hpp>
 #include <osmium/io/any_input.hpp>
@@ -30,20 +29,21 @@ namespace {
     /**
      *  Copy the first OSM object with a given Id to the output. Keep
      *  track of the Id of each object to do this.
-     *
-     *  We are using this functor class instead of a simple lambda, because the
-     *  lambda doesn't build on MSVC.
      */
     class copy_first_with_id {
         osmium::io::Writer* writer;
         osmium::object_id_type id = 0;
 
     public:
+        using iterator_category = std::output_iterator_tag;
+        using value_type = const osmium::OSMObject;
+        using reference = const osmium::OSMObject&;
+
         explicit copy_first_with_id(osmium::io::Writer& w) :
             writer(&w) {
         }
 
-        void operator()(const osmium::OSMObject& obj) {
+        void push_back(const osmium::OSMObject& obj) {
             if (obj.id() != id) {
                 if (obj.visible()) {
                     (*writer)(obj);
@@ -112,9 +112,8 @@ public:
             std::reverse(objects.ptr_begin(), objects.ptr_end());
             objects.sort(osmium::object_order_type_id_reverse_version());
 
-            auto output_it = boost::make_function_output_iterator(
-                    copy_first_with_id(*writer.get())
-                    );
+            copy_first_with_id copy_first{*writer.get()};
+            auto output_it = std::back_inserter(copy_first);
 
             std::set_union(objects.begin(),
                     objects.end(),

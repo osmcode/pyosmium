@@ -28,8 +28,7 @@ For other versions, a source wheel is provided. Make sure to install all
 external dependencies first. On Debian/Ubuntu-like systems, the following
 command installs all required packages:
 
-    sudo apt-get install build-essential cmake libboost-dev \
-                         libexpat1-dev zlib1g-dev libbz2-dev
+    sudo apt-get install build-essential cmake libexpat1-dev zlib1g-dev libbz2-dev
 
 
 ### Installing from source
@@ -45,7 +44,6 @@ pyosmium has the following dependencies:
  * [expat](https://libexpat.github.io/)
  * [libz](https://www.zlib.net/)
  * [libbz2](https://www.sourceware.org/bzip2/)
- * [Boost](https://www.boost.org/) variant and iterator >= 1.70
  * [Python Requests](https://docs.python-requests.org/)
  * [scikit-build-core](https://scikit-build-core.readthedocs.io)
  * a C++17-compatible compiler (Clang 13+, GCC 10+ are supported)
@@ -53,8 +51,7 @@ pyosmium has the following dependencies:
 
 ### Compiling from Source
 
-Make sure to install the development packages for expat, libz, libbz2
-and boost.
+Make sure to install the development packages for expat, libz and libbz2.
 
 The appropriate versions for Libosmium and Protozero will be downloaded into
 the `contrib` directory when building the source package:

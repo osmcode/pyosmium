@@ -60,9 +60,6 @@ endif()
 
 message(STATUS "Building in C++${CMAKE_CXX_STANDARD} mode")
 
-find_package(Boost 1.66 REQUIRED COMPONENTS)
-include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-
 # Modules without any Python code and just one source file.
 foreach(PYMOD geom index io area)
     pybind11_add_module(${PYMOD} lib/${PYMOD}.cc)
