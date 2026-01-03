@@ -12,7 +12,7 @@ jobs:
             - name: Install packages
               run: |
                 sudo apt-get update -y -qq
-                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev pipx
+                sudo apt-get install -y -qq libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev pipx
                 pipx install mypy
                 pipx inject mypy types-requests
                 pipx install flake8
@@ -116,7 +116,7 @@ jobs:
             - name: Install packages
               run: |
                 sudo apt-get update -y -qq
-                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev pipx
+                sudo apt-get install -y -qq libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev pipx
                 pipx install mypy
                 pipx inject mypy types-requests
                 pipx install flake8
@@ -329,11 +329,11 @@ jobs:
             - name: Install packages
               run: |
                 sudo apt-get update -y -qq
-                sudo apt-get install -y -qq libboost-dev libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev virtualenv
+                sudo apt-get install -y -qq libexpat1-dev zlib1g-dev libbz2-dev libproj-dev libgeos-dev liblz4-dev virtualenv
               if: ${{ matrix.flavour == 'linux' }}
 
             - name: Install packages
-              run: brew install boost geos virtualenv
+              run: brew install geos virtualenv
               shell: bash
               if: ${{ matrix.flavour == 'macos' }}
 
@@ -404,7 +404,7 @@ jobs:
               shell: bash
 
             - name: Install packages
-              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
+              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x86-windows
               shell: bash
 
             - name: Set up Python 3.8
@@ -531,7 +531,7 @@ jobs:
 
             - name: Install packages
               run: |
-                vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows boost-variant:x64-windows boost-iterator:x64-windows lz4:x86-windows
+                vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x86-windows
               shell: bash
 
             - name: Set up Python 3.13t

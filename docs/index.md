@@ -28,7 +28,6 @@ the following additional dependencies need to be available:
  * [expat](https://libexpat.github.io/)
  * [libz](https://www.zlib.net/)
  * [libbz2](https://www.sourceware.org/bzip2/)
- * [Boost](https://www.boost.org/) variant and iterator >= 1.41
  * [Python Requests](https://docs.python-requests.org/en/master/)
  * a recent C++ compiler (Clang 3.4+, GCC 4.8+)
 
@@ -41,7 +40,7 @@ of the build process:
 On Debian/Ubuntu-like systems, the following command installs all required
 packages:
 
-    sudo apt-get install python3-dev build-essential cmake libboost-dev \
+    sudo apt-get install python3-dev build-essential cmake \
                          libexpat1-dev zlib1g-dev libbz2-dev
 
 Compatible versions of libosmium and protozero are shipped with the source
