@@ -344,8 +344,10 @@ jobs:
 
             - name: Setup virtualenv
               run: |
-                virtualenv venv
+                virtualenv venv -p python${PYTHON_VERSION}
                 ./venv/bin/pip install build
+              env:
+                PYTHON_VERSION: ${{ matrix.python }}
 
             - name: Install package dependencies (develop)
               run: |
@@ -357,8 +359,8 @@ jobs:
 
             - name: Install package dependencies (release)
               run: |
-                  ./venv/bin/python -m build --sdist
                   ./venv/bin/pip install cmake
+                  ./venv/bin/python -m build --sdist
               shell: bash
               if: ${{ matrix.deps == 'release' }}
 
