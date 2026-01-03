@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
     build-default:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
 
         steps:
             - uses: actions/checkout@v4
@@ -108,7 +108,7 @@ jobs:
                   path: dist
 
     build-free-threaded:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
 
         steps:
             - uses: actions/checkout@v4
@@ -152,7 +152,7 @@ jobs:
 
 
     test-default:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
         needs: build-default
 
         strategy:
@@ -193,7 +193,7 @@ jobs:
                 ./osmium-test/bin/pyosmium-up-to-date -h
 
     test-314:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
         needs: build-default
 
         steps:
@@ -228,7 +228,7 @@ jobs:
                 ./osmium-test/bin/pyosmium-up-to-date -h
 
     test-free-threaded:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-24.04
         needs: build-free-threaded
 
         strategy:
@@ -290,14 +290,14 @@ jobs:
                       cc: gcc-14
                       cxx: g++-14
                       platform: ubuntu-24.04
-                      python: "3.13"
+                      python: "3.14"
                       deps: develop
                       flavour: linux
                     - compiler: clang
                       cc: clang-18
                       cxx: clang++-18
                       platform: ubuntu-24.04
-                      python: "3.13"
+                      python: "3.14"
                       deps: develop
                       flavour: linux
                     - compiler: macos-intel
@@ -307,7 +307,7 @@ jobs:
                       flavour: macos
                     - compiler: macos-arm
                       platform: macos-14
-                      python: "3.13"
+                      python: "3.14"
                       deps: develop
                       flavour: macos
 
@@ -337,6 +337,11 @@ jobs:
               shell: bash
               if: ${{ matrix.flavour == 'macos' }}
 
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "${{ matrix.python }}"
+                  allow-prereleases: true
+
             - name: Setup virtualenv
               run: |
                 virtualenv venv
@@ -353,13 +358,9 @@ jobs:
             - name: Install package dependencies (release)
               run: |
                   ./venv/bin/python -m build --sdist
+                  ./venv/bin/pip install cmake
               shell: bash
               if: ${{ matrix.deps == 'release' }}
-
-            - uses: actions/setup-python@v5
-              with:
-                  python-version: "${{ matrix.python }}"
-                  allow-prereleases: true
 
             - name: Build package
               run: |
