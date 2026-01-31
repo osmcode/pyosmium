@@ -32,8 +32,6 @@
 #      io         - include libraries needed for any type of input/output
 #      geos       - include if you want to use any of the GEOS functions
 #      gdal       - include if you want to use any of the OGR functions
-#      proj       - include if you want to use any of the Proj.4 functions
-#      sparsehash - include if you use the sparsehash index
 #      lz4        - include support for LZ4 compression of PBF files
 #
 #    You can check for success with something like this:
@@ -197,56 +195,6 @@ if(Osmium_USE_GDAL)
 endif()
 
 #----------------------------------------------------------------------
-# Component 'proj'
-if(Osmium_USE_PROJ)
-    find_path(PROJ_INCLUDE_DIR proj_api.h)
-    find_library(PROJ_LIBRARY NAMES proj)
-
-    list(APPEND OSMIUM_EXTRA_FIND_VARS PROJ_INCLUDE_DIR PROJ_LIBRARY)
-    if(PROJ_INCLUDE_DIR AND PROJ_LIBRARY)
-        set(PROJ_FOUND 1)
-        list(APPEND OSMIUM_LIBRARIES ${PROJ_LIBRARY})
-        list(APPEND OSMIUM_INCLUDE_DIRS ${PROJ_INCLUDE_DIR})
-    else()
-        message(WARNING "Osmium: PROJ.4 library is required but not found, please install it or configure the paths.")
-    endif()
-endif()
-
-#----------------------------------------------------------------------
-# Component 'sparsehash'
-if(Osmium_USE_SPARSEHASH)
-    find_path(SPARSEHASH_INCLUDE_DIR google/sparsetable)
-
-    list(APPEND OSMIUM_EXTRA_FIND_VARS SPARSEHASH_INCLUDE_DIR)
-    if(SPARSEHASH_INCLUDE_DIR)
-        # Find size of sparsetable::size_type. This does not work on older
-        # CMake versions because they can do this check only in C, not in C++.
-        if(NOT CMAKE_VERSION VERSION_LESS 3.0)
-           include(CheckTypeSize)
-           set(CMAKE_REQUIRED_INCLUDES ${SPARSEHASH_INCLUDE_DIR})
-           set(CMAKE_EXTRA_INCLUDE_FILES "google/sparsetable")
-           check_type_size("google::sparsetable<int>::size_type" SPARSETABLE_SIZE_TYPE LANGUAGE CXX)
-           set(CMAKE_EXTRA_INCLUDE_FILES)
-           set(CMAKE_REQUIRED_INCLUDES)
-        else()
-           set(SPARSETABLE_SIZE_TYPE ${CMAKE_SIZEOF_VOID_P})
-        endif()
-
-        # Sparsetable::size_type must be at least 8 bytes (64bit), otherwise
-        # OSM object IDs will not fit.
-        if(SPARSETABLE_SIZE_TYPE GREATER 7)
-            set(SPARSEHASH_FOUND 1)
-            add_definitions(-DOSMIUM_WITH_SPARSEHASH=${SPARSEHASH_FOUND})
-            list(APPEND OSMIUM_INCLUDE_DIRS ${SPARSEHASH_INCLUDE_DIR})
-        else()
-            message(WARNING "Osmium: Disabled Google SparseHash library on 32bit system (size_type=${SPARSETABLE_SIZE_TYPE}).")
-        endif()
-    else()
-        message(WARNING "Osmium: Google SparseHash library is required but not found, please install it or configure the paths.")
-    endif()
-endif()
-
-#----------------------------------------------------------------------
 
 list(REMOVE_DUPLICATES OSMIUM_INCLUDE_DIRS)
 
@@ -281,7 +229,6 @@ find_package_handle_standard_args(Osmium
                                   REQUIRED_VARS OSMIUM_INCLUDE_DIR ${OSMIUM_EXTRA_FIND_VARS}
                                   VERSION_VAR _libosmium_version)
 unset(OSMIUM_EXTRA_FIND_VARS)
-set(OSMIUM_VERSION ${_libosmium_version})
 
 #----------------------------------------------------------------------
 #
