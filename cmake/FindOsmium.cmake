@@ -73,6 +73,7 @@ if(Osmium_FIND_VERSION)
 endif()
 
 set(OSMIUM_INCLUDE_DIRS "${OSMIUM_INCLUDE_DIR}")
+set(OSMIUM_VERSION "${_libosmium_version}")
 
 #----------------------------------------------------------------------
 #
