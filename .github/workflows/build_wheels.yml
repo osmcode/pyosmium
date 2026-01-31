@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-latest]
         vcpkg: [none]
         include:
          - os: windows-latest
@@ -45,7 +45,6 @@ jobs:
            CIBW_TEST_COMMAND: pytest {project}/test
            CIBW_BUILD_FRONTEND: build
            CIBW_BEFORE_BUILD_LINUX: yum install -y expat-devel zlib-devel bzip2-devel lz4-devel
-           CIBW_BEFORE_BUILD_MACOS: brew install
            CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=11.0 SKBUILD_CMAKE_ARGS=-DWITH_LZ4=OFF
            CIBW_BEFORE_BUILD_WINDOWS: vcpkg install bzip2 expat zlib lz4
            CIBW_ENVIRONMENT_WINDOWS: 'CMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"'
