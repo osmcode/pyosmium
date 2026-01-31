@@ -1,0 +1,8 @@
+th {
+    background-color: #eee;
+}
+
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+    padding: 4px 10px;
+}

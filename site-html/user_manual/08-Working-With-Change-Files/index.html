@@ -1,0 +1,1779 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://osmcode.org/pyosmium/user_manual/08-Working-With-Change-Files/">
+      
+      
+        <link rel="prev" href="../07-Input-Formats-And-Other-Sources/">
+      
+      
+        <link rel="next" href="../09-Working-With-History-Files/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Working With Change Files - Pyosmium 4.3.0</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../css/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#working-with-change-files" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Pyosmium 4.3.0" class="md-header__button md-logo" aria-label="Pyosmium 4.3.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Pyosmium 4.3.0
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Working With Change Files
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  User Manual
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cookbooks/" class="md-tabs__link">
+          
+  
+  
+  Cookbooks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Pyosmium 4.3.0" class="md-nav__button md-logo" aria-label="Pyosmium 4.3.0" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Pyosmium 4.3.0
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/osmcode/pyosmium" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Manual
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Manual
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-First-Steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    First Steps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-Extracting-Object-Data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OSM Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-Working-with-Geometries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Geometries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-Working-with-Filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pre-Filtering Input Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-Working-with-Handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Handler-based Processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Writing-Data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-Input-Formats-And-Other-Sources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input Formats and Other Sources
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working With Change Files
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working With Change Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#osm-change-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OSM change files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#about-replication-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        About replication services
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-vs-simplified-change-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full vs. simplified change files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referential-integrity-of-change-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referential integrity of change files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#strategies-for-resolving-forward-and-backward-references-for-change-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strategies for resolving forward and backward references for change files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Strategies for resolving forward and backward references for change files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#following-changes-on-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Following changes on nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#following-changes-on-ways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Following changes on ways
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keeping-a-full-planet-snapshot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keeping a full planet snapshot
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-Working-With-History-Files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working With History Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-Replication-Tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbooks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Cookbooks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Enhance-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enhancing Tags in an OSM File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filtering-Data-By-Tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filtering an OSM File By Tags
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Filter-Data-By-Geometry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filtering by Geometry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Node-Infos-To-Boundaries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Place Node Information to Boundary Relations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Adding-Route-Info-To-Ways/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding Relation Information to Member Ways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cookbooks/Visualizing-Data-With-Geopandas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualising Data With GeoPandas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Dataclasses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OSM Data Containers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/File-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iterative Data Reading
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Handler-Processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Handlers and Handler Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Data-Writers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Writers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/IO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IO Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Geometry-Functions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geometry Processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Area/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Area Building
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Indexes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Indexes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Replication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/Thread-Safety/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Thread Safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="working-with-change-files">Working With Change Files<a class="headerlink" href="#working-with-change-files" title="Permanent link">🔗</a></h1>
+<p>OpenStreetMap is a database that is constantly changing. Data is added,
+improved and refined by the thousands of contributors around the world.
+A standard OpenStreetMap data file, like the "planet file" only represents
+a <em>snapshot</em> of the OpenStreetMap database: the state of the world at a given
+point in time. For many applications it is completely sufficient to work
+with such a snapshot. To get the latest version of the data, they can
+simply download another snapshot and process the data from scratch.
+For some applications, however, it is necessary to keep their view of
+OpenStreetMap always up-to-date with the latest version of the data.
+This is where <em>OSM change files</em> (also known as <em>OSM diff files</em>)
+come into play.</p>
+<h2 id="osm-change-files">OSM change files<a class="headerlink" href="#osm-change-files" title="Permanent link">🔗</a></h2>
+<p>OpenStreetMap is a database with immutable data: objects are never directly edited.
+Whenever you change an object, a new version of the object is created. In a similar
+vain, it is not really possible to delete an object. You can only create
+a new version of the object that is marked as being invisible.</p>
+<p>So, technically speaking an OSM database knows only one operation: adding a
+new version of an object. Change files are a collection of these additions to
+the main database over a given time period.</p>
+<p>When it comes to the file format and content an OSM change file does not
+differ greatly from a normal OSM file: a change file is a collection of nodes,
+ways and relations. There are just some meta attributes of the objects that
+are more relevant than before: the <strong>version</strong> number and the <strong>deleted</strong> flag. </p>
+<p>A single modification may describe one of three operations:</p>
+<ul>
+<li><strong>Creation.</strong> A new node, way or relation is added. It has always the
+  version number 1.</li>
+<li><strong>Modification.</strong> An existing object was directly modified: tags of the object,
+  the location of a node, the node list of a way or the member list of a
+  relation have been changed. A modified object has a version number larger
+  than 1 and the deleted flag is not set.</li>
+<li><strong>Deletion.</strong> The object has been marked as deleted. The deleted flag is
+  set to true. Delete objects are usually not included in normal snapshot files.
+  This is an important difference when working with change files.</li>
+</ul>
+<p>There is no explicit <em>undelete</em> operation. To undo a deletion, one can simply
+<em>modify</em> the object again and create a new version of the object with the
+delete flag set to false.</p>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>Undoing a deletion is an action that regularly happens in the
+OpenStreetMap database. It can, for example, happen when the edit of a
+user gets reverted because it was bogus.
+Always be prepared for an object to reappear.</p>
+</div>
+<h2 id="about-replication-services">About replication services<a class="headerlink" href="#about-replication-services" title="Permanent link">🔗</a></h2>
+<p>There are various ways to produce an OSM change file but the by far most
+important source of change files are <em>replication services</em>. These services
+publish in regular intervals all changes to the data that have happened in
+the area of interest.</p>
+<p>Change files from replication services are
+consecutively numbered. Each change is guaranteed to start exactly where
+the previous change ended, so that by applying one change after another to
+an existing planet (or extract), you can get a new complete snapshot
+that corresponds to a newer version of the OSM database.</p>
+<p>Each change file is accompanied by a state file which has information about
+the time of the change file. This can be used to find the right synchronisation
+point when working with OSM files from different sources.</p>
+<h2 id="full-vs-simplified-change-files">Full vs. simplified change files<a class="headerlink" href="#full-vs-simplified-change-files" title="Permanent link">🔗</a></h2>
+<p>A change file that comes from a replication service usually contains the
+full set of changes for a given time span. This means in particular that
+there may be multiple versions of the same object when it was changed
+multiple times in a very short time. In OSM, these kind of change files
+are referred to as being <em>full</em>.</p>
+<p>There are many use cases, where these intermediate versions
+are not really of interest. When updating a planet file, only the latest
+version of an object will remain. For these use cases, change files may be
+<em>simplified</em>. A simplified change file only keeps the latest version of
+each object. Programs like <code>pyosmium-get-changes</code> can produce either version
+of a change file. Usually, you want to work with simplified change files
+unless you are interested in the exact history of changes to OSM.</p>
+<h2 id="referential-integrity-of-change-files">Referential integrity of change files<a class="headerlink" href="#referential-integrity-of-change-files" title="Permanent link">🔗</a></h2>
+<p>We have previously discussed that the OSM data format is a topological format:
+ways contain references to nodes and relations can contain references to any
+kind of OSM object. This has two important implications for change files:</p>
+<ul>
+<li>
+<p><strong>Referential incompleteness</strong> 
+  When a way or relation is changed, then only the way or relation
+  itself will be included in a normal change file. This means, for example, that
+  you will usually not be able to reconstruct the geometry of a changed way
+  by looking at a change file alone. The necessary information about the
+  location of the way is saved in its nodes and these nodes will not be
+  present in the change file if they haven't been changed. You cannot
+  even rely on anything when a way or relation has been newly created: the
+  nodes or members the new object references may have been created
+  many months ago.</p>
+</li>
+<li>
+<p><strong>Indirect modifications</strong>
+  When a node that is part of a way is moved to a different location, then the
+  geometry of the way is changed. The OSM change file, however, will only contain
+  the new version of the node with the new location. The way itself has not
+  been changed: it still refers to the same list of nodes. Therefore the way
+  does not appear in the change file even though it might need to be updated
+  in your data.</p>
+</li>
+</ul>
+<p>The reminder of this section discusses how references can be resolved when
+working with change files.</p>
+<h2 id="strategies-for-resolving-forward-and-backward-references-for-change-files">Strategies for resolving forward and backward references for change files<a class="headerlink" href="#strategies-for-resolving-forward-and-backward-references-for-change-files" title="Permanent link">🔗</a></h2>
+<p>A change file can only ever fully interpreted in conjunction with a snapshot
+of the planet that corresponds to the time of the first change in the
+change file. Keeping such a planet snapshot is unfortunately not an easy
+task because of the sheer size of the full planet data. However, there are
+some shortcuts available depending on what kind of data you are interested in.</p>
+<h3 id="following-changes-on-nodes">Following changes on nodes<a class="headerlink" href="#following-changes-on-nodes" title="Permanent link">🔗</a></h3>
+<p>If you are only working with OSM nodes, no special provision are necessary.
+Every change in a node will make it appear in the change file.</p>
+<h3 id="following-changes-on-ways">Following changes on ways<a class="headerlink" href="#following-changes-on-ways" title="Permanent link">🔗</a></h3>
+<p>Ways reference nodes. To derive the node geometry of a changed way, you need
+to keep track of the location of each node. This process is very similar to
+the process of tracking nodes when
+<a href="../03-Working-with-Geometries/#line-geometries">creating way geometries</a>.
+You need to add a location cache when processing the change file. The
+main difference is that the location cache needs to made persistent in a file
+and that it needs to be pre-filled from the locations in your reference
+planet. You can use the location storage type <code>sparse_file_array</code> to
+create a persistent file which can be updated. Be aware that such a file
+is around 100GB in size these days. Populate the file by running with
+your planet file (here called <code>planet.osm.pbf</code>) as follows:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><span class="kn">import</span><span class="w"> </span><span class="nn">osmium</span>
+</span><span id="__span-0-2">
+</span><span id="__span-0-3"><span class="k">with</span> <span class="n">osmium</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="s2">&quot;planet.osm.pbf, osmium.osm.osm_entity_bits.NODE) as reader:</span>
+</span><span id="__span-0-4">    <span class="n">idx</span> <span class="o">=</span> <span class="n">osmium</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">create_map</span><span class="p">(</span><span class="s2">&quot;sparse_file_array,nodecache.data&quot;</span><span class="p">)</span>
+</span><span id="__span-0-5">
+</span><span id="__span-0-6">    <span class="n">osmium</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">osmium</span><span class="o">.</span><span class="n">NodeLocationsForWays</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
+</span></code></pre></div>
+<p>After this has run the file <code>nodecache.data</code> will contain location of all nodes
+that were found in the input file. Subsequently you can use the node cache
+with your change file just as described in the Geometry chapter:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><span class="kn">import</span><span class="w"> </span><span class="nn">osmium</span>
+</span><span id="__span-1-2">
+</span><span id="__span-1-3"><span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">osmium</span><span class="o">.</span><span class="n">FileProcessor</span><span class="p">(</span><span class="s2">&quot;mychange.osm.xml&quot;</span><span class="p">)</span>\
+</span><span id="__span-1-4">                 <span class="o">.</span><span class="n">with_locations</span><span class="p">(</span><span class="s2">&quot;sparse_file_array,nodecache.data&quot;</span><span class="p">):</span>
+</span><span id="__span-1-5">    <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">is_way</span><span class="p">():</span>
+</span><span id="__span-1-6">        <span class="n">coords</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">lon</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">n</span><span class="o">.</span><span class="n">lat</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">valid</span><span class="p">()))</span>
+</span><span id="__span-1-7">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Way </span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">: LINESTRING(</span><span class="si">{</span><span class="n">coords</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Note that this piece of code not only uses the locations from the cache file
+but it also <strong>updates</strong> the cache file with the locations from your change file.
+This is usually what you want. You can process subsequent change file and
+always have the reference to the corresponding locations.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>In theory there are no restrictions to which nodes may be references by
+a way. Thus, in theory, you always need to keep the
+full set of node location that exist in OSM. In practise, edits mostly
+happen in a confined area. Therefore, when your geographic area of
+interest is limited, it is sufficient to only keep the node locations
+that fall within that area. Just add a large enough buffer zone to
+account for nodes being moved around.</p>
+</div>
+<h2 id="keeping-a-full-planet-snapshot">Keeping a full planet snapshot<a class="headerlink" href="#keeping-a-full-planet-snapshot" title="Permanent link">🔗</a></h2>
+<p>After a full planet or an extract has been downloaded, it first needs to be
+brought in sync with the replication source of change files you are using.
+This is easiest done with the
+<a href="../10-Replication-Tools/#updating-a-planet-or-extract">pyosmium-up-to-date</a> tool.
+It takes an OSM file and a replication source and creates a new OSM file
+which is perfectly synchronised with the replication source. It will also
+tell you what the sequence number is of the next file to download. Use this
+sequence number to get the next change file. You can either download a
+single change file or use
+<a href="../10-Replication-Tools/#creating-change-files-for-updating-databases">pyosmium-get-changes</a> to download multiple change files at once and combine them.</p>
+<p>Now that you have the change file, you can use the synchronised planet to
+look up any missing OSM objects referenced in the file. Once you are done with
+processing, you need to merge the synchronised planet with the change file,
+for example using
+<a href="https://docs.osmcode.org/osmium/latest/osmium-apply-changes.html">osmium apply-changes</a>.
+After that you have a new synchronised planet ready for processing with the
+next change file.</p>
+<p>If you regularly work with change data, have a look at
+<a href="https://osm2pgsql.org/">osm2pgsql</a>. This is an application that stores OSM
+data in a PostgreSQL database and also handles updates and change files.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Sarah Hoffmann
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
