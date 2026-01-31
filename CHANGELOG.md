@@ -4,6 +4,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.3.0] - 2026-01-31
+
+### Added
+
+- explicit thread pool management
+- more sections in manual: on history and diff files and writers
+
+### Fixed
+
+- issue with pyosmium scripts not properly returning on Windows
+
+### Changed
+
+- updated to libosmium 2.23.0
+- use per-reader/writer thread pools instead of libosmium's global pool
+- replace boost iterator with simple C++ iteration tools from stdlib
+- drop dependency on boost
+
 ## [4.2.0] - 2025-10-21
 
 ### Added
@@ -15,13 +33,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - restore packaging of README
 - use replace() instead of rename() to make overwriting planet files on Windows
+  work
 
 ### Changed
 
 - pre-generate man pages for easier packaging
 - diff processing functions and tools now throw an Error when diffs are
-  requested that are older than then oldest available diff on the server
-- tools now error out, when the first diff download encounters a client
+  requested that are older than the oldest available diff on the server
+- tools now error out when the first diff download encounters a client
   error (HTTP 4xx)
 
 ## [4.1.1] - 2025-08-31
