@@ -42,6 +42,23 @@ def replication_server(httpserver):
 
 
 @pytest.fixture
+def replication_server_delete(httpserver):
+    def _state(seq):
+        seqtime = REPLICATION_BASE_TIME + dt.timedelta(hours=seq - REPLICATION_CURRENT)
+        timestamp = seqtime.strftime('%Y-%m-%dT%H\\:%M\\:%SZ')
+        return f"sequenceNumber={seq}\ntimestamp={timestamp}\n"
+
+    httpserver.no_handler_status_code = 404
+    httpserver.expect_request('/state.txt').respond_with_data(_state(REPLICATION_CURRENT))
+    for i in range(REPLICATION_BASE_SEQ, REPLICATION_CURRENT + 1):
+        httpserver.expect_request(f'/000/000/{i}.opl')\
+                  .respond_with_data(f"n{i} v2 dD")
+        httpserver.expect_request(f'/000/000/{i}.state.txt').respond_with_data(_state(i))
+
+    return httpserver.url_for('')
+
+
+@pytest.fixture
 def runner(replication_server):
     def _run(*args):
         return pyosmium_up_to_date(
@@ -77,6 +94,18 @@ def test_simple_update_override(runner, test_data):
 
     assert ids.nodes == [1]
     assert ids.relations == list(range(138, REPLICATION_CURRENT + 1))
+
+
+def test_simple_update_delete(replication_server_delete, test_data):
+    outfile = test_data("n138 v1 t2070-05-06T19:30:00Z x3 y5\nn139 v2 x3 y5\nn140 v3 x3 y5")
+
+    pyosmium_up_to_date(
+            ['--server', replication_server_delete, '--diff-type', 'opl', str(outfile)])
+
+    ids = IDCollector()
+    osmium.apply(outfile, ids)
+
+    assert ids.nodes == [140]
 
 
 def test_simple_update_new_file(runner, replication_server, test_data, tmp_path):
