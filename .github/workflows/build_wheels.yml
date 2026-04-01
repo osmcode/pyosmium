@@ -21,9 +21,9 @@ jobs:
            vcpkg: 'C:/vcpkg/installed/arm64-windows'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.14'
 
@@ -50,7 +50,7 @@ jobs:
            CIBW_ENVIRONMENT_WINDOWS: 'CMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"'
            CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: 'pipx run delvewheel repair --add-path ${{ matrix.vcpkg }}/bin/ --add-path ${{ matrix.vcpkg }}/debug/bin -w {dest_dir} {wheel}'
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: pyosmium-wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl

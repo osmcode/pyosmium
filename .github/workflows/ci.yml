@@ -7,7 +7,7 @@ jobs:
         runs-on: ubuntu-24.04
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Install packages
               run: |
@@ -24,7 +24,7 @@ jobs:
               run: mypy src
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: 3.8
 
@@ -35,7 +35,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: 3.9
 
@@ -46,7 +46,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.10"
 
@@ -57,7 +57,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.11
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.11"
 
@@ -68,7 +68,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.12
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.12"
 
@@ -79,7 +79,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.13
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.13"
 
@@ -90,7 +90,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.14
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.14"
                   allow-prereleases: true
@@ -102,7 +102,7 @@ jobs:
               shell: bash
 
             - name: Upload Artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: pyosmium-linux-x64-dist
                   path: dist
@@ -111,7 +111,7 @@ jobs:
         runs-on: ubuntu-24.04
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Install packages
               run: |
@@ -122,7 +122,7 @@ jobs:
                 pipx install flake8
 
             - name: Set up Python 3.13t
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.13t"
 
@@ -133,7 +133,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.14t
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.14t"
                   allow-prereleases: true
@@ -145,7 +145,7 @@ jobs:
               shell: bash
 
             - name: Upload Artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: pyosmium-linux-x64-dist-t
                   path: dist
@@ -161,15 +161,15 @@ jobs:
                 python-version: [3.8, 3.9, "3.10", "3.11", "3.12", "3.13"]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
 
-            - uses: actions/download-artifact@v4
+            - uses: actions/download-artifact@v7
               with:
                   name: pyosmium-linux-x64-dist
 
@@ -197,15 +197,15 @@ jobs:
         needs: build-default
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Set up Python 3.14
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: 3.14
                   allow-prereleases: true
 
-            - uses: actions/download-artifact@v4
+            - uses: actions/download-artifact@v8
               with:
                   name: pyosmium-linux-x64-dist
 
@@ -237,15 +237,15 @@ jobs:
                 python-version: ["3.13t", "3.14t"]
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
 
-            - uses: actions/download-artifact@v4
+            - uses: actions/download-artifact@v8
               with:
                   name: pyosmium-linux-x64-dist-t
 
@@ -316,7 +316,7 @@ jobs:
             CXX: ${{ matrix.cxx }}
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Clean up build environment
               run: |
@@ -337,7 +337,7 @@ jobs:
               shell: bash
               if: ${{ matrix.flavour == 'macos' }}
 
-            - uses: actions/setup-python@v5
+            - uses: actions/setup-python@v6
               with:
                   python-version: "${{ matrix.python }}"
                   allow-prereleases: true
@@ -394,9 +394,9 @@ jobs:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
-            - uses: actions/cache@v4
+            - uses: actions/cache@v5
               with:
                   path: |
                     C:/vcpkg_binary_cache
@@ -411,7 +411,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: 3.8
 
@@ -424,7 +424,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: 3.9
 
@@ -437,7 +437,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.10"
 
@@ -450,7 +450,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.11
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.11"
 
@@ -463,7 +463,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.12
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.12"
 
@@ -476,7 +476,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.13
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.13"
 
@@ -489,7 +489,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.14
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.14"
                   allow-prereleases: true
@@ -508,7 +508,7 @@ jobs:
                 delvewheel repair --add-path C:/vcpkg/installed/x64-windows/bin/ --add-path C:/vcpkg/installed/x64-windows/debug/bin dist/*.whl
 
             - name: 'Upload Artifact'
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: pyosmium-win64-dist
                   path: wheelhouse
@@ -520,9 +520,9 @@ jobs:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
-            - uses: actions/cache@v4
+            - uses: actions/cache@v5
               with:
                   path: |
                     C:/vcpkg_binary_cache
@@ -538,7 +538,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.13t
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.13t"
 
@@ -551,7 +551,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.14t
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.14t"
                   allow-prereleases: true
@@ -570,7 +570,7 @@ jobs:
                 delvewheel repair --add-path C:/vcpkg/installed/x64-windows/bin/ --add-path C:/vcpkg/installed/x64-windows/debug/bin dist/*.whl
 
             - name: 'Upload Artifact'
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: pyosmium-win64-dist-t
                   path: wheelhouse
@@ -589,15 +589,15 @@ jobs:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
 
-            - uses: actions/download-artifact@v4
+            - uses: actions/download-artifact@v8
               with:
                   name: pyosmium-win64-dist
 
@@ -647,15 +647,15 @@ jobs:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
 
-            - uses: actions/download-artifact@v4
+            - uses: actions/download-artifact@v8
               with:
                   name: pyosmium-win64-dist-t
 
