@@ -4,6 +4,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.3.1] - 2026-04-01
+
+### Fixed
+
+- regression in libosmium where deletions in extract diffs are not
+  handled correctly
+
+### Changed
+
+- updated to libosmium 2.23.1
+
+
 ## [4.3.0] - 2026-01-31
 
 ### Added

@@ -19,7 +19,7 @@ include(FetchContent)
 
 FetchContent_Declare(libosmium
                      GIT_REPOSITORY https://github.com/osmcode/libosmium
-                     GIT_TAG 9c49c960569c15dd09ff9eb9e9dce7f383ab6ed2 # release 2.23.0
+                     GIT_TAG 97dccf105391d410701ae8bd52170dc0ee041373 # release 2.23.1
                      SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contrib/libosmium
                      SOURCE_SUBDIR cmake
                      GIT_SUBMODULES_RECURSE OFF)

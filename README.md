@@ -38,6 +38,7 @@ command installs all required packages:
 pyosmium has the following dependencies:
 
  * [libosmium](https://github.com/osmcode/libosmium) >= 2.16.0
+   (versions 2.21.0 to 2.23.0 have a known issue when processing extract diffs)
  * [protozero](https://github.com/mapbox/protozero)
  * [cmake](https://cmake.org/)
  * [Pybind11](https://github.com/pybind/pybind11) >= 2.7
