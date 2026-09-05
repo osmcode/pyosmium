@@ -207,13 +207,18 @@ jobs:
         runs-on: ubuntu-24.04
         needs: build-default
 
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ["14", "15"]
+
         steps:
             - uses: actions/checkout@v7
 
-            - name: Set up Python 3.14
+            - name: Set up Python 3.${{ matrix.python-version }}
               uses: actions/setup-python@v7
               with:
-                  python-version: 3.14
+                  python-version: 3.${{ matrix.python-version }}
                   allow-prereleases: true
 
             - uses: actions/download-artifact@v8
@@ -224,7 +229,7 @@ jobs:
               run: |
                 pip install virtualenv
                 virtualenv osmium-test
-                WHEEL=`ls osmium*314-*.whl`
+                WHEEL=`ls osmium*3${{ matrix.python-version }}-*.whl`
                 ./osmium-test/bin/pip install ${WHEEL}
                 ./osmium-test/bin/pip install pytest pytest-httpserver pytest-run-parallel
               shell: bash
