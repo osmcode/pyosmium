@@ -7,7 +7,7 @@ jobs:
         runs-on: ubuntu-24.04
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Install packages
               run: |
@@ -24,7 +24,7 @@ jobs:
               run: mypy src
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: 3.8
 
@@ -35,7 +35,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: 3.9
 
@@ -46,7 +46,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.10"
 
@@ -57,7 +57,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.11
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.11"
 
@@ -68,7 +68,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.12
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.12"
 
@@ -79,7 +79,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.13
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.13"
 
@@ -90,12 +90,23 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.14
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.14"
-                  allow-prereleases: true
 
             - name: Build package 3.14
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+
+            - name: Set up Python 3.15
+              uses: actions/setup-python@v7
+              with:
+                  python-version: "3.15"
+                  allow-prereleases: true
+
+            - name: Build package 3.15
               run: |
                 pip install build wheel
                 python -m build
@@ -111,7 +122,7 @@ jobs:
         runs-on: ubuntu-24.04
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Install packages
               run: |
@@ -122,7 +133,7 @@ jobs:
                 pipx install flake8
 
             - name: Set up Python 3.13t
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.13t"
 
@@ -133,7 +144,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.14t
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.14t"
                   allow-prereleases: true
@@ -161,10 +172,10 @@ jobs:
                 python-version: [3.8, 3.9, "3.10", "3.11", "3.12", "3.13"]
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
@@ -197,10 +208,10 @@ jobs:
         needs: build-default
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Set up Python 3.14
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: 3.14
                   allow-prereleases: true
@@ -237,10 +248,10 @@ jobs:
                 python-version: ["3.13t", "3.14t"]
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
@@ -316,7 +327,7 @@ jobs:
             CXX: ${{ matrix.cxx }}
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Clean up build environment
               run: |
@@ -337,7 +348,7 @@ jobs:
               shell: bash
               if: ${{ matrix.flavour == 'macos' }}
 
-            - uses: actions/setup-python@v6
+            - uses: actions/setup-python@v7
               with:
                   python-version: "${{ matrix.python }}"
                   allow-prereleases: true
@@ -394,9 +405,9 @@ jobs:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
-            - uses: actions/cache@v5
+            - uses: actions/cache@v6
               with:
                   path: |
                     C:/vcpkg_binary_cache
@@ -411,7 +422,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.8
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: 3.8
 
@@ -424,7 +435,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.9
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: 3.9
 
@@ -437,7 +448,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.10
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.10"
 
@@ -450,7 +461,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.11
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.11"
 
@@ -463,7 +474,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.12
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.12"
 
@@ -476,7 +487,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.13
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.13"
 
@@ -489,12 +500,25 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.14
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.14"
-                  allow-prereleases: true
 
             - name: Build package 3.14
+              run: |
+                pip install build wheel
+                python -m build
+              shell: bash
+              env:
+                  CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+            - name: Set up Python 3.15
+              uses: actions/setup-python@v7
+              with:
+                  python-version: "3.15"
+                  allow-prereleases: true
+
+            - name: Build package 3.15
               run: |
                 pip install build wheel
                 python -m build
@@ -520,9 +544,9 @@ jobs:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
-            - uses: actions/cache@v5
+            - uses: actions/cache@v6
               with:
                   path: |
                     C:/vcpkg_binary_cache
@@ -538,7 +562,7 @@ jobs:
               shell: bash
 
             - name: Set up Python 3.13t
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.13t"
 
@@ -551,7 +575,7 @@ jobs:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
             - name: Set up Python 3.14t
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.14t"
                   allow-prereleases: true
@@ -589,10 +613,10 @@ jobs:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
@@ -647,10 +671,10 @@ jobs:
             PYTEST_ADDOPTS: ${{ matrix.test-args }}
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v6
+              uses: actions/setup-python@v7
               with:
                   python-version: ${{ matrix.python-version }}
                   allow-prereleases: true
