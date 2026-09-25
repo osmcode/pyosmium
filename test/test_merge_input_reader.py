@@ -99,3 +99,79 @@ def test_multibuffer_simplify(adder, tmp_path):
     mir.apply(h, simplify=True)
 
     assert h.data == ['N1/1', 'N2/1', 'W3/2']
+
+
+def test_simplify_same_id_different_object(tmp_path):
+    mir = osmium.MergeInputReader()
+
+    opls = ["""\
+            n1 v1 x1 y1
+            n2 v1 x90 y45
+            w1 v1 Nn1,n2
+            r1 v1 Mw1@
+            """,
+            """\
+            r1 v2 Mw1@ Thello=world
+            """]
+
+    for opl in opls:
+        add_as_file(mir, opl, tmp_path)
+
+    h = ListHandler()
+    mir.apply(h, simplify=True)
+
+    assert h.data == ['N1/1', 'N2/1', 'W1/1', 'R1/2']
+
+
+def test_apply_to_reader_nohistory(test_data, tmp_path):
+    fn = test_data("""\
+            n1 v1 x1 y1
+            n2 v1 x90 y45
+            w1 v1 Nn1,n2
+            r1 v1 Mw1@
+            """)
+
+    outfn = tmp_path / 'outfile_apply_to_reader_nohistory.opl'
+
+    reader = osmium.io.Reader(fn)
+    writer = osmium.io.Writer(outfn)
+
+    mir = osmium.MergeInputReader()
+    add_as_buffer(mir, "r1 v2 Mw1@ Thello=world", tmp_path)
+
+    mir.apply_to_reader(reader, writer, False)
+
+    reader.close()
+    writer.close()
+
+    h = ListHandler()
+    osmium.apply(outfn, h)
+
+    assert h.data == ['N1/1', 'N2/1', 'W1/1', 'R1/2']
+
+
+def test_apply_to_reader_with_history(test_data, tmp_path):
+    fn = test_data("""\
+            n1 v1 x1 y1
+            n2 v1 x90 y45
+            w1 v1 Nn1,n2
+            r1 v1 Mw1@
+            """)
+
+    outfn = tmp_path / 'outfile_apply_to_reader_nohistory.opl'
+
+    reader = osmium.io.Reader(fn)
+    writer = osmium.io.Writer(outfn)
+
+    mir = osmium.MergeInputReader()
+    add_as_buffer(mir, "r1 v2 Mw1@ Thello=world", tmp_path)
+
+    mir.apply_to_reader(reader, writer, True)
+
+    reader.close()
+    writer.close()
+
+    h = ListHandler()
+    osmium.apply(outfn, h)
+
+    assert h.data == ['N1/1', 'N2/1', 'W1/1', 'R1/1', 'R1/2']
