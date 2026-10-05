@@ -2,7 +2,7 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 """ Helper functions to communicate with replication servers.
 """
@@ -64,8 +64,7 @@ class ReplicationServer:
             state. If the replication service serves something other
             than osc.gz files, set the `diff_type` to the given file suffix.
         """
-
-        self.baseurl = url
+        self.baseurl = url.rstrip('/') + '/'
         self.diff_type = diff_type
         self.extra_request_params: Dict[str, Any] = dict(timeout=60, stream=True)
         self.session: Optional[requests.Session] = None
@@ -484,15 +483,15 @@ class ReplicationServer:
             service.
         """
         if seq is None:
-            return self.baseurl + '/state.txt'
+            return self.baseurl + 'state.txt'
 
-        return '%s/%03i/%03i/%03i.state.txt' % \
+        return '%s%03i/%03i/%03i.state.txt' % \
                (self.baseurl, seq / 1000000, (seq % 1000000) / 1000, seq % 1000)
 
     def get_diff_url(self, seq: int) -> str:
         """ Returns the URL to the diff file for the given sequence id.
         """
-        return '%s/%03i/%03i/%03i.%s' % \
+        return '%s%03i/%03i/%03i.%s' % \
                (self.baseurl,
                 seq / 1000000, (seq % 1000000) / 1000, seq % 1000,
                 self.diff_type)

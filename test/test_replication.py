@@ -2,7 +2,7 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import logging
 import time
@@ -22,30 +22,52 @@ import osmium.replication
 pytestmark = [pytest.mark.thread_unsafe, pytest.mark.iterations(1)]
 
 
-@pytest.mark.parametrize("inp,outp", [
-        (None,      'https://text.org/state.txt'),
-        (1,         'https://text.org/000/000/001.state.txt'),
-        (999,       'https://text.org/000/000/999.state.txt'),
-        (1000,      'https://text.org/000/001/000.state.txt'),
-        (573923,    'https://text.org/000/573/923.state.txt'),
-        (3290012,   'https://text.org/003/290/012.state.txt'),
+@pytest.mark.parametrize("baseurl,inp,outp", [
+        ("https://text.org",  None,      'https://text.org/state.txt'),
+        ("https://text.org",  1,         'https://text.org/000/000/001.state.txt'),
+        ("https://text.org",  999,       'https://text.org/000/000/999.state.txt'),
+        ("https://text.org",  1000,      'https://text.org/000/001/000.state.txt'),
+        ("https://text.org",  573923,    'https://text.org/000/573/923.state.txt'),
+        ("https://text.org",  3290012,   'https://text.org/003/290/012.state.txt'),
+
+        ("https://text.org/",  None,      'https://text.org/state.txt'),
+        ("https://text.org/",  1,         'https://text.org/000/000/001.state.txt'),
+        ("https://text.org//", None,      'https://text.org/state.txt'),
+        ("https://text.org//", 1,         'https://text.org/000/000/001.state.txt'),
+
+        ("https://text.org/area-updates",    None,
+         'https://text.org/area-updates/state.txt'),
+        ("https://text.org/area-updates",    3290012,
+         'https://text.org/area-updates/003/290/012.state.txt'),
+        ("https://text.org/area-updates/",   None,
+         'https://text.org/area-updates/state.txt'),
+        ("https://text.org/area-updates/",   3290012,
+         'https://text.org/area-updates/003/290/012.state.txt'),
+        ("https://text.org/area-updates//",  None,
+         'https://text.org/area-updates/state.txt'),
+        ("https://text.org/area-updates//",  3290012,
+         'https://text.org/area-updates/003/290/012.state.txt'),
+        ("https://text.org/area-updates///", 3290012,
+         'https://text.org/area-updates/003/290/012.state.txt'),
     ])
-def test_get_state_url(inp, outp):
-    svr = rserv.ReplicationServer("https://text.org")
+def test_get_state_url(baseurl, inp, outp):
+    svr = rserv.ReplicationServer(baseurl)
 
     assert outp == svr.get_state_url(inp)
 
 
-@pytest.mark.parametrize("inp,outp", [
-        (1,         'https://who.is/me//000/000/001.osc.gz'),
-        (500,       'https://who.is/me//000/000/500.osc.gz'),
-        (83750,     'https://who.is/me//000/083/750.osc.gz'),
-        (999999999, 'https://who.is/me//999/999/999.osc.gz'),
-    ])
-def test_get_diff_url(inp, outp):
-    svr = rserv.ReplicationServer("https://who.is/me/")
+@pytest.mark.parametrize("baseurl,inp,outp", [
+        ("https://who.is/me/", 1,         'https://who.is/me/000/000/001.osc.gz'),
+        ("https://who.is/me/", 500,       'https://who.is/me/000/000/500.osc.gz'),
+        ("https://who.is/me/", 83750,     'https://who.is/me/000/083/750.osc.gz'),
+        ("https://who.is/me/", 999999999, 'https://who.is/me/999/999/999.osc.gz'),
 
-    assert outp, svr.get_diff_url(inp)
+        ("https://who.is/me",  999999999, 'https://who.is/me/999/999/999.osc.gz'),
+    ])
+def test_get_diff_url(baseurl, inp, outp):
+    svr = rserv.ReplicationServer(baseurl)
+
+    assert outp == svr.get_diff_url(inp)
 
 
 @pytest.mark.parametrize("as_string", [True, False])
