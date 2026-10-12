@@ -79,7 +79,7 @@ Create a virtualenv with scikit-build-core and pybind11 preinstalled:
 
 Now compile pyosmium with:
 
-    /tmp/dev-venv/bin/pip --no-build-isolation --config-settings=editable.rebuild=true -Cbuild-dir=/tmp/build -ve.
+    /tmp/dev-venv/bin/pip install --no-build-isolation --config-settings=editable.rebuild=true -Cbuild-dir=/tmp/build -ve.
 
 
 ## Examples
