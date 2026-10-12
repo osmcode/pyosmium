@@ -73,7 +73,6 @@ public:
     pybind11::object get_or_create_python_object()
     {
         if (!m_valid) {
-            m_valid = true;
             if constexpr (std::is_same_v<T, osmium::Node>) {
                 m_pyobj = pybind11::module_::import("osmium.osm.types").attr("Node")(COSMNode{m_obj});
             } else if constexpr (std::is_same_v<T, osmium::Way>) {
@@ -87,6 +86,7 @@ public:
             }
         }
 
+        m_valid = true;
         return m_pyobj;
     }
 
