@@ -1,0 +1,13 @@
+root = true
+
+[Makefile]
+indent_style = tabs
+
+[*.yml]
+indent_style = space
+
+[*.py]
+indent_style = space
+
+# Currently lots of files where this fails (e.g. test fixtures)
+#indent_size = 4
