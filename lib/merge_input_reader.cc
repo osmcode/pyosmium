@@ -32,6 +32,7 @@ namespace {
      */
     class copy_first_with_id {
         osmium::io::Writer* writer;
+        osmium::item_type type = osmium::item_type::undefined;
         osmium::object_id_type id = 0;
 
     public:
@@ -44,10 +45,11 @@ namespace {
         }
 
         void push_back(const osmium::OSMObject& obj) {
-            if (obj.id() != id) {
+            if (obj.id() != id || obj.type() != type) {
                 if (obj.visible()) {
                     (*writer)(obj);
                 }
+                type = obj.type();
                 id = obj.id();
             }
         }

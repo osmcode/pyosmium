@@ -99,3 +99,29 @@ def test_multibuffer_simplify(adder, tmp_path):
     mir.apply(h, simplify=True)
 
     assert h.data == ['N1/1', 'N2/1', 'W3/2']
+
+
+def test_apply_to_reader_same_id_different_type(tmp_path):
+    mir = osmium.MergeInputReader()
+    mir.add_buffer(b"r1 v2 Mw1@", format='opl')
+
+    infile = tmp_path / 'input.opl'
+    infile.write_text(dedent("""\
+        n1 v1 x1 y1
+        w1 v1 Nn1
+        r1 v1 Mw1@
+        """))
+    outfile = tmp_path / 'output.opl'
+
+    reader = osmium.io.Reader(str(infile))
+    writer = osmium.io.Writer(str(outfile))
+    try:
+        mir.apply_to_reader(reader, writer)
+    finally:
+        reader.close()
+        writer.close()
+
+    h = ListHandler()
+    osmium.apply(str(outfile), h)
+
+    assert h.data == ['N1/1', 'W1/1', 'R1/2']
