@@ -419,9 +419,6 @@ jobs:
               with:
                 arch: amd64
 
-            - name: Install Ninja
-              run: pip install ninja
-
             - uses: actions/cache@v6
               with:
                   path: |
@@ -567,9 +564,6 @@ jobs:
               uses: ilammy/msvc-dev-cmd@v1
               with:
                 arch: amd64
-
-            - name: Install Ninja
-              run: pip install ninja
 
             - uses: actions/cache@v6
               with:

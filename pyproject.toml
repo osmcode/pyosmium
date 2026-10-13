@@ -69,6 +69,8 @@ pyosmium-up-to-date = "osmium.tools.pyosmium_up_to_date:main"
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.15"
+ninja.version = ">=1.11"
+ninja.make-fallback = false
 
 [tool.scikit-build.sdist]
 cmake = true
