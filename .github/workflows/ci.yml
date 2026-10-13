@@ -434,7 +434,7 @@ jobs:
             - name: Build package 3.8
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -447,7 +447,7 @@ jobs:
             - name: Build package 3.9
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -460,7 +460,7 @@ jobs:
             - name: Build package 3.10
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -473,7 +473,7 @@ jobs:
             - name: Build package 3.11
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -486,7 +486,7 @@ jobs:
             - name: Build package 3.12
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -499,7 +499,7 @@ jobs:
             - name: Build package 3.13
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -512,7 +512,7 @@ jobs:
             - name: Build package 3.14
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -526,7 +526,7 @@ jobs:
             - name: Build package 3.15
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -574,7 +574,7 @@ jobs:
             - name: Build package 3.13t
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -588,7 +588,7 @@ jobs:
             - name: Build package 3.14t
               run: |
                 pip install build wheel
-                python -m build
+                python -m build -C build-dir="$GITHUB_WORKSPACE/build/{state}-{wheel_tag}"
               shell: bash
               env:
                   CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
