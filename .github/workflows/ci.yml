@@ -717,7 +717,7 @@ jobs:
               shell: bash
               env:
                 PYVER: ${{ matrix.python-version }}
-              if: matrix.python-version != '3.14t'
+              if: matrix.python-version != '3.13t'
 
             - name: Install osmium (without shapely)
               run: |
@@ -729,7 +729,7 @@ jobs:
               shell: bash
               env:
                 PYVER: ${{ matrix.python-version }}
-              if: matrix.python-version == '3.14t'
+              if: matrix.python-version == '3.13t'
 
             - name: Run tests
               run: |
