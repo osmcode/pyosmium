@@ -408,9 +408,19 @@ jobs:
 
         env:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
+            CMAKE_GENERATOR: Ninja
+            CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
         steps:
             - uses: actions/checkout@v7
+
+            - name: Set up MSVC
+              uses: ilammy/msvc-dev-cmd@v1
+              with:
+                arch: amd64
+
+            - name: Install Ninja
+              run: pip install ninja
 
             - uses: actions/cache@v6
               with:
@@ -423,7 +433,7 @@ jobs:
               shell: bash
 
             - name: Install packages
-              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x86-windows
+              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x64-windows
               shell: bash
 
             - name: Set up Python 3.8
@@ -547,9 +557,19 @@ jobs:
 
         env:
             VCPKG_DEFAULT_BINARY_CACHE: C:/vcpkg_binary_cache
+            CMAKE_GENERATOR: Ninja
+            CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
         steps:
             - uses: actions/checkout@v7
+
+            - name: Set up MSVC
+              uses: ilammy/msvc-dev-cmd@v1
+              with:
+                arch: amd64
+
+            - name: Install Ninja
+              run: pip install ninja
 
             - uses: actions/cache@v6
               with:
@@ -563,7 +583,7 @@ jobs:
 
             - name: Install packages
               run: |
-                vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x86-windows
+                vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x64-windows
               shell: bash
 
             - name: Set up Python 3.13t
