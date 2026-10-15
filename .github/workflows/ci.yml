@@ -423,7 +423,7 @@ jobs:
               shell: bash
 
             - name: Install packages
-              run: vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x86-windows
+              run: vcpkg install bzip2 expat zlib lz4
               shell: bash
 
             - name: Set up Python 3.8
@@ -563,7 +563,7 @@ jobs:
 
             - name: Install packages
               run: |
-                vcpkg install bzip2:x64-windows expat:x64-windows zlib:x64-windows lz4:x86-windows
+                vcpkg install bzip2 expat zlib lz4
               shell: bash
 
             - name: Set up Python 3.13t
