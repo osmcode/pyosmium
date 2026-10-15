@@ -57,7 +57,7 @@ def get_replication_header(fname: str) -> ReplicationHeader:
                     LOG.warning("Sequence id '%d' in OSM file header is negative. Ignored.", seq)
                     seq = None
             except ValueError:
-                LOG.warning("Sequence id '%s' in OSM file header is not a number. Ignored.", seq)
+                LOG.warning("Sequence id '%s' in OSM file header is not a number. Ignored.", seqstr)
                 seq = None
         else:
             seq = None
