@@ -38,7 +38,6 @@ jobs:
           python -m cibuildwheel --output-dir wheelhouse
         shell: bash
         env:
-           CIBW_ENABLE: cpython-freethreading
            CIBW_ARCHS: "native"
            CIBW_SKIP: "*musllinux*"
            CIBW_TEST_REQUIRES: pytest pytest-httpserver
