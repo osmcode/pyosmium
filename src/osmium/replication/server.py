@@ -65,6 +65,15 @@ class ReplicationServer:
             than osc.gz files, set the `diff_type` to the given file suffix.
         """
 
+        # Canonicalize the baseurl to have exactle one trailing slash.
+        # Try to avoid calling `example.com/area-updates//state.txt`
+        # Don't turn `http://example.com/` into `http://example.com`
+        # Remove all trailing /'s then add one back
+        while url.endswith("/"):
+            url = url.rstrip("/")
+        # put a final / at the end
+        url = url + "/"
+
         self.baseurl = url
         self.diff_type = diff_type
         self.extra_request_params: Dict[str, Any] = dict(timeout=60, stream=True)
@@ -483,16 +492,19 @@ class ReplicationServer:
             i.e. the state file in the root directory of the replication
             service.
         """
-        if seq is None:
-            return self.baseurl + '/state.txt'
 
-        return '%s/%03i/%03i/%03i.state.txt' % \
+        # baseurl is guaranteed to end with /, as per __init__
+        if seq is None:
+            return self.baseurl + 'state.txt'
+
+        return '%s%03i/%03i/%03i.state.txt' % \
                (self.baseurl, seq / 1000000, (seq % 1000000) / 1000, seq % 1000)
 
     def get_diff_url(self, seq: int) -> str:
         """ Returns the URL to the diff file for the given sequence id.
         """
-        return '%s/%03i/%03i/%03i.%s' % \
+        # baseurl is guaranteed to end with /, as per __init__
+        return '%s%03i/%03i/%03i.%s' % \
                (self.baseurl,
                 seq / 1000000, (seq % 1000000) / 1000, seq % 1000,
                 self.diff_type)
