@@ -33,6 +33,7 @@ namespace {
     class copy_first_with_id {
         osmium::io::Writer* writer;
         osmium::object_id_type id = 0;
+        osmium::item_type type = osmium::item_type::undefined;
 
     public:
         using iterator_category = std::output_iterator_tag;
@@ -44,11 +45,12 @@ namespace {
         }
 
         void push_back(const osmium::OSMObject& obj) {
-            if (obj.id() != id) {
+            if (obj.id() != id || obj.type() != type) {
                 if (obj.visible()) {
                     (*writer)(obj);
                 }
                 id = obj.id();
+                type = obj.type();
             }
         }
 
@@ -67,7 +69,7 @@ public:
             osmium::item_type prev_type = osmium::item_type::undefined;
             osmium::object_id_type prev_id = 0;
             for (auto &item: objects) {
-                if (item.type() != prev_type || item.id() != prev_id) {
+                if (item.id() != prev_id || item.type() != prev_type) {
                     prev_type = item.type();
                     prev_id = item.id();
                     pyosmium::apply_item(item, handler);
