@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_OSM_BASE_OBJECTS_HPP
@@ -73,7 +73,6 @@ public:
     pybind11::object get_or_create_python_object()
     {
         if (!m_valid) {
-            m_valid = true;
             if constexpr (std::is_same_v<T, osmium::Node>) {
                 m_pyobj = pybind11::module_::import("osmium.osm.types").attr("Node")(COSMNode{m_obj});
             } else if constexpr (std::is_same_v<T, osmium::Way>) {
@@ -85,6 +84,7 @@ public:
             } else if constexpr (std::is_same_v<T, osmium::Changeset>) {
                 m_pyobj = pybind11::module_::import("osmium.osm.types").attr("Changeset")(COSMChangeset{m_obj});
             }
+            m_valid = true;
         }
 
         return m_pyobj;
