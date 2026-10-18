@@ -4,6 +4,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.3.2] - 2026-10-18
+
+### Added
+
+- support for Python 3.15
+
+### Fixed
+
+- MergeInputReader drops objects when IDs collide across OSM types
+- segfault when OSM object constructor is interrupted (thanks @t-miller)
+- bad variable in log output during replication (thanks @xovishnukosuri)
+
+### Changed
+
+- avoid double slashes in replication URLs (thanks @amandasaurus)
+- updated to protozero 1.8.2
+
 ## [4.3.1] - 2026-04-01
 
 ### Fixed

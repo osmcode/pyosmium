@@ -25,7 +25,7 @@ FetchContent_Declare(libosmium
                      GIT_SUBMODULES_RECURSE OFF)
 FetchContent_Declare(protozero
                      GIT_REPOSITORY https://github.com/mapbox/protozero
-                     GIT_TAG 89a55ad2962cca3adbe8383a4b6d9a8411352ef2 # release 1.8.1
+                     GIT_TAG af2f6e274e0a873a00e34d8c9ab99fca76898047 # release 1.8.2
                      SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contrib/protozero
                      SOURCE_SUBDIR cmake
                      GIT_SUBMODULES_RECURSE OFF)
