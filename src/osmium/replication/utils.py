@@ -2,7 +2,7 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 """ Helper functions for change file handling. """
 from typing import NamedTuple, Optional
@@ -57,7 +57,7 @@ def get_replication_header(fname: str) -> ReplicationHeader:
                     LOG.warning("Sequence id '%d' in OSM file header is negative. Ignored.", seq)
                     seq = None
             except ValueError:
-                LOG.warning("Sequence id '%s' in OSM file header is not a number. Ignored.", seq)
+                LOG.warning("Sequence id '%s' in OSM file header is not a number. Ignored.", seqstr)
                 seq = None
         else:
             seq = None
