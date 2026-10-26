@@ -79,6 +79,11 @@ def update_from_custom_server(start: ReplicationStart, options: Any) -> int:
             cookie_jar.load(options.cookie)
             svr.set_request_parameter('cookies', cookie_jar)
 
+        if options.user_agent is not None:
+            svr.set_request_parameter('headers',
+                                      {'User-Agent':
+                                       f"pyosmium/{pyosmium_release} - {options.user_agent}"})
+
         current = svr.get_state_info()
         if current is None:
             log.error("Cannot download state information. Is the replication URL correct?")
@@ -238,6 +243,8 @@ def get_arg_parser(from_main: bool = False) -> ArgumentParser:
                              'received cookies will be written to.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
+    parser.add_argument('--user-agent', dest='user_agent',
+                        help='Append given user-agent to default user-agent')
     parser.add_argument('--version', action='version',
                         version='pyosmium ' + pyosmium_release)
 
