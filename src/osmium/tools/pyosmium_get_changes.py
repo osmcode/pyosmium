@@ -108,6 +108,8 @@ def get_arg_parser(from_main: bool = False) -> ArgumentParser:
                         help='Do not deduplicate diffs.')
     parser.add_argument('--socket-timeout', dest='socket_timeout', type=int, default=60,
                         help='Set timeout for file downloads.')
+    parser.add_argument('--user-agent', dest='user_agent',
+                        help='Append given user-agent to default user-agent')
     parser.add_argument('--version', action='version', version='pyosmium ' + pyosmium_release)
 
     return parser
@@ -162,6 +164,11 @@ def pyosmium_get_changes(args: List[str]) -> int:
             cookie_jar = http.cookiejar.MozillaCookieJar(options.cookie)
             cookie_jar.load(options.cookie)
             svr.set_request_parameter('cookies', cookie_jar)
+
+        if options.user_agent is not None:
+            svr.set_request_parameter('headers',
+                                      {'User-Agent':
+                                       f"pyosmium/{pyosmium_release} - {options.user_agent}"})
 
         # Sanity check if server URL is correct and server is responding.
         current = svr.get_state_info()
