@@ -98,6 +98,7 @@ pybind11_add_module(filter
                     lib/tag_filter.cc
                     lib/id_filter.cc
                     lib/entity_filter.cc
+                    lib/not_filter.cc
                     lib/geo_interface_filter.cc)
 install(TARGETS filter DESTINATION osmium)
 target_link_libraries(filter PRIVATE ${OSMIUM_LIBRARIES})

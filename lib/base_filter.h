@@ -70,6 +70,7 @@ void init_tag_filter(pybind11::module &m);
 void init_id_filter(pybind11::module &m);
 void init_entity_filter(pybind11::module &m);
 void init_geo_interface_filter(pybind11::module &m);
+void init_not_filter(pybind11::module &m);
 
 } // namespace
 

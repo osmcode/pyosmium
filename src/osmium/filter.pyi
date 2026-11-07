@@ -6,8 +6,23 @@
 # For a full list of authors see the git log.
 from typing import Tuple, Iterable
 
-from ._osmium import BaseFilter
+from ._osmium import BaseFilter, HandlerLike
 from .osm import osm_entity_bits
+
+class NotFilter(BaseFilter):
+    """ Invert the result of a chain of filters.
+
+        An object passes if any wrapped filter would drop it. Wrapped filters
+        run in order and stop at the first drop, as in a normal filter chain.
+        Their side effects are preserved; inversion does not undo changes.
+    """
+    def __init__(self, *filters: HandlerLike) -> None:
+        """ Create an inverse filter from one or more handler-like filters.
+
+            The wrapper keeps the filters alive. `enable_for()` on this wrapper
+            restricts where inversion applies; other object types pass through.
+        """
+
 
 class EmptyTagFilter(BaseFilter):
     """ Filter class which only lets pass objects which have at least one tag.
@@ -40,14 +55,10 @@ class TagFilter(BaseFilter):
         (a filter that lets object pass that have tags with all the listed
         key-value pairs) you need to chain multiple TagFilter objects.
     """
-    def __init__(self, *tags: Tuple[str, str], invert: bool = False) -> None:
+    def __init__(self, *tags: Tuple[str, str]) -> None:
         """ Create a new filter object. The parameters list the key-value
             pairs by which the filter should choose objects. Each pair must
             be a tuple with two strings and at least one pair is required.
-
-            Set _invert_ to `True` to keep only objects which have none of
-            the listed key-value pairs, including objects without tags.
-            Types excluded by `enable_for()` still pass through unchanged.
         """
 
 

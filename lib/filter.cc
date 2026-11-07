@@ -24,5 +24,6 @@ PYBIND11_MODULE(filter, m)
     pyosmium::init_entity_filter(m);
     pyosmium::init_id_filter(m);
     pyosmium::init_geo_interface_filter(m);
+    pyosmium::init_not_filter(m);
 };
 

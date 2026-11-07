@@ -58,6 +58,30 @@ a custom handler that can be used in this function.
 
 The following section shortly describes the filters that are built into pyosmium.
 
+### NotFilter
+
+Use `NotFilter` to invert a filter or a whole chain. For example, to keep
+objects which are not tagged `landuse=forest`, including untagged objects:
+
+```python
+fp = osmium.FileProcessor('data.osm.pbf').with_filter(
+    osmium.filter.NotFilter(osmium.filter.TagFilter(('landuse', 'forest'))))
+```
+
+Multiple arguments form a normal filter chain inside the wrapper. An object
+passes `NotFilter(first, second)` if either filter would drop it; it is dropped
+only when both would let it pass. This differs from chaining two individually
+inverted filters. Nested `NotFilter` objects are supported.
+
+Wrapped filters run in order and stop at the first drop. Their side effects
+are preserved: inversion does not undo attributes or other changes made by a
+filter. The wrapper keeps its filters alive for as long as it exists.
+
+Call `enable_for()` on `NotFilter` to limit which object types are inverted;
+other types pass through unchanged. Restrictions on an inner filter still
+apply inside the chain: an inner filter skipped for an object lets it pass,
+and `NotFilter` inverts that result too.
+
 ### EmptyTagFilter
 
 This filter removes all objects that have no tags at all. Most of the nodes
@@ -227,20 +251,6 @@ Tags are given as two-element tuples.
                                .with_filter(osmium.filter.TagFilter(('highway','primary')))
                                .with_filter(osmium.filter.TagFilter(('surface','asphalt')))))
     ```
-
-To keep only objects that have none of the listed tags, set `invert=True`:
-
-!!! example
-    ```python
-    fp = osmium.FileProcessor('../data/liechtenstein.osm.pbf')\
-               .with_filter(osmium.filter.TagFilter(('highway', 'primary'),
-                                                    ('surface', 'asphalt'),
-                                                    invert=True))
-    ```
-
-This includes objects without tags. The option negates the whole OR predicate;
-chaining filters still combines them with AND. As with other filters,
-`enable_for()` leaves excluded object types unchanged.
 
 ### IdFilter
 
