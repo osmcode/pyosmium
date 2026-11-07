@@ -40,10 +40,14 @@ class TagFilter(BaseFilter):
         (a filter that lets object pass that have tags with all the listed
         key-value pairs) you need to chain multiple TagFilter objects.
     """
-    def __init__(self, *tags: Tuple[str, str]) -> None:
+    def __init__(self, *tags: Tuple[str, str], invert: bool = False) -> None:
         """ Create a new filter object. The parameters list the key-value
             pairs by which the filter should choose objects. Each pair must
             be a tuple with two strings and at least one pair is required.
+
+            Set _invert_ to `True` to keep only objects which have none of
+            the listed key-value pairs, including objects without tags.
+            Types excluded by `enable_for()` still pass through unchanged.
         """
 
 
