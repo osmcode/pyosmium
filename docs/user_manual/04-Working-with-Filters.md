@@ -228,6 +228,20 @@ Tags are given as two-element tuples.
                                .with_filter(osmium.filter.TagFilter(('surface','asphalt')))))
     ```
 
+To keep only objects that have none of the listed tags, set `invert=True`:
+
+!!! example
+    ```python
+    fp = osmium.FileProcessor('../data/liechtenstein.osm.pbf')\
+               .with_filter(osmium.filter.TagFilter(('highway', 'primary'),
+                                                    ('surface', 'asphalt'),
+                                                    invert=True))
+    ```
+
+This includes objects without tags. The option negates the whole OR predicate;
+chaining filters still combines them with AND. As with other filters,
+`enable_for()` leaves excluded object types unchanged.
+
 ### IdFilter
 
 This filter takes an iterable of numbers and lets only pass objects that

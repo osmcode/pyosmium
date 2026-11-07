@@ -28,7 +28,8 @@ struct Tag
 class TagFilter : public pyosmium::BaseFilter
 {
 public:
-    TagFilter(py::args args)
+    TagFilter(py::args args, bool invert)
+    : m_invert(invert)
     {
         if (args.empty()) {
             throw py::type_error{"Need tags to filter on."};
@@ -55,11 +56,11 @@ public:
         auto const &tags = o->tags();
         for (auto const &tag: m_tags) {
             if (tags.has_tag(tag.key.c_str(), tag.value.c_str())) {
-                return false;
+                return m_invert;
             }
         }
 
-        return true;
+        return !m_invert;
     }
 
     bool filter_changeset(pyosmium::PyOSMChangeset &o) override
@@ -67,15 +68,16 @@ public:
         auto const &tags = o.get()->tags();
         for (auto const &tag: m_tags) {
             if (tags.has_tag(tag.key.c_str(), tag.value.c_str())) {
-                return false;
+                return m_invert;
             }
         }
 
-        return true;
+        return !m_invert;
     }
 
 private:
     std::vector<Tag> m_tags;
+    bool m_invert;
 };
 
 }
@@ -85,7 +87,7 @@ namespace pyosmium {
 void init_tag_filter(pybind11::module &m)
 {
     py::class_<TagFilter, pyosmium::BaseFilter, BaseHandler>(m, "TagFilter")
-        .def(py::init<py::args>())
+        .def(py::init<py::args, bool>(), py::arg("invert") = false)
     ;
 }
 
