@@ -2,10 +2,11 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 import pytest
 import uuid
+import gc
 
 import osmium
 from helpers import CountingHandler
@@ -106,3 +107,45 @@ def test_thread_pool():
     assert pool.num_threads == 2
     assert pool.queue_size() == 0
     assert pool.queue_empty()
+
+
+class TestHandlerChainReferenceCounting:
+    """ Make sure that handler chains properly keep the references
+        of objects they use.
+    """
+
+    @pytest.fixture(autouse=True)
+    def init_example_data(self, test_data):
+        self.example_file = test_data("""
+          n1 x1 y2 Tfoo=bar
+          n2 x1 y3 Tthis=that
+        """)
+
+    def make_reader(self):
+        return osmium.io.Reader(self.example_file)
+
+    def test_filter_python_handler(self):
+        with self.make_reader() as rd:
+            for obj in osmium.OsmFileIterator(rd, CountingHandler()):
+                gc.collect()
+
+    def test_filter_native_handler(self):
+        with self.make_reader() as rd:
+            for obj in osmium.OsmFileIterator(rd, osmium.filter.EmptyTagFilter()):
+                gc.collect()
+
+    def test_fallback_python_handler(self):
+        with self.make_reader() as rd:
+            it = osmium.OsmFileIterator(rd, osmium.filter.KeyFilter('highway'))
+            it.set_filtered_handler(CountingHandler())
+            gc.collect()
+            for obj in it:
+                gc.collect()
+
+    def test_fallback_native_handler(self):
+        with self.make_reader() as rd:
+            it = osmium.OsmFileIterator(rd, osmium.filter.KeyFilter('highway'))
+            it.set_filtered_handler(osmium.filter.EmptyTagFilter())
+            gc.collect()
+            for obj in it:
+                gc.collect()

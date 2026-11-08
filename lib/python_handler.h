@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #ifndef PYOSMIUM_PYTHON_HANDLER_HPP
@@ -18,7 +18,7 @@ namespace pyosmium {
 class PythonHandler : public BaseHandler
 {
 public:
-    PythonHandler(pybind11::handle handler)
+    PythonHandler(pybind11::object handler)
     : m_handler(handler)
     {
         m_enabled_for = osmium::osm_entity_bits::nothing;
@@ -95,7 +95,7 @@ public:
         return false;
     }
 private:
-    pybind11::handle m_handler;
+    pybind11::object m_handler;
 };
 
 } // namespace

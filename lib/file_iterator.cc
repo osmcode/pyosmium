@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -118,7 +118,7 @@ public:
         m_filtered_handler = handler;
     }
 
-    void set_filtered_python_handler(pybind11::handle handler) {
+    void set_filtered_python_handler(pybind11::object handler) {
         m_filtered_python_handler = std::make_unique<pyosmium::PythonHandler>(handler);
         m_filtered_handler = m_filtered_python_handler.get();
     }
@@ -145,8 +145,7 @@ void init_osm_file_iterator(py::module &m)
              py::keep_alive<1, 2>())
         .def("set_filtered_handler", &OsmFileIterator::set_filtered_handler,
              py::keep_alive<1, 2>())
-        .def("set_filtered_handler", &OsmFileIterator::set_filtered_python_handler,
-             py::keep_alive<1, 2>())
+        .def("set_filtered_handler", &OsmFileIterator::set_filtered_python_handler)
         .def("__iter__", [](py::object const &self) { return self; })
         .def("__next__", &OsmFileIterator::next)
         ;
