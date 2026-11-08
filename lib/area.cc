@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 
@@ -63,7 +63,7 @@ class AreaManagerSecondPassHandler : public AreaManagerSecondPassHandlerBase
 {
 public:
     AreaManagerSecondPassHandler(MpManager *mp_manager, py::args args)
-    : AreaManagerSecondPassHandlerBase(mp_manager), m_args(args), m_handlers(m_args)
+    : AreaManagerSecondPassHandlerBase(mp_manager), m_handlers(args)
     {
         m_mp_manager->set_callback([this](osmium::memory::Buffer &&buffer) {
         for (auto &obj : buffer.select<osmium::Area>()) {
@@ -74,7 +74,6 @@ public:
     }
 
 private:
-    py::args m_args;
     pyosmium::HandlerChain m_handlers;
 
 };
@@ -143,8 +142,8 @@ PYBIND11_MODULE(area, m)
         .def("first_pass_handler", &AreaManager::first_pass_handler,
              py::return_value_policy::reference)
         .def("second_pass_handler", &AreaManager::second_pass_handler,
-             py::return_value_policy::take_ownership, py::keep_alive<1, 2>())
+             py::keep_alive<0, 1>())
         .def("second_pass_to_buffer", &AreaManager::second_pass_to_buffer,
-             py::keep_alive<1, 2>())
+             py::keep_alive<0, 1>())
     ;
 }
