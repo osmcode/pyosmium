@@ -9,21 +9,16 @@
 
 #include <osmium/osm.hpp>
 
+#include <map>
+#include <set>
+#include <string>
+#include <string_view>
+
 #include "base_filter.h"
 
 namespace py = pybind11;
 
 namespace {
-
-struct Tag
-{
-    Tag(std::string k, std::string v)
-    : key(std::move(k)), value(std::move(v))
-    {}
-
-    std::string key;
-    std::string value;
-};
 
 class TagFilter : public pyosmium::BaseFilter
 {
@@ -34,7 +29,6 @@ public:
             throw py::type_error{"Need tags to filter on."};
         }
 
-        m_tags.reserve(args.size());
         for (auto const &arg: args) {
             if (!py::isinstance<py::tuple>(arg)) {
                 throw py::type_error{"Each tag must be a tuple of (key, value)."};
@@ -45,37 +39,46 @@ public:
                 || !py::isinstance<py::str>(tag[1])) {
                 throw py::type_error{"Each tag must be a tuple of (key, value)."};
             }
-            m_tags.emplace_back(tag[0].cast<std::string>(),
-                                tag[1].cast<std::string>());
+            m_tags[tag[0].cast<std::string>()].insert(tag[1].cast<std::string>());
         }
     }
 
     bool filter(osmium::OSMObject const *o) override
     {
-        auto const &tags = o->tags();
-        for (auto const &tag: m_tags) {
-            if (tags.has_tag(tag.key.c_str(), tag.value.c_str())) {
-                return false;
-            }
-        }
-
-        return true;
+        return !has_matching_tag(o->tags());
     }
 
     bool filter_changeset(pyosmium::PyOSMChangeset &o) override
     {
-        auto const &tags = o.get()->tags();
-        for (auto const &tag: m_tags) {
-            if (tags.has_tag(tag.key.c_str(), tag.value.c_str())) {
-                return false;
-            }
-        }
-
-        return true;
+        return !has_matching_tag(o.get()->tags());
     }
 
 private:
-    std::vector<Tag> m_tags;
+    bool has_matching_tag(osmium::TagList const &tags) const
+    {
+        // With a single key, looking it up directly is faster than
+        // walking all tags of the object.
+        if (m_tags.size() == 1) {
+            auto const &[key, values] = *m_tags.begin();
+            char const *value = tags.get_value_by_key(key.c_str());
+            return value && values.count(std::string_view{value}) > 0;
+        }
+
+        for (auto const &tag: tags) {
+            auto const it = m_tags.find(std::string_view{tag.key()});
+            if (it != m_tags.end()
+                && it->second.count(std::string_view{tag.value()}) > 0
+                // Like TagList::has_tag(), only the first tag with a key counts.
+                && tags.get_value_by_key(tag.key()) == tag.value()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // std::less<> allows lookups by string_view without copying.
+    std::map<std::string, std::set<std::string, std::less<>>, std::less<>> m_tags;
 };
 
 }

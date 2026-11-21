@@ -25,7 +25,9 @@ def test_tag_filter_bad_arguments(kv):
 
 @pytest.mark.parametrize('tags,filt', [('foo=bar', [('foo', 'bar')]),
                                        ('a=1,b=2', [('x', 'x'), ('a', '1')]),
-                                       ('a=1,b=2', [('x', 'x'), ('b', '2')])
+                                       ('a=1,b=2', [('x', 'x'), ('b', '2')]),
+                                       ('a=1,b=2', [('a', '0'), ('a', '1'), ('a', '3')]),
+                                       ('a=1,b=2', [('a', '2'), ('b', '2')])
                                        ])
 def test_tag_filter_pass(opl_reader, tags, filt):
     data = f"""\
@@ -46,7 +48,10 @@ def test_tag_filter_pass(opl_reader, tags, filt):
 
 
 @pytest.mark.parametrize('tags,filt', [('foo=bar', [('foo', 'bars')]),
-                                       ('a=1,b=2', [('x', 'x'), ('a', '2')])
+                                       ('a=1,b=2', [('x', 'x'), ('a', '2')]),
+                                       ('a=1,b=2', [('a', '2')]),
+                                       ('a=1,a=2', [('a', '2')]),
+                                       ('a=1,a=2', [('a', '2'), ('x', 'x')])
                                        ])
 def test_tag_filter_fail(opl_reader, tags, filt):
     data = f"""\
