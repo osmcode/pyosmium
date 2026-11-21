@@ -2,11 +2,11 @@
 #
 # This file is part of pyosmium. (https://osmcode.org/pyosmium/)
 #
-# Copyright (C) 2024 Sarah Hoffmann <lonvia@denofr.de> and others.
+# Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
 # For a full list of authors see the git log.
 from typing import Tuple, Iterable
 
-from ._osmium import BaseFilter
+from ._osmium import BaseFilter, HandlerLike
 from .osm import osm_entity_bits
 
 class EmptyTagFilter(BaseFilter):
@@ -67,9 +67,20 @@ class IdFilter(BaseFilter):
             should let pass. It can be any iterable over ints.
         """
 
+class InvertFilter(BaseFilter):
+    """ Filter class which inverts the result of the given filters.
+
+        The filter accepts an object only when it is filtered by any
+        of the given filters in the handler chain.
+    """
+    def __init__(self, *handlers: HandlerLike) -> None:
+        """ Create a new filter object which inverts the given
+            handler chain.
+        """
 
 class GeoInterfaceFilter(BaseFilter):
-    """ Filter class, which adds a [__geo_interface__](https://gist.github.com/sgillies/2217756) attribute to object which have geometry information.
+    """ Filter class, which adds a [__geo_interface__](https://gist.github.com/sgillies/2217756)
+        attribute to objects which have geometry information.
 
         The filter can process node, way and area types. All other types
         will be dropped. To create geometries for ways, the location cache needs
