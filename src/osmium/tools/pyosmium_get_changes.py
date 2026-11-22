@@ -31,6 +31,7 @@ cookies to the server and will save received cookies to the jar file.
 """
 from typing import List
 import sys
+import re
 import logging
 from textwrap import dedent as msgfmt
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
@@ -209,9 +210,20 @@ def pyosmium_get_changes(args: List[str]) -> int:
                 log.error("Cannot find the end date/ID on the server.")
                 return 1
 
-        with SimpleWriter(outfile) as outhandler:
-            endseq = svr.apply_diffs(outhandler, startseq, max_size=max_size,
-                                     end_id=end_id, simplify=options.simplify)
+        format_name = options.outformat.split(',', 1)[0] if options.outformat else options.outfile
+        # PBF needs the actual download boundary before the writer opens.
+        if re.search(r'(?:^|\.)pbf(?:\.gz|\.bz2)?\Z', format_name):
+            diffs = svr.collect_diffs(startseq, max_size=max_size, end_id=end_id)
+            endseq = diffs.id if diffs is not None else None
+            header = (svr.make_replication_header(endseq, current)
+                      if endseq is not None and endseq >= startseq else None)
+            with SimpleWriter(outfile, header=header) as outhandler:
+                if diffs is not None:
+                    diffs.reader.apply(outhandler, simplify=options.simplify)
+        else:
+            with SimpleWriter(outfile) as outhandler:
+                endseq = svr.apply_diffs(outhandler, startseq, max_size=max_size,
+                                         end_id=end_id, simplify=options.simplify)
 
     # save cookies
     if options.cookie:

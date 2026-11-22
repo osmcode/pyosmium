@@ -246,6 +246,22 @@ class ReplicationServer:
 
         return diffs.id
 
+    def make_replication_header(self, sequence: int,
+                                state: Optional[OsmosisState] = None) -> oio.Header:
+        """ Create an Osmosis replication header for the given sequence.
+            If its state file is unavailable, omit the timestamp. A previously
+            downloaded state can be supplied to avoid fetching it again.
+        """
+        header = oio.Header()
+        header.set("osmosis_replication_base_url", requests.utils.urldefragauth(self.baseurl))
+        header.set("osmosis_replication_sequence_number", str(sequence))
+        if state is None or state.sequence != sequence:
+            state = self.get_state_info(sequence)
+        if state is not None and state.sequence == sequence:
+            header.set("osmosis_replication_timestamp",
+                       state.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        return header
+
     def apply_diffs_to_file(self, infile: str, outfile: str, start_id: int,
                             max_size: Optional[int] = None,
                             set_replication_header: bool = True,
@@ -291,15 +307,8 @@ class ReplicationServer:
         reader = oio.Reader(infile, thread_pool=thread_pool)
         has_history = reader.header().has_multiple_object_versions
 
-        h = oio.Header()
+        h = self.make_replication_header(diffs.id) if set_replication_header else oio.Header()
         h.has_multiple_object_versions = has_history
-        if set_replication_header:
-            h.set("osmosis_replication_base_url", self.baseurl)
-            h.set("osmosis_replication_sequence_number", str(diffs.id))
-            info = self.get_state_info(diffs.id)
-            if info is not None:
-                h.set("osmosis_replication_timestamp",
-                      info.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"))
         if extra_headers is not None:
             for k, v in extra_headers.items():
                 h.set(k, v)
@@ -452,7 +461,7 @@ class ReplicationServer:
                                     break
                                 ts = ts.replace(tzinfo=dt.timezone.utc)
 
-            except (URLError, IOError) as err:
+            except (URLError, IOError, ValueError) as err:
                 LOG.debug("Loading state info failed with: %s", str(err))
                 return None
 

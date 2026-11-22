@@ -157,6 +157,10 @@ omitted when you use minutely change files from openstreetmap.org.
 This simplifies multiple edits of the same element into the final change. If you want to
 retain the full version history specify `--no-deduplicate`.
 
+When saving to PBF (for example, `-o newchange.osc.pbf`), the file header
+also records the replication URL and the last sequence ID downloaded. It
+includes the timestamp for that sequence when the server provides it.
+
 `pyosmium-get-changes` loads only about 100MB worth of updates at once (about
 8 hours of planet updates). If you want more, then add a `--size` parameter.
 

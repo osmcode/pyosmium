@@ -148,6 +148,52 @@ def test_apply_diffs_endid(runner, tmp_path, replication_server, end_id, max_siz
     assert ids.relations == list(range(101, actual_end + 1))
 
 
+@pytest.mark.parametrize('filename,format_args,end_id,expected', [
+    ('delta.osc.pbf', [], 105, 105),
+    ('delta.bin', ['--format', 'osc.pbf,pbf_dense_nodes=false'], 110, 108),
+])
+def test_pbf_replication_header(runner, tmp_path, replication_server,
+                                filename, format_args, end_id, expected):
+    outfile = tmp_path / f'{uuid.uuid4()}-{filename}'
+    seqfile = tmp_path / f'{uuid.uuid4()}.seq'
+    assert 0 == runner('-I', 100, '--end-id', end_id, '-s', 1, '-f', seqfile,
+                       '-o', outfile, *format_args)
+
+    with osmium.io.Reader(osmium.io.File(outfile, 'pbf')) as reader:
+        header = reader.header()
+        assert header.get('osmosis_replication_sequence_number') == str(expected)
+        timestamp = REPLICATION_BASE_TIME + dt.timedelta(hours=expected - REPLICATION_CURRENT)
+        assert header.get('osmosis_replication_timestamp') == timestamp.strftime(
+            '%Y-%m-%dT%H:%M:%SZ')
+        assert header.get('osmosis_replication_base_url') == replication_server
+        ids = IDCollector()
+        osmium.apply(reader, ids)
+
+    assert ids.relations == list(range(101, expected + 1))
+    assert seqfile.read_text() == str(expected)
+
+
+@pytest.mark.parametrize('state_response,status', [
+    ('', 404),
+    ('sequenceNumber=invalid', 200),
+    ('sequenceNumber=2\ntimestamp=2017-08-26T11\\:04\\:02Z', 200),
+])
+def test_pbf_without_matching_state(runner, tmp_path, httpserver, state_response, status):
+    httpserver.expect_request('/state.txt').respond_with_data(
+        'sequenceNumber=2\ntimestamp=2017-08-26T11\\:04\\:02Z')
+    httpserver.expect_request('/000/000/001.opl').respond_with_data('n1 x1 y2')
+    httpserver.expect_request('/000/000/001.state.txt').respond_with_data(state_response,
+                                                                          status=status)
+    outfile = tmp_path / f'{uuid.uuid4()}.osc.pbf'
+    assert 0 == runner('-I', 0, '--end-id', 1, '-o', outfile)
+
+    with osmium.io.Reader(outfile) as reader:
+        header = reader.header()
+        assert header.get('osmosis_replication_base_url') == httpserver.url_for('')
+        assert header.get('osmosis_replication_sequence_number') == '1'
+        assert header.get('osmosis_replication_timestamp') == ''
+
+
 def test_change_id_too_old_for_replication_source(runner, tmp_path, replication_server, caplog):
     outfile = tmp_path / f"{uuid.uuid4()}.opl"
 
