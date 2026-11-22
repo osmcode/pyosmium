@@ -2,7 +2,7 @@
  *
  * This file is part of pyosmium. (https://osmcode.org/pyosmium/)
  *
- * Copyright (C) 2025 Sarah Hoffmann <lonvia@denofr.de> and others.
+ * Copyright (C) 2026 Sarah Hoffmann <lonvia@denofr.de> and others.
  * For a full list of authors see the git log.
  */
 #include <pybind11/pybind11.h>
@@ -23,6 +23,7 @@ PYBIND11_MODULE(filter, m)
     pyosmium::init_tag_filter(m);
     pyosmium::init_entity_filter(m);
     pyosmium::init_id_filter(m);
+    pyosmium::init_invert_filter(m);
     pyosmium::init_geo_interface_filter(m);
 };
 
