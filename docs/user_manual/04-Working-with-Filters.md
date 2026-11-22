@@ -228,6 +228,26 @@ Tags are given as two-element tuples.
                                .with_filter(osmium.filter.TagFilter(('surface','asphalt')))))
     ```
 
+### InvertFilter
+
+This filter can inverse the result of any other filter or filter chain.
+This can be useful when you want to exclude objects with certain tags. Be
+careful though, to use it as a global pre-filter as many objects in OSM have
+multiple primary tags. For example, an `InvertFilter(KeyFilter('building'))`
+may not only ignore buildings in the data set but also POIs like supermarkets
+when they are also tagged with a `building` tag.
+
+!!! example
+    ```python
+    print("Administrative boundaries that lack a admin_level tag:")
+    fp = osmium.FileProcessor('../data/liechtenstein.osm.pbf', entities=osmium.osm.RELATION)
+               .with_filter(osmium.filter.TagFilter('boundary', 'administrative'))
+               .with_filter(osmium.filter.InvertFilter(
+                                osmium.filter.KeyFilter('admin_level'))
+    for o in fp:
+        print(o)
+    ```
+
 ### IdFilter
 
 This filter takes an iterable of numbers and lets only pass objects that
